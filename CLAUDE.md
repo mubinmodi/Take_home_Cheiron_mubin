@@ -10,7 +10,7 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 
 ## Read first, in this order
 
-1. `docs/take-home-assignment.md`: the assignment, transcribed in full. The primary source.
+1. `docs/take-home-assignment.md`: the assignment, transcribed in full. The primary source. On this machine only (git-ignored, removed from GitHub 2026-10-04).
 2. `docs/take-home-rubric.md`: requirement IDs, scoring and submission checklist.
 3. `docs/harness-design.md`: the agreed design approach (goals, scope, counting rules, harness, loop, verifier, work order).
 4. `docs/hosted-deployment.md`: infrastructure and dependencies for a hosted version.
