@@ -137,9 +137,26 @@ The hosted mode refuses to start without Redis, Postgres and API keys (API keys 
 ## 2. How it works
 
 ```
-question ─► PLAN (the only model step) ─► GATE ─► RETRIEVE ─► COUNT ─► BUILD SPEC ─► VERIFY ─► response
-              typed Query Plan        validate,   all pages,   code   chart chosen   gate on      + run record
-              (or clarify/refuse)     repair once  match check  only   by code        every answer
+request ─► LOAD ─► SPLIT ─► PLAN ─► GATE ─► RETRIEVE ─► COUNT + BUILD SPEC ─► VERIFY ─► response + run record
+                            └ each part ──┘ └──────── then each part in turn ─────────┘
+                            (at most 3 parts: all are planned and gated first, then answered one by one)
+
+LOAD      follow-ups only: the earlier run's plan and request, by previous_run_id          code
+SPLIT     a message that asks several things becomes parts                                 code
+PLAN      the question → a typed Query Plan, or a clarification request, or a refusal       the model
+GATE      merge structured fields, check the plan against the catalog, repair once          code (+1 model call)
+RETRIEVE  every page from ClinicalTrials.gov; drug match check                             code
+COUNT +   count distinct trials; choose the chart type from the plan; build the spec        code
+BUILD SPEC  and the evidence
+VERIFY    re-derive every count and cited value from the trial records                     code
+
+Exits (each part ends in exactly one outcome):
+  PLAN      unsupported_query · clarification_required (options built by code from data)
+  GATE      unsupported_query · clarification_required when a field contradicts the question
+  RETRIEVE  scope_required (over 20,000 trials) · no_data · clarification_required ("which Merck?")
+  COUNT     no_data (nothing to plot, e.g. no trial reports a start date)
+  VERIFY    internal_error (verification_failed): the answer is withheld
+  any step  upstream_error / internal_error with a structured error; hosted: run_timeout after 30 s
 ```
 
 - **One model step.** A pydantic-ai agent turns the question (plus any structured fields, plus the previous plan for follow-ups) into a typed **Query Plan**: filters, operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`), what to group by (optionally with a second **series** dimension, "phases per year"), and a view or network kind. It may instead return a clarification request or a refusal. The model **never sees trial records** and **never outputs numbers, trial IDs or citations**.

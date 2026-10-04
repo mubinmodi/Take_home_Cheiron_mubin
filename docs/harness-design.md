@@ -80,12 +80,14 @@ The **capability catalog** is one versioned file. It feeds the planner prompt, t
 The model has one job: turn the question into a typed plan. The plan is either an executable plan, a request for clarification, or "unsupported".
 
 ```
-request → validate input → PLAN (LLM) → semantic gate → dry-plan compile ─┬─ ok → fetch pages
-                              ↑ repair once (structured validator errors) ─┘     → completeness gate
-                                                                                 → analyze → build chart
-                                                                                 → verify → respond
-                         ambiguous / unsupported → explicit outcome (clarification options or reason)
+request → validate input → load earlier run (follow-ups) → split into parts (code)
+   every part: PLAN (LLM) → semantic gate ─┬─ ok → field-conflict check → fetch every page (completeness gate)
+                  ↑ repair once ───────────┘       → sponsor ambiguity check → analyze → build chart
+                    (structured validator errors)  → verify → respond
+              ambiguous / unsupported / no data → explicit outcome (clarification options built by code, or reason)
 ```
+
+*Updated 2026-10-04 to match the build:* there is no separate dry-plan compile step (filters become API parameters during retrieval, in `cohort.build_params`); code splits multi-part messages before planning (all parts are planned and gated, then each is answered in turn); and code asks two clarifications of its own, when a structured field contradicts the question and when a sponsor name matches several lead sponsors.
 
 - The model never sees trial records, only the question and the catalog, so trial text can't inject instructions.
 - The model never calls tools. The pipeline calls typed functions with structured errors (`{code, message, retryable}`).
