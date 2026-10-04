@@ -1,0 +1,8 @@
+# What `gcloud run deploy --source .` uploads to Cloud Build: only what the Dockerfile needs.
+*
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!uv.lock
+!src/
+!src/**

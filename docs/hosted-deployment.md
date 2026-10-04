@@ -1,6 +1,6 @@
 # Hosted Deployment: Dependencies
 
-**Status:** Agreed direction (2026-10-03). The hosting platform is not chosen yet. **Hosting comes after a working local version** (user decision, 2026-10-03).
+**Status:** Agreed direction (2026-10-03). **Hosting comes after a working local version** (user decision, 2026-10-03). **Built 2026-10-04** on the smallest credible setup below (Cloud Run); see [What was built](#what-was-built-2026-10-04). Not yet deployed: that needs the user's cloud accounts.
 **Companion:** [harness-design.md](harness-design.md).
 
 ## The constraint that drives the hosted design
@@ -42,3 +42,23 @@ Not needed: vector database, run checkpointer, Kubernetes, separate API gateway.
 5. **Request handling:** synchronous with a hard ~30s deadline. Add `POST /runs` → `GET /runs/{id}` only if traces show deadline hits.
 
 **Smallest credible hosted setup:** Cloud Run + Upstash Redis + Neon Postgres + R2 + Langfuse cloud + a static frontend (all have free tiers).
+
+## What was built (2026-10-04)
+
+One codebase; `DEPLOYMENT=hosted` switches on the hosted dependencies and refuses to start without them.
+
+| Decision above | Built as | Where |
+|---|---|---|
+| API container on Cloud Run | Two-stage uv image, non-root, fonts for chart text, one worker; `deploy/cloud-run.sh` deploys from source with Secret Manager secrets, 60 s request timeout, 0–3 instances | `Dockerfile`, `deploy/` |
+| Redis: cache + shared rate limiter | GCRA token bucket in one Lua script (all instances share the 40/min budget), compressed page cache keyed by data timestamp, plus Idempotency-Keys and per-user counts. Degrades per instance if Redis fails | `shared_state.py` |
+| Postgres: run history | `runs` table (run ID, time, user, outcome, model calls, planner model, latency, question, full record as JSONB) via SQLAlchemy async + asyncpg; created on startup | `runs.py` |
+| Run bundles / R2 | Still deferred | — |
+| Secrets | Secret Manager, mounted as environment variables | `deploy/cloud-run.sh` |
+| Tracing | OpenTelemetry over OTLP to Langfuse when its keys are given | `telemetry.py`, `deploy/cloud-run.sh` |
+| 1. Cache key with data timestamp | Kept (`page_key`) | `ctgov/client.py` |
+| 2. Per-run page cap | Kept (`MAX_PAGES=20`) | `config.py` |
+| 3. Circuit breakers | One for ClinicalTrials.gov, one per planner model; an open model is skipped so the fallback answers at once | `breaker.py` |
+| 4. API key + per-user limit | `X-API-Key` on `POST /v1/query` (401), 30 questions/hour/user (429 + `Retry-After`) | `access.py`, `api.py` |
+| 5. ~30 s deadline | `RUN_DEADLINE_SECONDS=30` when hosted; unfinished parts end as `run_timeout` | `pipeline.py` |
+
+Deviations: no Alembic yet (one table, created with `IF NOT EXISTS`); the frontend stays served by the API rather than a separate static host. Tested with fakeredis and SQLite (`tests/test_hosted.py`) and end to end with `docker compose` (service + Redis 7 + Postgres 17).

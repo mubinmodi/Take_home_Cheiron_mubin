@@ -10,3 +10,6 @@ data/
 # Agent tooling: local issue tracker and skill configuration
 .scratch/
 docs/agents/
+
+# Built submission archive
+dist/
