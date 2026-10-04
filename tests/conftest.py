@@ -1,7 +1,7 @@
 """Shared fixtures: real ClinicalTrials.gov records (saved 2026-10-02) and a scripted planner."""
 
 import json
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +9,8 @@ import httpx
 import pytest
 import respx
 
+from clinical_trials_viz.api import create_app
+from clinical_trials_viz.config import Settings
 from clinical_trials_viz.ctgov.trial import Trial, parse_trial
 from clinical_trials_viz.models.plan import QueryPlan
 from clinical_trials_viz.planner import PlannerResult
@@ -65,3 +67,34 @@ class ScriptedPlanner:
 @pytest.fixture
 def http() -> httpx.AsyncClient:
     return httpx.AsyncClient()
+
+
+@pytest.fixture
+def settings(tmp_path) -> Settings:
+    return Settings(runs_dir=tmp_path / "runs", otel_exporter="none", ctgov_requests_per_minute=1000)
+
+
+@pytest.fixture
+def make_client(settings, ctgov):
+    """An HTTP client for the app, with the given planner and mocked ClinicalTrials.gov.
+
+    Unhandled errors come back as HTTP 500 responses (as for a real client) instead of being raised."""
+
+    async def make(planner) -> AsyncIterator[httpx.AsyncClient]:
+        app = create_app(settings, planner=planner, http=httpx.AsyncClient())
+        transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(transport=transport, base_url="http://test") as client,
+        ):
+            yield client
+
+    return make
+
+
+async def ask(make_client, planner, **body: Any) -> dict[str, Any]:
+    async for client in make_client(planner):
+        response = await client.post("/v1/query", json=body)
+        assert response.status_code == 200, response.text
+        return response.json()
+    raise AssertionError

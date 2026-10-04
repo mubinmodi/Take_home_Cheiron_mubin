@@ -1,5 +1,7 @@
 """OpenTelemetry setup: one trace per Run, spans per stage, plus HTTP and model spans."""
 
+import logging
+
 from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
@@ -26,3 +28,8 @@ def setup_tracing(exporter: str) -> None:
 
     HTTPXClientInstrumentor().instrument()
     Agent.instrument_all()
+
+
+def configure_logging(level: str) -> None:
+    """Send the service's warnings and errors (model failures, source errors, bugs with run IDs) to stderr."""
+    logging.basicConfig(level=level.upper(), format="%(asctime)s %(levelname)s %(name)s: %(message)s")

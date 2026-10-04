@@ -1,14 +1,9 @@
 """End-to-end through the HTTP API: scripted planner, mocked ClinicalTrials.gov, real everything else."""
 
-from collections.abc import AsyncIterator
-from typing import Any
-
 import httpx
-import pytest
 from pydantic_ai.messages import ModelMessage, ModelResponse, ToolCallPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
-from clinical_trials_viz.api import create_app
 from clinical_trials_viz.catalog import Dimension
 from clinical_trials_viz.config import Settings
 from clinical_trials_viz.models.plan import (
@@ -23,34 +18,7 @@ from clinical_trials_viz.models.plan import (
     UnsupportedPlan,
 )
 from clinical_trials_viz.planner import LLMPlanner
-from tests.conftest import ScriptedPlanner
-
-
-@pytest.fixture
-def settings(tmp_path) -> Settings:
-    return Settings(runs_dir=tmp_path / "runs", otel_exporter="none", ctgov_requests_per_minute=1000)
-
-
-@pytest.fixture
-def make_client(settings, ctgov):
-    async def make(planner) -> AsyncIterator[httpx.AsyncClient]:
-        app = create_app(settings, planner=planner, http=httpx.AsyncClient())
-        async with (
-            app.router.lifespan_context(app),
-            httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
-        ):
-            yield client
-
-    return make
-
-
-async def ask(make_client, planner, **body: Any) -> dict[str, Any]:
-    async for client in make_client(planner):
-        response = await client.post("/v1/query", json=body)
-        assert response.status_code == 200, response.text
-        return response.json()
-    raise AssertionError
-
+from tests.conftest import ScriptedPlanner, ask
 
 TREND = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"]), group_by=Dimension.START_YEAR)
 
@@ -208,7 +176,7 @@ def test_model_tiers_use_known_models_and_allowed_openai(monkeypatch):
 
     from pydantic_ai.models import KnownModelName
 
-    from clinical_trials_viz.config import MODEL_TIERS, Settings, disallowed_openai_models
+    from clinical_trials_viz.config import MODEL_TIERS, disallowed_openai_models
 
     known = set(typing.get_args(KnownModelName.__value__))
     names = [name for tier in MODEL_TIERS.values() for name in tier.values()]

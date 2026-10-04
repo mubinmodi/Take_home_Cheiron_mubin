@@ -9,6 +9,7 @@ from typing import Any
 import httpx
 
 from clinical_trials_viz.catalog import PAGE_SIZE, TRIAL_FIELDS
+from clinical_trials_viz.models.response import ErrorCode
 
 MAX_ATTEMPTS = 4
 RETRYABLE = frozenset({429, 500, 502, 503, 504})
@@ -23,7 +24,27 @@ def _retry_delay(response: httpx.Response, attempt: int) -> float:
 
 
 class UpstreamError(Exception):
-    """ClinicalTrials.gov failed or returned something unusable."""
+    """ClinicalTrials.gov failed or returned something unusable, after retries where retrying helps."""
+
+    def __init__(self, message: str, code: ErrorCode = ErrorCode.SOURCE_UNAVAILABLE, retryable: bool = True):
+        super().__init__(message)
+        self.code = code
+        self.retryable = retryable
+
+
+def _http_error(response: httpx.Response) -> UpstreamError:
+    status = response.status_code
+    if status == 429:
+        return UpstreamError(
+            "ClinicalTrials.gov rate limit reached; try again in a minute", ErrorCode.SOURCE_RATE_LIMITED
+        )
+    if status >= 500:
+        return UpstreamError(f"ClinicalTrials.gov is failing (HTTP {status})", ErrorCode.SOURCE_UNAVAILABLE)
+    return UpstreamError(
+        f"ClinicalTrials.gov rejected the request (HTTP {status}): {response.text[:200]}",
+        ErrorCode.SOURCE_REJECTED,
+        retryable=False,
+    )
 
 
 class ScopeTooLarge(Exception):
@@ -92,16 +113,22 @@ class CtGovClient:
                 response = await self._http.get(f"{self._base}{path}", params=params)
             except httpx.TransportError as exc:
                 if last:
-                    raise UpstreamError(f"ClinicalTrials.gov unreachable: {exc}") from exc
+                    raise UpstreamError(f"ClinicalTrials.gov unreachable: {type(exc).__name__}") from exc
                 await asyncio.sleep(2**attempt)
                 continue
             if response.status_code == 200:
-                return response.json()
+                try:
+                    return response.json()
+                except ValueError as exc:  # a maintenance page or truncated body instead of JSON
+                    if last:
+                        raise UpstreamError(
+                            "ClinicalTrials.gov returned a response that is not JSON",
+                            ErrorCode.SOURCE_INVALID_RESPONSE,
+                        ) from exc
+                    await asyncio.sleep(2**attempt)
+                    continue
             if response.status_code not in RETRYABLE or last:
-                detail = (
-                    "rate limit reached; try again in a minute" if response.status_code == 429 else response.text[:200]
-                )
-                raise UpstreamError(f"ClinicalTrials.gov returned HTTP {response.status_code}: {detail}")
+                raise _http_error(response)
             await asyncio.sleep(_retry_delay(response, attempt))
         raise UpstreamError("unreachable")  # pragma: no cover
 

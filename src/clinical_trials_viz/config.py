@@ -43,6 +43,12 @@ class Settings(BaseSettings):
     # Changing models is a configuration change, not a code change.
     planner_primary: str = MODEL_TIERS["mini"]["openai"]
     planner_fallback: str | None = MODEL_TIERS["mini"]["anthropic"]
+    # Each model attempt may take this long (the SDK defaults are 600 s with 2 retries, which would
+    # stall a request for minutes before the fallback runs); the whole planning step has a deadline.
+    planner_timeout_seconds: float = 20.0
+    planner_deadline_seconds: float = 60.0
+    render_timeout_seconds: float = 30.0  # one chart image
+    log_level: str = "WARNING"
 
     ctgov_base_url: str = "https://clinicaltrials.gov/api/v2"
     ctgov_requests_per_minute: int = 40  # stays under the reported ~50/min limit

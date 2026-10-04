@@ -61,12 +61,14 @@ async def _ask(body: dict[str, Any], *, full_json: bool, save_chart: bool) -> No
             if not (save_chart and answer.get("chart_url")):
                 continue
             image = await client.get(f"/v1/runs/{result['run_id']}/chart.png", params={"part": part})
-            if image.status_code == 200:
-                suffix = f"-part{part + 1}" if len(answers) > 1 else ""
-                path = get_settings().runs_dir.parent / "charts" / f"{result['run_id']}{suffix}.png"
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_bytes(image.content)
-                chart_paths[part] = path
+            if image.status_code != 200:  # the answer stands; only the picture is missing
+                answer.setdefault("warnings", []).append(f"Chart image not saved: {_error_text(image)}")
+                continue
+            suffix = f"-part{part + 1}" if len(answers) > 1 else ""
+            path = get_settings().runs_dir.parent / "charts" / f"{result['run_id']}{suffix}.png"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(image.content)
+            chart_paths[part] = path
     print(json.dumps(result, indent=2) if full_json else summarize(result, chart_paths))
 
 
@@ -93,6 +95,9 @@ def _answer_lines(a: dict[str, Any], run_id: str, chart_path: Path | None, query
     lines: list[str] = []
     if a.get("message") and a["outcome"] != "clarification_required":
         lines.append(a["message"])
+    if error := a.get("error"):
+        advice = "retrying later may help" if error["retryable"] else "retrying will not help"
+        lines.append(f"Error code: {error['code']} ({advice})")
     if spec := a.get("visualization"):
         lines += ["", spec["title"], *_data_lines(spec)]
     if clarification := a.get("clarification"):
@@ -114,9 +119,22 @@ def _answer_lines(a: dict[str, Any], run_id: str, chart_path: Path | None, query
         status = "passed" if verification["passed"] else f"FAILED ({', '.join(failed)})"
         lines.append(f"Verification: {status} ({len(verification['checks'])} checks) · "
                      f"{len(a.get('evidence', {}))} trials cited")  # fmt: skip
+    if warnings := a.get("warnings"):
+        lines += ["Warnings:", *(f"  - {w}" for w in warnings)]
     if chart_path:
         lines.append(f"Chart: {chart_path}")
     return lines
+
+
+def _error_text(response: Any) -> str:
+    """The message of an API error response, whatever its shape."""
+    try:
+        detail = response.json().get("detail")
+    except ValueError:
+        return f"HTTP {response.status_code}"
+    if isinstance(detail, dict):
+        return f"{detail.get('message')} [{detail.get('code')}]"
+    return str(detail)
 
 
 def _fmt(value: Any) -> str:

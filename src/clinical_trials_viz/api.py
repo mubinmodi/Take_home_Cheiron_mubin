@@ -1,13 +1,16 @@
 """HTTP API (FastAPI)."""
 
+import asyncio
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
 import httpx
-from fastapi import FastAPI, Header, HTTPException, Response
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, Header, HTTPException, Request, Response
+from fastapi.concurrency import run_in_threadpool
+from fastapi.responses import FileResponse, JSONResponse
 
 from clinical_trials_viz.config import Settings, get_settings
 from clinical_trials_viz.ctgov.client import CtGovClient
@@ -19,9 +22,15 @@ from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
 from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
 from clinical_trials_viz.runs import RunRecord, RunStore
-from clinical_trials_viz.telemetry import setup_tracing
+from clinical_trials_viz.telemetry import configure_logging, setup_tracing
 
 WEB_PAGE = Path(__file__).parent / "web" / "index.html"
+log = logging.getLogger(__name__)
+
+
+def http_error(status: int, code: str, message: str, retryable: bool = False) -> HTTPException:
+    """HTTP errors share one JSON shape: {"detail": {"code", "message", "retryable"}}."""
+    return HTTPException(status, {"code": code, "message": message, "retryable": retryable})
 
 
 def create_app(
@@ -29,6 +38,7 @@ def create_app(
 ) -> FastAPI:
     """Build the app. Tests pass a fake planner and a mocked HTTP client."""
     settings = settings or get_settings()
+    configure_logging(settings.log_level)
     setup_tracing(settings.otel_exporter)
 
     @asynccontextmanager
@@ -39,7 +49,13 @@ def create_app(
         )
         app.state.pipeline = Pipeline(
             client,
-            planner or build_planner(settings.planner_primary, settings.planner_fallback),
+            planner
+            or build_planner(
+                settings.planner_primary,
+                settings.planner_fallback,
+                timeout=settings.planner_timeout_seconds,
+                deadline=settings.planner_deadline_seconds,
+            ),
             RunStore(settings.runs_dir),
             settings.public_base_url,
         )
@@ -63,6 +79,13 @@ def create_app(
     def pipeline() -> Pipeline:
         return app.state.pipeline
 
+    @app.exception_handler(Exception)
+    async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+        """Anything not handled above: log it and answer in the same JSON shape as every other error."""
+        log.error("unhandled error on %s %s", request.method, request.url.path, exc_info=exc)
+        detail = {"code": "internal", "message": "Unexpected error; see the server log.", "retryable": False}
+        return JSONResponse(status_code=500, content={"detail": detail})
+
     @app.post("/v1/query", response_model=QueryResponse, response_model_exclude_none=True)
     async def query(
         request: QueryRequest,
@@ -82,9 +105,16 @@ def create_app(
             try:
                 replay = await keys.begin(idempotency_key, request)
             except KeyReused as exc:
-                raise HTTPException(422, "Idempotency-Key was already used for a different request") from exc
+                raise http_error(
+                    422, "idempotency_key_reused", "Idempotency-Key was already used for a different request"
+                ) from exc
             except KeyInProgress as exc:
-                raise HTTPException(409, "A request with this Idempotency-Key is still running; retry shortly") from exc
+                raise http_error(
+                    409,
+                    "request_in_progress",
+                    "A request with this Idempotency-Key is still running; retry shortly",
+                    True,
+                ) from exc
             if replay is not None and (record := pipeline().runs.load(replay)) is not None:
                 response.headers["Idempotent-Replayed"] = "true"
                 return record.response
@@ -93,7 +123,7 @@ def create_app(
         except RunNotFound as exc:
             if idempotency_key:
                 keys.abandon(idempotency_key)
-            raise HTTPException(404, f"previous_run_id {exc} not found") from exc
+            raise http_error(404, "run_not_found", f"previous_run_id {exc} not found") from exc
         except BaseException:
             if idempotency_key:
                 keys.abandon(idempotency_key)
@@ -106,7 +136,7 @@ def create_app(
     async def get_run(run_id: str) -> RunRecord:
         record = pipeline().runs.load(run_id)
         if record is None:
-            raise HTTPException(404, "run not found")
+            raise http_error(404, "run_not_found", "run not found")
         return record
 
     def visualization(run_id: str, part: int) -> VisualizationSpec:
@@ -115,16 +145,29 @@ def create_app(
         answers = [record.response, *record.response.additional_answers] if record else []
         spec = answers[part].visualization if 0 <= part < len(answers) else None
         if spec is None:
-            raise HTTPException(404, "no visualization for this run and part")
+            raise http_error(404, "no_visualization", "no visualization for this run and part")
         return spec
 
     @app.get("/v1/runs/{run_id}/chart.{fmt}")
     async def get_chart(run_id: str, fmt: Literal["png", "svg"], part: int = 0) -> Response:
         spec = visualization(run_id, part)
+        limit = settings.render_timeout_seconds
         try:
-            image = render(spec, fmt)
+            # Drawing is CPU work: run it off the event loop, with a time limit.
+            image = await asyncio.wait_for(run_in_threadpool(render, spec, fmt), limit)
         except NotRenderable as exc:
-            raise HTTPException(404, str(exc)) from exc
+            raise http_error(404, "not_renderable", str(exc)) from exc
+        except TimeoutError as exc:
+            log.warning("run %s part %d: drawing the chart took longer than %g s", run_id, part, limit)
+            raise http_error(504, "render_timeout", f"Drawing the chart took longer than {limit:g} s.", True) from exc
+        except Exception as exc:
+            log.error("run %s part %d: drawing the chart failed", run_id, part, exc_info=exc)
+            raise http_error(
+                500,
+                "render_failed",
+                f"The chart could not be drawn ({type(exc).__name__}); the visualization specification and "
+                "citations in the run are unaffected.",
+            ) from exc
         return Response(image, media_type="image/png" if fmt == "png" else "image/svg+xml")
 
     @app.get("/v1/runs/{run_id}/vega-lite.json")
@@ -135,7 +178,10 @@ def create_app(
         try:
             return to_vega_lite(spec)
         except NotRenderable as exc:
-            raise HTTPException(404, str(exc)) from exc
+            raise http_error(404, "not_renderable", str(exc)) from exc
+        except Exception as exc:
+            log.error("run %s part %d: Vega-Lite translation failed", run_id, part, exc_info=exc)
+            raise http_error(500, "render_failed", f"The chart could not be prepared ({type(exc).__name__}).") from exc
 
     @app.get("/", include_in_schema=False)
     async def page() -> FileResponse:

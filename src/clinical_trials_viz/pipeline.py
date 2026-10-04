@@ -10,14 +10,14 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 
 from opentelemetry import trace
-from pydantic_ai import ModelAPIError, UnexpectedModelBehavior, UsageLimitExceeded
 
 from clinical_trials_viz import clarify
 from clinical_trials_viz.analyze import breakdown, comparison_groups, cross_breakdown, enrollment_histogram
 from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS, DEFAULT_TOP_N, ENROLLMENT_FIELD, Dimension
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
-from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError
+from clinical_trials_viz.ctgov.client import CtGovClient, UpstreamError
 from clinical_trials_viz.ctgov.trial import Trial
+from clinical_trials_viz.failures import Failure, classify
 from clinical_trials_viz.models.plan import (
     AnswerPlan,
     ClarifyPlan,
@@ -29,11 +29,20 @@ from clinical_trials_viz.models.plan import (
     UnsupportedPlan,
 )
 from clinical_trials_viz.models.request import QueryRequest
-from clinical_trials_viz.models.response import Answer, AppliedFilters, Outcome, QueryResponse, SourceInfo
+from clinical_trials_viz.models.response import (
+    Answer,
+    AppliedFilters,
+    ErrorCode,
+    ErrorInfo,
+    Outcome,
+    QueryResponse,
+    SourceInfo,
+)
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import drug_drug_network, same_arm_pairs, sponsor_drug_network
-from clinical_trials_viz.planner import Planner, PlannerNotConfigured
+from clinical_trials_viz.planner import Planner
 from clinical_trials_viz.planning import plan_question
+from clinical_trials_viz.render import chart_problem
 from clinical_trials_viz.runs import RunStore, new_run_id
 from clinical_trials_viz.spec_builder import (
     breakdown_spec,
@@ -84,9 +93,14 @@ class _Run:
                 self.timings[name] = round((time.perf_counter() - start) * 1000, 1)
 
 
-def _finish(target: Answer, outcome: Outcome, message: str | None = None) -> None:
+def _finish(target: Answer, outcome: Outcome, message: str | None = None, error: ErrorInfo | None = None) -> None:
     target.outcome = outcome
     target.message = message
+    target.error = error
+
+
+def _fail(target: Answer, failure: Failure) -> None:
+    _finish(target, failure.outcome, failure.message, failure.error)
 
 
 class Pipeline:
@@ -119,15 +133,8 @@ class Pipeline:
             span.set_attribute("run.id", run.response.run_id)
             try:
                 await self._execute(run, previous)
-            except (ModelAPIError, UsageLimitExceeded) as exc:
-                _finish(run.response, Outcome.UPSTREAM_ERROR, f"The planning model failed: {exc}")
-            except PlannerNotConfigured as exc:
-                _finish(run.response, Outcome.INTERNAL_ERROR, str(exc))
-            except UnexpectedModelBehavior as exc:
-                _finish(run.response, Outcome.INTERNAL_ERROR, f"The planning model returned an unusable plan: {exc}")
-            except Exception:
-                log.exception("run %s failed", run.response.run_id)
-                _finish(run.response, Outcome.INTERNAL_ERROR, "Unexpected error; see server logs.")
+            except Exception as exc:  # planner failures, source failures and bugs alike end in one Outcome
+                _fail(run.response, classify(exc, run.response.run_id))
             span.set_attribute("run.outcome", run.response.outcome.value)
 
         response = run.response
@@ -137,7 +144,15 @@ class Pipeline:
         for answer in (response, *response.additional_answers):
             if answer.source:
                 answer.source.api_requests = api_requests  # shared by all parts of the Run
-        self.runs.save(run.request, response)  # the effective request, so later Follow-ups inherit it too
+        try:
+            self.runs.save(run.request, response)  # the effective request, so later Follow-ups inherit it too
+        except OSError as exc:  # e.g. a full disk: still answer, but nothing can be fetched by run ID later
+            log.error("run %s could not be saved: %s", response.run_id, exc)
+            response.warnings.append(
+                "This answer could not be saved, so its chart image and follow-ups are unavailable."
+            )
+            for answer in (response, *response.additional_answers):
+                answer.chart_url = None
         return response
 
     async def _execute(self, run: _Run, previous: QueryPlan | None) -> None:
@@ -149,15 +164,20 @@ class Pipeline:
         run.request = planning.request
         response = run.response
         response.plan = plan = planning.plan
+        response.planner_model = planning.model_name
         response.assumptions.extend(planning.notes)
+        response.warnings.extend(planning.warnings)
         if isinstance(plan, AnswerPlan | MultiAnswerPlan):
             response.relation = plan.relation
 
         parts = plan.parts if isinstance(plan, MultiAnswerPlan) else [plan]
-        for index, (part, gate) in enumerate(zip(parts, planning.gates, strict=True)):
+        for index, (part, gate, error) in enumerate(zip(parts, planning.gates, planning.part_errors, strict=True)):
             target = response if index == 0 else Answer(outcome=Outcome.INTERNAL_ERROR, plan=part)
             if index:
                 response.additional_answers.append(target)
+            if error is not None:  # the model could not plan this part; the other parts still run
+                _fail(target, classify(error, response.run_id))
+                continue
             if isinstance(part, UnsupportedPlan):
                 _finish(target, Outcome.UNSUPPORTED_QUERY, part.reason)
                 continue
@@ -169,15 +189,8 @@ class Pipeline:
             assert isinstance(part, AnswerPlan) and gate is not None
             try:
                 await self._answer(run, target, part, gate, index)
-            except ScopeTooLarge as exc:
-                _finish(
-                    target,
-                    Outcome.SCOPE_REQUIRED,
-                    f"{exc.total:,} trials match, more than the {exc.limit:,} this service retrieves "
-                    "per question. Narrow it, e.g. by phase, status, start years, country or sponsor.",
-                )
-            except UpstreamError as exc:
-                _finish(target, Outcome.UPSTREAM_ERROR, str(exc))
+            except Exception as exc:  # one part failing (source error, too broad, a bug) leaves the others intact
+                _fail(target, classify(exc, response.run_id))
 
     async def _answer(self, run: _Run, target: Answer, plan: AnswerPlan, gate: GateResult, index: int) -> None:
         """Answer one part of the Question into `target`."""
@@ -313,13 +326,28 @@ class Pipeline:
             )
         target.verification = verification
         if not verification.passed:
-            _finish(target, Outcome.INTERNAL_ERROR, "The answer failed verification and was withheld.")
+            failed = ", ".join(c.name for c in verification.checks if not c.passed)
+            log.error("run %s: verification failed (%s)", run.response.run_id, failed)
+            _finish(
+                target,
+                Outcome.INTERNAL_ERROR,
+                "The answer failed verification and was withheld.",
+                ErrorInfo(code=ErrorCode.VERIFICATION_FAILED, message=f"Failed checks: {failed}", retryable=False),
+            )
             return
         target.visualization = spec
         target.evidence = evidence
         if spec.type is not VisualizationType.TABLE:
-            part = f"?part={index}" if index else ""
-            target.chart_url = f"{self.public_base_url}/v1/runs/{run.response.run_id}/chart.png{part}"
+            # A chart that cannot be drawn does not change the answer: the specification and citations
+            # stand; only the image link is withheld, with a warning.
+            if problem := chart_problem(spec):
+                target.warnings.append(
+                    f"The chart image could not be prepared ({problem}); the visualization specification "
+                    "and citations are unaffected."
+                )
+            else:
+                part = f"?part={index}" if index else ""
+                target.chart_url = f"{self.public_base_url}/v1/runs/{run.response.run_id}/chart.png{part}"
         _finish(target, Outcome.SUCCESS)
 
 

@@ -21,6 +21,29 @@ class Outcome(StrEnum):
     INTERNAL_ERROR = "internal_error"
 
 
+class ErrorCode(StrEnum):
+    """Why an answer failed. Stable strings a client can branch on; `message` is for people."""
+
+    PLANNER_NOT_CONFIGURED = "planner_not_configured"  # no model has credentials
+    PLANNER_UNAVAILABLE = "planner_unavailable"  # every model failed with a provider or network error
+    PLANNER_REJECTED = "planner_rejected"  # providers refused the request (bad key, unknown model): fix configuration
+    PLANNER_TIMEOUT = "planner_timeout"  # planning took longer than the time limit
+    PLANNER_INVALID_OUTPUT = "planner_invalid_output"  # the model did not return a usable plan
+    SOURCE_UNAVAILABLE = "source_unavailable"  # ClinicalTrials.gov unreachable or failing (after retries)
+    SOURCE_RATE_LIMITED = "source_rate_limited"  # ClinicalTrials.gov rate limit, still hit after backing off
+    SOURCE_REJECTED = "source_rejected"  # ClinicalTrials.gov refused the request (4xx)
+    SOURCE_INVALID_RESPONSE = "source_invalid_response"  # ClinicalTrials.gov answered with something unreadable
+    SCOPE_TOO_LARGE = "scope_too_large"  # more trials match than one question may retrieve
+    VERIFICATION_FAILED = "verification_failed"  # the answer failed the verifier and was withheld
+    INTERNAL = "internal"  # a bug: see the server log for the run ID
+
+
+class ErrorInfo(BaseModel):
+    code: ErrorCode
+    message: str
+    retryable: bool = Field(description="True when sending the same request again later may succeed.")
+
+
 class AppliedFilters(BaseModel):
     """The Filters actually applied, after merging the plan with structured request fields."""
 
@@ -104,6 +127,12 @@ class Answer(BaseModel):
     clarification: Clarification | None = None
     source: SourceInfo | None = None
     verification: Verification | None = None
+    error: ErrorInfo | None = Field(default=None, description="Set when the outcome is a failure.")
+    warnings: list[str] = Field(
+        default_factory=list,
+        description="Problems that did not change the answer, e.g. the chart image could not be prepared "
+        "(the visualization specification and citations are still valid).",
+    )
 
 
 class QueryResponse(Answer):
@@ -116,4 +145,5 @@ class QueryResponse(Answer):
         description="When the Question asks several separate things: the answers to the second and third part.",
     )
     model_calls: int = 0
+    planner_model: str | None = Field(default=None, description="The model that produced the plan.")
     timings_ms: dict[str, float] = Field(default_factory=dict)

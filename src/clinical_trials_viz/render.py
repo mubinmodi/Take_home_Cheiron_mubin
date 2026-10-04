@@ -4,6 +4,7 @@ Reads only the specification. Vega-Lite receives finished values: no aggregate, 
 timeUnit transforms, because counting (and therefore citation) belongs to our code.
 """
 
+import logging
 import math
 from typing import Any, Literal
 
@@ -13,6 +14,7 @@ from clinical_trials_viz.catalog import NOT_REPORTED
 from clinical_trials_viz.models.spec import Channel, NetworkData, VisualizationSpec, VisualizationType
 
 ImageFormat = Literal["png", "svg"]
+log = logging.getLogger(__name__)
 
 _VL_TYPE = {"quantitative": "quantitative", "temporal": "temporal", "ordinal": "ordinal", "nominal": "nominal"}
 _WIDTH = 640
@@ -280,6 +282,19 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
             },
         ],
     }  # fmt: skip
+
+
+def chart_problem(spec: VisualizationSpec) -> str | None:
+    """Why this specification cannot become an image, or None. It compiles the chart to Vega without
+    drawing it (milliseconds), so a broken chart is caught before its `chart_url` is handed out."""
+    try:
+        vl_convert.vegalite_to_vega(to_vega_lite(spec))
+    except NotRenderable as exc:
+        return str(exc)
+    except Exception as exc:  # vl-convert raises ValueError for an invalid spec; anything else is a bug
+        log.warning("chart for %s failed to compile: %s", spec.type, exc)
+        return f"{type(exc).__name__}: {str(exc)[:160]}"
+    return None
 
 
 def render(spec: VisualizationSpec, fmt: ImageFormat) -> bytes:

@@ -4,6 +4,7 @@ Enough for Follow-ups (`previous_run_id`) and `chart_url`. Full run bundles with
 API responses (for replay) are deferred.
 """
 
+import logging
 import re
 import uuid
 from datetime import UTC, datetime
@@ -16,6 +17,7 @@ from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import QueryResponse
 
 _RUN_ID = re.compile(r"^run_[0-9a-f]{32}$")
+log = logging.getLogger(__name__)
 
 
 class RunRecord(BaseModel):
@@ -47,7 +49,12 @@ class RunStore:
         path.write_text(record.model_dump_json(indent=2))
 
     def load(self, run_id: str) -> RunRecord | None:
+        """The saved Run, or None when it does not exist or cannot be read (treated as not found)."""
         path = self._path(run_id)
         if path is None or not path.exists():
             return None
-        return RunRecord.model_validate_json(path.read_text())
+        try:
+            return RunRecord.model_validate_json(path.read_text())
+        except (OSError, ValueError) as exc:  # unreadable or corrupted file (pydantic errors are ValueErrors)
+            log.warning("run record %s could not be read: %s", run_id, exc)
+            return None
