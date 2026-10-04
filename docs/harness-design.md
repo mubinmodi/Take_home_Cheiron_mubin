@@ -1,6 +1,6 @@
 # Harness Design Approach
 
-**Status:** Agreed direction (2026-10-03; updated the same day with the API spike results and the request/clarification design). Supersedes the overlapping parts of [take-home-system-design.md](take-home-system-design.md) where they conflict (no checkpointer, no Postgres for the local build, no model routing).
+**Status:** Agreed direction (2026-10-03; updated the same day with the API spike results and the request/clarification design). Supersedes the overlapping parts of the earlier proposal (`take-home-system-design.md`, kept in the repo, not in the zip) where they conflict (no checkpointer, no Postgres for the local build, no model routing).
 **Method:** The user's own notes (`~/Downloads/AI Engineering Notes/`: agent system design, harness and loops, memory, worked walkthrough): goals → scope → rules → data → architecture.
 **Evidence:** [research/harness-system-design-research.md](research/harness-system-design-research.md), [research/query-to-visualization-workflow-design.md](research/query-to-visualization-workflow-design.md), [research/api-data-guide.md](research/api-data-guide.md) (API spike).
 

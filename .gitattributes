@@ -1,2 +1,10 @@
 # Local agent tooling stays out of `git archive` (the submission zip)
 .claude export-ignore
+# Working documents stay in the repo but not in the submission zip (problem-log ticket 05)
+CLAUDE.md export-ignore
+docs/take-home-assignment.md export-ignore
+docs/assignment-images export-ignore
+docs/take-home-rubric.md export-ignore
+docs/rubric-review.md export-ignore
+docs/take-home-exploration.md export-ignore
+docs/take-home-system-design.md export-ignore

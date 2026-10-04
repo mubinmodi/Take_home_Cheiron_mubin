@@ -72,7 +72,7 @@ uv run python -m evals.run       # score the configured planner on 42 questions 
 uv run ruff check src tests && uv run pyright
 ```
 
-**Hosted version (AWS).** The same container runs on AWS in us-east-2, as decided in [`docs/hosted-deployment.md`](docs/hosted-deployment.md). `DEPLOYMENT=hosted` switches on:
+**Hosted version (AWS).** Live demo: https://cl-f44fdf3287b047ef971affaa8d767246.ecs.us-east-2.on.aws (the page asks for an API key, which comes with the submission). The same container runs on AWS in us-east-2, as decided in [`docs/hosted-deployment.md`](docs/hosted-deployment.md). `DEPLOYMENT=hosted` switches on:
 - **Shared state in Redis** (`REDIS_URL`; ElastiCache Serverless for Valkey): one ClinicalTrials.gov request budget for all instances (the registry's limit is per IP), the page cache, Idempotency-Keys and per-user counts. If Redis fails, each falls back to working per instance.
 - **Run history in Postgres** (`DATABASE_URL`; RDS for PostgreSQL, not public): any instance can serve a Follow-up or a chart. Each row records the user, outcome, model calls and latency.
 - **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header (the key alone or as `name:key`; case, quotes and stray spaces from a pasted key are ignored), and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once.
@@ -393,25 +393,24 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 
 ## 10. Tools used, and what was designed vs generated
 
-- **Tools:**
-  - [Claude Code](https://claude.com/claude-code) (Anthropic) as the coding assistant: research, API exploration, implementation, tests and documentation
-  - pydantic-ai with OpenAI and Anthropic models as the service's planner
-  - Vega-Lite via `vl-convert` for rendering
-  - uv, ruff, pyright, pytest, respx, hypothesis, fakeredis; Docker for the container
-  - AWS for the hosted version: ECS Express Mode, ECR, RDS, ElastiCache, Secrets Manager, through the AWS CLI
-- **Designed deliberately by the author**, decided in design reviews before and during implementation (recorded in [`docs/harness-design.md`](docs/harness-design.md)):
-  - the one-model-step workflow and its limits
-  - the live-API decision
-  - counting rules: all study types count as trials, conditions trust the API search, comparison overlap groups, network size limits
-  - clarification as data-backed multiple choice, and follow-ups via `previous_run_id`
-  - our own spec as the contract with Vega-Lite only as renderer
-  - OpenAI primary with Anthropic fallback and Gemini as an option
-  - the request fields
-  - the order of work
-  - the hosted design ([`docs/hosted-deployment.md`](docs/hosted-deployment.md)): API keys and per-user limits, Redis and Postgres, plain OpenTelemetry tracing with no vendor, and the switch from the planned Cloud Run to AWS
-  - how the web page behaves: follow-ups added below as a thread, and a light/dark switch
-- **Generated with the assistant, then reviewed and adapted:**
-  - most of the code, tests and documentation, written by Claude Code against those decisions
-  - outputs and charts were inspected after each feature, and several defects found that way were fixed (section 9)
-  - the eval set's expected plans were drafted by the assistant for the author's review
-  - the AWS deployment was carried out by the author, step by step, following the assistant's instructions; the assistant wrote the deploy scripts and diagnosed the first deployment's failures from CloudTrail and the service logs
+**Tools:** Claude Code as the coding assistant; pydantic-ai with OpenAI, Anthropic and Gemini models for the planner; Vega-Lite (`vl-convert`) for charts; uv, ruff, pyright, pytest; Docker and the AWS CLI for the hosted version.
+
+**How we worked:** I directed the work. I chose what to research and set the architecture; the assistant researched what I asked and laid out the trade-offs for each open question. I made the decisions, and they are recorded in [`docs/harness-design.md`](docs/harness-design.md) and [`docs/hosted-deployment.md`](docs/hosted-deployment.md). The assistant then wrote the code, tests and docs to that architecture.
+
+**My decisions:**
+- **Scope:** the sample questions are examples; the service must also handle follow-ups, corrections and several questions in one request.
+- **Filters and clarifications:** filters come from the question; structured fields are optional overrides; ask a multiple-choice question only when the request is unclear.
+- **Data:** the live API only, with no local copy, and citations as trial IDs on every data point.
+- **Charts:** our own spec is the contract. Counting stays in our code and Vega-Lite only draws, so no library does the analysis. Images by default, plus an interactive page.
+- **Networks:** modelled on the gene-network image; drugs, sponsors and conditions, because the source has no gene data.
+- **Models:** OpenAI first, Anthropic as fallback, Gemini optional, all changed by configuration; the allowed OpenAI model list.
+- **Left out:** MCP, Neo4j, CI and full run bundles.
+- **Hosting:** OpenTelemetry without a vendor; a working local version before any hosting; AWS for the hosted version.
+- **Web page and failures:** follow-ups added below as a thread; light and dark themes; explicit handling of model and chart failures.
+
+**Generated by the assistant, then checked:**
+- Most of the code, tests and documentation, plus the eval questions' expected plans, which I reviewed.
+- I ran the outputs and charts; problems I found (unreadable charts, follow-ups replacing answers, pasted keys rejected) went back as fixes.
+- Data problems found on live data (procedures counted as drugs, rate limits) are handled in code, at my request.
+- I ran the AWS deployment myself, step by step. The assistant wrote the scripts and diagnosed the first deployment's failures.
+- A second model reviewed the finished code. Each finding was checked against the code and logged; the confirmed bugs are being fixed with regression tests.

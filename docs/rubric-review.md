@@ -29,7 +29,7 @@
 | SUB-07 | verified | `examples/`: five real runs (trend, geography, comparison, network, clarification), regenerated 2026-10-04 | — |
 | INT-02 | verified | README §10 | — |
 | INT-03 | verified | README §9 | — |
-| INT-04 | verified | README §10 | The author should confirm it matches their own account |
+| INT-04 | verified | README §10 | Confirmed by the author (2026-10-04) |
 
 ## Bonus and optional items
 
