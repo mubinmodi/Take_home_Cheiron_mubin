@@ -311,7 +311,7 @@ For the "China" bar of example 02, `evidence["NCT03340506"]` is:
 
 ## 5. Example runs
 
-[`examples/`](examples/) holds nine real runs of the service against the live ClinicalTrials.gov API, unedited: request, full JSON response and chart.
+[`examples/`](examples/) holds the five submitted examples (01–05; the assignment asks for 3–5) and four more outputs (06–09), one for each remaining chart type. All are real runs of the service against the live ClinicalTrials.gov API, unedited: request, full JSON response and chart.
 
 | Example | Outcome |
 |---|---|
