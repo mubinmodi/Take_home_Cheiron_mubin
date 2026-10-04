@@ -1,12 +1,12 @@
 """The verifier: a gate before every successful response. Failing checks block the answer."""
 
 from clinical_trials_viz.analyze import enrollment_bin, enrollment_type
-from clinical_trials_viz.catalog import NOT_REPORTED, OTHER_BUCKET, Dimension
+from clinical_trials_viz.catalog import NOT_REPORTED, OTHER_BUCKET, Dimension, study_url
 from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import same_arm_pairs, trial_drugs
-from clinical_trials_viz.spec_builder import duration_months, iso_date, trial_end
+from clinical_trials_viz.spec_builder import cited_value, duration_months, iso_date, trial_end
 
 
 def verify(
@@ -25,7 +25,13 @@ def verify(
             VerificationCheck(name=name, passed=not problems, detail="; ".join(problems[:5]) if problems else None)
         )
 
-    check("answers_plan", [] if spec.type is expected_type else [f"expected {expected_type}, built {spec.type}"])
+    # The chart answers the plan: its type, and it is grouped by the plan's dimensions.
+    wrong_plan = [] if spec.type is expected_type else [f"expected {expected_type}, built {spec.type}"]
+    if spec.type not in (VisualizationType.TABLE, VisualizationType.NETWORK_GRAPH):
+        enc = spec.encoding
+        encoded = {c.field for c in (enc.x, enc.y, enc.color) if c}
+        wrong_plan += [f"not grouped by {d.value}" for d in (dimension, series) if d and d.value not in encoded]
+    check("answers_plan", wrong_plan)
 
     datums = spec.datums()
 
@@ -58,7 +64,10 @@ def verify(
         for dim in [dimension, *([series] if series else [])]:
             for d in spec.rows():
                 label = d.get(dim.value)
-                if label in (OTHER_BUCKET, None):
+                if label is None:
+                    wrong.append(f"a row has no '{dim.value}' value")
+                    continue
+                if label == OTHER_BUCKET:
                     continue
                 for nct_id in d["trial_ids"]:
                     if nct_id in trials and label not in dimension_values(trials[nct_id], dim):
@@ -116,6 +125,24 @@ def verify(
                 )
             ],
         )
+
+    # Every quoted citation value is what the trial record says, re-derived the way it was built.
+    altered = []
+    for nct_id, entry in evidence.items():
+        trial = trials.get(nct_id)
+        if trial is None:
+            continue  # reported by citations_resolve
+        if (entry.nct_id, entry.title, entry.url) != (nct_id, trial.title, study_url(nct_id)):
+            altered.append(f"{nct_id}: identity, title or link differs from the record")
+        for name, value in entry.fields.items():
+            try:
+                expected = cited_value(trial, name)
+            except KeyError:
+                altered.append(f"{nct_id}: '{name}' is not a field we cite")
+                continue
+            if value != expected:
+                altered.append(f"{nct_id}: '{name}' differs from the record")
+    check("evidence_matches_source", altered)
 
     # Every cited trial meets the filters, checked against its own source values (not the API's word).
     check("cited_trials_meet_filters", [

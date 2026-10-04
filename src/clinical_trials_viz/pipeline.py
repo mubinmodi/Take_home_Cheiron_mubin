@@ -40,12 +40,16 @@ from clinical_trials_viz.models.response import (
     SourceInfo,
 )
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
-from clinical_trials_viz.network import drug_drug_network, same_arm_pairs, sponsor_drug_network
+from clinical_trials_viz.network import drug_drug_network, sponsor_drug_network
 from clinical_trials_viz.planner import Planner
 from clinical_trials_viz.planning import plan_question
 from clinical_trials_viz.render import chart_problem
 from clinical_trials_viz.runs import RunStore, StoreUnavailable, new_run_id
 from clinical_trials_viz.spec_builder import (
+    ARM_FIELD,
+    COMPLETION_FIELD,
+    PRIMARY_COMPLETION_FIELD,
+    START_FIELD,
     breakdown_spec,
     build_evidence,
     chart_type_for,
@@ -61,10 +65,6 @@ from clinical_trials_viz.spec_builder import (
 from clinical_trials_viz.validate import GateResult
 from clinical_trials_viz.verify import verify
 
-START_FIELD = "protocolSection.statusModule.startDateStruct"
-PRIMARY_COMPLETION_FIELD = "protocolSection.statusModule.primaryCompletionDateStruct"
-COMPLETION_FIELD = "protocolSection.statusModule.completionDateStruct"
-ARM_FIELD = "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)"
 log = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
@@ -374,25 +374,14 @@ class Pipeline:
         with run.stage("verify"):
             filters = target.applied_filters or AppliedFilters()
             extra = tuple(_cited_dimensions(plan))
-            evidence = build_evidence(spec, trials, dimension, filters, extra)
+            record: list[str] = []
             if spec.type in (VisualizationType.TIMELINE, VisualizationType.SCATTER_PLOT):
-                for nct_id, entry in evidence.items():
-                    trial = trials[nct_id]
-                    entry.fields[START_FIELD] = {"date": trial.start_date, "type": trial.start_date_type}
-                    entry.fields[PRIMARY_COMPLETION_FIELD] = {
-                        "date": trial.primary_completion_date,
-                        "type": trial.primary_completion_date_type,
-                    }
-                    entry.fields[COMPLETION_FIELD] = {"date": trial.completion_date, "type": trial.completion_date_type}
+                record += [START_FIELD, PRIMARY_COMPLETION_FIELD, COMPLETION_FIELD]
             if spec.type in (VisualizationType.HISTOGRAM, VisualizationType.SCATTER_PLOT):
-                for nct_id, entry in evidence.items():
-                    trial = trials[nct_id]
-                    entry.fields[ENROLLMENT_FIELD] = {"count": trial.enrollment, "type": trial.enrollment_type}
+                record.append(ENROLLMENT_FIELD)
             if plan.network is NetworkKind.DRUG_DRUG:
-                for nct_id, entry in evidence.items():  # the arms that make each link a combination
-                    entry.fields[ARM_FIELD] = {
-                        f"{a} + {b}": arms for (a, b), arms in same_arm_pairs(trials[nct_id]).items()
-                    }
+                record.append(ARM_FIELD)  # the arms that make each link a combination
+            evidence = build_evidence(spec, trials, dimension, filters, extra, tuple(record))
             verification = verify(
                 spec, evidence, trials, dimension, chart_type_for(plan), filters, series=plan.series_by
             )

@@ -126,6 +126,40 @@ def test_verifier_catches_a_trial_in_the_wrong_bucket(trials):
     assert not next(c for c in result.checks if c.name == "cited_values_match_source").passed
 
 
+def test_verifier_catches_a_chart_grouped_by_the_wrong_field(trials):
+    """The plan asked for phases; a bar chart grouped by status must not pass."""
+    by_id = {t.nct_id: t for t in trials}
+    spec = breakdown_spec(breakdown(trials, Dimension.STATUS, None), AppliedFilters(), len(trials))
+    evidence = build_evidence(spec, by_id, Dimension.STATUS, AppliedFilters())
+    result = verify(spec, evidence, by_id, Dimension.PHASE, VisualizationType.BAR_CHART, AppliedFilters())
+    assert not result.passed
+    assert not next(c for c in result.checks if c.name == "answers_plan").passed
+
+
+def test_verifier_catches_an_altered_citation_value(trials):
+    spec, evidence = _time_series(trials)
+    entry = next(iter(evidence.values()))
+    entry.fields["protocolSection.statusModule.startDateStruct"] = {"date": "1999-01-01", "type": "ACTUAL"}
+    result = verify(
+        spec,
+        evidence,
+        {t.nct_id: t for t in trials},
+        Dimension.START_YEAR,
+        VisualizationType.TIME_SERIES,
+        AppliedFilters(),
+    )
+    assert not next(c for c in result.checks if c.name == "evidence_matches_source").passed
+
+
+def test_verifier_catches_an_altered_citation_link(trials):
+    spec, evidence = _time_series(trials)
+    entry = next(iter(evidence.values()))
+    entry.url = "https://example.com/not-the-registry"
+    by_id = {t.nct_id: t for t in trials}
+    result = verify(spec, evidence, by_id, Dimension.START_YEAR, VisualizationType.TIME_SERIES, AppliedFilters())
+    assert not next(c for c in result.checks if c.name == "evidence_matches_source").passed
+
+
 def test_evidence_cites_the_source_field(trials):
     spec, evidence = _time_series(trials)
     entry = evidence[spec.data[-1]["trial_ids"][0]]

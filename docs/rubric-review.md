@@ -11,7 +11,7 @@
 | FUN-01 | verified | One typed plan per question (`planner.py`); planner eval on 42 questions: gpt-5.4-mini 42/42, claude-haiku-4-5 40/42 (`evals/results/`) | Residual planner variance on one comparison (README §8) |
 | FUN-02 | verified | Filters compiled to API parameters (`cohort.py`), every page fetched (`ctgov/client.py`); each response's `source` records API version, data timestamp, matches, cohort size and requests | Raw API pages are not stored (run bundles deferred) |
 | FUN-03 | verified | README §2, "When the answer is a chart"; the chart type is chosen by code (`spec_builder.py`) | — |
-| FUN-04 | verified | The verifier checks the chart answers the plan and recounts every datum (`verify.py`); `examples/` | — |
+| FUN-04 | verified | The verifier checks the chart answers the plan (type and grouping), recounts every datum and re-derives every citation value (`verify.py`); `examples/` | — |
 | FUN-05 | verified | Per-type contract in README §4; `GET /v1/runs/{id}/vega-lite.json`; the web page renders every type from the response | — |
 | SRC-01 | verified | Live API at request time; examples carry data timestamp 2026-10-02T09:00:04; test fixtures are saved real records (`tests/fixtures/`) | — |
 | IN-01 | verified | `query` required; missing, empty, whitespace-only, non-string, over-long and unknown-field requests each return 422 with a message (checked 2026-10-04) | — |
@@ -35,7 +35,7 @@
 
 | ID | Status | Evidence | Limitation |
 |---|---|---|---|
-| CIT-01 – CIT-04 | verified | Every Datum of every chart type carries `trial_ids`; `evidence` holds each cited trial once with the source field values that placed it; the verifier recounts and re-derives them | Tables cite only the 100 rows they show (`metadata.total_rows` gives the full count) |
+| CIT-01 – CIT-04 | verified | Every Datum of every chart type carries `trial_ids`; `evidence` holds each cited trial once with the source field values that placed it; the verifier recounts them and re-derives every quoted value from the record | Tables cite only the 100 rows they show (`metadata.total_rows` gives the full count) |
 | SUB-08 | verified | Web page at `GET /` (same response contract); deployed on AWS (API key required) | No video |
 | OUT-07 | verified | `assumptions` and `applied_filters` on every answer | — |
 
@@ -47,7 +47,7 @@
 | SD-02 | Clear module contracts (README code map); extension walkthrough (README §2, "Extending") | The extension is described, not shown as a worked change |
 | SD-03 | Complete paging or `scope_required`, never sampling; retries honouring `Retry-After`; missing values as "Not reported"; multi-valued fields counted once per trial per bucket; tests for each | No stored raw pages for exact replay |
 | AI-01 | The model never outputs numbers, IDs or citations; every answer is verified; eval questions are not in the prompt | Few adversarial phrasings in the eval |
-| AI-02 | Semantic gate with one repair (`validate.py`); tamper tests prove the verifier rejects wrong counts and citations | — |
+| AI-02 | Semantic gate with one repair (`validate.py`); tamper tests prove the verifier rejects wrong counts, wrong grouping and altered citations | — |
 | AI-03 | One typed plan; clarifications built from data; bounded outcomes; `model_calls` and `timings_ms` on every response | The plan is the only planning trace |
 | CODE-01 | Focused modules, README code map, ruff and pyright clean | — |
 | CODE-02 | 168 offline tests, including tamper tests and failure injection; regression tests confirmed to fail on the old code; live tests; archive smoke test | — |

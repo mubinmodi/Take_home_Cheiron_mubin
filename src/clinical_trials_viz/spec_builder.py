@@ -3,13 +3,16 @@
 The chart type follows deterministically from the Query Plan; the model does not choose it.
 """
 
+from collections.abc import Callable
 from datetime import date
+from functools import partial
 from typing import Any
 
 from clinical_trials_viz.analyze import Breakdown, ComparisonGroups, CrossBreakdown, Histogram, breakdown
 from clinical_trials_viz.catalog import (
     DIMENSIONS,
     ENROLLMENT_BINS,
+    ENROLLMENT_FIELD,
     NETWORK_MIN_EDGE_TRIALS,
     OTHER_BUCKET,
     PHASE_LABELS,
@@ -30,7 +33,7 @@ from clinical_trials_viz.models.spec import (
     VisualizationSpec,
     VisualizationType,
 )
-from clinical_trials_viz.network import Network
+from clinical_trials_viz.network import Network, same_arm_pairs
 
 COUNT = Channel(field="trial_count", type=FieldType.QUANTITATIVE, title="Trials")
 
@@ -341,7 +344,29 @@ def table_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[Visualizat
     return spec, assumptions
 
 
+NCT_ID_FIELD = "protocolSection.identificationModule.nctId"
 COLLABORATORS_FIELD = "protocolSection.sponsorCollaboratorsModule.collaborators.name"
+START_FIELD = DIMENSIONS[Dimension.START_YEAR].source_field
+PRIMARY_COMPLETION_FIELD = "protocolSection.statusModule.primaryCompletionDateStruct"
+COMPLETION_FIELD = "protocolSection.statusModule.completionDateStruct"
+ARM_FIELD = "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)"
+
+# How each cited field is read from a trial record. The evidence builder and the verifier both use
+# this table, so a Citation can be re-derived from the record it names.
+_CITED_FIELDS: dict[str, Callable[[Trial], Any]] = {
+    NCT_ID_FIELD: lambda t: t.nct_id,
+    COLLABORATORS_FIELD: lambda t: list(t.collaborators),
+    PRIMARY_COMPLETION_FIELD: lambda t: {"date": t.primary_completion_date, "type": t.primary_completion_date_type},
+    COMPLETION_FIELD: lambda t: {"date": t.completion_date, "type": t.completion_date_type},
+    ENROLLMENT_FIELD: lambda t: {"count": t.enrollment, "type": t.enrollment_type},
+    ARM_FIELD: lambda t: {f"{a} + {b}": arms for (a, b), arms in same_arm_pairs(t).items()},
+    **{info.source_field: partial(dimension_evidence, dimension=d) for d, info in DIMENSIONS.items()},
+}
+
+
+def cited_value(trial: Trial, field: str) -> Any:
+    """The value a Citation quotes for `field`, read from the trial record. KeyError: never cited."""
+    return _CITED_FIELDS[field](trial)
 
 
 def filter_dimensions(filters: AppliedFilters) -> list[Dimension]:
@@ -477,21 +502,25 @@ def build_evidence(
     dimension: Dimension | None,
     filters: AppliedFilters,
     extra: tuple[Dimension, ...] = (),
+    record_fields: tuple[str, ...] = (),
 ) -> dict[str, EvidenceEntry]:
     """One entry per cited trial, with the source values that placed it in the data: the field it
-    is grouped by and every field an applied filter (or comparison side, via `extra`) relies on."""
+    is grouped by, every field an applied filter (or comparison side, via `extra`) relies on, and
+    the record fields a per-trial chart plots (`record_fields`)."""
     wanted: list[Dimension] = [*filter_dimensions(filters), *extra, *([dimension] if dimension else [])]
-    cited = list(dict.fromkeys(wanted))
+    fields = [NCT_ID_FIELD, *(DIMENSIONS[d].source_field for d in wanted)]
+    if filters.sponsor and filters.sponsor_role == "any":
+        fields.append(COLLABORATORS_FIELD)
+    fields = list(dict.fromkeys([*fields, *record_fields]))
     evidence: dict[str, EvidenceEntry] = {}
     for datum in spec.datums():
         for nct_id in datum["trial_ids"]:
-            if nct_id in evidence:
-                continue
-            trial = trials[nct_id]
-            fields: dict[str, Any] = {"protocolSection.identificationModule.nctId": nct_id}
-            for dim in cited:
-                fields[DIMENSIONS[dim].source_field] = dimension_evidence(trial, dim)
-            if filters.sponsor and filters.sponsor_role == "any":
-                fields[COLLABORATORS_FIELD] = list(trial.collaborators)
-            evidence[nct_id] = EvidenceEntry(nct_id=nct_id, title=trial.title, url=study_url(nct_id), fields=fields)
+            if nct_id not in evidence:
+                trial = trials[nct_id]
+                evidence[nct_id] = EvidenceEntry(
+                    nct_id=nct_id,
+                    title=trial.title,
+                    url=study_url(nct_id),
+                    fields={f: cited_value(trial, f) for f in fields},
+                )
     return evidence

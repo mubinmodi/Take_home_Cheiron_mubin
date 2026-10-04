@@ -113,10 +113,10 @@ question ─► PLAN (the only model step) ─► GATE ─► RETRIEVE ─► CO
 - **When the answer is a chart** (the assignment asks both to judge whether a visualization fits and for a visualization as the answer). Every successful analytical answer is a visualization specification; a single number is a `single_value` and a list of trials a `table`, so a renderer handles every answer the same way. Code picks the type from the plan: counts over start years → `time_series`; a breakdown → `bar_chart`; a comparison or a crossed breakdown → `grouped_bar_chart`; enrollment distribution → `histogram`; trial by trial → `table`, `timeline` or `scatter_plot`; relationships → `network_graph`. Outcomes that are not answers (clarification, unsupported, no data, scope required, errors) carry no visualization; they say why and what to do next.
 - **Bounded:** at most 3 model calls per run (plan, one repair with the validator's errors, one provider fallback on transport errors only). Every attempt counts, a failed one included, and a model that failed is not tried again in the same run. The SDK's own single retry of a request is not counted. Every run ends in exactly one **outcome**: `success`, `no_data`, `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error`, `internal_error`.
 - **Verifier**, a gate before every successful response. It checks that:
-  - the chart answers the plan
+  - the chart answers the plan: its type, grouped by the plan's dimensions
   - every encoded field exists
   - each count equals its distinct cited trials
-  - every citation resolves
+  - every citation resolves, and every value it quotes is re-derived from the trial record
   - each cited trial really has its bucket's value, re-derived from its own record
   - each cited trial meets every filter
   - network edges join existing nodes, and every cited trial has both ends (or a shared arm, for combinations)
@@ -297,7 +297,7 @@ Example 02, "Which countries have the most recruiting trials for melanoma?":
 3. **Count.** Each trial is placed under every country where it has a current site, once per country. China gets 59 distinct trials.
 4. **Datum.** `{"country": "China", "trial_count": 59, "trial_ids": ["NCT03340506", …]}`. `trial_count` always equals the number of `trial_ids`.
 5. **Citation.** `evidence["NCT03340506"]` ("Dabrafenib and/or Trametinib Rollover Study") holds the source values behind it: `overallStatus = "RECRUITING"` (the status filter), `locations.country` including `"China"` (its bar), and condition MeSH terms including `"Melanoma"` (the condition search). In the web page, clicking the China bar lists all 59 trials with these values.
-6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" from each cited trial's own record, and checks every cited trial meets both filters. All six checks passed (`verification` in the response).
+6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" and every quoted citation value from each cited trial's own record, and checks every cited trial meets both filters. All seven checks passed (`verification` in the response).
 
 **A limitation, made visible:** example 05, "What phases are Merck's trials in?". Two different lead sponsors match "Merck". Rather than pick one, the service asks, offering options built from the data: Merck Sharp & Dohme (2,151 trials), Merck KGaA (275) or both.
 
@@ -372,7 +372,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - every failure point in §7 (21 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
   - the hosted mode (30 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits, circuit breakers opening and closing, and the run deadline keeping finished parts
   - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other, missing values as their own state), with property tests showing input order and duplicates do not change counts
-  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
+  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
 - **Live tests** against ClinicalTrials.gov (`pytest -m live`), and every answer type run end to end with the real models, with the images inspected (tables have none).
 - **Planner eval** (`evals/`): 42 questions modelled on the assignment's appendix, scored per question family per model.
 - **Iteration driven by real data.** Each of these was found by running the real service, then fixed and covered by a test:
