@@ -1,7 +1,5 @@
 {
-  "run_id": "run_e0c68431a6d844fc8539b1c905764679",
   "outcome": "success",
-  "relation": "new",
   "plan": {
     "kind": "answer",
     "relation": "new",
@@ -11,6 +9,7 @@
         "Pembrolizumab"
       ],
       "conditions": [],
+      "keywords": [],
       "phases": [],
       "statuses": [],
       "study_types": [],
@@ -26,6 +25,7 @@
       "Pembrolizumab"
     ],
     "conditions": [],
+    "keywords": [],
     "phases": [],
     "statuses": [],
     "study_types": [],
@@ -2882,7 +2882,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_e0c68431a6d844fc8539b1c905764679/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_5337c2e12e57464bbfbc2a0e231c604e/chart.png",
   "evidence": {
     "NCT04898751": {
       "nct_id": "NCT04898751",
@@ -47720,7 +47720,7 @@
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T05:08:08.626092Z",
+    "retrieved_at": "2026-10-04T08:59:43.325158Z",
     "search_matches": 2968,
     "cohort_size": 2629,
     "api_requests": 5
@@ -47758,10 +47758,15 @@
       }
     ]
   },
+  "warnings": [],
+  "run_id": "run_5337c2e12e57464bbfbc2a0e231c604e",
+  "relation": "new",
+  "additional_answers": [],
   "model_calls": 1,
+  "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1458.7,
-    "retrieve": 2863.4,
+    "plan": 2268.0,
+    "retrieve": 2623.3,
     "analyze": 1.2,
     "verify": 5.6
   }

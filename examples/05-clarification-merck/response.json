@@ -1,8 +1,6 @@
 {
-  "run_id": "run_23f2d2c8eff740b8a5163d929c73e8e8",
   "outcome": "clarification_required",
   "message": "'Merck' matches more than one lead sponsor. Which one do you mean?",
-  "relation": "new",
   "plan": {
     "kind": "answer",
     "relation": "new",
@@ -10,6 +8,7 @@
     "filters": {
       "drugs": [],
       "conditions": [],
+      "keywords": [],
       "phases": [],
       "statuses": [],
       "study_types": [],
@@ -24,6 +23,7 @@
   "applied_filters": {
     "drugs": [],
     "conditions": [],
+    "keywords": [],
     "phases": [],
     "statuses": [],
     "study_types": [],
@@ -68,14 +68,19 @@
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T05:08:19.562410Z",
+    "retrieved_at": "2026-10-04T08:59:55.948695Z",
     "search_matches": 2750,
     "cohort_size": 2750,
     "api_requests": 3
   },
+  "warnings": [],
+  "run_id": "run_353f9eb630f345059f14342d9f942b49",
+  "relation": "new",
+  "additional_answers": [],
   "model_calls": 1,
+  "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 986.0,
-    "retrieve": 2540.8
+    "plan": 1434.4,
+    "retrieve": 2660.3
   }
 }

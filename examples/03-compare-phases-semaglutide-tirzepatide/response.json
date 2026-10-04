@@ -1,7 +1,5 @@
 {
-  "run_id": "run_a42589be317445e393db418e03db49d6",
   "outcome": "success",
-  "relation": "new",
   "plan": {
     "kind": "answer",
     "relation": "new",
@@ -9,6 +7,7 @@
     "filters": {
       "drugs": [],
       "conditions": [],
+      "keywords": [],
       "phases": [],
       "statuses": [],
       "study_types": [],
@@ -29,6 +28,7 @@
   "applied_filters": {
     "drugs": [],
     "conditions": [],
+    "keywords": [],
     "phases": [],
     "statuses": [],
     "study_types": [],
@@ -1108,7 +1108,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_a42589be317445e393db418e03db49d6/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_144ea8468d144c1bb5cba21ac666dedc/chart.png",
   "evidence": {
     "NCT05249881": {
       "nct_id": "NCT05249881",
@@ -13113,7 +13113,7 @@
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T05:08:14.412604Z",
+    "retrieved_at": "2026-10-04T08:59:49.323317Z",
     "search_matches": 1065,
     "cohort_size": 832,
     "api_requests": 2
@@ -13147,11 +13147,16 @@
       }
     ]
   },
+  "warnings": [],
+  "run_id": "run_144ea8468d144c1bb5cba21ac666dedc",
+  "relation": "new",
+  "additional_answers": [],
   "model_calls": 1,
+  "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1226.7,
-    "retrieve": 1035.8,
-    "analyze": 1.7,
-    "verify": 3.2
+    "plan": 1342.0,
+    "retrieve": 1032.4,
+    "analyze": 1.9,
+    "verify": 3.6
   }
 }

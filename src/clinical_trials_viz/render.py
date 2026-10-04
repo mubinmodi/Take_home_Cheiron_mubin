@@ -25,6 +25,9 @@ class NotRenderable(Exception):
 
 
 DATUM_INDEX = "_datum"  # position in spec.datums(), so an interactive page can map a click to its Citation
+# The image renderer and the web page (web/index.html) use the same Vega-Lite release.
+VEGA_LITE_VERSION = "6.4"
+_SCHEMA = "https://vega.github.io/schema/vega-lite/v6.json"
 
 
 def _values(spec: VisualizationSpec) -> list[dict[str, Any]]:
@@ -51,7 +54,7 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
     if spec.subtitle:
         title["subtitle"] = spec.subtitle
     base: dict[str, Any] = {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "$schema": _SCHEMA,
         "title": title,
         "data": {"values": _values(spec)},
         "config": {"view": {"stroke": None}, "axis": {"labelLimit": 220}},
@@ -231,7 +234,7 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
     if spec.subtitle:
         title["subtitle"] = spec.subtitle
     return {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "$schema": _SCHEMA,
         "title": title,
         "width": width,
         "height": height,
@@ -288,7 +291,7 @@ def chart_problem(spec: VisualizationSpec) -> str | None:
     """Why this specification cannot become an image, or None. It compiles the chart to Vega without
     drawing it (milliseconds), so a broken chart is caught before its `chart_url` is handed out."""
     try:
-        vl_convert.vegalite_to_vega(to_vega_lite(spec))
+        vl_convert.vegalite_to_vega(to_vega_lite(spec), vl_version=VEGA_LITE_VERSION)
     except NotRenderable as exc:
         return str(exc)
     except Exception as exc:  # vl-convert raises ValueError for an invalid spec; anything else is a bug
@@ -300,5 +303,5 @@ def chart_problem(spec: VisualizationSpec) -> str | None:
 def render(spec: VisualizationSpec, fmt: ImageFormat) -> bytes:
     vl = to_vega_lite(spec)
     if fmt == "svg":
-        return vl_convert.vegalite_to_svg(vl, allowed_base_urls=[]).encode()
-    return vl_convert.vegalite_to_png(vl, scale=2, allowed_base_urls=[])
+        return vl_convert.vegalite_to_svg(vl, vl_version=VEGA_LITE_VERSION, allowed_base_urls=[]).encode()
+    return vl_convert.vegalite_to_png(vl, vl_version=VEGA_LITE_VERSION, scale=2, allowed_base_urls=[])

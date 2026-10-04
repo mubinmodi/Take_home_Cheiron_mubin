@@ -8,14 +8,14 @@
 
 Targets agreed 2026-10-03, except where marked.
 
-| Goal | Target | Measured by |
-|---|---|---|
-| No made-up numbers | 100%, guaranteed by the design | The model never outputs values, IDs or citations; code produces all of them |
-| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals |
-| Citations add up | 100% of data points | Verifier recounts every bar, bucket or edge from its cited trials |
-| Honest failure | 0 runs that report success after incomplete data | Tests that inject failures |
-| Latency | No target (this is a demo); measured and reported. Hard cap: undecided | Timing spans per stage |
-| Cost | ≤ 3 model calls per query | Counted on every run |
+| Goal | Target | Measured by | Result (2026-10-04) |
+|---|---|---|---|
+| No made-up numbers | 100%, guaranteed by the design | The model never outputs values, IDs or citations; code produces all of them | Met by design: the model returns only a plan; every count, cited trial and citation comes from code and the registry |
+| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 42 questions: `gpt-5.4-mini` 100%, `claude-haiku-4-5` 95% (`evals/results/`) |
+| Citations add up | 100% of data points | Verifier recounts every bar, bucket or edge from its cited trials | Every answer passes the verifier before it is returned; tamper tests prove it rejects wrong counts and citations |
+| Honest failure | 0 runs that report success after incomplete data | Tests that inject failures | Failure-injection tests for the model, ClinicalTrials.gov, charts and storage (`tests/test_failures.py`) |
+| Latency | No target (this is a demo); measured and reported. Hard cap: undecided locally; ~30 s when hosted ([hosted-deployment.md](hosted-deployment.md)) | Timing spans per stage | 1.7–4.9 s for the five live examples (planning 1.1–2.3 s, retrieval 0.6–2.7 s) |
+| Cost | ≤ 3 model calls per query | Counted on every run | Enforced; each live example used 1 call |
 
 Paging (≤ 1000 trials per page) limits how much can be fetched before the deadline. Past the cap, return `scope_required`; never sample silently.
 
@@ -159,7 +159,7 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 
 ## 7. Order to work in
 
-1. Goals, scope and counting rules doc (sections 1–3, decided with the user). Scope and counting rules decided 2026-10-03; the numeric targets in section 1 are still proposals.
+1. Goals, scope and counting rules doc (sections 1–3, decided with the user 2026-10-03). Results against the section 1 goals measured 2026-10-04. Steps 1–7 are done.
 2. API spike; save fixtures. **Done 2026-10-03** ([api-data-guide.md](research/api-data-guide.md)).
 3. Typed models: `QueryRequest`, `QueryPlan`, `AnalysisResult` (each datum carries its contributing trials), `Visualization`, `QueryResponse`.
 4. One end-to-end slice: trial count by start year, with citations, verification and replay.

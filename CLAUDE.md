@@ -39,9 +39,9 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 
 - Working version (2026-10-04): FastAPI service with the full pipeline for `aggregate` (single value, bar, time series), `compare` (grouped bar with overlap group) and `per_trial` (table), data-built clarifications, verifier, Vega-Lite PNG/SVG rendering and run records. `relate` returns a `network_graph`: `sponsor_drug` (two-column image) or `drug_drug` same-arm combinations (circular image). `bin` returns an enrollment `histogram` (actual vs estimated). `per_trial` returns a `table`, a `timeline` or a `scatter_plot` (enrollment vs duration), by `view`. Optional `keywords` filter (free text) for topics that are neither drug nor condition; sponsor categories are never sponsor names (gate check). All tickets under `.scratch/clinical-trials-viz-service/` are done.
 - The six assignment screenshots are in `docs/assignment-images/`.
-- API spike done: findings in `docs/research/api-data-guide.md`, saved responses in `docs/research/api-spike/`. Scope and counting rules are decided (`harness-design.md` sections 2–3); the numeric goals in section 1 are still proposals.
+- API spike done: findings in `docs/research/api-data-guide.md`, saved responses in `docs/research/api-spike/`. Goals, scope and counting rules are decided (`harness-design.md` sections 1–3); section 1 records the measured results.
 - Run with real models (OpenAI primary, Anthropic fallback); planner eval: gpt-5.4-mini 100%, claude-haiku-4-5 95% on 42 questions (`evals/results/`). Expected plans reviewed by the user (ticket 08 done).
-- README and five live example outputs (`examples/`) exist; examples predate multi-part questions and `series_by` and should be regenerated. Open: packaging as a zip.
+- README and five live example outputs (`examples/`, regenerated 2026-10-04 with the current response fields). The web page and the image renderer both use Vega-Lite 6.4 (`render.VEGA_LITE_VERSION`; exact CDN versions pinned in `web/index.html`). Next: the hosted version as decided in `docs/hosted-deployment.md`, then the final zip.
 
 ## Commands
 

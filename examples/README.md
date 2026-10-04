@@ -1,6 +1,6 @@
 # Example outputs
 
-Real runs of the service against the live ClinicalTrials.gov API (data timestamp `2026-10-02T09:00:04`, run 2026-10-03, planner `openai:gpt-5.4-mini`). Each folder holds the exact `request.json`, the full `response.json` returned by `POST /v1/query`, and `chart.png` rendered by `GET /v1/runs/{run_id}/chart.png`. Nothing was edited by hand. Regenerate with `uv run python -m examples.generate` (results change as the registry updates).
+Real runs of the service against the live ClinicalTrials.gov API (data timestamp `2026-10-02T09:00:04`, run 2026-10-04, planner `openai:gpt-5.4-mini`). Each folder holds the exact `request.json`, the full `response.json` returned by `POST /v1/query`, and `chart.png` rendered by `GET /v1/runs/{run_id}/chart.png`. Nothing was edited by hand. Regenerate with `uv run python -m examples.generate` (results change as the registry updates).
 
 | Example | Question | Outcome | Chart | Cited trials |
 |---|---|---|---|---|

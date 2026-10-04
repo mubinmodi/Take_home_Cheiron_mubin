@@ -211,7 +211,7 @@ async def test_source_failures_carry_a_code(make_client, ctgov, no_sleep, respon
 
 
 async def test_a_chart_that_cannot_compile_keeps_the_answer_and_drops_the_link(make_client, monkeypatch):
-    def invalid(spec):
+    def invalid(spec, **options):
         raise ValueError("invalid Vega-Lite specification")
 
     monkeypatch.setattr(render_module.vl_convert, "vegalite_to_vega", invalid)
