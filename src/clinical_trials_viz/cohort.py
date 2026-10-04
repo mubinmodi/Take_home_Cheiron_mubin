@@ -3,7 +3,7 @@
 from collections import Counter
 from dataclasses import dataclass, field
 
-from clinical_trials_viz.catalog import DRUG_IDENTITY_MIN_SHARE, TRIAL_FIELDS
+from clinical_trials_viz.catalog import DRUG_IDENTITY_MIN_SHARE, DRUG_INTERVENTION_TYPES, TRIAL_FIELDS
 from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.ctgov.trial import Trial, clean_drug_name, parse_trial
 from clinical_trials_viz.models.response import AppliedFilters
@@ -72,11 +72,18 @@ def resolve_drug_identity(trials: list[Trial]) -> str | None:
 
 
 def lists_drug(trial: Trial, name: str, identity: str | None) -> bool:
-    """Match check: the drug is one of the trial's interventions, not just mentioned elsewhere."""
+    """Match check: the drug is one of the trial's drug-type interventions, not just mentioned elsewhere.
+
+    MeSH terms are listed per trial, not per intervention, so a MeSH match counts only when the
+    trial has a drug-type intervention at all.
+    """
+    drugs = [i for i in trial.interventions if i.type in DRUG_INTERVENTION_TYPES]
+    if not drugs:
+        return False
     if identity and identity in (t.lower() for t in trial.intervention_mesh_terms):
         return True
     wanted = {clean_drug_name(name)} | ({identity} if identity else set())
-    for intervention in trial.interventions:
+    for intervention in drugs:
         names = [intervention.name, *intervention.other_names]
         if any(w in clean_drug_name(n) for n in names for w in wanted if w):
             return True
@@ -105,7 +112,7 @@ async def fetch_cohort(client: CtGovClient, filters: AppliedFilters, extra_field
             if dropped := len(found) - len(kept):
                 assumptions.append(
                     f"{dropped} of {len(found)} search matches for '{drug}' were excluded because "
-                    f"'{drug}' is not one of their interventions."
+                    f"'{drug}' is not one of their drug interventions."
                 )
             by_id.update((t.nct_id, t) for t in kept)
         cohort = Cohort(list(by_id.values()), matches, assumptions)

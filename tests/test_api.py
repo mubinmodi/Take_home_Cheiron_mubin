@@ -30,7 +30,9 @@ async def test_trend_question_end_to_end(make_client):
         assert body["outcome"] == "success"
         spec = body["visualization"]
         assert spec["type"] == "time_series"
-        assert spec["metadata"]["cohort_size"] == 46  # 4 of 50 search matches excluded by the match check
+        assert (
+            spec["metadata"]["cohort_size"] == 44
+        )  # 6 of 50 search matches excluded: 4 only mention it, 2 have no drug-type intervention
         assert body["verification"]["passed"]
         cited = {i for d in spec["data"] for i in d["trial_ids"]}
         assert cited == set(body["evidence"])
@@ -56,7 +58,7 @@ async def test_single_value_and_table(make_client):
     count = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["pembrolizumab"]))
     body = await ask(make_client, ScriptedPlanner(count), query="How many pembrolizumab trials?")
     assert body["visualization"]["type"] == "single_value"
-    assert body["visualization"]["data"][0]["trial_count"] == 46
+    assert body["visualization"]["data"][0]["trial_count"] == 44
 
     listing = AnswerPlan(operation=Operation.PER_TRIAL, filters=Filters(drugs=["pembrolizumab"]))
     body = await ask(make_client, ScriptedPlanner(listing), query="List pembrolizumab trials")

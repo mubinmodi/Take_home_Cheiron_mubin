@@ -4,7 +4,7 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from clinical_trials_viz.analyze import breakdown, comparison_groups
-from clinical_trials_viz.catalog import NOT_REPORTED, OTHER_BUCKET, Dimension
+from clinical_trials_viz.catalog import DRUG_INTERVENTION_TYPES, NOT_REPORTED, OTHER_BUCKET, Dimension
 from clinical_trials_viz.cohort import lists_drug, resolve_drug_identity
 from clinical_trials_viz.ctgov.trial import clean_drug_name, dimension_values
 
@@ -65,11 +65,20 @@ def test_drug_identity_resolves_to_mesh_term(trials):
 def test_match_check_excludes_trials_that_only_mention_the_drug(trials):
     identity = resolve_drug_identity(trials)
     kept = {t.nct_id for t in trials if lists_drug(t, "Keytruda", identity)}
-    # 45 trials carry the pembrolizumab MeSH term. Of the 5 without it, NCT02704156 names it in an
-    # intervention ("Cyberknife plus Pembrolizumab…") and stays; the other 4 only mention it elsewhere.
-    assert len(kept) == 46
-    assert "NCT02704156" in kept
     assert "NCT05553782" not in kept  # implantable microdevice study
+
+
+def test_match_check_requires_a_drug_type_intervention(trials):
+    """A Drug is a DRUG, BIOLOGICAL or COMBINATION_PRODUCT intervention (harness-design §3)."""
+    identity = resolve_drug_identity(trials)
+    kept = {t.nct_id for t in trials if lists_drug(t, "Keytruda", identity)}
+    assert "NCT04408898" not in kept  # pembrolizumab only inside a GENETIC intervention
+    assert "NCT02704156" not in kept  # "Cyberknife plus Pembrolizumab…", a DEVICE intervention
+    assert "NCT02178722" in kept  # DRUG "MK-3475", matched through MeSH
+    assert "NCT02600169" in kept  # DRUG "Pemprolizumab" (misspelt), matched through MeSH
+    by_id = {t.nct_id: t for t in trials}
+    for nct_id in kept:
+        assert any(i.type in DRUG_INTERVENTION_TYPES for i in by_id[nct_id].interventions)
 
 
 def test_clean_drug_name():

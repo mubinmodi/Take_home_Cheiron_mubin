@@ -207,7 +207,7 @@ All outcomes return HTTP 200 with the outcome in the body.
 | `visualization` | The **Visualization Specification** (below); present on success |
 | `chart_url` | Link to the rendered image (absent for tables) |
 | `evidence` | `{nct_id: {nct_id, title, url, fields}}`: each cited trial once, with the **source field values** (API field path → value) that placed it in the data and satisfied each filter |
-| `assumptions` | Defaults applied and data caveats (e.g. "9 of 126 search matches were excluded because 'Keytruda' is not one of their interventions") |
+| `assumptions` | Defaults applied and data caveats (e.g. "9 of 126 search matches were excluded because 'Keytruda' is not one of their drug interventions") |
 | `applied_filters` | The filters actually applied after merging structured fields; `from_request` names those pinned by the caller |
 | `clarification` | On `clarification_required`: `{field, question, options:[{label, value, trial_count}], multi_select, allow_free_text}`. Send the chosen `value` back in `field` with `previous_run_id`. |
 | `plan`, `relation` | The model's Query Plan, and whether a follow-up refined (`refine`) or replaced (`new`) the previous one |
