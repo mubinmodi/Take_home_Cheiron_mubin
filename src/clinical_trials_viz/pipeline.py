@@ -14,7 +14,7 @@ from pydantic_ai import ModelAPIError, UnexpectedModelBehavior, UsageLimitExceed
 
 from clinical_trials_viz import clarify
 from clinical_trials_viz.analyze import breakdown, comparison_groups, enrollment_histogram
-from clinical_trials_viz.catalog import DEFAULT_TOP_N, ENROLLMENT_FIELD, Dimension
+from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS, DEFAULT_TOP_N, ENROLLMENT_FIELD, Dimension
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
 from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError
 from clinical_trials_viz.ctgov.trial import Trial
@@ -206,7 +206,8 @@ class Pipeline:
             return
 
         with run.stage("retrieve"):
-            cohort = await fetch_cohort(self.client, filters)
+            extra = ARM_DESCRIPTION_FIELDS if plan.network is NetworkKind.DRUG_DRUG else None
+            cohort = await fetch_cohort(self.client, filters, extra)
         response.source.search_matches = cohort.search_matches
         response.source.cohort_size = len(cohort.trials)
         response.assumptions.extend(cohort.assumptions)

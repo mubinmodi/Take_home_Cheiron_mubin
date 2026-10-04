@@ -224,7 +224,7 @@ Regenerate with `uv run python -m examples.generate`.
 | **Own visualization spec, Vega-Lite only as renderer** | A documented, renderer-independent contract; Vega-Lite never aggregates, so every displayed number stays tied to its citations. | We maintain the spec and its renderer, including network layout. |
 | **Drug match check, condition search trusted** | "Trials of drug X" should give drug X: 11% of drug search matches only *mention* the drug. Condition search is intentionally broad (basket trials count). | Asymmetric rules, disclosed as assumptions with the excluded count. |
 | **Drug identity from MeSH, matched to drug-type interventions** | Pembrolizumab appears under 503 spellings. Trial-level MeSH terms also cover procedures (radiotherapy, biopsy), found on live data. | Unmatched brand names fall back to cleaned raw names. |
-| **Combination = same arm, not same trial** | 34% of same-trial drug pairs sit in different arms (drug vs comparator). | An arm can list alternatives ("carboplatin or cisplatin"), which the registry cannot distinguish; disclosed. |
+| **Combination = same arm, not same trial; alternatives read from arm text** | 34% of same-trial drug pairs sit in different arms (drug vs comparator). Within an arm, the description separates options ("cisplatin … OR carboplatin", "EITHER … OR …", "investigator's choice of …") from combinations ("… PLUS …"). | Text rules, not understanding: arms whose description never names both drugs are taken as given together. On "drugs combined with pembrolizumab", carboplatin + cisplatin fell from 113 to 49 trials while real combinations stayed. Fetching arm descriptions makes these questions slower (~8 s vs ~4 s). |
 | **Multi-phase trials count under each phase**; countries count trials, not sites | Matches the API's own phase filter, so counts reconcile (verified: local counts equal API totals). | Categories can sum to more than the total; flagged in metadata. |
 | **Clarify only without a sensible default** | "Year" = start year and "sponsor" = lead sponsor are reported as assumptions instead of asked. | Users must read assumptions to see defaults. |
 | **Follow-ups via `previous_run_id`** | No conversation memory: the earlier plan is loaded from the run record, and the response says whether it was refined or replaced. | One step back only; the client holds the conversation. |
@@ -237,7 +237,7 @@ Regenerate with `uv run python -m examples.generate`.
 - **Scope cap:** questions matching more than 20,000 trials return `scope_required`. A background job (`POST /runs` → `GET /runs/{id}`) or the API's own count endpoint for simple totals would lift it.
 - **Rate limit:** ClinicalTrials.gov returned HTTP 429 during development. The client honours `Retry-After` and backs off, and the limiter allows 40 requests per minute per process. Several processes, or a hosted service, would need a shared limiter (e.g. Redis).
 - **Drug classes** ("PD-1 inhibitors") are handled by a clarification listing the drugs most often found in matching trials. There is no verified class membership; the registry has none.
-- **Data quality is passed through, not corrected.** Enrollment outliers (one melanoma record lists 2,953,748 participants, another 999,999) are shown as recorded. Alternatives listed in one arm appear as combinations.
+- **Data quality is passed through, not corrected.** Enrollment outliers (one melanoma record lists 2,953,748 participants, another 999,999) are shown as recorded. Alternatives listed in an arm are detected from its description; when the description does not name both drugs, they still count as given together.
 - **Run records** keep the plan and response only. Full run bundles with the raw API pages, for exact offline replay, are designed but not built.
 - **The planner eval** has 36 questions: `gpt-5.4-mini` scores 97%, `claude-haiku-4-5` 92% (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. The one shared miss ("industry vs academic … Parkinson's and ALS") shows that questions naming two comparison axes need a clearer rule.
 - **Not built:**
@@ -262,6 +262,7 @@ Regenerate with `uv run python -m examples.generate`.
   - procedures counted as drugs (MeSH terms span all interventions) → drug identity matched to drug-type interventions
   - HTTP 429 → `Retry-After` handling
   - unreadable network images → 60-link cap
+  - alternatives in one arm ("cisplatin OR carboplatin") counted as combinations → detected from the arm description; checked on the real KEYNOTE-189 record and on real "either / investigator's choice" arm texts, including a false positive the tests caught (a dose unit "mg/m²" read as "or")
   - incomplete current-year counts → assumption
   - shallow citations → per-filter source values with a verifier check
 

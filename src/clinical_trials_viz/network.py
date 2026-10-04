@@ -1,5 +1,6 @@
 """Networks: link entities that share trials. All counting happens here, like `analyze`."""
 
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from itertools import combinations
@@ -11,7 +12,7 @@ from clinical_trials_viz.catalog import (
     NETWORK_TOP_DRUGS,
     NETWORK_TOP_SPONSORS,
 )
-from clinical_trials_viz.ctgov.trial import Trial, arm_drugs, drug_identities
+from clinical_trials_viz.ctgov.trial import Trial, arm_drugs, drug_identities, drug_name_variants
 
 
 @dataclass
@@ -115,13 +116,72 @@ def sponsor_drug_network(trials: list[Trial]) -> Network:
     return Network(list(nodes.values()), edges, contributing, assumptions)
 
 
-def same_arm_pairs(trial: Trial) -> dict[tuple[str, str], list[str]]:
-    """Drug pairs given together in at least one arm, with the arms that give both."""
-    pairs: dict[tuple[str, str], list[str]] = defaultdict(list)
+_ALTERNATIVE_WINDOW = 150  # characters between the two drug names
+_CUE_WINDOW = 120  # characters before the first name to look for "either" / "choice"
+_OR = re.compile(r"\bor\b|^\s*/\s*$")  # "or", or a slash directly between the names (not "mg/m2")
+_JOINED = re.compile(r"\bplus\b|\band\b|\bwith\b|\+|followed by|;")
+_CHOICE = re.compile(r"\beither\b|\bchoice\b")
+
+
+def _positions(text: str, names: set[str]) -> list[tuple[int, int]]:
+    spans = []
+    for name in names:
+        if len(name) < 3:
+            continue
+        spans += [(m.start(), m.end()) for m in re.finditer(r"\b" + re.escape(name) + r"\b", text)]
+    return spans
+
+
+def are_alternatives(description: str, a_names: set[str], b_names: set[str]) -> bool:
+    """True when the arm description offers the two drugs as alternatives. Between a mention of each
+    (within a window) there is "or" or "/", and either
+    - nothing joins them ("plus", "and", "with", "+", "followed by", ";"): "cisplatin 75 mg/m2 OR carboplatin", or
+    - "either" / "choice" comes just before the first: whole regimens offered as options, as in
+      "EITHER cisplatin + gemcitabine OR carboplatin + ..." or "investigator's choice of (A PLUS B OR A PLUS C)".
+
+    A direct join anywhere ("paclitaxel PLUS cisplatin", no "or" between) means they are given together,
+    even if another mention of one of them sits in a different option.
+    """
+    text = description.lower()
+    alternative = False
+    for a_start, a_end in _positions(text, a_names):
+        for b_start, b_end in _positions(text, b_names):
+            first_start, gap = (a_start, text[a_end:b_start]) if a_end <= b_start else (b_start, text[b_end:a_start])
+            if len(gap) > _ALTERNATIVE_WINDOW:
+                continue
+            if not _OR.search(gap):
+                if _JOINED.search(gap):
+                    return False  # joined directly: a combination
+                continue
+            cue = _CHOICE.search(text[max(0, first_start - _CUE_WINDOW) : first_start])
+            alternative = alternative or not _JOINED.search(gap) or bool(cue)
+    return alternative
+
+
+def _arm_pairs(trial: Trial) -> tuple[dict[tuple[str, str], list[str]], set[tuple[str, str]]]:
+    combined: dict[tuple[str, str], list[str]] = defaultdict(list)
+    alternatives: set[tuple[str, str]] = set()
+    descriptions = dict(trial.arm_descriptions)
+    variants = drug_name_variants(trial)
     for label, drugs in arm_drugs(trial).items():
-        for pair in combinations(sorted(drugs), 2):
-            pairs[pair].append(label)
-    return dict(pairs)
+        for a, b in combinations(sorted(drugs), 2):
+            text = descriptions.get(label)
+            if text and are_alternatives(text, variants.get(a, {a}), variants.get(b, {b})):
+                alternatives.add((a, b))
+            else:
+                combined[(a, b)].append(label)
+    return dict(combined), alternatives - set(combined)
+
+
+def same_arm_pairs(trial: Trial) -> dict[tuple[str, str], list[str]]:
+    """Drug pairs given together in at least one arm, with the arms that give both. A pair the arm
+    description offers as alternatives ("A or B") is not a combination in that arm."""
+    return _arm_pairs(trial)[0]
+
+
+def alternative_pairs(trial: Trial) -> set[tuple[str, str]]:
+    """Drug pairs that share an arm only as alternatives, never as a combination."""
+    return _arm_pairs(trial)[1]
 
 
 def drug_drug_network(trials: list[Trial]) -> Network:
@@ -129,8 +189,10 @@ def drug_drug_network(trials: list[Trial]) -> Network:
     drug_ids: dict[str, set[str]] = defaultdict(set)
     pair_ids: dict[tuple[str, str], set[str]] = defaultdict(set)
     no_arm_links = 0
+    alternatives = 0
     for trial in trials:
         pairs = same_arm_pairs(trial)
+        alternatives += len(alternative_pairs(trial))
         if not pairs:
             if len(trial_drugs(trial)) >= 2 and not arm_drugs(trial):
                 no_arm_links += 1
@@ -156,11 +218,15 @@ def drug_drug_network(trials: list[Trial]) -> Network:
         "only listed in different arms of a trial (e.g. drug vs comparator) are not linked.",
         f"Network shows the top {NETWORK_TOP_DRUGS} drugs by number of trials with a same-arm combination; "
         f"{len(drug_ids)} such drugs were found.",
-        "An arm can list alternatives (e.g. carboplatin or cisplatin at the investigator's choice); "
-        "the registry does not say which, so such pairs also appear as links.",
+        "Drugs an arm offers as alternatives (its description reads e.g. 'cisplatin or carboplatin') are not "
+        "a combination; arms without a description are taken as given together.",
         "Supplements, placebo, saline and 'standard of care' are not counted as drugs.",
         *capped,
     ]
+    if alternatives:
+        assumptions.append(
+            f"{alternatives} drug pairs appear in an arm only as alternatives and are not counted as combinations."
+        )
     if no_arm_links:
         assumptions.append(
             f"{no_arm_links} trials list two or more drugs but do not record which arm receives them, "

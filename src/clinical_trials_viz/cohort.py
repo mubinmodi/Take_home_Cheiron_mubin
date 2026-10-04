@@ -3,7 +3,7 @@
 from collections import Counter
 from dataclasses import dataclass, field
 
-from clinical_trials_viz.catalog import DRUG_IDENTITY_MIN_SHARE
+from clinical_trials_viz.catalog import DRUG_IDENTITY_MIN_SHARE, TRIAL_FIELDS
 from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.ctgov.trial import Trial, clean_drug_name, parse_trial
 from clinical_trials_viz.models.response import AppliedFilters
@@ -81,10 +81,11 @@ def lists_drug(trial: Trial, name: str, identity: str | None) -> bool:
     return False
 
 
-async def fetch_cohort(client: CtGovClient, filters: AppliedFilters) -> Cohort:
+async def fetch_cohort(client: CtGovClient, filters: AppliedFilters, extra_fields: list[str] | None = None) -> Cohort:
     """Retrieve every matching trial; raises ScopeTooLarge instead of sampling."""
+    fields = [*TRIAL_FIELDS, *(extra_fields or [])]
     if not filters.drugs:
-        result = await client.search(build_params(filters))
+        result = await client.search(build_params(filters), fields=fields)
         trials = [parse_trial(s) for s in result.studies]
         cohort = Cohort(trials, result.total)
     else:
@@ -92,7 +93,7 @@ async def fetch_cohort(client: CtGovClient, filters: AppliedFilters) -> Cohort:
         matches = 0
         assumptions: list[str] = []
         for drug in filters.drugs:
-            result = await client.search(build_params(filters, drug))
+            result = await client.search(build_params(filters, drug), fields=fields)
             found = [parse_trial(s) for s in result.studies]
             matches += result.total
             identity = resolve_drug_identity(found)

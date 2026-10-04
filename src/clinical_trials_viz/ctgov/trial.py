@@ -44,6 +44,7 @@ class Trial:
     condition_mesh_terms: tuple[str, ...]
     countries: tuple[str, ...]  # distinct, current site locations
     removed_countries: tuple[str, ...]
+    arm_descriptions: tuple[tuple[str, str], ...]  # (arm label, description); fetched only when needed
     enrollment: int | None
     enrollment_type: str | None
     raw: dict[str, Any] = field(repr=False, compare=False, hash=False)
@@ -112,6 +113,9 @@ def parse_trial(study: dict[str, Any]) -> Trial:
         condition_mesh_terms=_unique([m.get("term") for m in _get(d, "conditionBrowseModule", "meshes") or []]),
         countries=_unique([loc.get("country") for loc in _get(p, "contactsLocationsModule", "locations") or []]),
         removed_countries=tuple(_get(d, "miscInfoModule", "removedCountries") or ()),
+        arm_descriptions=tuple(
+            (g.get("label") or "", g["description"]) for g in arms.get("armGroups") or [] if g.get("description")
+        ),
         enrollment=_get(design, "enrollmentInfo", "count"),
         enrollment_type=_get(design, "enrollmentInfo", "type"),
         raw=study,
@@ -154,6 +158,14 @@ def drug_interventions(trial: Trial) -> list[tuple[Intervention, str]]:
         matched[id(unmatched_drugs[0])] = unmatched_mesh[0]
     named = [(i, matched[id(i)] or clean_drug_name(i.name)) for i in drugs]
     return [(i, name) for i, name in named if name and name not in NON_DRUG_TERMS]
+
+
+def drug_name_variants(trial: Trial) -> dict[str, set[str]]:
+    """Every way each Drug is written in this trial (standard name, intervention name, other names)."""
+    variants: dict[str, set[str]] = {}
+    for intervention, name in drug_interventions(trial):
+        variants.setdefault(name, {name}).update(_names(intervention))
+    return variants
 
 
 def arm_drugs(trial: Trial) -> dict[str, tuple[str, ...]]:

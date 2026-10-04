@@ -238,6 +238,10 @@ ENROLLMENT_BINS: list[tuple[str, int, int | None]] = [
     ("Over 5,000", 5001, None),
 ]
 ENROLLMENT_FIELD = "protocolSection.designModule.enrollmentInfo"
+
+# Arm descriptions are long text, fetched only for drug-drug networks to tell alternatives
+# ("cisplatin OR carboplatin") from combinations ("pembrolizumab PLUS pemetrexed").
+ARM_DESCRIPTION_FIELDS = ["ArmGroupDescription"]
 MAX_TOP_N = 50
 MAX_COMPARE_SIDES = 5
 PAGE_SIZE = 1000

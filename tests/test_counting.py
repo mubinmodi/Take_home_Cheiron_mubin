@@ -84,3 +84,41 @@ def test_comparison_groups_put_shared_trials_in_overlap(trials):
     assert len(groups.trials["Both"]) == 10
     assert len(groups.trials["A only"]) == 20
     assert len(groups.trials["B only"]) == 20
+
+
+def test_arm_alternatives_are_not_combinations():
+    """KEYNOTE-189 (real record): pembrolizumab PLUS pemetrexed PLUS cisplatin OR carboplatin."""
+    import json
+    from pathlib import Path
+
+    from clinical_trials_viz.ctgov.trial import parse_trial
+    from clinical_trials_viz.network import alternative_pairs, are_alternatives, same_arm_pairs
+
+    study = json.loads((Path(__file__).parent / "fixtures" / "NCT02578680_keynote189.json").read_text())
+    trial = parse_trial(study)
+    combined = same_arm_pairs(trial)
+    assert ("carboplatin", "pembrolizumab") in combined
+    assert ("cisplatin", "pemetrexed") in combined
+    assert ("carboplatin", "cisplatin") not in combined
+    assert ("carboplatin", "cisplatin") in alternative_pairs(trial)
+
+    assert are_alternatives("cisplatin 75 mg/m2 IV OR carboplatin AUC 5", {"cisplatin"}, {"carboplatin"})
+    assert are_alternatives("investigator's choice of docetaxel/paclitaxel", {"docetaxel"}, {"paclitaxel"})
+    assert not are_alternatives("pembrolizumab 200 mg IV PLUS pemetrexed", {"pembrolizumab"}, {"pemetrexed"})
+    assert not are_alternatives("carboplatin and paclitaxel, or observation", {"carboplatin"}, {"paclitaxel"})
+    # Real arm texts that offer whole regimens or use long dosing phrases (NCT03066778, NCT02853305, NCT03635567).
+    long_gap = (
+        "investigator's choice of platinum therapy (carboplatin titrated to an area under the plasma drug "
+        "concentration-time curve [AUC] 5 IV on Day 1 OR cisplatin 75 mg/m^2 IV on Day 1)"
+    )
+    either = (
+        "standard therapy chemotherapy with EITHER cisplatin 70 mg/m^2 IV on Day 1 (or Day 2 if required) "
+        "+ gemcitabine IV infusion 1,000 mg/m^2 OR carboplatin AUC 5"
+    )
+    regimens = (
+        "Investigator choice of chemotherapy for up to 6 cycles (paclitaxel 175 mg/m^2 PLUS cisplatin 50 mg/m^2 "
+        "WITH or WITHOUT bevacizumab 15 mg/kg per local label OR paclitaxel 175 mg/m^2 PLUS carboplatin AUC 5"
+    )
+    for text in (long_gap, either, regimens):
+        assert are_alternatives(text, {"cisplatin"}, {"carboplatin"})
+    assert not are_alternatives(regimens, {"paclitaxel"}, {"cisplatin"})  # given together within a regimen
