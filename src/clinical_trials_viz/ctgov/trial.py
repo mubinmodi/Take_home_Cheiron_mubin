@@ -1,7 +1,7 @@
 """A typed view of one ClinicalTrials.gov study record, and the values each Dimension reads from it."""
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from clinical_trials_viz.catalog import (
@@ -47,7 +47,6 @@ class Trial:
     arm_descriptions: tuple[tuple[str, str], ...]  # (arm label, description); fetched only when needed
     enrollment: int | None
     enrollment_type: str | None
-    raw: dict[str, Any] = field(repr=False, compare=False, hash=False)
 
     @property
     def start_year(self) -> int | None:
@@ -118,7 +117,6 @@ def parse_trial(study: dict[str, Any]) -> Trial:
         ),
         enrollment=_get(design, "enrollmentInfo", "count"),
         enrollment_type=_get(design, "enrollmentInfo", "type"),
-        raw=study,
     )
 
 

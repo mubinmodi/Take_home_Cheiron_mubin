@@ -27,7 +27,7 @@ Not needed: vector database, run checkpointer, Kubernetes, separate API gateway.
 
 - **Core:** `fastapi`, `uvicorn`, `pydantic` v2, `pydantic-settings`, `httpx` (async), `tenacity`.
 - **Model layer:** `pydantic-ai-slim[openai,anthropic,google]` `FallbackModel` (OpenAI primary, Anthropic fallback by default, Gemini available; chosen by configuration), tool-based output mode.
-- **Chart and analysis:** our own visualization schema (pydantic models exported as JSON Schema); `vl-convert-python` to render Vega-Lite to PNG/SVG; plain Python for counting (`pandas` optional); `networkx` only for network metrics.
+- **Chart and analysis:** our own visualization schema (pydantic models exported as JSON Schema); `vl-convert-python` to render Vega-Lite to PNG/SVG; plain Python for counting (`pandas` optional).
 - **Storage and cache:** `redis` (asyncio), `sqlalchemy` 2.x, `asyncpg`, `alembic`, `boto3`/`aioboto3`.
 - **Observability:** `opentelemetry-sdk` with FastAPI and httpx instrumentation (pydantic-ai emits OpenTelemetry spans too); `structlog`.
 - **Optional:** `langgraph`.
