@@ -36,7 +36,7 @@
 | ID | Status | Evidence | Limitation |
 |---|---|---|---|
 | CIT-01 – CIT-04 | verified | Every Datum of every chart type carries `trial_ids`; `evidence` holds each cited trial once with the source field values that placed it; the verifier recounts them and re-derives every quoted value from the record | Tables cite only the 100 rows they show (`metadata.total_rows` gives the full count) |
-| SUB-08 | verified | Web page at `GET /` (same response contract); deployed on AWS (API key required) | No video |
+| SUB-08 | verified | Web page at `GET /` (same response contract); deployed on AWS, open for the review (no key; URL in README §1) | No video |
 | OUT-07 | verified | `assumptions` and `applied_filters` on every answer | — |
 
 ## Scored subcriteria
@@ -50,7 +50,7 @@
 | AI-02 | Semantic gate with one repair (`validate.py`); tamper tests prove the verifier rejects wrong counts, wrong grouping and altered citations | — |
 | AI-03 | One typed plan; clarifications built from data; bounded outcomes; `model_calls` and `timings_ms` on every response | The plan is the only planning trace |
 | CODE-01 | Focused modules, README code map, ruff and pyright clean | — |
-| CODE-02 | 168 offline tests, including tamper tests and failure injection; regression tests confirmed to fail on the old code; live tests; archive smoke test | — |
+| CODE-02 | 189 offline tests, including tamper tests and failure injection; regression tests confirmed to fail on the old code; live tests; archive smoke test | — |
 | COV-01 | README §5 table: all nine appendix questions with their eval cases, plus supported and unsupported boundaries | — |
 | COV-02 | Five composable operations × dimensions × filters, multi-part questions and crossed charts, held out from the prompt | — |
 | COV-03 | Nine chart types, including two network kinds with documented weights and size limits | No investigator or site networks |

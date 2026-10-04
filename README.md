@@ -84,11 +84,12 @@ On AWS it runs on **ECS Express Mode** (App Runner closed to new customers in Ap
 ```bash
 API_KEYS=you:a-long-random-key docker compose up --build   # the hosted mode on this machine, with Redis and Postgres
 deploy/aws/create-service.sh                                # create the ECS Express Mode service (after the one-time setup)
-TAG=v2 deploy/aws/update-service.sh                         # roll out new code: build, push, rolling update with rollback
+TAG=v6 deploy/aws/update-service.sh                         # roll out new code: build, push, rolling update with rollback
+TAG=v6 SET_ENV="OPEN_ACCESS=true" deploy/aws/update-service.sh   # the same, also changing settings
 deploy/smoke-test.sh https://YOUR-SERVICE-URL               # health, a question, a follow-up and a chart
 ```
 
-The hosted mode refuses to start without Redis, Postgres and API keys. The one-time AWS setup (registry, roles, database, cache, secrets) is listed command by command in [`docs/hosted-deployment.md`](docs/hosted-deployment.md#aws-deployment-2026-10-04), with costs (roughly $50–60 a month while running) and teardown. Every question costs 1–3 model calls; the per-user limit caps that.
+The hosted mode refuses to start without Redis, Postgres and API keys (API keys may be left out only with `OPEN_ACCESS=true`). The one-time AWS setup (registry, roles, database, cache, secrets) is listed command by command in [`docs/hosted-deployment.md`](docs/hosted-deployment.md#aws-deployment-2026-10-04), with costs (roughly $50–60 a month while running) and teardown. Every question costs 1–3 model calls; the per-user limit caps that (with open access, nothing does: tear the service down after the review).
 
 ---
 
@@ -180,7 +181,7 @@ If a structured field and the question name different values for the same filter
 | Same key while the first request is still running | **409** (retry shortly) |
 | Key older than 24 hours | Treated as new |
 
-**API key (hosted).** When the service is configured with `API_KEYS`, send `X-API-Key: <your key>`. A missing or wrong key gets **401** (`unauthorized`); more questions than the hourly limit get **429** (`rate_limited`) with a `Retry-After` header. Idempotent replays do not count against the limit.
+**API key (hosted).** When the service is configured with `API_KEYS` (and not `OPEN_ACCESS`), send `X-API-Key: <your key>`. A missing or wrong key gets **401** (`unauthorized`); more questions than the hourly limit get **429** (`rate_limited`) with a `Retry-After` header. Idempotent replays do not count against the limit.
 
 Request equality is judged on the validated request, so whitespace and field order do not matter. A request that fails before producing a run (e.g. unknown `previous_run_id`) does not consume its key. Without the header, every POST is a new run. The JSON Schemas for request and response are served at `GET /v1/schema`.
 
@@ -209,7 +210,7 @@ All outcomes return HTTP 200 with the outcome in the body.
 | `evidence` | `{nct_id: {nct_id, title, url, fields}}`: each cited trial once, with the **source field values** (API field path → value) that placed it in the data and satisfied each filter |
 | `assumptions` | Defaults applied and data caveats (e.g. "9 of 126 search matches were excluded because 'Keytruda' is not one of their drug interventions") |
 | `applied_filters` | The filters actually applied after merging structured fields; `from_request` names those pinned by the caller |
-| `clarification` | On `clarification_required`: `{field, question, options:[{label, value, trial_count}], multi_select, allow_free_text}`. Send the chosen `value` back in `field` with `previous_run_id`. |
+| `clarification` | On `clarification_required`: `{field, question, reason, options:[{label, value, trial_count}], multi_select, allow_free_text}`. Send the chosen `value` back in `field` with `previous_run_id`. `reason` is `conflict` when a structured field contradicts the question. |
 | `plan`, `relation` | The model's Query Plan, and whether a follow-up refined (`refine`) or replaced (`new`) the previous one |
 | `source` | API version, data timestamp, retrieval time, search matches, cohort size, API requests |
 | `verification` | `{passed, checks:[{name, passed, detail}]}` |
@@ -366,15 +367,16 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 ## 9. How correctness was validated
 
 - **API spike before design.** Every filter was checked against the live API, and local counts reproduce the API's own totals exactly: start year 2020 = 263, Phase 3 = 367, Germany = 326, recruiting = 712. Findings and data-quality measurements are in [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md).
-- **168 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
+- **189 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
   - every chart type, clarifications, follow-ups, repair
   - `scope_required`, `no_data`, upstream errors, rate-limit retries
-  - every failure point in §7 (21 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
-  - the hosted mode (30 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits, circuit breakers opening and closing, and the run deadline keeping finished parts
-  - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other, missing values as their own state), with property tests showing input order and duplicates do not change counts
-  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
+  - every failure point in §7 (23 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
+  - the hosted mode (36 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits (per user, and Idempotency-Keys scoped per user), open access, circuit breakers opening and closing, the run deadline keeping finished parts and covering a slow run store
+  - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other with "Not reported" kept separate, missing values as their own state, the drug filter keeping only drug-type interventions), with property tests showing input order and duplicates do not change counts
+  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, a trial wrongly counted in "Other", an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
 - **Live tests** against ClinicalTrials.gov (`pytest -m live`), and every answer type run end to end with the real models, with the images inspected (tables have none).
 - **Planner eval** (`evals/`): 42 questions modelled on the assignment's appendix, scored per question family per model.
+- **An external code review** by a second model, every finding checked against the code. Ten were real and are fixed, each with a regression test that failed first. Among them: the drug filter kept trials that gave the drug only as a device or tracer; fallback attempts escaped the 3-call limit; the verifier missed a wrong grouping and altered citations; "Not reported" was folded into "Other"; and picking your own filter's value in a conflict clarification asked again forever.
 - **Iteration driven by real data.** Each of these was found by running the real service, then fixed and covered by a test:
   - procedures counted as drugs (MeSH terms span all interventions) → drug identity matched to drug-type interventions
   - HTTP 429 → `Retry-After` handling
