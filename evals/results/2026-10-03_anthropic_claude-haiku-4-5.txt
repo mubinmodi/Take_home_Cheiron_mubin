@@ -1,0 +1,58 @@
+PASS  trend-01         How has the number of trials for pembrolizumab changed per year since 2015?
+PASS  trend-02         Show yearly trial counts for Keytruda from 2018 onwards
+PASS  trend-03         How many trials started each year for type 2 diabetes?
+PASS  trend-04         Number of Alzheimer's disease trials per year between 2010 and 2020
+FAIL  trend-05         How has the number of trials for this drug changed over time?
+        kind: expected 'answer', got 'clarify'
+        operation: expected 'aggregate', got None
+        group_by: expected 'start_year', got None
+PASS  dist-01          How are breast cancer trials distributed across phases?
+PASS  dist-02          Phase breakdown of recruiting multiple sclerosis studies
+PASS  dist-03          What are the most common intervention types for depression trials?
+PASS  dist-04          Which intervention types appear most in metformin trials?
+PASS  dist-05          What is the status breakdown of COVID-19 vaccine trials?
+PASS  dist-06          Who are the top 5 lead sponsors of melanoma trials?
+PASS  cmp-01           Compare phases for trials involving pembrolizumab vs nivolumab
+PASS  cmp-02           Semaglutide versus tirzepatide: how do their trials split by phase?
+PASS  cmp-03           Compare sponsor categories across lung cancer and breast cancer trials
+FAIL  cmp-04           Industry vs academic sponsorship: compare Parkinson's disease and ALS trials
+        kind: expected 'answer', got 'clarify'
+        operation: expected 'compare', got None
+        group_by: expected 'sponsor_class', got None
+        compare_sides: expected [{'condition': "parkinson's disease"}, {'condition': 'als'}], got None
+PASS  cmp-05           How many recruiting trials do atezolizumab, durvalumab and avelumab each have?
+PASS  geo-01           Which countries have the most recruiting trials for melanoma?
+PASS  geo-02           Top 10 countries running completed sickle cell disease trials
+PASS  geo-03           How many recruiting obesity trials are there in the UK?
+PASS  net-01           Show a network of sponsors and drugs for glioblastoma trials
+PASS  net-02           Which drugs are most often combined with pembrolizumab?
+PASS  single-01        How many phase 3 trials of semaglutide are currently recruiting?
+PASS  list-01          List the recruiting phase 3 pembrolizumab trials in Germany
+FAIL  study-01         Which countries does NCT02578680 recruit in?
+        operation: expected 'aggregate', got 'per_trial'
+        group_by: expected 'country', got None
+PASS  sponsor-01       What phases are Pfizer's trials in?
+PASS  clarify-01       How has the number of trials for this drug changed over time?
+PASS  clarify-02       How many trials of PD-1 inhibitors started each year?
+PASS  clarify-03       Show nivolumab trials by phase
+PASS  clarify-04       Compare these two drugs by phase
+PASS  unsupported-01   Is pembrolizumab more effective than nivolumab for lung cancer?
+PASS  unsupported-02   Which cancer treatment should I take?
+PASS  hist-01          What is the enrollment distribution of melanoma trials?
+PASS  hist-02          How many participants do completed breast cancer trials usually enroll?
+PASS  timeline-01      Show a timeline of recruiting phase 3 pembrolizumab trials in Germany
+PASS  scatter-01       Plot enrollment against duration for melanoma trials
+PASS  net-03           Which companies are developing which drugs for obesity?
+
+33/36 plans correct (92%) using anthropic:claude-haiku-4-5
+  clarification   4/4
+  comparison      4/5
+  distribution    7/7
+  geographic      3/3
+  histogram       2/2
+  network         3/3
+  per_trial       3/3
+  single_study    0/1
+  single_value    1/1
+  time_trend      4/5
+  unsupported     2/2

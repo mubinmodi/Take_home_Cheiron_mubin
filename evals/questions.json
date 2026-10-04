@@ -1,6 +1,6 @@
 {
   "description": "Planner eval set modelled on the assignment appendix (docs/assignment-images/IMG_5213.png). Each case lists the question, optional structured fields, and the expected plan. Only the keys listed under `expect` are checked; drug, condition, sponsor and country names compare case-insensitively.",
-  "version": "2026-10-03.1",
+  "version": "2026-10-03.2",
   "cases": [
     {
       "id": "trend-01",
@@ -378,8 +378,7 @@
           ]
         },
         "network": "drug_drug"
-      },
-      "note": "drug_drug networks arrive in ticket 03; the plan should still say drug_drug."
+      }
     },
     {
       "id": "single-01",
@@ -520,6 +519,96 @@
       "question": "Which cancer treatment should I take?",
       "expect": {
         "kind": "unsupported"
+      }
+    },
+    {
+      "id": "hist-01",
+      "family": "histogram",
+      "appendix": "(enrollment distribution)",
+      "question": "What is the enrollment distribution of melanoma trials?",
+      "expect": {
+        "kind": "answer",
+        "operation": "bin",
+        "filters": {
+          "conditions": [
+            "melanoma"
+          ]
+        }
+      }
+    },
+    {
+      "id": "hist-02",
+      "family": "histogram",
+      "appendix": "(enrollment distribution)",
+      "question": "How many participants do completed breast cancer trials usually enroll?",
+      "expect": {
+        "kind": "answer",
+        "operation": "bin",
+        "filters": {
+          "conditions": [
+            "breast cancer"
+          ],
+          "statuses": [
+            "COMPLETED"
+          ]
+        }
+      }
+    },
+    {
+      "id": "timeline-01",
+      "family": "per_trial",
+      "appendix": "(trial timeline)",
+      "question": "Show a timeline of recruiting phase 3 pembrolizumab trials in Germany",
+      "expect": {
+        "kind": "answer",
+        "operation": "per_trial",
+        "view": "timeline",
+        "filters": {
+          "drugs": [
+            "pembrolizumab"
+          ],
+          "phases": [
+            "PHASE3"
+          ],
+          "statuses": [
+            "RECRUITING"
+          ],
+          "countries": [
+            "germany"
+          ]
+        }
+      }
+    },
+    {
+      "id": "scatter-01",
+      "family": "per_trial",
+      "appendix": "(scatter)",
+      "question": "Plot enrollment against duration for melanoma trials",
+      "expect": {
+        "kind": "answer",
+        "operation": "per_trial",
+        "view": "scatter",
+        "filters": {
+          "conditions": [
+            "melanoma"
+          ]
+        }
+      }
+    },
+    {
+      "id": "net-03",
+      "family": "network",
+      "appendix": "Show a network of sponsors ↔ drugs for [condition] trials.",
+      "question": "Which companies are developing which drugs for obesity?",
+      "expect": {
+        "kind": "answer",
+        "operation": "relate",
+        "network": "sponsor_drug",
+        "filters": {
+          "conditions": [
+            "obesity"
+          ]
+        }
       }
     }
   ]
