@@ -219,10 +219,35 @@ def table_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[Visualizat
     return spec, assumptions
 
 
+COLLABORATORS_FIELD = "protocolSection.sponsorCollaboratorsModule.collaborators.name"
+
+
+def filter_dimensions(filters: AppliedFilters) -> list[Dimension]:
+    """The source fields that decide whether a trial passes each applied filter."""
+    used = {
+        Dimension.DRUG: bool(filters.drugs),
+        Dimension.CONDITION: bool(filters.conditions),
+        Dimension.PHASE: bool(filters.phases),
+        Dimension.STATUS: bool(filters.statuses),
+        Dimension.STUDY_TYPE: bool(filters.study_types),
+        Dimension.LEAD_SPONSOR: bool(filters.sponsor),
+        Dimension.COUNTRY: bool(filters.countries),
+        Dimension.START_YEAR: bool(filters.start_year_from or filters.start_year_to),
+    }
+    return [d for d, on in used.items() if on]
+
+
 def build_evidence(
-    spec: VisualizationSpec, trials: dict[str, Trial], dimension: Dimension | None
+    spec: VisualizationSpec,
+    trials: dict[str, Trial],
+    dimension: Dimension | None,
+    filters: AppliedFilters,
+    extra: tuple[Dimension, ...] = (),
 ) -> dict[str, EvidenceEntry]:
-    """One entry per cited trial, with the source values that placed it in the data."""
+    """One entry per cited trial, with the source values that placed it in the data: the field it
+    is grouped by and every field an applied filter (or comparison side, via `extra`) relies on."""
+    wanted: list[Dimension] = [*filter_dimensions(filters), *extra, *([dimension] if dimension else [])]
+    cited = list(dict.fromkeys(wanted))
     evidence: dict[str, EvidenceEntry] = {}
     for datum in spec.data:
         for nct_id in datum["trial_ids"]:
@@ -230,7 +255,9 @@ def build_evidence(
                 continue
             trial = trials[nct_id]
             fields: dict[str, Any] = {"protocolSection.identificationModule.nctId": nct_id}
-            if dimension is not None:
-                fields[DIMENSIONS[dimension].source_field] = dimension_evidence(trial, dimension)
+            for dim in cited:
+                fields[DIMENSIONS[dim].source_field] = dimension_evidence(trial, dim)
+            if filters.sponsor and filters.sponsor_role == "any":
+                fields[COLLABORATORS_FIELD] = list(trial.collaborators)
             evidence[nct_id] = EvidenceEntry(nct_id=nct_id, title=trial.title, url=study_url(nct_id), fields=fields)
     return evidence

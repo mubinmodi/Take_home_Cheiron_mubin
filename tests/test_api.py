@@ -220,3 +220,21 @@ def test_model_tiers_use_known_models_and_allowed_openai(monkeypatch):
     defaults = Settings(_env_file=None)  # type: ignore[call-arg]
     assert defaults.planner_primary == MODEL_TIERS["mini"]["openai"]
     assert defaults.planner_fallback == MODEL_TIERS["mini"]["anthropic"]
+
+
+def test_cli_summary_is_short_and_points_to_the_full_response():
+    from clinical_trials_viz.cli import summarize
+
+    response = {
+        "run_id": "run_x", "outcome": "success", "model_calls": 1, "timings_ms": {"plan": 1000.0},
+        "source": {"api_requests": 3},
+        "visualization": {"type": "single_value", "title": "Number of trials: Keytruda", "encoding": {},
+                          "data": [{"trial_count": 117, "trial_ids": ["NCT1"]}], "metadata": {}},
+        "applied_filters": {"drugs": ["Keytruda"], "sponsor_role": "lead"},
+        "assumptions": ["'Keytruda' was matched as 'pembrolizumab'."],
+        "verification": {"passed": True, "checks": [{"name": "a", "passed": True}]},
+        "evidence": {"NCT1": {}},
+    }  # fmt: skip
+    text = summarize(response)
+    assert "117 trials" in text and "Filters: drugs=Keytruda" in text and "--json" in text
+    assert "NCT1" not in text  # evidence is not dumped

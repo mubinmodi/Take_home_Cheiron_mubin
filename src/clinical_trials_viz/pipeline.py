@@ -260,8 +260,10 @@ class Pipeline:
     ) -> None:
         response = run.response
         with run.stage("verify"):
-            evidence = build_evidence(spec, trials, dimension)
-            verification = verify(spec, evidence, trials, dimension, chart_type_for(plan))
+            filters = response.applied_filters or AppliedFilters()
+            sides = tuple(_side_dimensions(plan))
+            evidence = build_evidence(spec, trials, dimension, filters, sides)
+            verification = verify(spec, evidence, trials, dimension, chart_type_for(plan), filters)
         response.verification = verification
         if not verification.passed:
             run.finish(Outcome.INTERNAL_ERROR, "The answer failed verification and was withheld.")
@@ -271,3 +273,16 @@ class Pipeline:
         if spec.type is not VisualizationType.TABLE:
             response.chart_url = f"{self.public_base_url}/v1/runs/{response.run_id}/chart.png"
         run.finish(Outcome.SUCCESS)
+
+
+def _side_dimensions(plan: AnswerPlan) -> list[Dimension]:
+    """Fields that decide which comparison side a trial belongs to, so they are cited too."""
+    found = []
+    for side in plan.compare_sides:
+        if side.drug:
+            found.append(Dimension.DRUG)
+        elif side.condition:
+            found.append(Dimension.CONDITION)
+        elif side.sponsor:
+            found.append(Dimension.LEAD_SPONSOR)
+    return list(dict.fromkeys(found))

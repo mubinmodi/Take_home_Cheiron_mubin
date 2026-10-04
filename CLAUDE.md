@@ -47,7 +47,8 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 uv sync                                        # install
 cp .env.example .env                           # then add OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_API_KEY
 uv run clinical-trials-viz serve               # API on http://127.0.0.1:8000 (docs at /docs)
-uv run clinical-trials-viz ask "How many recruiting Keytruda trials are there?"
+uv run clinical-trials-viz ask "How many recruiting Keytruda trials are there?"   # summary; chart saved to data/charts/
+uv run clinical-trials-viz ask "..." --json --previous RUN_ID --fields '{"drug_name": "Keytruda"}'  # full response, follow-up, fields
 uv run pytest                                  # offline tests (live API tests deselected)
 uv run pytest -m live                          # tests against the real ClinicalTrials.gov API
 uv run python -m evals.run [case-id ...]       # score the planner on evals/questions.json (needs an API key)
@@ -57,7 +58,7 @@ uv run ruff check src tests && uv run ruff format src tests && uv run pyright
 
 ## Code map (`src/clinical_trials_viz/`)
 
-`pipeline.py` runs the fixed workflow and owns Outcomes: `planner.py` (the only model step) → `validate.py` (merge structured fields, semantic gate, one repair) → `cohort.py` (compile Filters to API params, retrieve all pages, drug match check) → `analyze.py` (all counting) → `spec_builder.py` (chart type chosen by code from the plan, spec + evidence) → `verify.py` (gate) → `runs.py` (run record). `clarify.py` builds clarification options from data. `catalog.py` is the capability catalog. `ctgov/` is the API client and the typed `Trial` record. `render.py` turns a spec into Vega-Lite and PNG/SVG. Tests use real records saved in `tests/fixtures/` and mock the API with `respx`.
+`pipeline.py` runs the fixed workflow and owns Outcomes: `planner.py` (the only model step) → `validate.py` (merge structured fields, semantic gate, one repair) → `cohort.py` (compile Filters to API params, retrieve all pages, drug match check) → `analyze.py` (all counting) → `spec_builder.py` (chart type chosen by code from the plan, spec + evidence) → `verify.py` (gate) → `runs.py` (run record). `clarify.py` builds clarification options from data. `cli.py` holds `serve` and `ask`. `catalog.py` is the capability catalog. `ctgov/` is the API client and the typed `Trial` record. `render.py` turns a spec into Vega-Lite and PNG/SVG. Tests use real records saved in `tests/fixtures/` and mock the API with `respx`.
 
 ## Stack
 

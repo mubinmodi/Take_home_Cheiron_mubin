@@ -70,13 +70,20 @@ def _time_series(trials):
     spec = breakdown_spec(
         breakdown(trials, Dimension.START_YEAR, None), AppliedFilters(drugs=["pembrolizumab"]), len(trials)
     )
-    return spec, build_evidence(spec, {t.nct_id: t for t in trials}, Dimension.START_YEAR)
+    return spec, build_evidence(spec, {t.nct_id: t for t in trials}, Dimension.START_YEAR, AppliedFilters())
 
 
 def test_time_series_spec_verifies(trials):
     spec, evidence = _time_series(trials)
     assert spec.type is VisualizationType.TIME_SERIES
-    result = verify(spec, evidence, {t.nct_id: t for t in trials}, Dimension.START_YEAR, VisualizationType.TIME_SERIES)
+    result = verify(
+        spec,
+        evidence,
+        {t.nct_id: t for t in trials},
+        Dimension.START_YEAR,
+        VisualizationType.TIME_SERIES,
+        AppliedFilters(),
+    )
     assert result.passed, result.checks
 
 
@@ -84,7 +91,14 @@ def test_verifier_catches_a_wrong_count(trials):
     spec, evidence = _time_series(trials)
     datum = next(d for d in spec.data if d["trial_count"])
     datum["trial_count"] += 1
-    result = verify(spec, evidence, {t.nct_id: t for t in trials}, Dimension.START_YEAR, VisualizationType.TIME_SERIES)
+    result = verify(
+        spec,
+        evidence,
+        {t.nct_id: t for t in trials},
+        Dimension.START_YEAR,
+        VisualizationType.TIME_SERIES,
+        AppliedFilters(),
+    )
     assert not result.passed
     assert not next(c for c in result.checks if c.name == "counts_match_citations").passed
 
@@ -96,7 +110,14 @@ def test_verifier_catches_a_trial_in_the_wrong_bucket(trials):
     a["trial_count"] -= 1
     b["trial_ids"].append(moved)
     b["trial_count"] += 1
-    result = verify(spec, evidence, {t.nct_id: t for t in trials}, Dimension.START_YEAR, VisualizationType.TIME_SERIES)
+    result = verify(
+        spec,
+        evidence,
+        {t.nct_id: t for t in trials},
+        Dimension.START_YEAR,
+        VisualizationType.TIME_SERIES,
+        AppliedFilters(),
+    )
     assert not next(c for c in result.checks if c.name == "cited_values_match_source").passed
 
 
@@ -128,3 +149,23 @@ def test_single_value_and_table(trials):
     assert table.metadata.total_rows == len(trials)
     with pytest.raises(NotRenderable):
         render(table, "png")
+
+
+def test_filtered_answer_cites_and_checks_filter_fields(trials):
+    phase3 = [t for t in trials if "PHASE3" in t.phases]
+    filters = AppliedFilters(drugs=["pembrolizumab"], phases=[Phase.PHASE3])
+    spec = single_value_spec(phase3, filters)
+    by_id = {t.nct_id: t for t in trials}
+    evidence = build_evidence(spec, by_id, None, filters)
+    entry = evidence[phase3[0].nct_id]
+    assert "PHASE3" in entry.fields["protocolSection.designModule.phases"]
+    assert "pembrolizumab" in entry.fields["derivedSection.interventionBrowseModule.meshes.term"]
+    assert verify(spec, evidence, by_id, None, VisualizationType.SINGLE_VALUE, filters).passed
+
+    # A trial that fails the phase filter must not be counted.
+    other = next(t for t in trials if "PHASE3" not in t.phases)
+    bad = single_value_spec([*phase3, other], filters)
+    result = verify(
+        bad, build_evidence(bad, by_id, None, filters), by_id, None, VisualizationType.SINGLE_VALUE, filters
+    )
+    assert not next(c for c in result.checks if c.name == "cited_trials_meet_filters").passed
