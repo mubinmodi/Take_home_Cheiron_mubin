@@ -7,22 +7,13 @@ together with the run ID, which the message quotes for unexpected errors.
 import logging
 from dataclasses import dataclass
 
-from pydantic_ai import (
-    FallbackExceptionGroup,
-    ModelAPIError,
-    ModelHTTPError,
-    UnexpectedModelBehavior,
-    UsageLimitExceeded,
-)
+from pydantic_ai import FallbackExceptionGroup, ModelAPIError, UnexpectedModelBehavior, UsageLimitExceeded
 
 from clinical_trials_viz.ctgov.client import ScopeTooLarge, UpstreamError
 from clinical_trials_viz.models.response import ErrorCode, ErrorInfo, Outcome
-from clinical_trials_viz.planner import PlannerNotConfigured, PlannerTimeout, describe_model_error
+from clinical_trials_viz.planner import PlannerNotConfigured, PlannerTimeout, describe_model_error, is_outage
 
 log = logging.getLogger(__name__)
-
-# Provider statuses where trying again later may work; other 4xx (bad key, unknown model) need a config fix.
-_RETRYABLE_STATUS = frozenset({408, 409, 429})
 
 
 @dataclass(frozen=True)
@@ -45,12 +36,6 @@ def _model_errors(exc: BaseException) -> list[ModelAPIError]:
     return [exc] if isinstance(exc, ModelAPIError) else []
 
 
-def _retryable(exc: ModelAPIError) -> bool:
-    if isinstance(exc, ModelHTTPError):
-        return exc.status_code in _RETRYABLE_STATUS or exc.status_code >= 500
-    return True  # connection errors and timeouts
-
-
 def classify(exc: BaseException, run_id: str) -> Failure:
     """The Outcome and error for an exception raised while answering (all or part of) a Run."""
     if isinstance(exc, ScopeTooLarge):
@@ -67,7 +52,7 @@ def classify(exc: BaseException, run_id: str) -> Failure:
     if errors := _model_errors(exc):
         tried = "; ".join(describe_model_error(e) for e in errors)
         log.warning("run %s: every planning model failed: %s", run_id, tried)
-        if any(_retryable(e) for e in errors):
+        if any(is_outage(e) for e in errors):
             return _failure(
                 Outcome.UPSTREAM_ERROR,
                 ErrorCode.PLANNER_UNAVAILABLE,

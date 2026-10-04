@@ -4,17 +4,24 @@ and the run deadline. The local mode must keep working with none of it configure
 import asyncio
 
 import fakeredis
+import httpx
 import pytest
 from pydantic import SecretStr, ValidationError
+from pydantic_ai import ModelHTTPError
+from pydantic_ai.messages import ModelMessage, ModelResponse, ToolCallPart
+from pydantic_ai.models.function import AgentInfo, FunctionModel
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
 from clinical_trials_viz.catalog import Dimension
 from clinical_trials_viz.config import HOSTED_QUERIES_PER_HOUR, HOSTED_RUN_DEADLINE_SECONDS, Settings
+from clinical_trials_viz.ctgov import client as ctgov_client
 from clinical_trials_viz.idempotency import KeyInProgress, KeyReused
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
 from clinical_trials_viz.models.request import QueryRequest
+from clinical_trials_viz.planner import LLMPlanner
 from clinical_trials_viz.runs import async_database_url, runs_table
 from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisRateLimiter, RedisUserLimiter
 from tests.conftest import ScriptedPlanner, ask
@@ -245,3 +252,111 @@ async def test_user_limits_hold_across_instances():
     wait = await one.spend("alice")  # the third question this hour, whichever instance takes it
     assert wait is not None and 0 < wait <= 3600
     assert await other.spend("bob") is None
+
+
+# --- Circuit breakers -------------------------------------------------------------------------------
+
+
+class Clock:
+    def __init__(self):
+        self.now = 0.0
+
+    def __call__(self) -> float:
+        return self.now
+
+
+def test_a_breaker_opens_after_repeated_failures_and_lets_one_trial_through():
+    clock = Clock()
+    breaker = CircuitBreaker("source", failures=2, cooldown=30, clock=clock)
+    breaker.failure()
+    breaker.check()  # one failure: still closed
+    breaker.failure()
+    with pytest.raises(CircuitOpen) as info:
+        breaker.check()
+    assert info.value.retry_in == 30
+    clock.now = 30
+    breaker.check()  # the cool-down is over: one trial call
+    with pytest.raises(CircuitOpen):
+        breaker.check()  # the others wait for it
+    breaker.failure()  # the trial failed: another full cool-down
+    clock.now = 45
+    with pytest.raises(CircuitOpen) as info:
+        breaker.check()
+    assert info.value.retry_in == 15
+    clock.now = 60
+    breaker.check()
+    breaker.success()  # the trial succeeded: closed
+    breaker.check()
+    breaker.check()
+
+
+def test_a_trial_that_ends_without_an_answer_frees_its_slot():
+    clock = Clock()
+    breaker = CircuitBreaker("source", failures=1, cooldown=10, clock=clock)
+    breaker.failure()
+    clock.now = 10
+    breaker.check()
+    breaker.release()  # e.g. the run was cancelled mid-call
+    breaker.check()  # the next call may try instead
+
+
+@pytest.fixture
+def instant_retries(monkeypatch):
+    async def instant(_):
+        return None
+
+    monkeypatch.setattr(ctgov_client.asyncio, "sleep", instant)
+
+
+async def test_clinicaltrials_failing_repeatedly_fails_fast(make_client, ctgov, settings, instant_retries):
+    settings.breaker_failures = 2
+    studies = ctgov.get("/studies").mock(return_value=httpx.Response(503, text="maintenance"))
+    async for client in make_client(ScriptedPlanner(TREND, TREND, TREND)):
+        for _ in range(2):
+            body = (await client.post("/v1/query", json=QUESTION)).json()
+            assert body["error"]["code"] == "source_unavailable" and "HTTP 503" in body["message"]
+        calls = studies.call_count
+        body = (await client.post("/v1/query", json=QUESTION)).json()
+    assert studies.call_count == calls  # not called again: the breaker is open
+    assert body["error"]["code"] == "source_unavailable" and body["error"]["retryable"]
+    assert "paused for 30 s" in body["message"]
+
+
+async def test_a_model_failing_repeatedly_is_skipped_until_its_cool_down_ends(make_client):
+    calls: list[str] = []
+
+    def outage(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        calls.append("primary")
+        raise ModelHTTPError(503, "primary-model")
+
+    def plan(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        args = {"operation": "aggregate", "filters": {"drugs": ["Keytruda"]}, "group_by": "start_year"}
+        return ModelResponse(parts=[ToolCallPart("answer_plan", args)], model_name="fallback-model")
+
+    planner = LLMPlanner(
+        FunctionModel(outage, model_name="primary-model"),
+        FunctionModel(plan, model_name="fallback-model"),
+        breaker_failures=1,
+        breaker_cooldown=60,
+    )
+    async for client in make_client(planner):
+        first = (await client.post("/v1/query", json=QUESTION)).json()
+        second = (await client.post("/v1/query", json=QUESTION)).json()
+    assert first["outcome"] == second["outcome"] == "success"
+    assert calls == ["primary"]  # the second question went straight to the fallback
+    assert any("primary-model: not called, paused for 60 s" in w for w in second["warnings"])
+
+
+async def test_a_rejected_key_never_opens_a_breaker(make_client):
+    calls: list[str] = []
+
+    def bad_key(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        calls.append("primary")
+        raise ModelHTTPError(401, "primary-model")
+
+    planner = LLMPlanner(FunctionModel(bad_key, model_name="primary-model"), breaker_failures=1)
+    async for client in make_client(planner):
+        for _ in range(2):
+            body = (await client.post("/v1/query", json=QUESTION)).json()
+            assert body["error"]["code"] == "planner_rejected"  # the real cause, every time
+    assert calls == ["primary", "primary"]

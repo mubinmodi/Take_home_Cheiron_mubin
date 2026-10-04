@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 
 import httpx
 
+from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
 from clinical_trials_viz.catalog import PAGE_SIZE, TRIAL_FIELDS
 from clinical_trials_viz.models.response import ErrorCode
 
@@ -154,15 +155,41 @@ class CtGovClient:
         limiter: Limiter,
         max_pages: int,
         cache: PageCache | None = None,
+        breaker: CircuitBreaker | None = None,
     ):
         self._http = http
         self._base = base_url.rstrip("/")
         self._limiter = limiter
         self.max_pages = max_pages
         self._cache = cache or MemoryPageCache()
+        self._breaker = breaker or CircuitBreaker("ClinicalTrials.gov", failures=5, cooldown=30.0)
         self._version: tuple[float, SourceVersion] | None = None
 
     async def _get(self, path: str, params: dict[str, str] | None = None) -> Any:
+        """One logical request (with its retries), behind the circuit breaker."""
+        try:
+            self._breaker.check()
+        except CircuitOpen as exc:
+            raise UpstreamError(
+                f"ClinicalTrials.gov failed repeatedly; requests are paused for {exc.retry_in:.0f} s. "
+                "Please try again shortly.",
+                ErrorCode.SOURCE_UNAVAILABLE,
+            ) from exc
+        try:
+            body = await self._attempts(path, params)
+        except UpstreamError as exc:
+            if exc.code is ErrorCode.SOURCE_REJECTED:
+                self._breaker.success()  # it answered; the request was at fault
+            else:
+                self._breaker.failure()
+            raise
+        except BaseException:
+            self._breaker.release()
+            raise
+        self._breaker.success()
+        return body
+
+    async def _attempts(self, path: str, params: dict[str, str] | None) -> Any:
         for attempt in range(MAX_ATTEMPTS):
             last = attempt == MAX_ATTEMPTS - 1
             await self._limiter.acquire()

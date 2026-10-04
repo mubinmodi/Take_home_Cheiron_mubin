@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from redis.asyncio import Redis
 
 from clinical_trials_viz.access import MemoryUserLimiter, UserLimiter, identify
+from clinical_trials_viz.breaker import CircuitBreaker
 from clinical_trials_viz.config import Settings, get_settings
 from clinical_trials_viz.ctgov.client import CtGovClient, MemoryPageCache, RateLimiter
 from clinical_trials_viz.idempotency import MAX_KEY_LENGTH, FileIdempotencyStore, KeyInProgress, KeyReused, KeyStore
@@ -62,6 +63,7 @@ def create_app(
             RedisRateLimiter(shared, per_minute) if shared else RateLimiter(per_minute),
             settings.max_pages,
             RedisPageCache(shared) if shared else MemoryPageCache(),
+            CircuitBreaker("ClinicalTrials.gov", settings.breaker_failures, settings.breaker_cooldown_seconds),
         )
         database_url = settings.database_url.get_secret_value() if settings.database_url else None
         runs = run_store(database_url, settings.runs_dir)
@@ -74,6 +76,8 @@ def create_app(
                 settings.planner_fallback,
                 timeout=settings.planner_timeout_seconds,
                 deadline=settings.planner_deadline_seconds,
+                breaker_failures=settings.breaker_failures,
+                breaker_cooldown=settings.breaker_cooldown_seconds,
             ),
             runs,
             settings.public_base_url,

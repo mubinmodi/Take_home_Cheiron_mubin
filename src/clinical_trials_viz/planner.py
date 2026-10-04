@@ -23,6 +23,7 @@ from pydantic_ai.providers import Provider, infer_provider
 from pydantic_ai.providers.anthropic import AnthropicProvider
 from pydantic_ai.providers.openai import OpenAIProvider
 
+from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
 from clinical_trials_viz.catalog import CATALOG_VERSION, DIMENSIONS, PHASE_LABELS, OverallStatus
 from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, QueryPlan, UnsupportedPlan
 
@@ -156,6 +157,18 @@ class UnconfiguredPlanner:
         raise PlannerNotConfigured(self.reason)
 
 
+# Provider statuses that may pass with time; other 4xx (bad key, unknown model) need a configuration fix.
+_OUTAGE_STATUS = frozenset({408, 409, 429})
+
+
+def is_outage(exc: ModelAPIError) -> bool:
+    """A provider failure that may pass (server error, rate limit, timeout, network), as opposed to a
+    configuration error such as a bad key or an unknown model."""
+    if isinstance(exc, ModelHTTPError):
+        return exc.status_code in _OUTAGE_STATUS or exc.status_code >= 500
+    return True
+
+
 def describe_model_error(exc: ModelAPIError) -> str:
     """A short, safe description of a provider failure: never the response body."""
     if isinstance(exc, ModelHTTPError):
@@ -168,8 +181,13 @@ _model_failures: ContextVar[list[str] | None] = ContextVar("planner_model_failur
 
 
 class _ReportingModel(WrapperModel):
-    """Notes a model's provider failure (log and response warning), then re-raises it so the
-    FallbackModel moves on to the next model."""
+    """One planner model behind its circuit breaker. Notes a provider failure (log and response
+    warning), then re-raises it so the FallbackModel moves on to the next model; while the breaker is
+    open the model is skipped at once instead of waiting for its timeout."""
+
+    def __init__(self, wrapped: Model, breaker: CircuitBreaker):
+        super().__init__(wrapped)
+        self._breaker = breaker
 
     async def request(
         self,
@@ -178,13 +196,34 @@ class _ReportingModel(WrapperModel):
         model_request_parameters: ModelRequestParameters,
     ) -> ModelResponse:
         try:
-            return await super().request(messages, model_settings, model_request_parameters)
+            self._breaker.check()
+        except CircuitOpen as exc:
+            skipped = ModelAPIError(
+                self.model_name, f"not called, paused for {exc.retry_in:.0f} s after repeated failures"
+            )
+            self._note(skipped)
+            raise skipped from exc
+        try:
+            response = await super().request(messages, model_settings, model_request_parameters)
         except ModelAPIError as exc:
-            note = describe_model_error(exc)
-            log.warning("planner model failed: %s", note)
-            if (failures := _model_failures.get()) is not None:
-                failures.append(note)
+            if is_outage(exc):
+                self._breaker.failure()
+            else:
+                self._breaker.success()  # it answered; the configuration is at fault
+            self._note(exc)
             raise
+        except BaseException:
+            self._breaker.release()
+            raise
+        self._breaker.success()
+        return response
+
+    @staticmethod
+    def _note(exc: ModelAPIError) -> None:
+        note = describe_model_error(exc)
+        log.warning("planner model failed: %s", note)
+        if (failures := _model_failures.get()) is not None:
+            failures.append(note)
 
 
 def _api_key(variable: str) -> str:
@@ -205,7 +244,13 @@ def _provider(name: str, timeout: float) -> Provider[Any]:
 
 
 def build_planner(
-    primary: str, fallback: str | None, *, timeout: float = 20.0, deadline: float | None = 60.0
+    primary: str,
+    fallback: str | None,
+    *,
+    timeout: float = 20.0,
+    deadline: float | None = 60.0,
+    breaker_failures: int = 5,
+    breaker_cooldown: float = 30.0,
 ) -> Planner:
     """Create the configured models that have credentials; the service still starts without any."""
     models: list[Model] = []
@@ -220,7 +265,13 @@ def build_planner(
             log.warning("planner model %s unavailable: %s", name, exc)
     if not models:
         return UnconfiguredPlanner("No planner model is configured. " + " ".join(problems))
-    return LLMPlanner(*models, timeout=timeout, deadline=deadline)
+    return LLMPlanner(
+        *models,
+        timeout=timeout,
+        deadline=deadline,
+        breaker_failures=breaker_failures,
+        breaker_cooldown=breaker_cooldown,
+    )
 
 
 class LLMPlanner:
@@ -236,10 +287,15 @@ class LLMPlanner:
         *,
         timeout: float | None = None,
         deadline: float | None = None,
+        breaker_failures: int = 5,
+        breaker_cooldown: float = 30.0,
     ):
-        models = [
-            _ReportingModel(m if isinstance(m, Model) else infer_model(m)) for m in (primary, fallback) if m is not None
-        ]
+        models = []
+        for m in (primary, fallback):
+            if m is not None:
+                model = m if isinstance(m, Model) else infer_model(m)
+                breaker = CircuitBreaker(f"planner model {model.model_name}", breaker_failures, breaker_cooldown)
+                models.append(_ReportingModel(model, breaker))
         model: Model = FallbackModel(*models, fallback_on=(ModelAPIError,)) if len(models) > 1 else models[0]
         self._deadline = deadline
         self._agent = Agent(
