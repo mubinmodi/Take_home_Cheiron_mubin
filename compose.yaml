@@ -1,0 +1,31 @@
+# The hosted mode on one machine: the service with Redis and Postgres (docs/hosted-deployment.md).
+#   API_KEYS=you:a-long-random-key docker compose up --build
+# Model keys come from .env (OPENAI_API_KEY / ANTHROPIC_API_KEY); the service runs at http://localhost:8080.
+services:
+  app:
+    build: .
+    ports: ["8080:8080"]
+    env_file: .env
+    environment:
+      DEPLOYMENT: hosted
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql+asyncpg://trials:trials@postgres:5432/trials
+      API_KEYS: ${API_KEYS:-}  # from the shell or .env; the service refuses to start without it
+      PUBLIC_BASE_URL: http://localhost:8080
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+  redis:
+    image: redis:7-alpine
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: trials
+      POSTGRES_PASSWORD: trials
+      POSTGRES_DB: trials
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "trials"]
+      interval: 2s
+      retries: 15
