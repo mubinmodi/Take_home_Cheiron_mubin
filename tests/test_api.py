@@ -426,3 +426,24 @@ async def test_view_only_for_per_trial(make_client):
     planner = ScriptedPlanner(bad, TREND)
     await ask(make_client, planner, query="x")
     assert "view is only allowed" in planner.calls[1]["repair"][1][0]
+
+
+async def test_scatter_plot_end_to_end(make_client, trials):
+    from clinical_trials_viz.spec_builder import duration_months
+
+    plan = AnswerPlan(
+        operation=Operation.PER_TRIAL, view=PerTrialView.SCATTER, filters=Filters(drugs=["pembrolizumab"])
+    )
+    async for client in make_client(ScriptedPlanner(plan)):
+        body = (await client.post("/v1/query", json={"query": "Enrollment against duration"})).json()
+        assert body["outcome"] == "success", body.get("message")
+        spec = body["visualization"]
+        assert spec["type"] == "scatter_plot" and spec["metadata"]["y_scale"] == "symlog"
+        by_id = {t.nct_id: t for t in trials}
+        for point in spec["data"]:
+            trial = by_id[point["nct_id"]]
+            assert point["enrollment"] == trial.enrollment
+            assert point["duration_months"] == duration_months(trial) >= 0
+        assert body["verification"]["passed"]
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")

@@ -93,6 +93,21 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
                 },
             }
 
+        case VisualizationType.SCATTER_PLOT:
+            assert enc.x and enc.y and enc.color
+            return {
+                **base,
+                "width": _WIDTH,
+                "height": 380,
+                "mark": {"type": "point", "filled": True, "opacity": 0.6, "size": 30},
+                "encoding": {
+                    "x": _channel(enc.x),
+                    "y": _channel(enc.y, scale={"type": meta.y_scale}, axis=_y_axis(spec, enc.y.field)),
+                    "color": _channel(enc.color, sort=meta.series_order),
+                    "tooltip": _tooltip(spec),
+                },
+            }
+
         case VisualizationType.TIMELINE:
             assert enc.x and enc.x2 and enc.y and enc.color
             return {
@@ -144,6 +159,18 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
             }
 
     raise NotRenderable(f"{spec.type} has no image form")
+
+
+def _y_axis(spec: VisualizationSpec, field: str) -> dict[str, Any]:
+    """Symmetric-log axes need explicit ticks: 0 and powers of ten up to the largest value."""
+    if spec.metadata.y_scale != "symlog":
+        return {}
+    top = max((d[field] for d in spec.rows()), default=1) or 1
+    ticks, value = [0], 1
+    while value <= top * 10:
+        ticks.append(value)
+        value *= 10
+    return {"values": ticks, "format": ",.0f"}
 
 
 def _short(label: str, limit: int = 40) -> str:

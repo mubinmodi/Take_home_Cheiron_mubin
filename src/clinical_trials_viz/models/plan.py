@@ -28,6 +28,7 @@ class NetworkKind(StrEnum):
 class PerTrialView(StrEnum):
     TABLE = "table"  # "list the trials"
     TIMELINE = "timeline"  # "timeline", "when did they run", "durations"
+    SCATTER = "scatter"  # "enrollment against duration", "plot size vs length"
 
 
 class Filters(BaseModel):
@@ -91,7 +92,7 @@ class AnswerPlan(BaseModel):
     top_n: int | None = Field(
         default=None, ge=1, le=50, description="Only when the user asks for a number, e.g. 'top 5 countries'."
     )
-    view: PerTrialView | None = Field(default=None, description="per_trial only: table (default) or timeline.")
+    view: PerTrialView | None = Field(default=None, description="per_trial only: table (default), timeline or scatter.")
     network: NetworkKind | None = Field(default=None, description="relate only: which entities the network links.")
 
 

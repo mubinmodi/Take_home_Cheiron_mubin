@@ -40,6 +40,7 @@ from clinical_trials_viz.spec_builder import (
     comparison_spec,
     histogram_spec,
     network_spec,
+    scatter_spec,
     single_value_spec,
     table_spec,
     timeline_spec,
@@ -231,7 +232,9 @@ class Pipeline:
         self, run: _Run, plan: AnswerPlan, filters: AppliedFilters, cohort: Cohort
     ) -> tuple[VisualizationSpec, Dimension | None]:
         if plan.operation is Operation.PER_TRIAL:
-            build = timeline_spec if plan.view is PerTrialView.TIMELINE else table_spec
+            build = {PerTrialView.TIMELINE: timeline_spec, PerTrialView.SCATTER: scatter_spec}.get(
+                plan.view or PerTrialView.TABLE, table_spec
+            )
             spec, notes = build(cohort.trials, filters)
             run.response.assumptions.extend(notes)
             return spec, None
@@ -293,7 +296,7 @@ class Pipeline:
             filters = response.applied_filters or AppliedFilters()
             sides = tuple(_cited_dimensions(plan))
             evidence = build_evidence(spec, trials, dimension, filters, sides)
-            if spec.type is VisualizationType.TIMELINE:
+            if spec.type in (VisualizationType.TIMELINE, VisualizationType.SCATTER_PLOT):
                 for nct_id, entry in evidence.items():
                     trial = trials[nct_id]
                     entry.fields[START_FIELD] = {"date": trial.start_date, "type": trial.start_date_type}
@@ -302,7 +305,7 @@ class Pipeline:
                         "type": trial.primary_completion_date_type,
                     }
                     entry.fields[COMPLETION_FIELD] = {"date": trial.completion_date, "type": trial.completion_date_type}
-            if plan.operation is Operation.BIN:
+            if spec.type in (VisualizationType.HISTOGRAM, VisualizationType.SCATTER_PLOT):
                 for nct_id, entry in evidence.items():
                     trial = trials[nct_id]
                     entry.fields[ENROLLMENT_FIELD] = {"count": trial.enrollment, "type": trial.enrollment_type}

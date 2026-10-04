@@ -3,6 +3,7 @@
 The chart type follows deterministically from the Query Plan; the model does not choose it.
 """
 
+from datetime import date
 from typing import Any
 
 from clinical_trials_viz.analyze import Breakdown, ComparisonGroups, Histogram, breakdown
@@ -37,7 +38,10 @@ COUNT = Channel(field="trial_count", type=FieldType.QUANTITATIVE, title="Trials"
 def chart_type_for(plan: AnswerPlan) -> VisualizationType:
     """Which visualization answers a plan. Decided by code, so the same plan always gets the same chart."""
     if plan.operation is Operation.PER_TRIAL:
-        return VisualizationType.TIMELINE if plan.view is PerTrialView.TIMELINE else VisualizationType.TABLE
+        return {
+            PerTrialView.TIMELINE: VisualizationType.TIMELINE,
+            PerTrialView.SCATTER: VisualizationType.SCATTER_PLOT,
+        }.get(plan.view or PerTrialView.TABLE, VisualizationType.TABLE)
     if plan.operation is Operation.RELATE:
         return VisualizationType.NETWORK_GRAPH
     if plan.operation is Operation.BIN:
@@ -375,6 +379,58 @@ def timeline_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[Visuali
             cohort_size=len(trials),
             total_rows=len(dated),
         ),
+    )  # fmt: skip
+    return spec, notes
+
+
+def duration_months(trial: Trial) -> float | None:
+    """Months from start to primary completion (or completion); None when a date is missing."""
+    end, _ = trial_end(trial)
+    start_iso, end_iso = iso_date(trial.start_date), iso_date(end)
+    if not start_iso or not end_iso:
+        return None
+    days = (date.fromisoformat(end_iso) - date.fromisoformat(start_iso)).days
+    return round(days / 30.44, 1)
+
+
+def scatter_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[VisualizationSpec, list[str]]:
+    points, missing, negative = [], 0, 0
+    for t in sorted(trials, key=lambda t: t.nct_id):
+        months = duration_months(t)
+        if months is None or t.enrollment is None:
+            missing += 1
+            continue
+        if months < 0:
+            negative += 1
+            continue
+        _, end_type = trial_end(t)
+        estimated = "ESTIMATED" in (t.start_date_type, end_type, t.enrollment_type)
+        points.append({
+            "nct_id": t.nct_id, "title": t.title, "duration_months": months, "enrollment": t.enrollment,
+            "values": "Includes estimated values" if estimated else "Actual values",
+            "trial_ids": [t.nct_id],
+        })  # fmt: skip
+    notes = [
+        "Duration runs from the start date to the primary completion date (or completion date when missing); "
+        "enrollment uses a symmetric log scale."
+    ]
+    if missing:
+        notes.append(f"{missing} trials lack a start date, completion date or enrollment and are not plotted.")
+    if negative:
+        notes.append(f"{negative} trials have a completion date before their start date and are not plotted.")
+    x = Channel(field="duration_months", type=FieldType.QUANTITATIVE, title="Duration (months)")
+    y = Channel(field="enrollment", type=FieldType.QUANTITATIVE, title="Enrollment (participants)")
+    color = Channel(field="values", type=FieldType.NOMINAL, title="Values")
+    spec = VisualizationSpec(
+        type=VisualizationType.SCATTER_PLOT,
+        title=f"Enrollment vs duration: {describe_filters(filters)}",
+        subtitle=f"{len(points):,} of {len(trials):,} trials",
+        encoding=Encoding(x=x, y=y, color=color, tooltip=[
+            Channel(field="nct_id", type=FieldType.NOMINAL, title="NCT ID"),
+            Channel(field="title", type=FieldType.NOMINAL, title="Title"), x, y, color]),
+        data=points,
+        metadata=RenderMetadata(units="participants", series_order=["Actual values", "Includes estimated values"],
+                                y_scale="symlog", cohort_size=len(trials)),
     )  # fmt: skip
     return spec, notes
 

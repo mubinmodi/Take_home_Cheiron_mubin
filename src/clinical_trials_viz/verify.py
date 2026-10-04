@@ -6,7 +6,7 @@ from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import same_arm_pairs, trial_drugs
-from clinical_trials_viz.spec_builder import iso_date, trial_end
+from clinical_trials_viz.spec_builder import duration_months, iso_date, trial_end
 
 
 def verify(
@@ -100,6 +100,20 @@ def verify(
             ]:
                 wrong.append(f"{d['nct_id']}: {d['start']}–{d['end']} does not match its record")
         check("cited_values_match_source", wrong)
+
+    if spec.type is VisualizationType.SCATTER_PLOT:
+        check(
+            "cited_values_match_source",
+            [
+                f"{d['nct_id']}: point does not match its record"
+                for d in spec.rows()
+                if (t := trials.get(d["nct_id"]))
+                and (
+                    (d["duration_months"], d["enrollment"]) != (duration_months(t), t.enrollment)
+                    or d["trial_ids"] != [t.nct_id]
+                )
+            ],
+        )
 
     # Every cited trial meets the filters, checked against its own source values (not the API's word).
     check("cited_trials_meet_filters", [

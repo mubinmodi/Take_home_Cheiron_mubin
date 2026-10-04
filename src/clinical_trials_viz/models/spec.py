@@ -15,6 +15,7 @@ class VisualizationType(StrEnum):
     NETWORK_GRAPH = "network_graph"
     HISTOGRAM = "histogram"
     TIMELINE = "timeline"
+    SCATTER_PLOT = "scatter_plot"
 
 
 class FieldType(StrEnum):
@@ -72,6 +73,9 @@ class RenderMetadata(BaseModel):
     )
     bipartite: bool = Field(default=False, description="network_graph: edges only join different node kinds.")
     min_edge_trials: int | None = Field(default=None, description="network_graph: edges need this many trials.")
+    y_scale: Literal["linear", "symlog"] = Field(
+        default="linear", description="symlog: symmetric log scale for skewed values that include 0."
+    )
     bins: list[dict[str, Any]] | None = Field(
         default=None, description="histogram: bins in order, each {label, min, max}; max null = no upper limit."
     )

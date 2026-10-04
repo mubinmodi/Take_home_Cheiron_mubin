@@ -119,6 +119,11 @@ def _data_lines(spec: dict[str, Any]) -> list[str]:
         return [f"  {len(data['nodes'])} nodes, {len(data['edges'])} links (heaviest first):", *rows] + (
             [f"  … {more} more links"] if more > 0 else []
         )
+    if spec["type"] == "scatter_plot":
+        top = sorted(data, key=lambda d: -d["enrollment"])[:5]
+        return [f"  {len(data):,} points; largest enrollment:"] + [
+            f"  {d['nct_id']}  {d['enrollment']:>7,} participants  {d['duration_months']:>6} months" for d in top
+        ]
     if spec["type"] == "timeline":
         rows = [f"  {d['start']} → {d['end']}  {d['trial'][:90]}" for d in data[:MAX_ROWS]]
         return rows + ([f"  … {len(data) - MAX_ROWS} more"] if len(data) > MAX_ROWS else [])
