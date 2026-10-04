@@ -14,7 +14,7 @@ Targets agreed 2026-10-03, except where marked.
 | Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 46 questions: `gpt-5.4-mini` 46/46, 45/46 and 45/46 in three runs (2026-10-04, with the split step); `claude-haiku-4-5` 95% on the earlier 42 (`evals/results/`) |
 | Citations add up | 100% of data points | Verifier recounts every bar, bucket or edge from its cited trials | Every answer passes the verifier before it is returned; tamper tests prove it rejects wrong counts and citations |
 | Honest failure | 0 runs that report success after incomplete data | Tests that inject failures | Failure-injection tests for the model, ClinicalTrials.gov, charts and storage (`tests/test_failures.py`) |
-| Latency | No target (this is a demo); measured and reported. Hard cap: undecided locally; ~30 s when hosted ([hosted-deployment.md](hosted-deployment.md)) | Timing spans per stage | 1.7–4.9 s for the five live examples (planning 1.1–2.3 s, retrieval 0.6–2.7 s) |
+| Latency | No target (this is a demo); measured and reported. Hard cap: undecided locally; ~30 s when hosted ([hosted-deployment.md](hosted-deployment.md)) | Timing spans per stage | 3.3–6.2 s for the five submitted examples on 2026-10-04 (planning, split included, 2.0–3.0 s; retrieval 0.6–3.1 s) |
 | Cost | ≤ 3 model calls per query (planning); plus one split call, added 2026-10-04 | Counted on every run | Enforced; a single question usually takes 2 calls |
 
 Paging (≤ 1000 trials per page) limits how much can be fetched before the deadline. Past the cap, return `scope_required`; never sample silently.
@@ -54,7 +54,7 @@ Rules decided from the API spike ([api-data-guide.md](research/api-data-guide.md
 - **Drug classes** ("PD-1 inhibitors"): no class list exists in the source, so the service asks. Code runs the text search for the class name, counts the drugs most often found in the matches, and offers them as a multi-select clarification labelled "drugs most often found in trials mentioning …" (not a verified class membership).
 - **"Drug"** means intervention types `DRUG`, `BIOLOGICAL` and `COMBINATION_PRODUCT`. Pembrolizumab is recorded as `BIOLOGICAL` in about a third of its trials.
 - **Drug identity** is the intervention MeSH term; when it is missing, a cleaned raw name (lower case, dose and ® removed), marked as unresolved. Condition grouping uses condition MeSH terms, not raw text.
-- **Countries:** current site locations only; this matches the API's `LocationCountry` filter. Studies whose sites were moved to `removedCountries` are counted and reported in `assumptions[]`.
+- **Countries:** current site locations only; this matches the API's `LocationCountry` filter. Sites moved to `removedCountries` are read but not counted (planned: reporting them in `assumptions[]`; not built).
 - **Drug ↔ drug networks:** an edge means "given in the same arm" (arm-to-intervention links exist for 98% of studies). Drugs only co-listed in different arms do not form a combination edge. Supplements (`DIETARY_SUPPLEMENT`), saline and placebo are left out of drug networks.
 - **Network size:** top 15 lead sponsors and top 25 drugs by trial count; edges need at least 2 supporting trials. All cut-offs are reported in `assumptions[]`.
 - **Dates:** month-only dates (8%) count in their year; `ESTIMATED` dates are labelled; future start years stay visible.
@@ -77,7 +77,7 @@ The **capability catalog** is one versioned file. It feeds the planner prompt, t
 
 ### Harness
 
-The model has one job: turn the question into a typed plan. The plan is either an executable plan, a request for clarification, or "unsupported".
+The model has two jobs: split the message into its separate questions, and turn each question into a typed plan. The plan is either an executable plan, a request for clarification, or "unsupported".
 
 ```
 request → validate input → load earlier run (follow-ups) → split into parts (model; code as fallback)
@@ -97,7 +97,7 @@ request → validate input → load earlier run (follow-ups) → split into part
 
 - **The question drives the filters.** The user can send only `query`. The model extracts the filters (drug, condition, phase, sponsor and role, country, status, years, NCT IDs, comparison groups) into the `QueryPlan`; code validates them against the catalog and enums and applies them.
 - **Structured fields are optional.** They pin a filter without relying on extraction, resolve references such as "this drug", and carry clarification answers back. Unknown fields are rejected. Each field accepts one value or a list, so comparisons and multi-value answers fit. Every applied filter is echoed in the response.
-- **Ask only when unclear**, like a multiple-choice pop-up. `clarification_required` holds one `field`, a short `question` and 2–4 `options` (`label` for display, `value` to send back). Ask when no sensible default exists: a reference with nothing to resolve it ("this drug" with no drug), a comparison with missing groups, or a name that matches different entities (e.g. "Merck": Merck Sharp & Dohme vs Merck KGaA). **Code builds the options from the data** (e.g. the distinct lead sponsors matching "Merck", with trial counts); the model only marks which filter is ambiguous and never writes option values. A clarification may allow several choices (drug classes). Do not ask when a default exists: year = start year, sponsor = lead sponsor, brand names resolved by the API's synonym search. Defaults go into `assumptions[]`.
+- **Ask only when unclear**, like a multiple-choice pop-up. `clarification_required` holds one `field`, a short `question` and two or more `options` (`label` for display, `value` to send back). Ask when no sensible default exists: a reference with nothing to resolve it ("this drug" with no drug), a comparison with missing groups, or a name that matches different entities (e.g. "Merck": Merck Sharp & Dohme vs Merck KGaA). **Code builds the options from the data** (e.g. the distinct lead sponsors matching "Merck", with trial counts); the model only marks which filter is ambiguous and never writes option values. A clarification may allow several choices (drug classes). Do not ask when a default exists: year = start year, sponsor = lead sponsor, brand names resolved by the API's synonym search. Defaults go into `assumptions[]`.
 - **Conflict:** if a structured field and the question text name different values for the same filter, return `clarification_required`; never pick one silently.
 - **Follow-ups, corrections and clarification answers** send `previous_run_id`. The service loads the earlier `QueryPlan` from that run's bundle, and the model gets the new message plus the old plan and writes a corrected plan. This is still one model step and needs no chat memory: the client holds the conversation, and the response can show what changed between the two plans. The model decides whether the new message refines the earlier plan or starts a new question, and the response reports which.
 
@@ -114,7 +114,7 @@ request → validate input → load earlier run (follow-ups) → split into part
 | Endpoint | Returns |
 |---|---|
 | `POST /v1/query` | Outcome, visualization specification, evidence, assumptions, `run_id`, `chart_url` |
-| `GET /v1/runs/{run_id}` | The saved run bundle (replay, debugging) |
+| `GET /v1/runs/{run_id}` | The saved run record: request, plan and response (full run bundles for replay are not built) |
 | `GET /v1/runs/{run_id}/chart.png` and `.svg` | The rendered image, from the saved specification |
 | `GET /v1/schema` | Request and response JSON Schemas |
 | `GET /health` | Service status |
@@ -133,6 +133,8 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 
 ### Verifier (gate before every response)
 
+*Built (2026-10-04):* the checks in `verify.py` are listed in README §2. Of the design below, the JSON Schema validation, label-length limits and the `countTotal` count check were not built; the count rules were instead verified once against `countTotal` during the API spike (section 1).
+
 - **Validity:** the spec validates against our own published visualization JSON Schema, and every encoded field exists in `data`.
 - **Legality:** the chart answers the validated plan (dimension, measure, filters, chart type, sort).
 - **Readability:** category limits with top-N + "Other" (after complete retrieval), label lengths, no silent time gaps.
@@ -141,7 +143,7 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 
 ### LLM ops
 
-- **Trace:** one trace per run, with spans per stage, plus a run bundle (request, plan, raw responses, results, chart spec, verification) that can be replayed with no model or API calls.
+- **Trace:** one trace per run, with spans per stage, plus a run record (request, plan, response). A full run bundle with the raw API responses, replayable with no model or API calls, was designed but not built.
 - **Evaluate:** binary pass/fail per stage. Process: was the plan right? Outcome: do the numbers match hand-checked fixtures?
 - **Diagnose:** a wrong plan means changing the prompt or catalog. A right plan with wrong numbers is a bug; fix the code.
 - **Release check:** the eval suite reruns on every prompt, model, schema or catalog change.

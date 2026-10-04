@@ -111,6 +111,8 @@ Present for all but 5 studies; 43% are `ESTIMATED` (planned, not actual). A hist
 
 ## 6. What this settles and what is still open
 
+*Decided since (2026-10-03/04):* the open items below were settled in `docs/harness-design.md` section 3, and the rate limit was confirmed in practice (HTTP 429 seen during development; README §8).
+
 Settled by evidence:
 - Synonym search works: Keytruda / MK-3475 / pembrolizumab return the same trials.
 - Local counting reproduces API totals, so the verifier's count check is feasible.

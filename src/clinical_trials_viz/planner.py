@@ -139,21 +139,21 @@ class MessageParts(BaseModel):
 
 SPLIT_INSTRUCTIONS = """You read a message sent to a clinical-trials analytics service and list the separate
 questions it asks. You never answer them.
-- One request is one answer or chart. "Phases of melanoma trials per year" and "trials by phase and
-  status" are each ONE request.
-- A comparison is always ONE request: never split its sides. "Compare phases for semaglutide vs
-  tirzepatide trials", "A versus B", "compare A and B" and "how does A compare with B" stay whole.
+- One request is one answer or chart. "Statuses of asthma trials per year" and "trials by phase and
+  sponsor class" are each ONE request.
+- A comparison is always ONE request: never split its sides. "Compare statuses for atorvastatin vs
+  insulin trials", "A versus B", "compare A and B" and "how does A compare with B" stay whole.
 - A message asks several things when it joins requests that each need their own answer: "and", "also",
-  "plus", ";", a new sentence or a second "?", or numbering ("1) ... 2) ..."). "How many X, and which
-  countries have the most?" is TWO requests. "What phases, what countries and what intervention types
-  are lung cancer trials?" is THREE.
+  "plus", ";", a new sentence or a second "?", or numbering ("1) ... 2) ..."). "How many X, and what is
+  their trend?" is TWO requests. "What statuses, what sponsors and what study types do psoriasis
+  trials have?" is THREE.
 - Each item is read alone, without the others, so it must make sense on its own. Replace every word
   that points to another request ("their", "them", "those", "these", "it", "the same", "ones") with
   what it refers to: the drug, condition, status, phase, country and years.
-  "List recruiting Keytruda trials in Germany and show their phases" becomes
-  ["List recruiting Keytruda trials in Germany", "Show the phases of recruiting Keytruda trials in Germany"].
-  "Which sponsors run the most Alzheimer's trials? Which countries host them?" becomes
-  ["Which sponsors run the most Alzheimer's trials?", "Which countries host Alzheimer's trials?"].
+  "Show completed atorvastatin trials in Canada and plot their enrollment" becomes
+  ["Show completed atorvastatin trials in Canada", "Plot the enrollment of completed atorvastatin trials in Canada"].
+  "Which sponsors run the most asthma trials? Which countries host them?" becomes
+  ["Which sponsors run the most asthma trials?", "Which countries host asthma trials?"].
 - Otherwise keep the user's words. Never add a question the user did not ask; never drop one.
 - A message that asks one thing: return it unchanged as the only item."""
 

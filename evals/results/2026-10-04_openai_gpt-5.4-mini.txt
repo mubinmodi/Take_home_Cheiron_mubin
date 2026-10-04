@@ -32,9 +32,7 @@ PASS  unsupported-02   Which cancer treatment should I take?
 PASS  hist-01          What is the enrollment distribution of melanoma trials?
 PASS  hist-02          How many participants do completed breast cancer trials usually enroll?
 PASS  timeline-01      Show a timeline of recruiting phase 3 pembrolizumab trials in Germany
-FAIL  scatter-01       Plot enrollment against duration for melanoma trials
-        operation: expected 'per_trial', got 'bin'
-        view: expected 'scatter', got None
+PASS  scatter-01       Plot enrollment against duration for melanoma trials
 PASS  net-03           Which companies are developing which drugs for obesity?
 PASS  multi-01         How many trials does Pfizer sponsor, and what are the most common conditions in lung cancer trials?
 PASS  multi-02         Show melanoma trials by phase and also by start year
@@ -47,7 +45,7 @@ PASS  multi-06         List recruiting Keytruda trials in Germany and show their
 PASS  multi-07         1) trials per year for semaglutide 2) phases for tirzepatide
 PASS  multi-08         What phases are lung cancer trials in, what countries, and what intervention types?
 
-45/46 plans correct (98%) using openai:gpt-5.4-mini
+46/46 plans correct (100%) using openai:gpt-5.4-mini
   clarification   4/4
   comparison      5/5
   distribution    7/7
@@ -55,7 +53,7 @@ PASS  multi-08         What phases are lung cancer trials in, what countries, an
   histogram       2/2
   multi_part      8/8
   network         3/3
-  per_trial       2/3
+  per_trial       3/3
   series          2/2
   single_study    1/1
   single_value    1/1

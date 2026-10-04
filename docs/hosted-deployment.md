@@ -115,7 +115,7 @@ deploy/aws/create-service.sh
 deploy/smoke-test.sh https://SERVICE_ENDPOINT
 ```
 
-New code goes out with `TAG=vN deploy/aws/update-service.sh`: build, push, and a rolling update that changes only the image (rolled back automatically if the new tasks fail their health checks). Live as of 2026-10-04: v4 (v2 startup fix, v3 threaded web page, v4 tolerant key check).
+New code goes out with `TAG=vN deploy/aws/update-service.sh`: build, push, and a rolling update that changes only the image (rolled back automatically if the new tasks fail their health checks). Live as of 2026-10-04: v6 (v2 startup fix, v3 threaded web page, v4 tolerant key check, v5 light and dark themes, v6 the first review's fixes and open access for the review).
 
 ### First deployment: what went wrong and the fixes
 
@@ -127,7 +127,7 @@ Verified live: `/health`, a question (melanoma trials by country), a follow-up r
 
 ### Costs and teardown
 
-Running costs are roughly $50–60 a month, paid from the free plan's credits: the load balancer (~$16 + usage), one Fargate task with 0.5 vCPU and 1 GB on ARM (~$15), RDS db.t4g.micro with 20 GB (~$14), ElastiCache Serverless at its minimum (~$6), and Secrets Manager (6 secrets, ~$2.40). Every question also costs 1–3 model calls, which the per-user limit caps.
+Running costs are roughly $50–60 a month, paid from the free plan's credits: the load balancer (~$16 + usage), one Fargate task with 0.5 vCPU and 1 GB on ARM (~$15), RDS db.t4g.micro with 20 GB (~$14), ElastiCache Serverless at its minimum (~$6), and Secrets Manager (6 secrets, ~$2.40). Every question also costs 2–5 model calls (one split call, two if the primary model fails, then up to three planning calls), which the per-user limit caps.
 
 To delete everything, in this order:
 

@@ -117,8 +117,12 @@ _Avoid_: Request, job, session
 How a Run ended: success, no data, clarification required, unsupported, scope required, upstream error or internal error.
 _Avoid_: Status, result
 
+**Run Record**:
+The saved record of a Run: its request, Query Plan and response. Follow-ups load the earlier plan from it, and chart images are drawn from it.
+_Avoid_: Run Bundle (the fuller design below)
+
 **Run Bundle**:
-The saved record of a Run (Question, Query Plan, raw source responses, answer and checks) that can be replayed without the model or the API.
+Designed, not built: a Run Record plus the raw source responses, so a Run could be replayed without the model or the API.
 _Avoid_: Log, trace, snapshot
 
 **Capability Catalog**:
