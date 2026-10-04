@@ -2,6 +2,7 @@
 and the run deadline. The local mode must keep working with none of it configured."""
 
 import asyncio
+import time
 
 import fakeredis
 import httpx
@@ -360,3 +361,42 @@ async def test_a_rejected_key_never_opens_a_breaker(make_client):
             body = (await client.post("/v1/query", json=QUESTION)).json()
             assert body["error"]["code"] == "planner_rejected"  # the real cause, every time
     assert calls == ["primary", "primary"]
+
+
+# --- Run deadline -----------------------------------------------------------------------------------
+
+HISTOGRAM = AnswerPlan(operation=Operation.BIN, filters=Filters(drugs=["pembrolizumab"]))
+TWO_PARTS = "Show Keytruda trials per year, and show the enrollment distribution of pembrolizumab trials"
+
+
+async def test_a_run_past_its_deadline_ends_as_run_timeout_and_is_recorded(make_client, settings):
+    settings.run_deadline_seconds = 0.2
+
+    async def hang(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        await asyncio.sleep(5)
+        raise AssertionError("unreachable")
+
+    started = time.perf_counter()
+    async for client in make_client(LLMPlanner(FunctionModel(hang, model_name="slow-model"))):
+        body = (await client.post("/v1/query", json=QUESTION)).json()
+        assert (await client.get(f"/v1/runs/{body['run_id']}")).status_code == 200
+    assert time.perf_counter() - started < 2
+    assert body["outcome"] == "upstream_error"
+    assert body["error"]["code"] == "run_timeout" and body["error"]["retryable"]
+    assert "longer than 0.2 s and was stopped during planning" in body["message"]
+
+
+async def test_parts_answered_before_the_deadline_stand(make_client, settings, ctgov, page):
+    settings.run_deadline_seconds = 0.5
+
+    async def slow_for_pembrolizumab(request: httpx.Request) -> httpx.Response:
+        if "pembrolizumab" in str(request.url).lower():
+            await asyncio.sleep(5)
+        return httpx.Response(200, json=page)
+
+    ctgov.get("/studies").mock(side_effect=slow_for_pembrolizumab)
+    body = await ask(make_client, ScriptedPlanner(TREND, HISTOGRAM), query=TWO_PARTS)
+    assert body["outcome"] == "success" and body["visualization"]["type"] == "time_series"
+    second = body["additional_answers"][0]
+    assert second["outcome"] == "upstream_error" and second["error"]["code"] == "run_timeout"
+    assert "stopped during retrieval from ClinicalTrials.gov" in second["message"]

@@ -35,6 +35,7 @@ class ErrorCode(StrEnum):
     SOURCE_INVALID_RESPONSE = "source_invalid_response"  # ClinicalTrials.gov answered with something unreadable
     SCOPE_TOO_LARGE = "scope_too_large"  # more trials match than one question may retrieve
     VERIFICATION_FAILED = "verification_failed"  # the answer failed the verifier and was withheld
+    RUN_TIMEOUT = "run_timeout"  # the whole Run took longer than its deadline (hosted: ~30 s)
     INTERNAL = "internal"  # a bug: see the server log for the run ID
 
 

@@ -3,9 +3,10 @@
 Every Run ends in exactly one Outcome. The model is called at most three times.
 """
 
+import asyncio
 import logging
 import time
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from datetime import UTC, datetime
 
@@ -69,6 +70,13 @@ tracer = trace.get_tracer(__name__)
 
 
 DEFAULT_BASE_URL = "http://localhost:8000"  # chart links when neither the settings nor the caller give one
+_STAGE_NAMES = {
+    "plan": "planning",
+    "clarify": "building clarification options",
+    "retrieve": "retrieval from ClinicalTrials.gov",
+    "analyze": "counting",
+    "verify": "verification",
+}
 
 
 class RunNotFound(Exception):
@@ -85,10 +93,14 @@ class _Run:
         self.response = QueryResponse(run_id=new_run_id(), outcome=Outcome.INTERNAL_ERROR)
         self.model_calls = 0
         self.timings: dict[str, float] = {}
+        self.stage_name = "plan"  # the stage under way, reported if the run deadline passes
+        self.parts: Sequence[AnswerPlan | ClarifyPlan | UnsupportedPlan] = ()  # the Question's parts, once planned
+        self.part = 0  # the part being answered
 
     @contextmanager
     def stage(self, name: str) -> Iterator[None]:
         start = time.perf_counter()
+        self.stage_name = name
         with tracer.start_as_current_span(name):
             try:
                 yield
@@ -107,11 +119,19 @@ def _fail(target: Answer, failure: Failure) -> None:
 
 
 class Pipeline:
-    def __init__(self, client: CtGovClient, planner: Planner, runs: RunStore, public_base_url: str | None = None):
+    def __init__(
+        self,
+        client: CtGovClient,
+        planner: Planner,
+        runs: RunStore,
+        public_base_url: str | None = None,
+        run_deadline: float | None = None,
+    ):
         self.client = client
         self.planner = planner
         self.runs = runs
         self.public_base_url = public_base_url
+        self.run_deadline = run_deadline  # seconds for a whole Run; None: no limit
         self._countries: set[str] | None = None
 
     async def known_countries(self) -> set[str]:
@@ -139,10 +159,15 @@ class Pipeline:
         run = _Run(request, previous_request, links)
         with tracer.start_as_current_span("run") as span, count_requests() as requests:
             span.set_attribute("run.id", run.response.run_id)
+            deadline = asyncio.timeout(self.run_deadline)
             try:
-                await self._execute(run, previous)
+                async with deadline:
+                    await self._execute(run, previous)
             except Exception as exc:  # planner failures, source failures and bugs alike end in one Outcome
-                _fail(run.response, classify(exc, run.response.run_id))
+                if isinstance(exc, TimeoutError) and deadline.expired():
+                    self._stop_at_deadline(run)
+                else:
+                    _fail(run.response, classify(exc, run.response.run_id))
             span.set_attribute("run.outcome", run.response.outcome.value)
 
         response = run.response
@@ -178,8 +203,9 @@ class Pipeline:
         if isinstance(plan, AnswerPlan | MultiAnswerPlan):
             response.relation = plan.relation
 
-        parts = plan.parts if isinstance(plan, MultiAnswerPlan) else [plan]
+        run.parts = parts = plan.parts if isinstance(plan, MultiAnswerPlan) else [plan]
         for index, (part, gate, error) in enumerate(zip(parts, planning.gates, planning.part_errors, strict=True)):
+            run.part = index
             target = response if index == 0 else Answer(outcome=Outcome.INTERNAL_ERROR, plan=part)
             if index:
                 response.additional_answers.append(target)
@@ -199,6 +225,27 @@ class Pipeline:
                 await self._answer(run, target, part, gate, index)
             except Exception as exc:  # one part failing (source error, too broad, a bug) leaves the others intact
                 _fail(target, classify(exc, response.run_id))
+
+    def _stop_at_deadline(self, run: _Run) -> None:
+        """The run deadline passed: parts already answered stand; the part under way and any after it
+        end as `run_timeout`, naming the stage that was running."""
+        assert self.run_deadline is not None
+        stage = _STAGE_NAMES.get(run.stage_name, run.stage_name)
+        log.warning("run %s passed its %g s deadline during %s", run.response.run_id, self.run_deadline, stage)
+        error = ErrorInfo(
+            code=ErrorCode.RUN_TIMEOUT,
+            message=f"Answering took longer than {self.run_deadline:g} s and was stopped during {stage}. Narrow the "
+            "question (for example by phase, status, start years or country) or try again.",
+            retryable=True,
+        )
+        answers = [run.response, *run.response.additional_answers]
+        for index in range(run.part, max(len(run.parts), 1)):
+            if index < len(answers):
+                target = answers[index]
+            else:
+                target = Answer(outcome=Outcome.UPSTREAM_ERROR, plan=run.parts[index])
+                run.response.additional_answers.append(target)
+            _finish(target, Outcome.UPSTREAM_ERROR, error.message, error)
 
     async def _answer(self, run: _Run, target: Answer, plan: AnswerPlan, gate: GateResult, index: int) -> None:
         """Answer one part of the Question into `target`."""

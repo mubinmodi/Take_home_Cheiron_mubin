@@ -81,6 +81,7 @@ def create_app(
             ),
             runs,
             settings.public_base_url,
+            settings.run_deadline_seconds,
         )
         app.state.idempotency = (
             RedisIdempotencyStore(shared) if shared else FileIdempotencyStore(settings.runs_dir / "idempotency")
