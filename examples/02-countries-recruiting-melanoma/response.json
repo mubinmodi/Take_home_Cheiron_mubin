@@ -861,7 +861,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_6f868f563b9f4c6aa7bba493c8453411/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_4c9724e99ae54a47a706a28785a13689/chart.png",
   "evidence": {
     "NCT00001823": {
       "nct_id": "NCT00001823",
@@ -9908,7 +9908,7 @@
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T14:04:19.147931Z",
+    "retrieved_at": "2026-10-04T14:28:47.832127Z",
     "search_matches": 480,
     "cohort_size": 480,
     "api_requests": 1
@@ -9926,6 +9926,10 @@
       },
       {
         "name": "counts_match_citations",
+        "passed": true
+      },
+      {
+        "name": "cohort_covered",
         "passed": true
       },
       {
@@ -9947,15 +9951,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_6f868f563b9f4c6aa7bba493c8453411",
+  "run_id": "run_4c9724e99ae54a47a706a28785a13689",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 1,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 969.6,
-    "retrieve": 556.1,
-    "analyze": 1.0,
-    "verify": 5.7
+    "plan": 813.8,
+    "retrieve": 475.3,
+    "analyze": 0.6,
+    "verify": 2.8
   }
 }

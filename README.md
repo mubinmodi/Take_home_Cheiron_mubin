@@ -4,7 +4,7 @@ A backend service that answers natural-language questions about clinical trials 
 
 ```
 POST /v1/query  {"query": "How has the number of trials for this drug changed over time?", "drug_name": "Pembrolizumab"}
-→ time_series of trials per start year · 2,621 cited trials · verified · chart at /v1/runs/{id}/chart.png
+→ time_series of trials per start year · 2,620 cited trials · verified · chart at /v1/runs/{id}/chart.png
 ```
 
 Supported answers:
@@ -263,7 +263,7 @@ The images are produced by translating this spec, and only this spec, into Vega-
 
 | Example | Outcome |
 |---|---|
-| The assignment's own request ("this drug" + `drug_name: Pembrolizumab`) | `time_series`, 2,621 cited trials |
+| The assignment's own request ("this drug" + `drug_name: Pembrolizumab`) | `time_series`, 2,620 cited trials |
 | "Which countries have the most recruiting trials for melanoma?" | `bar_chart`, 480 |
 | "Compare phases for trials involving semaglutide vs tirzepatide" | `grouped_bar_chart`, 824 |
 | "Show a network of sponsors and drugs for glioblastoma trials" | `network_graph`, 975 |
@@ -298,7 +298,7 @@ Example 02, "Which countries have the most recruiting trials for melanoma?":
 3. **Count.** Each trial is placed under every country where it has a current site, once per country. China gets 59 distinct trials.
 4. **Datum.** `{"country": "China", "trial_count": 59, "trial_ids": ["NCT03340506", …]}`. `trial_count` always equals the number of `trial_ids`.
 5. **Citation.** `evidence["NCT03340506"]` ("Dabrafenib and/or Trametinib Rollover Study") holds the source values behind it: `overallStatus = "RECRUITING"` (the status filter), `locations.country` including `"China"` (its bar), and condition MeSH terms including `"Melanoma"` (the condition search). In the web page, clicking the China bar lists all 59 trials with these values.
-6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" and every quoted citation value from each cited trial's own record, and checks every cited trial meets both filters. All seven checks passed (`verification` in the response).
+6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" and every quoted citation value from each cited trial's own record, and checks every cited trial meets both filters. All eight checks passed (`verification` in the response).
 
 **A limitation, made visible:** example 05, "What phases are Merck's trials in?". Two different lead sponsors match "Merck". Rather than pick one, the service asks, offering options built from the data: Merck Sharp & Dohme (2,151 trials), Merck KGaA (275) or both.
 

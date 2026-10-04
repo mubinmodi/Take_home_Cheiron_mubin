@@ -5,7 +5,7 @@
     "outcome": "success",
     "type": "time_series",
     "title": "Trials by start year: Pembrolizumab",
-    "cited_trials": 2621,
+    "cited_trials": 2620,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
     "model_calls": 1,
