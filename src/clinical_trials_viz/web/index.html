@@ -299,8 +299,10 @@ function keyForm(turn) {
                           : "This service needs an API key.";
   return el("div", {}, el("p", { class: "muted" }, hint), el("form", { class: "row", onsubmit: (e) => {
     e.preventDefault();
-    if (!input.value.trim()) return;
-    saveKey(input.value.trim());
+    // Keys are plain ASCII: drop what notes apps add (spaces, line breaks, invisible and curly characters).
+    const key = input.value.replace(/[^\x21-\x7E]/g, "");
+    if (!key) return;
+    saveKey(key);
     run(turn);
   } }, input, el("button", { type: "submit", class: "primary" }, "Save key and ask")));
 }

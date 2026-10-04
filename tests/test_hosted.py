@@ -430,3 +430,18 @@ def test_a_key_is_accepted_alone_or_as_stored_with_its_name():
     assert identify(KEY, users) == identify(f"alice:{KEY}", users) == identify(f" {KEY}\n", users) == "alice"
     assert identify(f"bob:{KEY}", users) is None  # the name must be the key's own
     assert identify("alice:not-the-key", users) is None and identify(None, users) is None
+
+
+def test_a_key_pasted_through_a_notes_app_still_matches():
+    hex_key = "0123456789abcdef0123456789abcdef01234567"
+    users = {hex_key: "mubin"}
+    for pasted in (
+        f"Mubin:{hex_key}",  # first letter capitalized
+        hex_key.upper(),
+        f"\u201c{hex_key}\u201d",  # curly quotes
+        f'"mubin:{hex_key}"',
+        f"{hex_key}\u200b",  # a zero-width space
+        f"\u00a0{hex_key} \r\n",
+    ):
+        assert identify(pasted, users) == "mubin", repr(pasted)
+    assert identify(hex_key[:-1] + "8", users) is None  # one different character is still refused
