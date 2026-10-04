@@ -4,9 +4,9 @@ Real runs of the service against the live ClinicalTrials.gov API (data timestamp
 
 | Example | Question | Outcome | Chart | Cited trials |
 |---|---|---|---|---|
-| [01-trend-this-drug](01-trend-this-drug/) | "How has the number of trials for this drug changed over time?" + `drug_name: Pembrolizumab` (the assignment's example request) | success | `time_series` | 2,629 |
+| [01-trend-this-drug](01-trend-this-drug/) | "How has the number of trials for this drug changed over time?" + `drug_name: Pembrolizumab` (the assignment's example request) | success | `time_series` | 2,621 |
 | [02-countries-recruiting-melanoma](02-countries-recruiting-melanoma/) | "Which countries have the most recruiting trials for melanoma?" | success | `bar_chart` | 480 |
-| [03-compare-phases-semaglutide-tirzepatide](03-compare-phases-semaglutide-tirzepatide/) | "Compare phases for trials involving semaglutide vs tirzepatide" | success | `grouped_bar_chart` | 832 |
+| [03-compare-phases-semaglutide-tirzepatide](03-compare-phases-semaglutide-tirzepatide/) | "Compare phases for trials involving semaglutide vs tirzepatide" | success | `grouped_bar_chart` | 824 |
 | [04-network-sponsors-drugs-glioblastoma](04-network-sponsors-drugs-glioblastoma/) | "Show a network of sponsors and drugs for glioblastoma trials" | success | `network_graph` | 975 |
 | [05-clarification-merck](05-clarification-merck/) | "What phases are Merck's trials in?" | `clarification_required` | — | — |
 

@@ -42,7 +42,7 @@
   "visualization": {
     "type": "grouped_bar_chart",
     "title": "Trials by phase: semaglutide vs tirzepatide",
-    "subtitle": "832 trials",
+    "subtitle": "824 trials",
     "encoding": {
       "x": {
         "field": "phase",
@@ -616,7 +616,7 @@
       {
         "phase": "Not applicable",
         "group": "semaglutide only",
-        "trial_count": 41,
+        "trial_count": 39,
         "trial_ids": [
           "NCT04174755",
           "NCT04383197",
@@ -633,7 +633,6 @@
           "NCT06344247",
           "NCT06363487",
           "NCT06390501",
-          "NCT06497595",
           "NCT06546384",
           "NCT06555146",
           "NCT06608433",
@@ -646,7 +645,6 @@
           "NCT06989203",
           "NCT07065383",
           "NCT07091500",
-          "NCT07195994",
           "NCT07317115",
           "NCT07361874",
           "NCT07391267",
@@ -664,7 +662,7 @@
       {
         "phase": "Not reported",
         "group": "semaglutide only",
-        "trial_count": 68,
+        "trial_count": 65,
         "trial_ids": [
           "NCT03457012",
           "NCT03631186",
@@ -704,7 +702,6 @@
           "NCT05768945",
           "NCT06118203",
           "NCT06154486",
-          "NCT06182618",
           "NCT06234111",
           "NCT06269120",
           "NCT06283667",
@@ -715,10 +712,8 @@
           "NCT06659679",
           "NCT06659718",
           "NCT06659744",
-          "NCT06820047",
           "NCT06914102",
           "NCT06967389",
-          "NCT07018544",
           "NCT07043361",
           "NCT07055607",
           "NCT07056803",
@@ -962,7 +957,7 @@
       {
         "phase": "Not applicable",
         "group": "tirzepatide only",
-        "trial_count": 12,
+        "trial_count": 9,
         "trial_ids": [
           "NCT06301256",
           "NCT07176663",
@@ -970,11 +965,8 @@
           "NCT07364175",
           "NCT07373834",
           "NCT07382024",
-          "NCT07387796",
           "NCT07443956",
           "NCT07574723",
-          "NCT07619989",
-          "NCT07728318",
           "NCT07811895"
         ]
       },
@@ -1103,12 +1095,12 @@
       ],
       "other_bucket": false,
       "multi_valued": true,
-      "cohort_size": 832,
+      "cohort_size": 824,
       "bipartite": false,
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_52e170dfe3854c50853c25771a4d7598/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_0920a4ac4b594311a100693a22343963/chart.png",
   "evidence": {
     "NCT05249881": {
       "nct_id": "NCT05249881",
@@ -8377,22 +8369,6 @@
         ]
       }
     },
-    "NCT06497595": {
-      "nct_id": "NCT06497595",
-      "title": "Lifestyle Intervention to Reduce the Risk of Sarcopenia in Adults With Diabetes & Obesity Treated With Semaglutide",
-      "url": "https://clinicaltrials.gov/study/NCT06497595",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06497595",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "semaglutide",
-          "Exercise",
-          "Nutritional Status"
-        ],
-        "protocolSection.designModule.phases": [
-          "NA"
-        ]
-      }
-    },
     "NCT06546384": {
       "nct_id": "NCT06546384",
       "title": "GLP-1 RA on Alcohol Consumption, Metabolism and Liver Parameters in Patients With Obesity and Fatty Liver Disease",
@@ -8564,20 +8540,6 @@
         "protocolSection.identificationModule.nctId": "NCT07091500",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Exercise",
-          "semaglutide"
-        ],
-        "protocolSection.designModule.phases": [
-          "NA"
-        ]
-      }
-    },
-    "NCT07195994": {
-      "nct_id": "NCT07195994",
-      "title": "A Clinical Trial to Examine the Efficacy and Safety of an Investigational Product With and Without Use of Semaglutide on Glycemic Response in Adults With Prediabetes or Type 2 Diabetes",
-      "url": "https://clinicaltrials.gov/study/NCT07195994",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07195994",
-        "derivedSection.interventionBrowseModule.meshes.term": [
           "semaglutide"
         ],
         "protocolSection.designModule.phases": [
@@ -9238,18 +9200,6 @@
         "protocolSection.designModule.phases": []
       }
     },
-    "NCT06182618": {
-      "nct_id": "NCT06182618",
-      "title": "Retrospective Analysis for Patients With Metabolic Syndrome",
-      "url": "https://clinicaltrials.gov/study/NCT06182618",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06182618",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Diet"
-        ],
-        "protocolSection.designModule.phases": []
-      }
-    },
     "NCT06234111": {
       "nct_id": "NCT06234111",
       "title": "Semaglutide and Physical Activity for Obesity and Multimorbidity",
@@ -9375,18 +9325,6 @@
         "protocolSection.designModule.phases": []
       }
     },
-    "NCT06820047": {
-      "nct_id": "NCT06820047",
-      "title": "Sleeve Gastrectomy vs. Lifestyle & Medications: Impact on BMI Trajectory and Target Attainment in a Matched Cohort Study",
-      "url": "https://clinicaltrials.gov/study/NCT06820047",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06820047",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "semaglutide"
-        ],
-        "protocolSection.designModule.phases": []
-      }
-    },
     "NCT06914102": {
       "nct_id": "NCT06914102",
       "title": "Emulation of the STEP-HFpEF DM Heart Failure Trial in Healthcare Claims Data",
@@ -9405,18 +9343,6 @@
       "url": "https://clinicaltrials.gov/study/NCT06967389",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06967389",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "semaglutide"
-        ],
-        "protocolSection.designModule.phases": []
-      }
-    },
-    "NCT07018544": {
-      "nct_id": "NCT07018544",
-      "title": "A Multicentre, Prospective, Single-arm, Non-interventional Regulatory Post-marketing Surveillance (rPMS) Study to Investigate the Safety and Effectiveness of Wegovy\u00ae (Semaglutide) in Patients With Obesity and Patients With Overweight in Routine Clinical Practice in Korea",
-      "url": "https://clinicaltrials.gov/study/NCT07018544",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07018544",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "semaglutide"
         ],
@@ -12281,20 +12207,6 @@
         ]
       }
     },
-    "NCT07387796": {
-      "nct_id": "NCT07387796",
-      "title": "Clinical and Neurobehavioral Changes With Weight Loss Drug Discontinuation and Reinitiation",
-      "url": "https://clinicaltrials.gov/study/NCT07387796",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07387796",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Discontinuation and Reinitiation of Tirzepatide"
-        ],
-        "protocolSection.designModule.phases": [
-          "NA"
-        ]
-      }
-    },
     "NCT07443956": {
       "nct_id": "NCT07443956",
       "title": "Combination of Biologic and Anti-obesity Therapies in Psoriatic Arthritis",
@@ -12318,36 +12230,6 @@
         "protocolSection.identificationModule.nctId": "NCT07574723",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Tirzepatide"
-        ],
-        "protocolSection.designModule.phases": [
-          "NA"
-        ]
-      }
-    },
-    "NCT07619989": {
-      "nct_id": "NCT07619989",
-      "title": "Transcutaneous Auricular Vagus Nerve Stimulation for Poor Weight-Loss Response to Incretin Receptor Agonists",
-      "url": "https://clinicaltrials.gov/study/NCT07619989",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07619989",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "transcutaneous auricular vagus nerve stimulation",
-          "Sham"
-        ],
-        "protocolSection.designModule.phases": [
-          "NA"
-        ]
-      }
-    },
-    "NCT07728318": {
-      "nct_id": "NCT07728318",
-      "title": "Efficacy, Safety, and Treatment Satisfaction of Once-Weekly Tirzepatide in Obese Type 2 Diabetic Patients",
-      "url": "https://clinicaltrials.gov/study/NCT07728318",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07728318",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Tirzepatide",
-          "Standard of Care"
         ],
         "protocolSection.designModule.phases": [
           "NA"
@@ -13105,17 +12987,17 @@
     }
   },
   "assumptions": [
-    "141 of 769 search matches for 'semaglutide' were excluded because 'semaglutide' is not one of their interventions.",
-    "54 of 296 search matches for 'tirzepatide' were excluded because 'tirzepatide' is not one of their interventions.",
+    "146 of 769 search matches for 'semaglutide' were excluded because 'semaglutide' is not one of their drug interventions.",
+    "57 of 296 search matches for 'tirzepatide' were excluded because 'tirzepatide' is not one of their drug interventions.",
     "Trials that involve more than one compared side are shown as 'Both'.",
     "A trial can have several phase values, so categories can add up to more than the total."
   ],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T12:48:44.513136Z",
+    "retrieved_at": "2026-10-04T14:04:20.749909Z",
     "search_matches": 1065,
-    "cohort_size": 832,
+    "cohort_size": 824,
     "api_requests": 2
   },
   "verification": {
@@ -13142,21 +13024,25 @@
         "passed": true
       },
       {
+        "name": "evidence_matches_source",
+        "passed": true
+      },
+      {
         "name": "cited_trials_meet_filters",
         "passed": true
       }
     ]
   },
   "warnings": [],
-  "run_id": "run_52e170dfe3854c50853c25771a4d7598",
+  "run_id": "run_0920a4ac4b594311a100693a22343963",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 1,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1281.2,
-    "retrieve": 1165.9,
+    "plan": 885.4,
+    "retrieve": 969.7,
     "analyze": 2.0,
-    "verify": 3.0
+    "verify": 4.3
   }
 }

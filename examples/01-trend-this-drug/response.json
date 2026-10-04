@@ -41,7 +41,7 @@
   "visualization": {
     "type": "time_series",
     "title": "Trials by start year: Pembrolizumab",
-    "subtitle": "2629 trials",
+    "subtitle": "2621 trials",
     "encoding": {
       "x": {
         "field": "start_year",
@@ -299,7 +299,7 @@
       },
       {
         "start_year": "2016",
-        "trial_count": 186,
+        "trial_count": 185,
         "trial_ids": [
           "NCT01676753",
           "NCT02289209",
@@ -378,7 +378,6 @@
           "NCT02702401",
           "NCT02702414",
           "NCT02703714",
-          "NCT02704156",
           "NCT02705820",
           "NCT02707588",
           "NCT02707666",
@@ -993,7 +992,7 @@
       },
       {
         "start_year": "2019",
-        "trial_count": 219,
+        "trial_count": 218,
         "trial_ids": [
           "NCT02757391",
           "NCT03161431",
@@ -1167,7 +1166,6 @@
           "NCT04034225",
           "NCT04040361",
           "NCT04041310",
-          "NCT04044859",
           "NCT04045730",
           "NCT04058145",
           "NCT04060342",
@@ -1219,7 +1217,7 @@
       },
       {
         "start_year": "2020",
-        "trial_count": 237,
+        "trial_count": 236,
         "trial_ids": [
           "NCT03260712",
           "NCT03695471",
@@ -1365,7 +1363,6 @@
           "NCT04393350",
           "NCT04394624",
           "NCT04396457",
-          "NCT04408898",
           "NCT04414540",
           "NCT04417192",
           "NCT04418219",
@@ -1463,7 +1460,7 @@
       },
       {
         "start_year": "2021",
-        "trial_count": 238,
+        "trial_count": 237,
         "trial_ids": [
           "NCT03219450",
           "NCT03448666",
@@ -1499,7 +1496,6 @@
           "NCT04541108",
           "NCT04548752",
           "NCT04550624",
-          "NCT04555226",
           "NCT04590781",
           "NCT04592211",
           "NCT04601857",
@@ -2212,7 +2208,7 @@
       },
       {
         "start_year": "2024",
-        "trial_count": 216,
+        "trial_count": 214,
         "trial_ids": [
           "NCT04838652",
           "NCT05231122",
@@ -2420,22 +2416,20 @@
           "NCT06711900",
           "NCT06716853",
           "NCT06724016",
-          "NCT06734533",
           "NCT06771544",
           "NCT06771674",
           "NCT06784648",
           "NCT06812858",
-          "NCT06880029",
           "NCT06907602",
           "NCT06984588",
           "NCT07436390",
           "NCT07523763"
         ],
-        "estimated_count": 19
+        "estimated_count": 18
       },
       {
         "start_year": "2025",
-        "trial_count": 206,
+        "trial_count": 205,
         "trial_ids": [
           "NCT04129515",
           "NCT04569461",
@@ -2565,7 +2559,6 @@
           "NCT06962787",
           "NCT06963814",
           "NCT06966700",
-          "NCT06976021",
           "NCT06976944",
           "NCT06978114",
           "NCT06980272",
@@ -2644,11 +2637,11 @@
           "NCT07448831",
           "NCT07455019"
         ],
-        "estimated_count": 34
+        "estimated_count": 33
       },
       {
         "start_year": "2026",
-        "trial_count": 170,
+        "trial_count": 169,
         "trial_ids": [
           "NCT04901741",
           "NCT05077215",
@@ -2680,7 +2673,6 @@
           "NCT07221942",
           "NCT07222566",
           "NCT07232602",
-          "NCT07251582",
           "NCT07262619",
           "NCT07264075",
           "NCT07264816",
@@ -2821,7 +2813,7 @@
           "NCT07853690",
           "NCT07856212"
         ],
-        "estimated_count": 89
+        "estimated_count": 88
       },
       {
         "start_year": "2027",
@@ -2877,12 +2869,12 @@
       ],
       "other_bucket": false,
       "multi_valued": false,
-      "cohort_size": 2629,
+      "cohort_size": 2621,
       "bipartite": false,
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_b4d7c76e9b0346668538264577ee18a6/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_fa11bb773e834413b1f2bdf3c24cd5f4/chart.png",
   "evidence": {
     "NCT04898751": {
       "nct_id": "NCT04898751",
@@ -7091,22 +7083,6 @@
         ],
         "protocolSection.statusModule.startDateStruct": {
           "date": "2016-05-06",
-          "type": "ACTUAL"
-        }
-      }
-    },
-    "NCT02704156": {
-      "nct_id": "NCT02704156",
-      "title": "SBRT Plus Pembrolizumab and Trametinib for Pancreatic Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT02704156",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT02704156",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Cyberknife plus Pembrolizumab and Trametinib",
-          "Cyberknife plus Gemcitabine"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2016-10",
           "type": "ACTUAL"
         }
       }
@@ -19985,21 +19961,6 @@
         }
       }
     },
-    "NCT04044859": {
-      "nct_id": "NCT04044859",
-      "title": "ADP-A2M4CD8 as Monotherapy or in Combination With Either Nivolumab or Pembrolizumab in HLA-A2+ Subjects With MAGE-A4 Positive Tumors (SURPASS)",
-      "url": "https://clinicaltrials.gov/study/NCT04044859",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT04044859",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Autologous genetically modified ADP-A2M4CD8 cells alone or in combination with nivolumab every four weeks or pembrolizumab every 6 weeks"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2019-08-20",
-          "type": "ACTUAL"
-        }
-      }
-    },
     "NCT04045730": {
       "nct_id": "NCT04045730",
       "title": "The Study of Gemcitabine Plus Nab-Paclitaxel in Combination With Pegvorhyaluronidase Alfa (PVHA; PEGPH20) and Pembrolizumab as Front-line Treatment for Metastatic Pancreatic Adenocarcinoma.",
@@ -23297,21 +23258,6 @@
         }
       }
     },
-    "NCT04408898": {
-      "nct_id": "NCT04408898",
-      "title": "SPEARHEAD 2 Study in Subjects With Recurrent or Metastatic Head and Neck Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT04408898",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT04408898",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "pembrolizumab"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2020-07-02",
-          "type": "ACTUAL"
-        }
-      }
-    },
     "NCT04414540": {
       "nct_id": "NCT04414540",
       "title": "Combining Pembrolizumab and Metformin in Metastatic Head and Neck Cancer Patients",
@@ -25424,21 +25370,6 @@
         ],
         "protocolSection.statusModule.startDateStruct": {
           "date": "2021-09-15",
-          "type": "ACTUAL"
-        }
-      }
-    },
-    "NCT04555226": {
-      "nct_id": "NCT04555226",
-      "title": "The Efficacy of Lymph Node Dissection for Stage IIICr of Cervical Cancer(CQGOG0103)",
-      "url": "https://clinicaltrials.gov/study/NCT04555226",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT04555226",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Lymph Node Excision"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2021-01-11",
           "type": "ACTUAL"
         }
       }
@@ -40808,22 +40739,6 @@
         }
       }
     },
-    "NCT06734533": {
-      "nct_id": "NCT06734533",
-      "title": "Anlotinib-based Combination Therapy in Patients with Hormone Receptor-positive\uff08HR+\uff09 Metastatic Breast Cancer(MBC) .",
-      "url": "https://clinicaltrials.gov/study/NCT06734533",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06734533",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "sintilimab",
-          "Fulvestrant"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2024-12-05",
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06771544": {
       "nct_id": "NCT06771544",
       "title": "Metronomic Cyclophosphamide With Pembrolizumab in Checkpoint Inhibitor Refractory Melanoma",
@@ -40885,21 +40800,6 @@
         ],
         "protocolSection.statusModule.startDateStruct": {
           "date": "2024-01-09",
-          "type": "ACTUAL"
-        }
-      }
-    },
-    "NCT06880029": {
-      "nct_id": "NCT06880029",
-      "title": "Circadian Rhythm Impact on TNBC Response to Neoadjuvant Immunotherapy",
-      "url": "https://clinicaltrials.gov/study/NCT06880029",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06880029",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Morning pembrolizumab infusions"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2024-09-01",
           "type": "ACTUAL"
         }
       }
@@ -43273,23 +43173,6 @@
         }
       }
     },
-    "NCT06976021": {
-      "nct_id": "NCT06976021",
-      "title": "Immune PET and Proteomics for the Assessment of Response to Spatially Fractionated or Palliative Radiotherapy With or Without Immunotherapy",
-      "url": "https://clinicaltrials.gov/study/NCT06976021",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06976021",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Baseline 89-Zr Pembrolizumab Immuno PET-CT",
-          "Proteomic assay",
-          "Follow-up 89-Zr Pembrolizumab Immuno PET-CT"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2025-06",
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06976944": {
       "nct_id": "NCT06976944",
       "title": "Pembrolizumab + Paclitaxel +/- Bevacizumab for Triple-negative Breast Cancer",
@@ -45129,23 +45012,6 @@
         "protocolSection.statusModule.startDateStruct": {
           "date": "2026-02-09",
           "type": "ACTUAL"
-        }
-      }
-    },
-    "NCT07251582": {
-      "nct_id": "NCT07251582",
-      "title": "Effect of Infusion Timing on Pathologic Response to Neoadjuvant Immunotherapy in Resectable Non-Small Cell Lung Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT07251582",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07251582",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "toripalimab",
-          "pembrolizumab",
-          "Platinum Compounds"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2026-08-12",
-          "type": "ESTIMATED"
         }
       }
     },
@@ -47712,7 +47578,7 @@
     }
   },
   "assumptions": [
-    "339 of 2968 search matches for 'Pembrolizumab' were excluded because 'Pembrolizumab' is not one of their interventions.",
+    "347 of 2968 search matches for 'Pembrolizumab' were excluded because 'Pembrolizumab' is not one of their drug interventions.",
     "Start year uses the trial start date; some dates are estimated (planned) rather than actual.",
     "Counts from 2026 on are incomplete: they include only trials already registered, mostly with planned start dates.",
     "4 trials have no start date; they are listed as 'Not reported' and not plotted on the time axis."
@@ -47720,9 +47586,9 @@
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T12:48:38.381816Z",
+    "retrieved_at": "2026-10-04T14:04:15.058555Z",
     "search_matches": 2968,
-    "cohort_size": 2629,
+    "cohort_size": 2621,
     "api_requests": 5
   },
   "verification": {
@@ -47749,6 +47615,10 @@
         "passed": true
       },
       {
+        "name": "evidence_matches_source",
+        "passed": true
+      },
+      {
         "name": "cited_trials_meet_filters",
         "passed": true
       },
@@ -47759,15 +47629,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_b4d7c76e9b0346668538264577ee18a6",
+  "run_id": "run_fa11bb773e834413b1f2bdf3c24cd5f4",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 1,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 2450.2,
-    "retrieve": 2777.5,
-    "analyze": 1.3,
-    "verify": 5.8
+    "plan": 1486.1,
+    "retrieve": 2831.3,
+    "analyze": 1.2,
+    "verify": 8.2
   }
 }

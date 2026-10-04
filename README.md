@@ -4,7 +4,7 @@ A backend service that answers natural-language questions about clinical trials 
 
 ```
 POST /v1/query  {"query": "How has the number of trials for this drug changed over time?", "drug_name": "Pembrolizumab"}
-→ time_series of trials per start year · 2,629 cited trials · verified · chart at /v1/runs/{id}/chart.png
+→ time_series of trials per start year · 2,621 cited trials · verified · chart at /v1/runs/{id}/chart.png
 ```
 
 Supported answers:
@@ -262,9 +262,9 @@ The images are produced by translating this spec, and only this spec, into Vega-
 
 | Example | Outcome |
 |---|---|
-| The assignment's own request ("this drug" + `drug_name: Pembrolizumab`) | `time_series`, 2,629 cited trials |
+| The assignment's own request ("this drug" + `drug_name: Pembrolizumab`) | `time_series`, 2,621 cited trials |
 | "Which countries have the most recruiting trials for melanoma?" | `bar_chart`, 480 |
-| "Compare phases for trials involving semaglutide vs tirzepatide" | `grouped_bar_chart`, 832 |
+| "Compare phases for trials involving semaglutide vs tirzepatide" | `grouped_bar_chart`, 824 |
 | "Show a network of sponsors and drugs for glioblastoma trials" | `network_graph`, 975 |
 | "What phases are Merck's trials in?" | `clarification_required`: Merck Sharp & Dohme (2,151) / Merck KGaA (275) / All of these (2,426) |
 
