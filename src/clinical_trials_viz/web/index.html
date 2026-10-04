@@ -363,7 +363,7 @@ function answerBlock(turn, a, part, total) {
   if (a.message && a.outcome !== "clarification_required") box.append(el("p", {}, a.message));
   const clarifyEl = el("div", {});
   renderClarification(clarifyEl, a, turn, part);
-  box.append(clarifyEl);
+  box.append(clarifyEl, suggestionsBlock(turn, a, part, total));
   let draw = null;
   const spec = a.visualization;
   if (spec) {
@@ -516,6 +516,28 @@ const CITE_HINT = "Click any bar, point, node, link or row to see the trials beh
 function partQuery(turn, part) {
   const requests = (turn.response.plan && turn.response.plan.requests) || [];
   return requests.length > part ? requests[part] : turn.body.query;
+}
+
+/** No answer: corrections counted by the service (sent as a follow-up) or questions it can answer. */
+function suggestionsBlock(turn, a, part, total) {
+  const list = a.suggestions || [];
+  if (!list.length) return "";
+  const box = el("div", { class: "options" },
+    el("strong", {}, a.outcome === "unsupported_query" ? "Questions the registry can answer" : "Try instead"));
+  for (const s of list) {
+    if (s.follow_up) {
+      // A part of a multi-part question is asked again as its own question, with the correction.
+      const query = total > 1 ? `${partQuery(turn, part)} (${s.follow_up})` : s.follow_up;
+      box.append(el("button", { type: "button", onclick: () =>
+        ask({ query, previous_run_id: turn.response.run_id }, "follow-up") }, s.label));
+    } else if (s.query) {
+      box.append(el("button", { type: "button", onclick: () => { $("query").value = s.query; ask({ query: s.query }); } },
+        s.label));
+    } else {
+      box.append(el("p", { class: "muted" }, s.label));
+    }
+  }
+  return box;
 }
 
 function renderClarification(box, answer, turn, part) {

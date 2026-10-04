@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 
 from opentelemetry import trace
 
-from clinical_trials_viz import clarify
+from clinical_trials_viz import clarify, suggest
 from clinical_trials_viz.analyze import breakdown, comparison_groups, cross_breakdown, enrollment_histogram
 from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS, DEFAULT_TOP_N, ENROLLMENT_FIELD, NOT_REPORTED, Dimension
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
@@ -38,6 +38,7 @@ from clinical_trials_viz.models.response import (
     Outcome,
     QueryResponse,
     SourceInfo,
+    Suggestion,
 )
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import drug_drug_network, sponsor_drug_network
@@ -55,6 +56,7 @@ from clinical_trials_viz.spec_builder import (
     chart_type_for,
     comparison_spec,
     cross_spec,
+    describe_filters,
     histogram_spec,
     network_spec,
     scatter_spec,
@@ -80,6 +82,7 @@ _STAGE_NAMES = {
     "retrieve": "retrieval from ClinicalTrials.gov",
     "analyze": "counting",
     "verify": "verification",
+    "suggest": "counting corrections",
 }
 
 
@@ -245,6 +248,7 @@ class Pipeline:
                 _fail(target, classify(error, response.run_id))
                 continue
             if isinstance(part, UnsupportedPlan):
+                target.suggestions = [Suggestion(label=q, query=q) for q in part.suggestions]
                 _finish(target, Outcome.UNSUPPORTED_QUERY, part.reason)
                 continue
             if isinstance(part, ClarifyPlan):
@@ -311,7 +315,7 @@ class Pipeline:
                 _finish(target, Outcome.CLARIFICATION_REQUIRED, question.question)
                 return
         if not cohort.trials:
-            _finish(target, Outcome.NO_DATA, "No trials match these filters (all matching pages were retrieved).")
+            await self._no_data(run, target, filters)
             return
 
         with run.stage("analyze"):
@@ -323,6 +327,23 @@ class Pipeline:
             _finish(target, Outcome.NO_DATA, f"None of the {len(cohort.trials)} matching trials report {missing}.")
             return
         self._finish_success(run, target, plan, spec, {t.nct_id: t for t in cohort.trials}, dimension, index)
+
+    async def _no_data(self, run: _Run, target: Answer, filters: AppliedFilters) -> None:
+        """No trial matches: say how the question was read, and offer corrections counted live."""
+        read = describe_filters(filters)
+        with run.stage("suggest"):
+            if unknown := await suggest.unknown_drugs(filters, self.client):
+                names = ", ".join(f"'{d}'" for d in unknown)
+                message = (
+                    f"No trial in ClinicalTrials.gov lists {names} as an intervention. Check the spelling, or try "
+                    "the generic, brand or code name."
+                )
+            else:
+                message = f"No trials match {read}. Every matching page was checked, so this is not a sample."
+                target.suggestions = await suggest.corrections(filters, self.client)
+                if target.suggestions:
+                    message += " Removing one filter finds trials; see the suggestions."
+        _finish(target, Outcome.NO_DATA, message)
 
     def _build(
         self, target: Answer, plan: AnswerPlan, filters: AppliedFilters, cohort: Cohort

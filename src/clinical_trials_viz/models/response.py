@@ -75,6 +75,17 @@ class ClarificationOption(BaseModel):
     trial_count: int | None = None
 
 
+class Suggestion(BaseModel):
+    """A way forward when there is no answer: a counted correction, or a question the registry can answer."""
+
+    label: str
+    follow_up: str | None = Field(
+        default=None, description="Send as a Follow-up (`query` with `previous_run_id`) to apply this correction."
+    )
+    query: str | None = Field(default=None, description="Send as a new question.")
+    trial_count: int | None = Field(default=None, description="Trials matching after the correction, counted live.")
+
+
 class Clarification(BaseModel):
     """A question for the user. Send the chosen value(s) back in `field` with `previous_run_id`."""
 
@@ -129,6 +140,9 @@ class Answer(BaseModel):
     evidence: dict[str, EvidenceEntry] = Field(default_factory=dict)
     assumptions: list[str] = Field(default_factory=list)
     clarification: Clarification | None = None
+    suggestions: list[Suggestion] = Field(
+        default_factory=list, description="When there is no answer: corrections or questions that can be answered."
+    )
     source: SourceInfo | None = None
     verification: Verification | None = None
     error: ErrorInfo | None = Field(default=None, description="Set when the outcome is a failure.")

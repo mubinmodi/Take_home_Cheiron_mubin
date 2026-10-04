@@ -40,6 +40,7 @@ A **verifier** then re-derives every count and cited value from the trial record
   - sponsor ↔ drug networks and same-arm drug ↔ drug combination networks: `network_graph`
 - deep citations: every data point lists its trials, and each trial carries the source field values that placed it there;
 - clarifications for ambiguous sponsors, drug classes, missing references and fields that contradict the question;
+- when there is no answer, a plain reason and a way forward: how the question was read, corrections counted live ("without the country filter: about 126 trials", one click to apply), a hint for a drug name nobody lists, or questions the registry can answer;
 - follow-ups and corrections ("only phase 3") through `previous_run_id`, and questions that ask several things at once;
 - PNG/SVG images, and a web page where clicking any bar, point, node or link shows its trials;
 - a hosted version on AWS: a [live demo](https://cl-f44fdf3287b047ef971affaa8d767246.ecs.us-east-2.on.aws), no key needed.
@@ -169,7 +170,7 @@ Exits (each part ends in exactly one outcome):
   - chooses the chart type deterministically from the plan
   - builds the spec and evidence
   - verifies
-- **When the answer is a chart** (the assignment asks both to judge whether a visualization fits and for a visualization as the answer). Every successful analytical answer is a visualization specification; a single number is a `single_value` and a list of trials a `table`, so a renderer handles every answer the same way. Code picks the type from the plan: counts over start years → `time_series`; a breakdown → `bar_chart`; a comparison or a crossed breakdown → `grouped_bar_chart`; enrollment distribution → `histogram`; trial by trial → `table`, `timeline` or `scatter_plot`; relationships → `network_graph`. Outcomes that are not answers (clarification, unsupported, no data, scope required, errors) carry no visualization; they say why and what to do next.
+- **When the answer is a chart** (the assignment asks both to judge whether a visualization fits and for a visualization as the answer). Every successful analytical answer is a visualization specification; a single number is a `single_value` and a list of trials a `table`, so a renderer handles every answer the same way. Code picks the type from the plan: counts over start years → `time_series`; a breakdown → `bar_chart`; a comparison or a crossed breakdown → `grouped_bar_chart`; enrollment distribution → `histogram`; trial by trial → `table`, `timeline` or `scatter_plot`; relationships → `network_graph`. Outcomes that are not answers (clarification, unsupported, no data, scope required, errors) carry no visualization; they say why and what to do next. A `no_data` answer states how the question was read and, in `suggestions`, offers the corrections that find trials, each counted live with that one filter removed. An `unsupported_query` answer offers up to three related questions the registry can answer.
 - **Bounded:** one split call (two if the primary model fails), then at most 3 planning calls per run, shared by the parts (plan, one repair with the validator's errors, one provider fallback on transport errors only). A single question usually takes 2 calls. Every attempt counts, a failed one included, and a model that failed is not tried again in the same run. The SDK's own single retry of a request is not counted. Every run ends in exactly one **outcome**: `success`, `no_data`, `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error`, `internal_error`.
 - **Verifier**, a gate before every successful response. It checks that:
   - the chart answers the plan: its type, grouped by the plan's dimensions
@@ -197,6 +198,7 @@ Code map (`src/clinical_trials_viz/`):
 | `verify.py` | The gate |
 | `render.py` | Spec → Vega-Lite → PNG/SVG |
 | `clarify.py` | Clarification options built from data |
+| `suggest.py` | Corrections for `no_data`, counted live |
 | `catalog.py` | The versioned capability catalog: dimensions, enums, counting constants |
 | `ctgov/` | API client and the typed trial record |
 | `failures.py` | Any exception → one outcome and a structured error |
@@ -269,6 +271,7 @@ Every Outcome returns HTTP 200 with the outcome in the body; HTTP error codes ar
 | `evidence` | `{nct_id: {nct_id, title, url, fields}}`: each cited trial once, with the **source field values** (API field path → value) that placed it in the data and satisfied each filter |
 | `assumptions` | Defaults applied and data caveats (e.g. "9 of 126 search matches were excluded because 'Keytruda' is not one of their drug interventions") |
 | `applied_filters` | The filters actually applied after merging structured fields; `from_request` names those pinned by the caller |
+| `suggestions` | When there is no answer: `[{label, follow_up, query, trial_count}]`. A correction (`no_data`) has `follow_up`, text to send with `previous_run_id`, and `trial_count`, counted live; a question the registry can answer (`unsupported_query`) has `query`, to send as a new question |
 | `clarification` | On `clarification_required`: `{field, question, reason, options:[{label, value, trial_count}], multi_select, allow_free_text}`. Send the chosen `value` back in `field` with `previous_run_id`. `reason` is `conflict` when a structured field contradicts the question. |
 | `plan`, `relation` | The model's Query Plan, and whether a follow-up refined (`refine`) or replaced (`new`) the previous one |
 | `source` | API version, data timestamp, retrieval time, search matches, cohort size, API requests |
@@ -450,7 +453,9 @@ Every failure ends in one Outcome with a structured `error` (`code`, `message`, 
 | **The model returns no usable plan** (text instead of a plan, after one retry) | Stopped; not sent to the fallback, which is for provider failures only | `internal_error` · `planner_invalid_output` (retryable) |
 | **No model configured** | The service still starts; every question explains which key is missing | `internal_error` · `planner_not_configured` |
 | **ClinicalTrials.gov** fails | Retries with backoff (honouring `Retry-After`), then stops with the reason | `upstream_error` · `source_unavailable` / `source_rate_limited` / `source_rejected` / `source_invalid_response` |
+| **No trial matches** | Says how the question was read; offers the corrections that find trials, each counted live with one filter removed. A drug name that no trial lists at all gets a spelling hint | `no_data` + `suggestions` |
 | **Nothing to plot** (no trial reports a start date for a trend, the dates for a timeline, or enrollment for a scatter) | Stopped after full retrieval, naming the missing field | `no_data` |
+| **The registry cannot answer the question** (efficacy, advice) | Says why, and offers up to three related questions it can answer | `unsupported_query` + `suggestions` |
 | **The chart cannot be built** (Vega-Lite fails to compile) | Checked at query time by compiling the chart (milliseconds, no drawing): the answer, specification and citations stand; `chart_url` is withheld with a warning | `success` + warning |
 | **Drawing the image fails or hangs** | Drawing runs off the event loop with a time limit; the image request fails in JSON, the run is unaffected | HTTP `500 render_failed` / `504 render_timeout` |
 | **The interactive chart cannot load** (offline, CDN blocked) | The web page shows the same data as a table, still clickable for citations | — |

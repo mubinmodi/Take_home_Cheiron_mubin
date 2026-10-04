@@ -890,3 +890,47 @@ async def test_a_sponsor_clarification_answer_is_not_a_conflict(make_client):
     )  # fmt: skip
     assert (body.get("clarification") or {}).get("reason") != "conflict"
     assert body["applied_filters"]["exact_sponsors"] == ["Merck Sharp & Dohme LLC"]
+
+
+# --- When the data is not there: say so, say how the question was read, suggest corrections --------
+
+
+def _empty_when(page, marker: str):
+    """Mock search: nothing when the request contains `marker`, else the fixture page."""
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if marker.lower() in str(request.url).lower():
+            return httpx.Response(200, json={"studies": [], "totalCount": 0})
+        return httpx.Response(200, json=page)
+
+    return respond
+
+
+async def test_no_data_says_how_it_was_read_and_suggests_counted_corrections(make_client, ctgov, page):
+    ctgov.get("/studies").mock(side_effect=_empty_when(page, "Germany"))
+    filters = Filters(drugs=["Keytruda"], phases=[Phase.PHASE3], countries=["Germany"])
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=filters)
+    body = await ask(make_client, ScriptedPlanner(plan), query="How many phase 3 Keytruda trials are in Germany?")
+    assert body["outcome"] == "no_data"
+    assert "Keytruda; Phase 3; in Germany" in body["message"]  # how the question was read
+    corrections = body["suggestions"]
+    without_country = [s for s in corrections if "Germany" in s["label"]]
+    assert without_country and without_country[0]["trial_count"] == 50  # a real count, not a guess
+    assert without_country[0]["follow_up"]  # one click asks again without that filter
+    assert not any("Phase 3" in s["label"] for s in corrections)  # dropping the phase alone still finds nothing
+
+
+async def test_a_drug_nobody_lists_suggests_checking_the_name(make_client, ctgov, page):
+    ctgov.get("/studies").mock(side_effect=_empty_when(page, "Keytrudda"))
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytrudda"]))
+    body = await ask(make_client, ScriptedPlanner(plan), query="How many Keytrudda trials are there?")
+    assert body["outcome"] == "no_data"
+    assert "Check the spelling" in body["message"]
+
+
+async def test_an_unanswerable_question_offers_questions_the_registry_can_answer(make_client):
+    ideas = ["How many phase 3 Keytruda trials have results posted?", "Which phases are Keytruda trials in?"]
+    plan = UnsupportedPlan(reason="ClinicalTrials.gov does not say which drug works best.", suggestions=ideas)
+    body = await ask(make_client, ScriptedPlanner(plan), query="Does Keytruda work better than Opdivo?")
+    assert body["outcome"] == "unsupported_query"
+    assert [s["query"] for s in body["suggestions"]] == ideas

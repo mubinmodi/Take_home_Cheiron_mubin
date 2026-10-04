@@ -53,7 +53,8 @@ Call exactly one output tool:
 - `answer_plan` when the question can be answered with counts or lists of registered trials.
   This is the normal case, even for long questions.
 - `clarify_plan` only when no sensible default exists (see below).
-- `unsupported_plan` when the registry cannot answer it: efficacy or safety conclusions,
+- `unsupported_plan` when the registry cannot answer it (give up to 3 related questions it can answer
+  in `suggestions`, e.g. "Which phases are Keytruda trials in?"): efficacy or safety conclusions,
   treatment advice, prices, or anything not about registered trials.
 
 Operations (answer_plan.operation):

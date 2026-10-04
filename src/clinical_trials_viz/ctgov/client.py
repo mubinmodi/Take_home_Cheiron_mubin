@@ -265,6 +265,14 @@ class CtGovClient:
             raise ScopeTooLarge(total, max_pages * PAGE_SIZE)
         return SearchResult(studies, total, complete)
 
+    async def count(self, params: dict[str, str]) -> int:
+        """How many studies match, without fetching them (one small request)."""
+        version = await self.version()
+        page = await self._page(
+            {**params, "fields": "NCTId", "pageSize": "1", "countTotal": "true"}, version.data_timestamp
+        )
+        return int(page.get("totalCount", 0))
+
     async def countries(self) -> list[str]:
         """All country names the API uses for site locations."""
         body = await self._get("/stats/field/values", {"fields": "LocationCountry"})

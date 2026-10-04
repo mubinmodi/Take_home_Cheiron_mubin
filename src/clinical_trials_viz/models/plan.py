@@ -131,6 +131,11 @@ class UnsupportedPlan(BaseModel):
 
     kind: Literal["unsupported"] = "unsupported"
     reason: str = Field(description="One sentence explaining why, addressed to the user.")
+    suggestions: list[str] = Field(
+        default_factory=list,
+        max_length=3,
+        description="Up to 3 related questions the registry can answer, written as the user would ask them.",
+    )
 
 
 class MultiAnswerPlan(BaseModel):
