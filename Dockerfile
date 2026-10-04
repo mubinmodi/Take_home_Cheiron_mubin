@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # The hosted service (docs/hosted-deployment.md): one process with one worker per container, because
-# the per-process state (circuit breakers, caches) is per worker. Cloud Run sets PORT.
+# the per-process state (circuit breakers, caches) is per worker. The platform may set PORT (default 8080).
 
 FROM python:3.13-slim-bookworm AS build
 COPY --from=ghcr.io/astral-sh/uv:0.6.16 /uv /bin/uv
@@ -24,7 +24,7 @@ RUN useradd --create-home --uid 10001 app
 COPY --from=build --chown=app:app /app/.venv /app/.venv
 USER app
 WORKDIR /home/app
-# FORWARDED_ALLOW_IPS: Cloud Run's front end sets X-Forwarded-Proto; trusting it makes chart links https.
+# FORWARDED_ALLOW_IPS: the load balancer sets X-Forwarded-Proto; trusting it makes chart links https.
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     DEPLOYMENT=hosted \

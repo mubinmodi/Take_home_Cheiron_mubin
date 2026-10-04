@@ -16,7 +16,7 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     serve = sub.add_parser("serve", help="run the HTTP API")
     serve.add_argument("--host", default="127.0.0.1")
-    serve.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))  # PORT: set by Cloud Run
+    serve.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))  # PORT: set by the platform
     serve.add_argument("--reload", action="store_true")
     ask = sub.add_parser("ask", help="answer one question and print a summary (or --json for the full response)")
     ask.add_argument("query")

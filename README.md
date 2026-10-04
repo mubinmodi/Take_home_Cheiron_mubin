@@ -71,20 +71,23 @@ uv run python -m evals.run       # score the configured planner on 42 questions 
 uv run ruff check src tests && uv run pyright
 ```
 
-**Hosted version.** The same service in a container on Google Cloud Run, with Upstash Redis and Neon Postgres, as decided in [`docs/hosted-deployment.md`](docs/hosted-deployment.md). `DEPLOYMENT=hosted` switches on:
-- **Shared state in Redis** (`REDIS_URL`): one ClinicalTrials.gov request budget for all instances (the registry's limit is per IP), the page cache, Idempotency-Keys and per-user counts. If Redis fails, each falls back to working per instance.
-- **Run history in Postgres** (`DATABASE_URL`): any instance can serve a Follow-up or a chart. Each row records the user, outcome, model calls and latency.
-- **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header, and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once.
+**Hosted version (AWS).** The same container runs on AWS in us-east-2, as decided in [`docs/hosted-deployment.md`](docs/hosted-deployment.md). `DEPLOYMENT=hosted` switches on:
+- **Shared state in Redis** (`REDIS_URL`; ElastiCache Serverless for Valkey): one ClinicalTrials.gov request budget for all instances (the registry's limit is per IP), the page cache, Idempotency-Keys and per-user counts. If Redis fails, each falls back to working per instance.
+- **Run history in Postgres** (`DATABASE_URL`; RDS for PostgreSQL, not public): any instance can serve a Follow-up or a chart. Each row records the user, outcome, model calls and latency.
+- **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header (the key alone or as `name:key`), and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once.
 - **Circuit breakers** for ClinicalTrials.gov and each model, and a **30 s run deadline** (`RUN_DEADLINE_SECONDS`).
-- **Traces:** OpenTelemetry spans per stage (plus HTTP and model calls), exported over OTLP to the endpoint in `OTEL_EXPORTER_OTLP_ENDPOINT`.
+- **Traces:** OpenTelemetry spans per stage (plus HTTP and model calls), exported over OTLP when `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
+
+On AWS it runs on **ECS Express Mode** (App Runner closed to new customers in April 2026): Fargate tasks on ARM with 0.5 vCPU and 1 GB, 1–2 of them, behind an HTTPS load balancer and auto scaling that Express Mode manages; the image is in ECR. **Secrets Manager** holds the model keys, `API_KEYS` and the connection strings, and ECS reads them into environment variables when a task starts. The database and cache accept connections only from the service's security group.
 
 ```bash
 API_KEYS=you:a-long-random-key docker compose up --build   # the hosted mode on this machine, with Redis and Postgres
-PROJECT=my-gcp-project deploy/cloud-run.sh                  # deploy to Cloud Run; secrets go to Secret Manager
+deploy/aws/create-service.sh                                # create the ECS Express Mode service (after the one-time setup)
+TAG=v2 deploy/aws/update-service.sh                         # roll out new code: build, push, rolling update with rollback
 deploy/smoke-test.sh https://YOUR-SERVICE-URL               # health, a question, a follow-up and a chart
 ```
 
-The hosted mode refuses to start without Redis, Postgres and API keys. Deploying needs your own accounts: Google Cloud with billing and the `gcloud` CLI, Upstash and Neon (all have free tiers). Every question costs 1–3 model calls; the per-user limit caps that.
+The hosted mode refuses to start without Redis, Postgres and API keys. The one-time AWS setup (registry, roles, database, cache, secrets) is listed command by command in [`docs/hosted-deployment.md`](docs/hosted-deployment.md#aws-deployment-2026-10-04), with costs (roughly $50–60 a month while running) and teardown. Every question costs 1–3 model calls; the per-user limit caps that.
 
 ---
 
@@ -313,7 +316,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 - **Data quality is passed through, not corrected.** Enrollment outliers (one melanoma record lists 2,953,748 participants, another 999,999) are shown as recorded. Alternatives listed in an arm are detected from its description; when the description does not name both drugs, they still count as given together.
 - **Run records** keep the plan and response only. Full run bundles with the raw API pages, for exact offline replay, are designed but not built.
 - **The planner eval** has 42 questions, including multi-part and crossed ones: `gpt-5.4-mini` scores 100% (42/42), `claude-haiku-4-5` 95% (40/42) (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. Repeated runs show residual variance: the "industry vs academic … Parkinson's and ALS" comparison sometimes omits the sponsor-category breakdown (4 of 5 runs correct).
-- **Hosting:** the hosted version is built and was tested on this machine with Docker (compose: service, Redis, Postgres; health, a question, a follow-up and a chart, 401 without a key), but it has not been deployed to Cloud Run from this repository: that needs your cloud accounts. Circuit breakers are per instance; the table is created on startup (a migration tool such as Alembic would come with the first schema change).
+- **Hosting:** deployed on AWS (us-east-2) and checked live with the smoke test: health, a question, a follow-up from the Postgres run history, and a chart. The first deployment exposed a startup that waited a minute on an unreachable database; it now connects in the background. Circuit breakers are per instance. The table is created on startup; a migration tool such as Alembic would come with the first schema change. Traces are not yet sent anywhere on AWS: X-Ray needs an OpenTelemetry collector next to the app.
 - **Time cap:** the 30 s run deadline applies when hosted; locally there is none. Questions near the page cap can exceed 30 s; a background job (`POST /runs`) would be the next step if traces show deadline hits.
 - **Not built:** investigator and site networks.
 
