@@ -160,6 +160,19 @@ def test_verifier_catches_an_altered_citation_link(trials):
     assert not next(c for c in result.checks if c.name == "evidence_matches_source").passed
 
 
+def test_verifier_catches_a_trial_wrongly_counted_in_other(trials):
+    by_id = {t.nct_id: t for t in trials}
+    spec = breakdown_spec(breakdown(trials, Dimension.COUNTRY, 3), AppliedFilters(), len(trials))
+    us = next(d for d in spec.data if d["country"] == "United States")
+    other = next(d for d in spec.data if d["country"] == "Other")
+    moved = next(i for i in us["trial_ids"] if by_id[i].countries == ("United States",))
+    other["trial_ids"].append(moved)
+    other["trial_count"] += 1
+    evidence = build_evidence(spec, by_id, Dimension.COUNTRY, AppliedFilters())
+    result = verify(spec, evidence, by_id, Dimension.COUNTRY, VisualizationType.BAR_CHART, AppliedFilters())
+    assert not next(c for c in result.checks if c.name == "cited_values_match_source").passed
+
+
 def test_evidence_cites_the_source_field(trials):
     spec, evidence = _time_series(trials)
     entry = evidence[spec.data[-1]["trial_ids"][0]]

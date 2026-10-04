@@ -36,9 +36,21 @@ def test_country_counts_trials_not_sites(trials):
 
 def test_top_n_folds_the_rest_into_other(trials):
     result = breakdown(trials, Dimension.COUNTRY, 3)
-    assert [b.label for b in result.buckets][-1] == OTHER_BUCKET
-    assert len(result.buckets) == 4
+    assert OTHER_BUCKET in [b.label for b in result.buckets]
+    assert len([b for b in result.buckets if b.label not in (OTHER_BUCKET, NOT_REPORTED)]) == 3
     assert result.folded > 0
+
+
+def test_top_n_keeps_not_reported_out_of_other(trials):
+    """Missing is its own state (harness-design §3), even when the long tail is folded."""
+    no_country = {t.nct_id for t in trials if not t.countries}
+    assert no_country  # the fixture has trials without a site country
+    result = breakdown(trials, Dimension.COUNTRY, 3)
+    labels = [b.label for b in result.buckets]
+    assert labels[-2:] == [OTHER_BUCKET, NOT_REPORTED]
+    other = next(b for b in result.buckets if b.label == OTHER_BUCKET)
+    assert not no_country & set(other.trial_ids)
+    assert set(result.buckets[-1].trial_ids) == no_country
 
 
 def test_missing_values_are_their_own_state(trials):

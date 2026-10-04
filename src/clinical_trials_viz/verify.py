@@ -62,15 +62,20 @@ def verify(
     if dimension is not None and spec.type not in (VisualizationType.TABLE, VisualizationType.NETWORK_GRAPH):
         wrong = []
         for dim in [dimension, *([series] if series else [])]:
+            shown = {d.get(dim.value) for d in spec.rows()} - {OTHER_BUCKET, None}
             for d in spec.rows():
                 label = d.get(dim.value)
                 if label is None:
                     wrong.append(f"a row has no '{dim.value}' value")
                     continue
-                if label == OTHER_BUCKET:
-                    continue
                 for nct_id in d["trial_ids"]:
-                    if nct_id in trials and label not in dimension_values(trials[nct_id], dim):
+                    if nct_id not in trials:
+                        continue
+                    values = dimension_values(trials[nct_id], dim)
+                    # 'Other' holds trials with a value outside the categories shown.
+                    if (label == OTHER_BUCKET and not set(values) - shown) or (
+                        label != OTHER_BUCKET and label not in values
+                    ):
                         wrong.append(f"{nct_id} counted under '{label}'")
         check("cited_values_match_source", wrong)
 

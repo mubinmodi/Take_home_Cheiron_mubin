@@ -87,13 +87,14 @@ def breakdown(trials: list[Trial], dimension: Dimension, top_n: int | None) -> B
             )
 
     ordered = sorted(buckets.values(), key=lambda b: _sort_key(dimension, b))
-    if info.top_n and top_n and len([b for b in ordered if b.label != NOT_REPORTED]) > top_n:
-        keep = [b for b in ordered if b.label != NOT_REPORTED][:top_n]
-        rest = [b for b in ordered if b not in keep]
+    reported = [b for b in ordered if b.label != NOT_REPORTED]
+    if info.top_n and top_n and len(reported) > top_n:
+        keep, rest = reported[:top_n], reported[top_n:]
         other_ids = sorted({i for b in rest for i in b.trial_ids})
         result.folded = len(rest)
         result.top_n = top_n
-        ordered = [*keep, Bucket(OTHER_BUCKET, other_ids)]
+        # Missing stays its own state, after "Other": it is not a low-ranked category.
+        ordered = [*keep, Bucket(OTHER_BUCKET, other_ids), *[b for b in ordered if b.label == NOT_REPORTED]]
         result.assumptions.append(
             f"Showing the top {top_n} {info.label.lower()} categories; {len(rest)} others are combined in '{OTHER_BUCKET}'."
         )
