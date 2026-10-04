@@ -19,6 +19,7 @@ class Intervention:
     type: str
     name: str
     other_names: tuple[str, ...]
+    arm_labels: tuple[str, ...] = ()  # arms that receive this intervention
 
 
 @dataclass(frozen=True)
@@ -62,6 +63,25 @@ def _unique(values: list[str]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(v for v in values if v))
 
 
+def _interventions(arms: dict[str, Any]) -> tuple[Intervention, ...]:
+    """Interventions with the arms that receive them. The record links them both ways (an
+    intervention's arm labels, an arm's "Type: Name" intervention list); either is enough."""
+    from_arms: dict[str, list[str]] = {}
+    for arm in arms.get("armGroups") or []:
+        for entry in arm.get("interventionNames") or []:
+            name = entry.split(": ", 1)[-1]
+            from_arms.setdefault(name, []).append(arm.get("label") or "")
+    return tuple(
+        Intervention(
+            i.get("type") or "OTHER",
+            i.get("name") or "",
+            tuple(i.get("otherNames") or ()),
+            _unique([*(i.get("armGroupLabels") or []), *from_arms.get(i.get("name") or "", [])]),
+        )
+        for i in arms.get("interventions") or []
+    )
+
+
 def parse_trial(study: dict[str, Any]) -> Trial:
     p = study.get("protocolSection", {})
     d = study.get("derivedSection", {})
@@ -82,10 +102,7 @@ def parse_trial(study: dict[str, Any]) -> Trial:
         lead_sponsor=_get(sponsors, "leadSponsor", "name"),
         lead_sponsor_class=_get(sponsors, "leadSponsor", "class"),
         collaborators=_unique([c.get("name") for c in sponsors.get("collaborators") or []]),
-        interventions=tuple(
-            Intervention(i.get("type") or "OTHER", i.get("name") or "", tuple(i.get("otherNames") or ()))
-            for i in arms.get("interventions") or []
-        ),
+        interventions=_interventions(arms),
         intervention_mesh_terms=_unique([m.get("term") for m in _get(d, "interventionBrowseModule", "meshes") or []]),
         conditions=tuple(_get(p, "conditionsModule", "conditions") or ()),
         condition_mesh_terms=_unique([m.get("term") for m in _get(d, "conditionBrowseModule", "meshes") or []]),
@@ -121,14 +138,8 @@ def _mesh_for(intervention: Intervention, mesh_terms: list[str]) -> str | None:
     return None
 
 
-def drug_identities(trial: Trial) -> tuple[str, ...]:
-    """The Drugs in a trial, one per drug-type intervention.
-
-    MeSH terms are listed per trial and also cover procedures and diagnostics, so each term is
-    matched to an intervention by name and kept only for drug-type interventions. A drug listed
-    under another name (e.g. "MK-3475") is paired with the one unmatched MeSH term when exactly
-    one of each remains; otherwise its cleaned raw name is used.
-    """
+def drug_interventions(trial: Trial) -> list[tuple[Intervention, str]]:
+    """Each drug-type intervention with its Drug name (see `drug_identities`), non-drugs removed."""
     mesh = [t.lower() for t in trial.intervention_mesh_terms]
     drugs = [i for i in trial.interventions if i.type in DRUG_INTERVENTION_TYPES]
     matched = {id(i): _mesh_for(i, mesh) for i in trial.interventions}
@@ -137,8 +148,28 @@ def drug_identities(trial: Trial) -> tuple[str, ...]:
     unmatched_mesh = [m for m in mesh if m not in used]
     if len(unmatched_drugs) == 1 and len(unmatched_mesh) == 1:
         matched[id(unmatched_drugs[0])] = unmatched_mesh[0]
-    names = [matched[id(i)] or clean_drug_name(i.name) for i in drugs]
-    return _unique([n for n in names if n and n not in NON_DRUG_TERMS])
+    named = [(i, matched[id(i)] or clean_drug_name(i.name)) for i in drugs]
+    return [(i, name) for i, name in named if name and name not in NON_DRUG_TERMS]
+
+
+def arm_drugs(trial: Trial) -> dict[str, tuple[str, ...]]:
+    """Drugs given in each arm, by arm label. Empty when the record does not link arms to interventions."""
+    by_arm: dict[str, list[str]] = {}
+    for intervention, name in drug_interventions(trial):
+        for label in intervention.arm_labels:
+            by_arm.setdefault(label, []).append(name)
+    return {label: _unique(names) for label, names in by_arm.items()}
+
+
+def drug_identities(trial: Trial) -> tuple[str, ...]:
+    """The Drugs in a trial, one per drug-type intervention.
+
+    MeSH terms are listed per trial and also cover procedures and diagnostics, so each term is
+    matched to an intervention by name and kept only for drug-type interventions. A drug listed
+    under another name (e.g. "MK-3475") is paired with the one unmatched MeSH term when exactly
+    one of each remains; otherwise its cleaned raw name is used.
+    """
+    return _unique([name for _, name in drug_interventions(trial)])
 
 
 def dimension_values(trial: Trial, dimension: Dimension) -> tuple[str, ...]:

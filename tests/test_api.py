@@ -287,16 +287,65 @@ def test_verifier_rejects_a_trial_cited_for_an_edge_it_does_not_have(trials):
     assert any(stranger.nct_id in p for p in problems)
 
 
-async def test_network_needs_a_kind_and_drug_drug_is_not_ready(make_client):
+async def test_network_needs_a_kind(make_client):
     no_kind = AnswerPlan(operation=Operation.RELATE)
     planner = ScriptedPlanner(no_kind, SPONSOR_DRUG)
     body = await ask(make_client, planner, query="network")
     assert planner.calls[1]["repair"] and "relate needs network" in planner.calls[1]["repair"][1][0]
     assert body["outcome"] == "success"
 
-    drug_drug = AnswerPlan(operation=Operation.RELATE, network=NetworkKind.DRUG_DRUG)
-    body = await ask(make_client, ScriptedPlanner(drug_drug), query="drugs combined with pembrolizumab")
-    assert body["outcome"] == "unsupported_query"
+
+DRUG_DRUG = AnswerPlan(
+    operation=Operation.RELATE, network=NetworkKind.DRUG_DRUG, filters=Filters(drugs=["pembrolizumab"])
+)
+
+
+async def test_drug_drug_network_links_only_same_arm_combinations(make_client, trials):
+    from clinical_trials_viz.ctgov.trial import arm_drugs, drug_identities
+    from clinical_trials_viz.network import same_arm_pairs
+
+    async for client in make_client(ScriptedPlanner(DRUG_DRUG)):
+        body = (await client.post("/v1/query", json={"query": "Which drugs are combined with pembrolizumab?"})).json()
+        assert body["outcome"] == "success", body.get("message")
+        spec = body["visualization"]
+        assert spec["type"] == "network_graph" and not spec["metadata"]["bipartite"]
+        assert {n["kind"] for n in spec["data"]["nodes"]} == {"drug"}
+        assert all(e["kind"] == "same_arm" for e in spec["data"]["edges"])
+        assert body["verification"]["passed"]
+        assert any("same arm" in a for a in body["assumptions"])
+        # Every cited trial's evidence names the arms that give each linked pair.
+        by_id = {t.nct_id: t for t in trials}
+        for edge in spec["data"]["edges"]:
+            pair = " + ".join(sorted(x.split(":", 1)[1] for x in (edge["source"], edge["target"])))
+            for nct_id in edge["trial_ids"]:
+                arms = next(
+                    v
+                    for k, v in body["evidence"][nct_id]["fields"].items()
+                    if k.startswith("protocolSection.armsInterventionsModule")
+                )
+                assert arms[pair]
+                assert pair.split(" + ")[0] in drug_identities(by_id[nct_id])
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")
+
+    # Co-Listing is not a combination: a real trial whose drugs sit in different arms has no pair for them.
+    colisted = [t for t in trials if len(drug_identities(t)) >= 2 and arm_drugs(t)
+                and len(set(drug_identities(t))) > len({d for p in same_arm_pairs(t) for d in p})]  # fmt: skip
+    assert colisted, "fixture should include a trial with drugs in different arms"
+
+
+def test_verifier_rejects_a_same_arm_edge_without_a_shared_arm(trials):
+    from clinical_trials_viz.models.response import AppliedFilters
+    from clinical_trials_viz.network import drug_drug_network, same_arm_pairs
+    from clinical_trials_viz.spec_builder import network_spec
+    from clinical_trials_viz.verify import network_problems
+
+    spec = network_spec(drug_drug_network(trials), AppliedFilters(), len(trials), NetworkKind.DRUG_DRUG)
+    edge = spec.data.edges[0]  # type: ignore[union-attr]
+    pair = tuple(sorted(x.split(":", 1)[1] for x in (edge["source"], edge["target"])))
+    stranger = next(t for t in trials if pair not in same_arm_pairs(t))
+    edge["trial_ids"].append(stranger.nct_id)
+    assert any(stranger.nct_id in p for p in network_problems(spec.data, {t.nct_id: t for t in trials}))  # type: ignore[arg-type]
 
 
 async def test_rate_limited_requests_are_retried(make_client, ctgov, page, monkeypatch):

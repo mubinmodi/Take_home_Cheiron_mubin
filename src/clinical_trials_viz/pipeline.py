@@ -18,11 +18,11 @@ from clinical_trials_viz.catalog import DEFAULT_TOP_N, Dimension
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
 from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError
 from clinical_trials_viz.ctgov.trial import Trial
-from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, Operation, QueryPlan, UnsupportedPlan
+from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, NetworkKind, Operation, QueryPlan, UnsupportedPlan
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import AppliedFilters, Outcome, QueryResponse, SourceInfo
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
-from clinical_trials_viz.network import sponsor_drug_network
+from clinical_trials_viz.network import drug_drug_network, same_arm_pairs, sponsor_drug_network
 from clinical_trials_viz.planner import Planner, PlannerNotConfigured
 from clinical_trials_viz.runs import RunStore, new_run_id
 from clinical_trials_viz.spec_builder import (
@@ -38,6 +38,7 @@ from clinical_trials_viz.validate import check_plan
 from clinical_trials_viz.verify import verify
 
 MAX_MODEL_CALLS = 3
+ARM_FIELD = "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)"
 log = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
@@ -209,7 +210,7 @@ class Pipeline:
         with run.stage("analyze"):
             spec, dimension = self._build(run, plan, filters, cohort)
         if isinstance(spec.data, NetworkData) and not spec.data.edges:
-            run.finish(Outcome.NO_DATA, "No sponsor and drug share enough trials to draw a link (all pages retrieved).")
+            run.finish(Outcome.NO_DATA, "No entities share enough trials to draw a link (all pages retrieved).")
             return
         self._finish_success(run, plan, spec, {t.nct_id: t for t in cohort.trials}, dimension)
 
@@ -221,9 +222,11 @@ class Pipeline:
             run.response.assumptions.extend(notes)
             return spec, None
         if plan.operation is Operation.RELATE:
-            network = sponsor_drug_network(cohort.trials)
+            kind = plan.network or NetworkKind.SPONSOR_DRUG
+            build = sponsor_drug_network if kind is NetworkKind.SPONSOR_DRUG else drug_drug_network
+            network = build(cohort.trials)
             run.response.assumptions.extend(network.assumptions)
-            return network_spec(network, filters, network.contributing_trials), None
+            return network_spec(network, filters, network.contributing_trials, kind), None
         if plan.group_by is None:
             return single_value_spec(cohort.trials, filters), None
         result = breakdown(cohort.trials, plan.group_by, plan.top_n or DEFAULT_TOP_N)
@@ -272,6 +275,11 @@ class Pipeline:
             filters = response.applied_filters or AppliedFilters()
             sides = tuple(_cited_dimensions(plan))
             evidence = build_evidence(spec, trials, dimension, filters, sides)
+            if plan.network is NetworkKind.DRUG_DRUG:
+                for nct_id, entry in evidence.items():  # the arms that make each link a combination
+                    entry.fields[ARM_FIELD] = {
+                        f"{a} + {b}": arms for (a, b), arms in same_arm_pairs(trials[nct_id]).items()
+                    }
             verification = verify(spec, evidence, trials, dimension, chart_type_for(plan), filters)
         response.verification = verification
         if not verification.passed:
@@ -288,6 +296,8 @@ def _cited_dimensions(plan: AnswerPlan) -> list[Dimension]:
     """Fields beyond the filters that place a trial in the answer: its comparison side, or the
     entities a network links. They are cited too."""
     if plan.operation is Operation.RELATE:
+        if plan.network is NetworkKind.DRUG_DRUG:
+            return [Dimension.DRUG]
         return [Dimension.LEAD_SPONSOR, Dimension.DRUG]
     found = []
     for side in plan.compare_sides:

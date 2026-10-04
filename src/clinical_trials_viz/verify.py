@@ -4,7 +4,7 @@ from clinical_trials_viz.catalog import NOT_REPORTED, OTHER_BUCKET, Dimension
 from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
-from clinical_trials_viz.network import trial_drugs
+from clinical_trials_viz.network import same_arm_pairs, trial_drugs
 
 
 def verify(
@@ -134,4 +134,8 @@ def network_problems(data: NetworkData, trials: dict[str, Trial]) -> list[str]:
             trial = trials.get(nct_id)
             if trial and any(n.get("label") not in _node_values(trial, n.get("kind", "")) for n in ends if n):
                 problems.append(f"{nct_id} cited for {edge['source']} -> {edge['target']} but lacks one end")
+            elif trial and edge.get("kind") == "same_arm":
+                pair = tuple(sorted(str(n.get("label")) for n in ends if n))
+                if pair not in same_arm_pairs(trial):
+                    problems.append(f"{nct_id} cited for {pair[0]} + {pair[1]} but no arm gives both")
     return problems

@@ -4,6 +4,7 @@ Reads only the specification. Vega-Lite receives finished values: no aggregate, 
 timeUnit transforms, because counting (and therefore citation) belongs to our code.
 """
 
+import math
 from typing import Any, Literal
 
 import vl_convert
@@ -118,31 +119,45 @@ def _short(label: str, limit: int = 40) -> str:
 
 
 def _network(spec: VisualizationSpec) -> dict[str, Any]:
-    """Two-column layout for bipartite networks: first node kind on the left, second on the right,
-    each sorted by trial count (the data order). Positions come from the spec alone."""
+    """Positions come from the spec alone. Two node kinds: two columns (first kind left), each sorted
+    by trial count. One node kind: a circle, heaviest first."""
     data = spec.data
-    if not isinstance(data, NetworkData) or not spec.metadata.bipartite:
-        raise NotRenderable("only two-sided networks have an image form yet")
+    if not isinstance(data, NetworkData):
+        raise NotRenderable("network_graph needs nodes and edges")
     kinds = spec.metadata.node_kinds or []
-    columns: dict[str, list[dict[str, Any]]] = {k: [] for k in kinds}
-    for node in data.nodes:
-        columns.setdefault(node["kind"], []).append(node)
-    rows = max((len(c) for c in columns.values()), default=1)
     position: dict[str, tuple[float, float]] = {}
     nodes = []
-    for x, (kind, members) in enumerate(columns.items()):
-        offset = (rows - len(members)) / 2  # centre the shorter column
-        for i, node in enumerate(members):
-            position[node["id"]] = (x, i + offset)
-            nodes.append({"x": x, "y": i + offset, "label": _short(node["label"]), "kind": kind,
-                          "trial_count": node["trial_count"], "align": "right" if x == 0 else "left"})  # fmt: skip
+    if spec.metadata.bipartite:
+        columns: dict[str, list[dict[str, Any]]] = {k: [] for k in kinds}
+        for node in data.nodes:
+            columns.setdefault(node["kind"], []).append(node)
+        rows = max((len(c) for c in columns.values()), default=1)
+        for x, members in enumerate(columns.values()):
+            offset = (rows - len(members)) / 2  # centre the shorter column
+            for i, node in enumerate(members):
+                position[node["id"]] = (x, i + offset)
+        x_scale = {"domain": [-0.9, 1.9], "nice": False}
+        y_scale = {"domain": [-0.5, rows - 0.5], "reverse": True, "nice": False}
+        width, height = 760, max(200, 24 * rows)
+    else:
+        # One node kind: a circle in data order (heaviest first, clockwise from the top).
+        count = max(len(data.nodes), 1)
+        for i, node in enumerate(data.nodes):
+            angle = math.pi / 2 - 2 * math.pi * i / count
+            position[node["id"]] = (math.cos(angle), math.sin(angle))
+        x_scale = {"domain": [-1.9, 1.9], "nice": False}
+        y_scale = {"domain": [-1.25, 1.25], "nice": False}
+        width, height = 760, 520
+    for node in data.nodes:
+        x, y = position[node["id"]]
+        left = x < 0 or (spec.metadata.bipartite and x == 0)
+        nodes.append({"x": x, "y": y, "label": _short(node["label"]), "kind": node["kind"],
+                      "trial_count": node["trial_count"], "align": "right" if left else "left"})  # fmt: skip
     edges = [
         {"x": position[e["source"]][0], "y": position[e["source"]][1],
          "x2": position[e["target"]][0], "y2": position[e["target"]][1], "trial_count": e["trial_count"]}
         for e in data.edges
     ]  # fmt: skip
-    x_scale = {"domain": [-0.9, 1.9], "nice": False}
-    y_scale = {"domain": [-0.5, rows - 0.5], "reverse": True, "nice": False}
     axis_off = {"axis": None}
     title: dict[str, Any] = {"text": spec.title, "anchor": "start"}
     if spec.subtitle:
@@ -150,8 +165,8 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": title,
-        "width": 760,
-        "height": max(200, 24 * rows),
+        "width": width,
+        "height": height,
         "config": {"view": {"stroke": None}},
         "layer": [
             {

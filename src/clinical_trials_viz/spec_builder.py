@@ -16,7 +16,7 @@ from clinical_trials_viz.catalog import (
     study_url,
 )
 from clinical_trials_viz.ctgov.trial import Trial, dimension_evidence
-from clinical_trials_viz.models.plan import AnswerPlan, Operation
+from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry
 from clinical_trials_viz.models.spec import (
     Channel,
@@ -194,7 +194,9 @@ def comparison_spec(
 NODE_KIND = Channel(field="kind", type=FieldType.NOMINAL, title="Entity")
 
 
-def network_spec(network: Network, filters: AppliedFilters, cohort_size: int) -> VisualizationSpec:
+def network_spec(
+    network: Network, filters: AppliedFilters, cohort_size: int, kind: NetworkKind = NetworkKind.SPONSOR_DRUG
+) -> VisualizationSpec:
     nodes = [
         {"id": n.id, "label": n.label, "kind": n.kind, "trial_count": len(n.trial_ids), "trial_ids": n.trial_ids}
         for n in network.nodes
@@ -204,11 +206,16 @@ def network_spec(network: Network, filters: AppliedFilters, cohort_size: int) ->
          "trial_ids": e.trial_ids}
         for e in network.edges
     ]  # fmt: skip
-    kinds = list(dict.fromkeys(n.kind for n in network.nodes)) or ["sponsor", "drug"]
+    sponsor_drug = kind is NetworkKind.SPONSOR_DRUG
+    kinds = ["sponsor", "drug"] if sponsor_drug else ["drug"]
+    if sponsor_drug:
+        title, counted = "Lead sponsors and drugs", "trials with a drug and a lead sponsor"
+    else:
+        title, counted = "Drugs given together in the same arm", "trials with a same-arm drug combination"
     return VisualizationSpec(
         type=VisualizationType.NETWORK_GRAPH,
-        title=f"Lead sponsors and drugs: {describe_filters(filters)}",
-        subtitle=f"{cohort_size:,} trials with a drug and a lead sponsor · showing {len(nodes)} nodes, {len(edges)} links",
+        title=f"{title}: {describe_filters(filters)}",
+        subtitle=f"{cohort_size:,} {counted} · showing {len(nodes)} nodes, {len(edges)} links",
         encoding=Encoding(
             label=Channel(field="label", type=FieldType.NOMINAL, title="Name"),
             size=COUNT,
@@ -220,7 +227,7 @@ def network_spec(network: Network, filters: AppliedFilters, cohort_size: int) ->
         ),
         data=NetworkData(nodes=nodes, edges=edges),
         metadata=RenderMetadata(
-            units="trials", node_kinds=kinds, bipartite=True, min_edge_trials=NETWORK_MIN_EDGE_TRIALS,
+            units="trials", node_kinds=kinds, bipartite=sponsor_drug, min_edge_trials=NETWORK_MIN_EDGE_TRIALS,
             cohort_size=cohort_size,
         ),
     )  # fmt: skip
