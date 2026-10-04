@@ -1,0 +1,2 @@
+# Local agent tooling stays out of `git archive` (the submission zip)
+.claude export-ignore
