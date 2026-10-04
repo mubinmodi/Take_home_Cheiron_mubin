@@ -1,0 +1,57 @@
+[project]
+name = "clinical-trials-viz"
+version = "0.1.0"
+description = "Answers clinical-trial questions with cited visualization specifications from ClinicalTrials.gov"
+authors = [
+    { name = "Mubin Modi", email = "mubinmodi@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.142.2",
+    "httpx>=0.28.1",
+    "networkx>=3.7",
+    "opentelemetry-exporter-otlp-proto-http>=1.45.0",
+    "opentelemetry-instrumentation-fastapi>=0.66b0",
+    "opentelemetry-instrumentation-httpx>=0.66b0",
+    "opentelemetry-sdk>=1.45.0",
+    "pydantic>=2.13.5",
+    "pydantic-ai-slim[anthropic,openai]>=2.54.0",
+    "pydantic-settings>=2.15.0",
+    "uvicorn[standard]>=0.54.0",
+    "vl-convert-python>=1.9.0.post1",
+]
+
+[project.scripts]
+clinical-trials-viz = "clinical_trials_viz:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.168.3",
+    "pyright>=1.1.414",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "respx>=0.23.1",
+    "ruff>=0.16.10",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]  # the formatter handles line length; long strings stay readable
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-m 'not live'"
+testpaths = ["tests"]
+markers = ["live: calls the real ClinicalTrials.gov API (deselect with -m 'not live')"]
+
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.13"
