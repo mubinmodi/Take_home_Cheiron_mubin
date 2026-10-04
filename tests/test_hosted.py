@@ -15,6 +15,7 @@ from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from clinical_trials_viz import pipeline as pipeline_module
 from clinical_trials_viz import runs as runs_module
 from clinical_trials_viz.access import identify
 from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
@@ -402,6 +403,55 @@ async def test_parts_answered_before_the_deadline_stand(make_client, settings, c
     second = body["additional_answers"][0]
     assert second["outcome"] == "upstream_error" and second["error"]["code"] == "run_timeout"
     assert "stopped during retrieval from ClinicalTrials.gov" in second["message"]
+
+
+async def test_loading_the_earlier_run_counts_toward_the_deadline(make_client, settings, monkeypatch):
+    settings.run_deadline_seconds = 0.2
+    async for client in make_client(ScriptedPlanner(TREND, TREND)):
+        first = (await client.post("/v1/query", json=QUESTION)).json()
+        store = client._transport.app.state.pipeline.runs  # type: ignore[attr-defined]
+
+        async def slow_load(run_id, load=store.load):
+            await asyncio.sleep(2)
+            return await load(run_id)
+
+        monkeypatch.setattr(store, "load", slow_load)
+        started = time.perf_counter()
+        body = (await client.post("/v1/query", json={**QUESTION, "previous_run_id": first["run_id"]})).json()
+        assert time.perf_counter() - started < 1
+    assert body["error"]["code"] == "run_timeout"
+    assert "stopped during loading the earlier answer" in body["message"]
+
+
+async def test_a_follow_up_while_the_store_is_down_is_503(make_client, monkeypatch):
+    async for client in make_client(ScriptedPlanner(TREND)):
+        first = (await client.post("/v1/query", json=QUESTION)).json()
+        store = client._transport.app.state.pipeline.runs  # type: ignore[attr-defined]
+
+        async def down(run_id):
+            raise runs_module.StoreUnavailable("database down")
+
+        monkeypatch.setattr(store, "load", down)
+        response = await client.post("/v1/query", json={**QUESTION, "previous_run_id": first["run_id"]})
+        assert response.status_code == 503
+        assert response.json()["detail"]["code"] == "store_unavailable"
+
+
+async def test_a_slow_save_still_answers_with_a_warning(make_client, monkeypatch):
+    monkeypatch.setattr(pipeline_module, "SAVE_TIMEOUT_SECONDS", 0.05, raising=False)
+    async for client in make_client(ScriptedPlanner(TREND)):
+        store = client._transport.app.state.pipeline.runs  # type: ignore[attr-defined]
+
+        async def slow_save(*args):
+            await asyncio.sleep(2)
+
+        monkeypatch.setattr(store, "save", slow_save)
+        started = time.perf_counter()
+        body = (await client.post("/v1/query", json=QUESTION)).json()
+        assert time.perf_counter() - started < 1
+    assert body["outcome"] == "success"
+    assert any("could not be saved" in w for w in body["warnings"])
+    assert "chart_url" not in body
 
 
 async def test_an_unreachable_database_does_not_hold_up_startup(tmp_path, monkeypatch):

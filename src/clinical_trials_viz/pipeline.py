@@ -70,7 +70,11 @@ tracer = trace.get_tracer(__name__)
 
 
 DEFAULT_BASE_URL = "http://localhost:8000"  # chart links when neither the settings nor the caller give one
+# Saving runs outside the run deadline (a computed answer is worth returning), but not for long.
+SAVE_TIMEOUT_SECONDS = 5.0
+
 _STAGE_NAMES = {
+    "load": "loading the earlier answer",
     "plan": "planning",
     "clarify": "building clarification options",
     "retrieve": "retrieval from ClinicalTrials.gov",
@@ -161,22 +165,17 @@ class Pipeline:
     ) -> QueryResponse:
         """Answer one request. `base_url` is the address it arrived on, for chart links when the
         settings give no public address; `user` is recorded in the run history."""
-        previous: QueryPlan | None = None
-        previous_request: QueryRequest | None = None
-        if request.previous_run_id:
-            record = await self.runs.load(request.previous_run_id)
-            if record is None:
-                raise RunNotFound(request.previous_run_id)
-            previous, previous_request = record.plan, record.request
-
         links = (self.public_base_url or base_url or DEFAULT_BASE_URL).rstrip("/")
-        run = _Run(request, previous_request, links)
+        run = _Run(request, None, links)
         with tracer.start_as_current_span("run") as span, count_requests() as requests:
             span.set_attribute("run.id", run.response.run_id)
             deadline = asyncio.timeout(self.run_deadline)
             try:
                 async with deadline:
+                    previous = await self._load_previous(run)
                     await self._execute(run, previous)
+            except (RunNotFound, StoreUnavailable):  # the request cannot start: HTTP 404 / 503
+                raise
             except Exception as exc:  # planner failures, source failures and bugs alike end in one Outcome
                 if isinstance(exc, TimeoutError) and deadline.expired():
                     self._stop_at_deadline(run)
@@ -192,8 +191,12 @@ class Pipeline:
             if answer.source:
                 answer.source.api_requests = api_requests  # shared by all parts of the Run
         try:
-            await self.runs.save(run.request, response, user)  # the effective request, so Follow-ups inherit it
-        except StoreUnavailable as exc:  # full disk, database down: still answer, but nothing can be fetched later
+            async with asyncio.timeout(SAVE_TIMEOUT_SECONDS):  # the effective request, so Follow-ups inherit it
+                await self.runs.save(run.request, response, user)
+        except (
+            StoreUnavailable,
+            TimeoutError,
+        ) as exc:  # full disk, database down: still answer, but nothing can be fetched later
             log.error("run %s could not be saved: %s", response.run_id, exc)
             response.warnings.append(
                 "This answer could not be saved, so its chart image and follow-ups are unavailable."
@@ -201,6 +204,17 @@ class Pipeline:
             for answer in (response, *response.additional_answers):
                 answer.chart_url = None
         return response
+
+    async def _load_previous(self, run: _Run) -> QueryPlan | None:
+        """A Follow-up's earlier plan and request, from its run record."""
+        if not run.request.previous_run_id:
+            return None
+        with run.stage("load"):
+            record = await self.runs.load(run.request.previous_run_id)
+        if record is None:
+            raise RunNotFound(run.request.previous_run_id)
+        run.previous_request = record.request
+        return record.plan
 
     async def _execute(self, run: _Run, previous: QueryPlan | None) -> None:
         with run.stage("plan"):

@@ -59,7 +59,7 @@ One codebase; `DEPLOYMENT=hosted` switches on the hosted dependencies and refuse
 | 2. Per-run page cap | Kept (`MAX_PAGES=20`) | `config.py` |
 | 3. Circuit breakers | One for ClinicalTrials.gov, one per planner model; an open model is skipped so the fallback answers at once | `breaker.py` |
 | 4. API key + per-user limit | `X-API-Key` on `POST /v1/query` (401), 30 questions/hour/user (429 + `Retry-After`) | `access.py`, `api.py` |
-| 5. ~30 s deadline | `RUN_DEADLINE_SECONDS=30` when hosted; unfinished parts end as `run_timeout` | `pipeline.py` |
+| 5. ~30 s deadline | `RUN_DEADLINE_SECONDS=30` when hosted, from loading a Follow-up's earlier run to verification; unfinished parts end as `run_timeout`. Saving the run has its own 5 s limit and falls back to a warning | `pipeline.py` |
 
 Deviations: no Alembic yet (one table, created with `IF NOT EXISTS`). Tested with fakeredis and SQLite (`tests/test_hosted.py`), end to end with `docker compose` (service + Redis 7 + Postgres 17), and live on AWS with `deploy/smoke-test.sh`.
 
