@@ -188,6 +188,20 @@ async def test_a_failed_repair_in_one_part_does_not_stop_the_next(make_client):
     assert second["outcome"] == "success" and second["visualization"]["type"] == "histogram"
 
 
+async def test_a_failed_repair_still_counts_the_first_plan(make_client):
+    def model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        if reply := split_reply(messages, info):
+            return reply
+        if len(messages) > 1:  # the repair turn
+            raise ModelHTTPError(503, "only-model")
+        args = {"operation": "bin", "filters": {"drugs": ["Keytruda"]}, "group_by": "start_year"}  # invalid
+        return ModelResponse(parts=[ToolCallPart("answer_plan", args)])
+
+    body = await ask(make_client, LLMPlanner(FunctionModel(model, model_name="only-model")), query="Keytruda trials")
+    assert body["outcome"] == "upstream_error"
+    assert body["model_calls"] == 3  # split, the invalid plan, the failed repair
+
+
 # --- Bugs and verification ------------------------------------------------------------------------
 
 

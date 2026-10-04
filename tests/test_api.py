@@ -934,3 +934,32 @@ async def test_an_unanswerable_question_offers_questions_the_registry_can_answer
     body = await ask(make_client, ScriptedPlanner(plan), query="Does Keytruda work better than Opdivo?")
     assert body["outcome"] == "unsupported_query"
     assert [s["query"] for s in body["suggestions"]] == ideas
+
+
+# --- Third review --------------------------------------------------------------------------------
+
+
+async def test_a_sponsor_list_with_a_name_the_question_does_not_mention_is_a_conflict(make_client):
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(sponsor="Merck"), group_by=Dimension.PHASE)
+    body = await ask(make_client, ScriptedPlanner(plan), query="What phases are Merck's trials in?",
+                     sponsor=["Merck", "Pfizer"])  # fmt: skip
+    assert body["outcome"] == "clarification_required"
+    assert body["clarification"]["reason"] == "conflict"
+
+
+async def test_a_new_question_does_not_inherit_an_earlier_conflict_answer(make_client):
+    merck = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(sponsor="Merck"), group_by=Dimension.PHASE)
+    pfizer = AnswerPlan(
+        relation="new", operation=Operation.AGGREGATE, filters=Filters(sponsor="Pfizer"), group_by=Dimension.PHASE
+    )
+    async for client in make_client(ScriptedPlanner(merck, pfizer)):
+        first = (await client.post("/v1/query", json={"query": "Merck phases?", "sponsor": "Pfizer Inc"})).json()
+        assert first["clarification"]["field"] == "sponsor"
+        # A different question, with a stale structured sponsor: still a conflict, asked again.
+        body = {
+            "query": "What phases are Pfizer's trials in?",
+            "sponsor": ["Merck"],
+            "previous_run_id": first["run_id"],
+        }
+        second = (await client.post("/v1/query", json=body)).json()
+        assert second["outcome"] == "clarification_required" and second["clarification"]["reason"] == "conflict"

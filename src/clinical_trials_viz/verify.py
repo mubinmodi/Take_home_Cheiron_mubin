@@ -71,6 +71,25 @@ def verify(
     cited = {i for d in datums for i in d["trial_ids"]}
     check("citations_resolve", [f"{i} missing" for i in sorted(cited) if i not in evidence or i not in trials])
 
+    # Every trial with a bucket's value is in that bucket: a multi-phase trial counts under each phase.
+    # (Grouped bars split trials into comparison groups first, so they are not checked here.)
+    if dimension is not None and spec.type in (VisualizationType.BAR_CHART, VisualizationType.TIME_SERIES):
+        rows = spec.rows()
+        dims = [dimension, *([series] if series else [])]
+        shown_by_dim = {dim: {d.get(dim.value) for d in rows} - {OTHER_BUCKET, None} for dim in dims}
+
+        def belongs(trial: Trial, dim: Dimension, label: object) -> bool:
+            values = set(dimension_values(trial, dim))
+            return bool(values - shown_by_dim[dim]) if label == OTHER_BUCKET else label in values
+
+        incomplete = [
+            f"'{' / '.join(str(d.get(dim.value)) for dim in dims)}' leaves out {len(missing)} trial(s)"
+            for d in rows
+            if (missing := {i for i, t in trials.items() if all(belongs(t, dim, d.get(dim.value)) for dim in dims)}
+                - set(d["trial_ids"]))
+        ]  # fmt: skip
+        check("buckets_complete", incomplete)
+
     # Each cited trial really has the value of the bucket it is counted in (both, for a crossed chart).
     if dimension is not None and spec.type not in (VisualizationType.TABLE, VisualizationType.NETWORK_GRAPH):
         wrong = []

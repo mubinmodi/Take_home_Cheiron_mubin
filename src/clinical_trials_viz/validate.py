@@ -96,8 +96,8 @@ def _request_value(value: object) -> FieldValue:
 
 def _differs(request_field: str, asked: object, given: object) -> bool:
     if request_field == "sponsor":  # a term vs exact names: "Merck" agrees with "Merck Sharp & Dohme LLC"
-        term = str(asked).strip().lower()
-        return not any(term in name or name in term for name in _as_set(given))
+        term = str(asked).strip().lower()  # every name must match it: ["Merck", "Pfizer"] would widen "Merck"
+        return not all(term in name or name in term for name in _as_set(given))
     return _as_set(asked) != _as_set(given)
 
 

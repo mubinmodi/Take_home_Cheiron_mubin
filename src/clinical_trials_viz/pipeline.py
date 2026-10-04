@@ -104,6 +104,7 @@ class _Run:
         self.parts: Sequence[AnswerPlan | ClarifyPlan | UnsupportedPlan] = ()  # the Question's parts, once planned
         self.part = 0  # the part being answered
         self.answered: dict[str, str | None] = {}  # request field -> reason, for each Clarification just answered
+        self.previous_queries: set[str] = set()  # the earlier run's question (and its parts), to tell an answer
 
     @contextmanager
     def stage(self, name: str) -> Iterator[None]:
@@ -222,6 +223,8 @@ class Pipeline:
         run.previous_request = record.request
         earlier = (record.response, *record.response.additional_answers)
         run.answered = {a.clarification.field: a.clarification.reason for a in earlier if a.clarification}
+        parts = record.plan.requests if isinstance(record.plan, MultiAnswerPlan) else []
+        run.previous_queries = {record.request.query, *parts}
         return record.plan
 
     async def _execute(self, run: _Run, previous: QueryPlan | None) -> None:
@@ -290,7 +293,7 @@ class Pipeline:
             return
         target.applied_filters = filters = gate.filters
         target.assumptions.extend(gate.assumptions)
-        if await self._ask_about_conflict(run, target, gate):
+        if await self._ask_about_conflict(run, target, plan, gate):
             return
         version = await self.client.version()
         target.source = SourceInfo(
@@ -375,12 +378,17 @@ class Pipeline:
         target.assumptions.extend(result.assumptions)
         return breakdown_spec(result, filters, len(cohort.trials)), plan.group_by
 
-    async def _ask_about_conflict(self, run: _Run, target: Answer, gate: GateResult) -> bool:
+    async def _ask_about_conflict(self, run: _Run, target: Answer, plan: AnswerPlan, gate: GateResult) -> bool:
         """When a structured field contradicts the question, ask which value is meant, unless the field
         answers the previous run's Clarification (an answer is final) or both names are the same drug."""
+        # The previous run's answers settle a field only for that question: a Clarification answer resends
+        # it (or its part), a refinement continues it. A new question with a stale field is asked again.
+        continuing = plan.relation == "refine" or run.request.query in run.previous_queries
         for conflict in gate.conflicts:
             asked, given = clarify.show_value(conflict.question_value), clarify.show_value(conflict.field_value)
-            if conflict.request_field in run.answered:  # e.g. which Merck, or which of two conflicting values
+            if (
+                continuing and conflict.request_field in run.answered
+            ):  # e.g. which Merck, or which of two conflicting values
                 if run.answered[conflict.request_field] == "conflict":
                     target.assumptions.append(f"Used {given}, as you chose; the question says {asked}.")
                 continue

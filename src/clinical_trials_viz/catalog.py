@@ -7,7 +7,8 @@ Rules here are decided in docs/harness-design.md sections 2-3.
 from dataclasses import dataclass
 from enum import StrEnum
 
-CATALOG_VERSION = "2026-10-03.1"
+# Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS).
+CATALOG_VERSION = "2026-10-04.1"
 
 
 class Phase(StrEnum):
@@ -251,7 +252,12 @@ TIMELINE_MAX_ROWS = 50
 # Structured request fields that pin a filter: request field -> (applied filter, what the user calls it).
 # Ambiguity rule (harness-design: conflict): when the question names a different value for one of these,
 # code asks which one is meant, offering both as valid values of the field; the answer is final.
-# Sponsor is pinned as exact lead sponsor names (see validate.merge_filters).
+# Sponsor is pinned as exact lead sponsor names (see validate.merge_filters), with two exceptions:
+# - a question's sponsor term ("Merck") agrees with field names that contain it ("Merck Sharp & Dohme
+#   LLC"), so a sponsor conflict needs a field name that does not; every name must agree;
+# - a field that repeats the question's own term is searched as a lead sponsor name, not matched exactly,
+#   so choosing "your question" in a conflict can still lead to the "which Merck?" question.
+# A field the previous run asked about is settled only while the conversation continues that question.
 PINNED_FIELDS: dict[str, tuple[str, str]] = {
     "drug_name": ("drugs", "drug"),
     "condition": ("conditions", "condition"),

@@ -193,6 +193,18 @@ def test_verifier_catches_a_bar_chart_that_drops_a_category(trials):
     assert not next(c for c in result.checks if c.name == "cohort_covered").passed
 
 
+def test_verifier_catches_a_multi_phase_trial_missing_from_one_of_its_bars(trials):
+    by_id = {t.nct_id: t for t in trials}
+    spec = breakdown_spec(breakdown(trials, Dimension.PHASE, None), AppliedFilters(), len(trials))
+    multi = next(t for t in trials if len(t.phases) > 1)
+    row = next(d for d in spec.data if d["trial_ids"] and multi.nct_id in d["trial_ids"])
+    row["trial_ids"].remove(multi.nct_id)  # still counted under its other phase
+    row["trial_count"] -= 1
+    evidence = build_evidence(spec, by_id, Dimension.PHASE, AppliedFilters())
+    result = verify(spec, evidence, by_id, Dimension.PHASE, VisualizationType.BAR_CHART, AppliedFilters())
+    assert not next(c for c in result.checks if c.name == "buckets_complete").passed
+
+
 def test_evidence_cites_the_source_field(trials):
     spec, evidence = _time_series(trials)
     entry = evidence[spec.data[-1]["trial_ids"][0]]
