@@ -130,7 +130,18 @@ Only `query` is required. Every other field pins a filter, so the model does not
 | `nct_id` | string or list | `NCT` + 8 digits; ≤ 20 | Specific trial(s) |
 | `previous_run_id` | string | must exist (404 otherwise) | Follow-up, correction, or clarification answer |
 
-If a structured field and the question name different values for the same filter, the service asks rather than picking one. The JSON Schemas for request and response are served at `GET /v1/schema`.
+If a structured field and the question name different values for the same filter, the service asks rather than picking one.
+
+**Idempotent retries.** Send an optional `Idempotency-Key` header (up to 255 characters) to make retries safe:
+
+| Case | Response |
+|---|---|
+| Same key, same request | The original response, unchanged: same `run_id`, no model call, no API requests, header `Idempotent-Replayed: true` |
+| Same key, different request | **422** |
+| Same key while the first request is still running | **409** (retry shortly) |
+| Key older than 24 hours | Treated as new |
+
+Request equality is judged on the validated request, so whitespace and field order do not matter. A request that fails before producing a run (e.g. unknown `previous_run_id`) does not consume its key. Without the header, every POST is a new run. The JSON Schemas for request and response are served at `GET /v1/schema`.
 
 Other endpoints:
 - `GET /v1/runs/{run_id}`: the saved run record (request, plan, response)

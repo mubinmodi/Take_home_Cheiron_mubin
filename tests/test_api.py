@@ -475,3 +475,51 @@ async def test_sponsor_clarification_offers_all_of_these_and_accepts_it(make_cli
         assert second["applied_filters"]["exact_sponsors"] == everything["value"]
         assert second["visualization"]["metadata"]["cohort_size"] == everything["trial_count"]
         assert second["verification"]["passed"]
+
+
+async def test_idempotency_key_replays_without_running_again(make_client):
+    planner = ScriptedPlanner(TREND, TREND)
+    async for client in make_client(planner):
+        body = {"query": "Keytruda trials per year"}
+        headers = {"Idempotency-Key": "retry-123"}
+        first = await client.post("/v1/query", json=body, headers=headers)
+        again = await client.post("/v1/query", json={"query": "  Keytruda trials per year "}, headers=headers)
+        assert first.status_code == again.status_code == 200
+        assert again.json()["run_id"] == first.json()["run_id"]
+        assert again.json() == first.json()
+        assert again.headers["Idempotent-Replayed"] == "true"
+        assert "Idempotent-Replayed" not in first.headers
+        assert len(planner.calls) == 1  # the model was not called again
+
+        reused = await client.post("/v1/query", json={"query": "something else"}, headers=headers)
+        assert reused.status_code == 422
+
+        no_key_a = (await client.post("/v1/query", json=body)).json()
+        assert no_key_a["run_id"] != first.json()["run_id"]  # without a key every POST is a new run
+
+
+async def test_idempotency_key_in_progress_is_409_and_failures_can_retry(make_client):
+    import asyncio
+
+    started, release = asyncio.Event(), asyncio.Event()
+
+    class SlowPlanner(ScriptedPlanner):
+        async def plan(self, *args, **kwargs):
+            started.set()
+            await release.wait()
+            return await super().plan(*args, **kwargs)
+
+    async for client in make_client(SlowPlanner(TREND, TREND)):
+        headers = {"Idempotency-Key": "slow-1"}
+        first = asyncio.create_task(client.post("/v1/query", json={"query": "q"}, headers=headers))
+        await started.wait()
+        busy = await client.post("/v1/query", json={"query": "q"}, headers=headers)
+        assert busy.status_code == 409
+        release.set()
+        assert (await first).status_code == 200
+
+        missing = {"query": "q2", "previous_run_id": "run_" + "0" * 32}
+        assert (await client.post("/v1/query", json=missing, headers={"Idempotency-Key": "k2"})).status_code == 404
+        # A request that failed before producing a run does not consume its key: a corrected retry runs.
+        retry = await client.post("/v1/query", json={"query": "q"}, headers={"Idempotency-Key": "k2"})
+        assert retry.status_code == 200 and retry.json()["outcome"] == "success"

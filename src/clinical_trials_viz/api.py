@@ -2,13 +2,14 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 import httpx
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, Header, HTTPException, Response
 
 from clinical_trials_viz.config import Settings, get_settings
 from clinical_trials_viz.ctgov.client import CtGovClient
+from clinical_trials_viz.idempotency import MAX_KEY_LENGTH, IdempotencyStore, KeyInProgress, KeyReused
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import QueryResponse
 from clinical_trials_viz.pipeline import Pipeline, RunNotFound
@@ -37,6 +38,7 @@ def create_app(
             RunStore(settings.runs_dir),
             settings.public_base_url,
         )
+        app.state.idempotency = IdempotencyStore(settings.runs_dir / "idempotency")
         yield
         if http is None:
             await client_http.aclose()
@@ -57,11 +59,43 @@ def create_app(
         return app.state.pipeline
 
     @app.post("/v1/query", response_model=QueryResponse, response_model_exclude_none=True)
-    async def query(request: QueryRequest) -> QueryResponse:
+    async def query(
+        request: QueryRequest,
+        response: Response,
+        idempotency_key: Annotated[
+            str | None,
+            Header(
+                alias="Idempotency-Key",
+                max_length=MAX_KEY_LENGTH,
+                description="Optional. Retrying with the same key and request returns the original response "
+                "without running again; the same key with a different request is rejected (422).",
+            ),
+        ] = None,
+    ) -> QueryResponse:
+        keys: IdempotencyStore = app.state.idempotency
+        if idempotency_key:
+            try:
+                replay = await keys.begin(idempotency_key, request)
+            except KeyReused as exc:
+                raise HTTPException(422, "Idempotency-Key was already used for a different request") from exc
+            except KeyInProgress as exc:
+                raise HTTPException(409, "A request with this Idempotency-Key is still running; retry shortly") from exc
+            if replay is not None and (record := pipeline().runs.load(replay)) is not None:
+                response.headers["Idempotent-Replayed"] = "true"
+                return record.response
         try:
-            return await pipeline().run(request)
+            result = await pipeline().run(request)
         except RunNotFound as exc:
+            if idempotency_key:
+                keys.abandon(idempotency_key)
             raise HTTPException(404, f"previous_run_id {exc} not found") from exc
+        except BaseException:
+            if idempotency_key:
+                keys.abandon(idempotency_key)
+            raise
+        if idempotency_key:
+            keys.finish(idempotency_key, request, result.run_id)
+        return result
 
     @app.get("/v1/runs/{run_id}", response_model=RunRecord, response_model_exclude_none=True)
     async def get_run(run_id: str) -> RunRecord:
