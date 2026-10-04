@@ -76,7 +76,7 @@ uv run ruff check src tests && uv run pyright
 - **Run history in Postgres** (`DATABASE_URL`): any instance can serve a Follow-up or a chart. Each row records the user, outcome, model calls and latency.
 - **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header, and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once.
 - **Circuit breakers** for ClinicalTrials.gov and each model, and a **30 s run deadline** (`RUN_DEADLINE_SECONDS`).
-- **Traces** to Langfuse over OpenTelemetry (optional).
+- **Traces:** OpenTelemetry spans per stage (plus HTTP and model calls), exported over OTLP to the endpoint in `OTEL_EXPORTER_OTLP_ENDPOINT`.
 
 ```bash
 API_KEYS=you:a-long-random-key docker compose up --build   # the hosted mode on this machine, with Redis and Postgres
@@ -84,7 +84,7 @@ PROJECT=my-gcp-project deploy/cloud-run.sh                  # deploy to Cloud Ru
 deploy/smoke-test.sh https://YOUR-SERVICE-URL               # health, a question, a follow-up and a chart
 ```
 
-The hosted mode refuses to start without Redis, Postgres and API keys. Deploying needs your own accounts: Google Cloud with billing and the `gcloud` CLI, Upstash, Neon, and optionally Langfuse (all have free tiers). Every question costs 1–3 model calls; the per-user limit caps that.
+The hosted mode refuses to start without Redis, Postgres and API keys. Deploying needs your own accounts: Google Cloud with billing and the `gcloud` CLI, Upstash and Neon (all have free tiers). Every question costs 1–3 model calls; the per-user limit caps that.
 
 ---
 

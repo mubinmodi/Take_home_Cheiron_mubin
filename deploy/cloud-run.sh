@@ -4,7 +4,8 @@
 # Before the first run:
 #   - a Google Cloud project with billing, and the gcloud CLI logged in (gcloud auth login)
 #   - an Upstash Redis database (its rediss:// URL) and a Neon Postgres database (its connection string)
-#   - optional: a Langfuse project for traces (public and secret key)
+#   - optional: an OpenTelemetry (OTLP) endpoint for traces: export OTEL_EXPORTER_OTLP_ENDPOINT, and
+#     OTEL_EXPORTER_OTLP_HEADERS if it needs authentication (stored as a secret)
 #
 # Usage:
 #   PROJECT=my-project deploy/cloud-run.sh
@@ -42,13 +43,10 @@ put_secret() {  # create a secret, or add a version when a new value is exported
 }
 
 ENV_VARS="RUN_DEADLINE_SECONDS=30,USER_QUERIES_PER_HOUR=30,LOG_LEVEL=INFO"
-if [ -n "${LANGFUSE_PUBLIC_KEY:-}" ] && [ -n "${LANGFUSE_SECRET_KEY:-}" ]; then
-  # Traces go to Langfuse over OTLP; the auth header is a secret too.
-  # OTLP header values are URL-encoded: %20 is the space after "Basic".
-  OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic%20$(printf %s "$LANGFUSE_PUBLIC_KEY:$LANGFUSE_SECRET_KEY" | base64 | tr -d '\n')"
-  export OTEL_EXPORTER_OTLP_HEADERS
-  SECRETS+=(OTEL_EXPORTER_OTLP_HEADERS)
-  ENV_VARS+=",OTEL_EXPORTER=otlp,OTEL_EXPORTER_OTLP_ENDPOINT=${LANGFUSE_OTLP_ENDPOINT:-https://cloud.langfuse.com/api/public/otel}"
+if [ -n "${OTEL_EXPORTER_OTLP_ENDPOINT:-}" ]; then
+  # OpenTelemetry traces over OTLP to the endpoint given; its auth header, if any, is a secret.
+  ENV_VARS+=",OTEL_EXPORTER=otlp,OTEL_EXPORTER_OTLP_ENDPOINT=$OTEL_EXPORTER_OTLP_ENDPOINT"
+  if [ -n "${OTEL_EXPORTER_OTLP_HEADERS:-}" ]; then SECRETS+=(OTEL_EXPORTER_OTLP_HEADERS); fi
 fi
 
 for name in "${SECRETS[@]}"; do put_secret "$name"; done

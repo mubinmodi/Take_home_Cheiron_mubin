@@ -41,7 +41,7 @@ Not needed: vector database, run checkpointer, Kubernetes, separate API gateway.
 4. **Abuse protection:** API-key header and a per-user rate limit (every request costs LLM money).
 5. **Request handling:** synchronous with a hard ~30s deadline. Add `POST /runs` → `GET /runs/{id}` only if traces show deadline hits.
 
-**Smallest credible hosted setup:** Cloud Run + Upstash Redis + Neon Postgres + R2 + Langfuse cloud + a static frontend (all have free tiers).
+**Smallest credible hosted setup:** Cloud Run + Upstash Redis + Neon Postgres, with OpenTelemetry tracing (decided 2026-10-03; no vendor backend). Object storage (R2) only once run bundles are built (deferred). The API serves the web page.
 
 ## What was built (2026-10-04)
 
@@ -54,11 +54,11 @@ One codebase; `DEPLOYMENT=hosted` switches on the hosted dependencies and refuse
 | Postgres: run history | `runs` table (run ID, time, user, outcome, model calls, planner model, latency, question, full record as JSONB) via SQLAlchemy async + asyncpg; created on startup | `runs.py` |
 | Run bundles / R2 | Still deferred | — |
 | Secrets | Secret Manager, mounted as environment variables | `deploy/cloud-run.sh` |
-| Tracing | OpenTelemetry over OTLP to Langfuse when its keys are given | `telemetry.py`, `deploy/cloud-run.sh` |
+| Tracing | OpenTelemetry spans exported over OTLP to `OTEL_EXPORTER_OTLP_ENDPOINT` (any OpenTelemetry backend) | `telemetry.py`, `deploy/cloud-run.sh` |
 | 1. Cache key with data timestamp | Kept (`page_key`) | `ctgov/client.py` |
 | 2. Per-run page cap | Kept (`MAX_PAGES=20`) | `config.py` |
 | 3. Circuit breakers | One for ClinicalTrials.gov, one per planner model; an open model is skipped so the fallback answers at once | `breaker.py` |
 | 4. API key + per-user limit | `X-API-Key` on `POST /v1/query` (401), 30 questions/hour/user (429 + `Retry-After`) | `access.py`, `api.py` |
 | 5. ~30 s deadline | `RUN_DEADLINE_SECONDS=30` when hosted; unfinished parts end as `run_timeout` | `pipeline.py` |
 
-Deviations: no Alembic yet (one table, created with `IF NOT EXISTS`); the frontend stays served by the API rather than a separate static host. Tested with fakeredis and SQLite (`tests/test_hosted.py`) and end to end with `docker compose` (service + Redis 7 + Postgres 17).
+Deviations: no Alembic yet (one table, created with `IF NOT EXISTS`). Tested with fakeredis and SQLite (`tests/test_hosted.py`) and end to end with `docker compose` (service + Redis 7 + Postgres 17).
