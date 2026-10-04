@@ -188,3 +188,35 @@ async def test_llm_planner_wiring_with_tool_output(make_client):
     body = await ask(make_client, LLMPlanner(FunctionModel(model)), query="Keytruda trials per year")
     assert body["outcome"] == "success"
     assert body["model_calls"] == 1
+
+
+def test_build_planner_uses_only_models_with_keys(monkeypatch):
+    """Swapping providers is configuration: any of OpenAI, Anthropic or Gemini fills either slot."""
+    from clinical_trials_viz.planner import LLMPlanner, UnconfiguredPlanner, build_planner
+
+    for key in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY", "GEMINI_API_KEY"):
+        monkeypatch.delenv(key, raising=False)
+    assert isinstance(build_planner("openai:gpt-5.4-mini", "google:gemini-3.5-flash"), UnconfiguredPlanner)
+
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-key")
+    assert isinstance(build_planner("openai:gpt-5.4-mini", "google:gemini-3.5-flash"), LLMPlanner)
+    assert isinstance(build_planner("google:gemini-3.5-flash", None), LLMPlanner)
+
+
+def test_model_tiers_use_known_models_and_allowed_openai(monkeypatch):
+    import typing
+
+    from pydantic_ai.models import KnownModelName
+
+    from clinical_trials_viz.config import MODEL_TIERS, Settings, disallowed_openai_models
+
+    known = set(typing.get_args(KnownModelName.__value__))
+    names = [name for tier in MODEL_TIERS.values() for name in tier.values()]
+    assert set(names) <= known
+    assert disallowed_openai_models(*names) == []
+    assert disallowed_openai_models("openai:gpt-6-sol", "google:gemini-3.5-flash") == ["openai:gpt-6-sol"]
+    monkeypatch.delenv("PLANNER_PRIMARY", raising=False)
+    monkeypatch.delenv("PLANNER_FALLBACK", raising=False)
+    defaults = Settings(_env_file=None)  # type: ignore[call-arg]
+    assert defaults.planner_primary == MODEL_TIERS["mini"]["openai"]
+    assert defaults.planner_fallback == MODEL_TIERS["mini"]["anthropic"]

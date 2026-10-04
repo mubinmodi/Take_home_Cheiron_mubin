@@ -123,7 +123,7 @@ Local build (decided 2026-10-03): each Run is saved as a small **run record** (r
 
 There is no open-ended agent loop; every loop is bounded:
 - Plan repair: at most once.
-- Provider fallback: at most once, only on provider or transport errors, never on semantic failure. Implemented with pydantic-ai's `FallbackModel`: OpenAI primary, Anthropic fallback, both chosen by configuration strings (e.g. `openai:…`, `anthropic:…`) so a model can be changed without code changes. Use tool-based output mode (native structured output inside a fallback chain has an open issue, [pydantic/pydantic-ai#3104](https://github.com/pydantic/pydantic-ai/issues/3104)), set `fallback_on` to provider/transport errors only, and cap pydantic-ai's own retries so every attempt counts toward the 3-call limit.
+- Provider fallback: at most once, only on provider or transport errors, never on semantic failure. Implemented with pydantic-ai's `FallbackModel`: OpenAI primary, Anthropic fallback by default, and Gemini (`google:…`) available for either slot (added 2026-10-03), all chosen by configuration strings (e.g. `openai:…`, `anthropic:…`, `google:…`) so a model can be changed without code changes. Use tool-based output mode (native structured output inside a fallback chain has an open issue, [pydantic/pydantic-ai#3104](https://github.com/pydantic/pydantic-ai/issues/3104)), set `fallback_on` to provider/transport errors only, and cap pydantic-ai's own retries so every attempt counts toward the 3-call limit.
 - Total model calls: at most 3.
 - Paging stops at the source's end, the page or record cap, or the deadline.
 

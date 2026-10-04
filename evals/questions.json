@@ -1,0 +1,165 @@
+{
+  "description": "Planner eval set modelled on the assignment appendix (docs/assignment-images/IMG_5213.png). Each case lists the question, optional structured fields, and the expected plan. Only the keys listed under `expect` are checked; drug, condition, sponsor and country names compare case-insensitively.",
+  "version": "2026-10-03.1",
+  "cases": [
+    {
+      "id": "trend-01", "family": "time_trend", "appendix": "How has the number of trials for [drug] changed per year since 2015?",
+      "question": "How has the number of trials for pembrolizumab changed per year since 2015?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "start_year", "filters": {"drugs": ["pembrolizumab"], "start_year_from": 2015}}
+    },
+    {
+      "id": "trend-02", "family": "time_trend", "appendix": "How has the number of trials for [drug] changed per year since 2015?",
+      "question": "Show yearly trial counts for Keytruda from 2018 onwards",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "start_year", "filters": {"drugs": ["keytruda"], "start_year_from": 2018}}
+    },
+    {
+      "id": "trend-03", "family": "time_trend", "appendix": "How many trials started each year for [condition]?",
+      "question": "How many trials started each year for type 2 diabetes?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "start_year", "filters": {"conditions": ["type 2 diabetes"]}}
+    },
+    {
+      "id": "trend-04", "family": "time_trend", "appendix": "How many trials started each year for [condition]?",
+      "question": "Number of Alzheimer's disease trials per year between 2010 and 2020",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "start_year", "filters": {"conditions": ["alzheimer's disease"], "start_year_from": 2010, "start_year_to": 2020}}
+    },
+    {
+      "id": "trend-05", "family": "time_trend", "appendix": "How has the number of trials for [drug] changed per year since 2015?",
+      "question": "How has the number of trials for this drug changed over time?",
+      "fields": {"drug_name": "Pembrolizumab"},
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "start_year"}
+    },
+    {
+      "id": "dist-01", "family": "distribution", "appendix": "How are [condition] trials distributed across phases?",
+      "question": "How are breast cancer trials distributed across phases?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "phase", "filters": {"conditions": ["breast cancer"]}}
+    },
+    {
+      "id": "dist-02", "family": "distribution", "appendix": "How are [condition] trials distributed across phases?",
+      "question": "Phase breakdown of recruiting multiple sclerosis studies",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "phase", "filters": {"conditions": ["multiple sclerosis"], "statuses": ["RECRUITING"]}}
+    },
+    {
+      "id": "dist-03", "family": "distribution", "appendix": "What are the most common intervention types for [drug/condition] trials?",
+      "question": "What are the most common intervention types for depression trials?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "intervention_type", "filters": {"conditions": ["depression"]}}
+    },
+    {
+      "id": "dist-04", "family": "distribution", "appendix": "What are the most common intervention types for [drug/condition] trials?",
+      "question": "Which intervention types appear most in metformin trials?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "intervention_type", "filters": {"drugs": ["metformin"]}}
+    },
+    {
+      "id": "dist-05", "family": "distribution", "appendix": "How are [condition] trials distributed across phases?",
+      "question": "What is the status breakdown of COVID-19 vaccine trials?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "status", "filters": {"conditions": ["covid-19"]}}
+    },
+    {
+      "id": "dist-06", "family": "distribution", "appendix": "How are [condition] trials distributed across phases?",
+      "question": "Who are the top 5 lead sponsors of melanoma trials?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "lead_sponsor", "top_n": 5, "filters": {"conditions": ["melanoma"]}}
+    },
+    {
+      "id": "cmp-01", "family": "comparison", "appendix": "Compare phases for trials involving Drug A vs Drug B.",
+      "question": "Compare phases for trials involving pembrolizumab vs nivolumab",
+      "expect": {"kind": "answer", "operation": "compare", "group_by": "phase", "compare_sides": [{"drug": "pembrolizumab"}, {"drug": "nivolumab"}]}
+    },
+    {
+      "id": "cmp-02", "family": "comparison", "appendix": "Compare phases for trials involving Drug A vs Drug B.",
+      "question": "Semaglutide versus tirzepatide: how do their trials split by phase?",
+      "expect": {"kind": "answer", "operation": "compare", "group_by": "phase", "compare_sides": [{"drug": "semaglutide"}, {"drug": "tirzepatide"}]}
+    },
+    {
+      "id": "cmp-03", "family": "comparison", "appendix": "Compare sponsor categories across two conditions.",
+      "question": "Compare sponsor categories across lung cancer and breast cancer trials",
+      "expect": {"kind": "answer", "operation": "compare", "group_by": "sponsor_class", "compare_sides": [{"condition": "lung cancer"}, {"condition": "breast cancer"}]}
+    },
+    {
+      "id": "cmp-04", "family": "comparison", "appendix": "Compare sponsor categories across two conditions.",
+      "question": "Industry vs academic sponsorship: compare Parkinson's disease and ALS trials",
+      "expect": {"kind": "answer", "operation": "compare", "group_by": "sponsor_class", "compare_sides": [{"condition": "parkinson's disease"}, {"condition": "als"}]}
+    },
+    {
+      "id": "cmp-05", "family": "comparison", "appendix": "Compare phases for trials involving Drug A vs Drug B.",
+      "question": "How many recruiting trials do atezolizumab, durvalumab and avelumab each have?",
+      "expect": {"kind": "answer", "operation": "compare", "group_by": null, "filters": {"statuses": ["RECRUITING"]}, "compare_sides": [{"drug": "atezolizumab"}, {"drug": "durvalumab"}, {"drug": "avelumab"}]}
+    },
+    {
+      "id": "geo-01", "family": "geographic", "appendix": "Which countries have the most recruiting trials for [condition]?",
+      "question": "Which countries have the most recruiting trials for melanoma?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "country", "filters": {"conditions": ["melanoma"], "statuses": ["RECRUITING"]}}
+    },
+    {
+      "id": "geo-02", "family": "geographic", "appendix": "Which countries have the most recruiting trials for [condition]?",
+      "question": "Top 10 countries running completed sickle cell disease trials",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "country", "top_n": 10, "filters": {"conditions": ["sickle cell disease"], "statuses": ["COMPLETED"]}}
+    },
+    {
+      "id": "geo-03", "family": "geographic", "appendix": "Which countries have the most recruiting trials for [condition]?",
+      "question": "How many recruiting obesity trials are there in the UK?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": null, "filters": {"conditions": ["obesity"], "statuses": ["RECRUITING"], "countries": ["united kingdom"]}}
+    },
+    {
+      "id": "net-01", "family": "network", "appendix": "Show a network of sponsors ↔ drugs for [condition] trials.",
+      "question": "Show a network of sponsors and drugs for glioblastoma trials",
+      "expect": {"kind": "answer", "operation": "relate", "filters": {"conditions": ["glioblastoma"]}},
+      "note": "relate is not built yet; the service returns unsupported_query, but the plan should still say relate."
+    },
+    {
+      "id": "net-02", "family": "network", "appendix": "Which drugs frequently co-occur in combination studies (drug ↔ drug network)?",
+      "question": "Which drugs are most often combined with pembrolizumab?",
+      "expect": {"kind": "answer", "operation": "relate", "filters": {"drugs": ["pembrolizumab"]}},
+      "note": "relate is not built yet."
+    },
+    {
+      "id": "single-01", "family": "single_value", "appendix": "(no chart needed)",
+      "question": "How many phase 3 trials of semaglutide are currently recruiting?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": null, "filters": {"drugs": ["semaglutide"], "phases": ["PHASE3"], "statuses": ["RECRUITING"]}}
+    },
+    {
+      "id": "list-01", "family": "per_trial", "appendix": "(trial list)",
+      "question": "List the recruiting phase 3 pembrolizumab trials in Germany",
+      "expect": {"kind": "answer", "operation": "per_trial", "filters": {"drugs": ["pembrolizumab"], "phases": ["PHASE3"], "statuses": ["RECRUITING"], "countries": ["germany"]}}
+    },
+    {
+      "id": "study-01", "family": "single_study", "appendix": "(question about one study)",
+      "question": "Which countries does NCT02578680 recruit in?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "country", "filters": {"nct_ids": ["NCT02578680"]}}
+    },
+    {
+      "id": "sponsor-01", "family": "distribution", "appendix": "(sponsor filter)",
+      "question": "What phases are Pfizer's trials in?",
+      "expect": {"kind": "answer", "operation": "aggregate", "group_by": "phase", "filters": {"sponsor": "pfizer", "sponsor_role": "lead"}}
+    },
+    {
+      "id": "clarify-01", "family": "clarification", "appendix": "(missing reference)",
+      "question": "How has the number of trials for this drug changed over time?",
+      "expect": {"kind": "clarify", "reason": "missing_reference", "field": "drug"}
+    },
+    {
+      "id": "clarify-02", "family": "clarification", "appendix": "(drug class)",
+      "question": "How many trials of PD-1 inhibitors started each year?",
+      "expect": {"kind": "clarify", "reason": "drug_class", "field": "drug"}
+    },
+    {
+      "id": "clarify-03", "family": "clarification", "appendix": "(conflict with a structured field)",
+      "question": "Show nivolumab trials by phase",
+      "fields": {"drug_name": "Pembrolizumab"},
+      "expect": {"kind": "clarify", "reason": "conflict", "field": "drug"}
+    },
+    {
+      "id": "clarify-04", "family": "clarification", "appendix": "(missing comparison sides)",
+      "question": "Compare these two drugs by phase",
+      "expect": {"kind": "clarify", "reason": "missing_comparison"}
+    },
+    {
+      "id": "unsupported-01", "family": "unsupported", "appendix": "(not answerable from the registry)",
+      "question": "Is pembrolizumab more effective than nivolumab for lung cancer?",
+      "expect": {"kind": "unsupported"}
+    },
+    {
+      "id": "unsupported-02", "family": "unsupported", "appendix": "(medical advice)",
+      "question": "Which cancer treatment should I take?",
+      "expect": {"kind": "unsupported"}
+    }
+  ]
+}

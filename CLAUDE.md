@@ -21,7 +21,7 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 
 - A fixed workflow with one model step (typed `QueryPlan` via structured output), not an autonomous agent loop.
 - Code owns API requests, counting, chart construction and citations; the model never outputs numbers, NCT IDs or citations, and never sees trial records.
-- One plan repair, at most one provider fallback, at most 3 model calls per run; explicit terminal outcomes. Planner uses pydantic-ai `FallbackModel`: OpenAI primary, Anthropic fallback, models chosen by configuration; tool-based output mode; fallback on provider errors only; its retries count toward the 3-call limit.
+- One plan repair, at most one provider fallback, at most 3 model calls per run; explicit terminal outcomes. Planner uses pydantic-ai `FallbackModel`: OpenAI primary (`gpt-5.4-mini`), Anthropic fallback (`claude-haiku-4-5`, same tier) by default; Gemini (`google:…`, `GOOGLE_API_KEY`) can fill either slot; equivalent models per tier and the allowed OpenAI model list are in `config.py` (`MODEL_TIERS`, `ALLOWED_OPENAI_MODELS`); models chosen by configuration; tool-based output mode; fallback on provider errors only; its retries count toward the 3-call limit.
 - Our own visualization specification is the API contract (Vega-Lite is only the renderer): `type`, `title`, `encoding`, `data`, metadata; chart types plus `single_value` and `table`. Each datum cites `trial_ids`; one shared `evidence` map holds each trial once. The renderer translates our spec into Vega-Lite with finished values only (no Vega-Lite aggregate/bin/timeUnit; counting stays in code) and exports PNG/SVG via `vl-convert`; networks get positions from `networkx` and are drawn as Vega-Lite points + rules. An interactive `vega-embed` page is optional, decided later.
 - No RAG, vector database, long-term memory, run checkpointer or multi-agent design.
 - Plain Python pipeline (LangGraph optional, not required): each stage is an ordinary testable function returning structured errors `{code, message, retryable}`.
@@ -45,11 +45,12 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 
 ```bash
 uv sync                                        # install
-cp .env.example .env                           # then add OPENAI_API_KEY / ANTHROPIC_API_KEY
+cp .env.example .env                           # then add OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_API_KEY
 uv run clinical-trials-viz serve               # API on http://127.0.0.1:8000 (docs at /docs)
 uv run clinical-trials-viz ask "How many recruiting Keytruda trials are there?"
 uv run pytest                                  # offline tests (live API tests deselected)
 uv run pytest -m live                          # tests against the real ClinicalTrials.gov API
+uv run python -m evals.run [case-id ...]       # score the planner on evals/questions.json (needs an API key)
 uv run pytest tests/test_api.py::test_compare_has_overlap_group   # one test
 uv run ruff check src tests && uv run ruff format src tests && uv run pyright
 ```
