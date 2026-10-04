@@ -14,7 +14,7 @@ from opentelemetry import trace
 
 from clinical_trials_viz import clarify
 from clinical_trials_viz.analyze import breakdown, comparison_groups, cross_breakdown, enrollment_histogram
-from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS, DEFAULT_TOP_N, ENROLLMENT_FIELD, Dimension
+from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS, DEFAULT_TOP_N, ENROLLMENT_FIELD, NOT_REPORTED, Dimension
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
 from clinical_trials_viz.ctgov.client import CtGovClient, UpstreamError, count_requests
 from clinical_trials_viz.ctgov.trial import Trial
@@ -106,6 +106,20 @@ class _Run:
                 yield
             finally:
                 self.timings[name] = round((time.perf_counter() - start) * 1000, 1)
+
+
+def _nothing_to_plot(spec: VisualizationSpec, dimension: Dimension | None) -> str | None:
+    """The fields no trial reports when a chart would have nothing to draw, else None."""
+    match spec.type:
+        case VisualizationType.TIMELINE if not spec.rows():
+            return "both a start date and a completion date"
+        case VisualizationType.SCATTER_PLOT if not spec.rows():
+            return "a start date, a completion date and enrollment"
+        case VisualizationType.TIME_SERIES if dimension is Dimension.START_YEAR and all(
+            d[dimension.value] == NOT_REPORTED for d in spec.rows()
+        ):
+            return "a start date"
+    return None
 
 
 def _finish(target: Answer, outcome: Outcome, message: str | None = None, error: ErrorInfo | None = None) -> None:
@@ -284,6 +298,9 @@ class Pipeline:
             spec, dimension = self._build(target, plan, filters, cohort)
         if isinstance(spec.data, NetworkData) and not spec.data.edges:
             _finish(target, Outcome.NO_DATA, "No entities share enough trials to draw a link (all pages retrieved).")
+            return
+        if missing := _nothing_to_plot(spec, dimension):
+            _finish(target, Outcome.NO_DATA, f"None of the {len(cohort.trials)} matching trials report {missing}.")
             return
         self._finish_success(run, target, plan, spec, {t.nct_id: t for t in cohort.trials}, dimension, index)
 

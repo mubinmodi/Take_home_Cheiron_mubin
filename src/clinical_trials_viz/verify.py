@@ -126,7 +126,7 @@ def verify(
     # Readability: no silent gaps in a time series.
     if spec.type is VisualizationType.TIME_SERIES and dimension is Dimension.START_YEAR:
         years = sorted({int(d[dimension.value]) for d in spec.rows() if d[dimension.value] != NOT_REPORTED})
-        check("no_time_gaps", [] if years == list(range(min(years), max(years) + 1)) else ["missing years"])
+        check("no_time_gaps", [] if not years or years == list(range(years[0], years[-1] + 1)) else ["missing years"])
 
     return Verification(passed=all(c.passed for c in checks), checks=checks)
 

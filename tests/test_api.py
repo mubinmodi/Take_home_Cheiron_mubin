@@ -1,5 +1,7 @@
 """End-to-end through the HTTP API: scripted planner, mocked ClinicalTrials.gov, real everything else."""
 
+import json
+
 import httpx
 from pydantic_ai.messages import ModelMessage, ModelResponse, ToolCallPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
@@ -682,3 +684,42 @@ async def test_sponsor_categories_are_not_sponsor_names(make_client):
     errors = planner.calls[1]["repair"][1]
     assert any("'Industry' is a sponsor category" in e and "sponsor_class" in e for e in errors)
     assert body["outcome"] == "success" and body["visualization"]["type"] == "grouped_bar_chart"
+
+
+def _without(page, *paths: tuple[str, ...]):
+    """A copy of the fixture page with the given protocol fields removed from every record."""
+    copy = json.loads(json.dumps(page))
+    for study in copy["studies"]:
+        for path in paths:
+            node = study["protocolSection"]
+            for key in path[:-1]:
+                node = node.get(key, {})
+            node.pop(path[-1], None)
+    return copy
+
+
+START = ("statusModule", "startDateStruct")
+ENROLLMENT = ("designModule", "enrollmentInfo")
+
+
+async def test_trend_with_no_start_dates_is_no_data(make_client, ctgov, page):
+    ctgov.get("/studies").respond(json=_without(page, START))
+    body = await ask(make_client, ScriptedPlanner(TREND), query="How have Keytruda trials changed over time?")
+    assert body["outcome"] == "no_data"
+    assert "report a start date" in body["message"]
+
+
+async def test_timeline_with_no_dates_is_no_data(make_client, ctgov, page):
+    ctgov.get("/studies").respond(json=_without(page, START))
+    plan = AnswerPlan(operation=Operation.PER_TRIAL, filters=Filters(drugs=["Keytruda"]), view=PerTrialView.TIMELINE)
+    body = await ask(make_client, ScriptedPlanner(plan), query="Timeline of Keytruda trials")
+    assert body["outcome"] == "no_data"
+    assert "report both a start date and a completion date" in body["message"]
+
+
+async def test_scatter_with_no_enrollment_is_no_data(make_client, ctgov, page):
+    ctgov.get("/studies").respond(json=_without(page, ENROLLMENT))
+    plan = AnswerPlan(operation=Operation.PER_TRIAL, filters=Filters(drugs=["Keytruda"]), view=PerTrialView.SCATTER)
+    body = await ask(make_client, ScriptedPlanner(plan), query="Enrollment vs duration for Keytruda trials")
+    assert body["outcome"] == "no_data"
+    assert "report" in body["message"] and "enrollment" in body["message"]

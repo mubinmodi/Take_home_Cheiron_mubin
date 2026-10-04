@@ -335,6 +335,7 @@ Every failure ends in one Outcome with a structured `error` (`code`, `message`, 
 | **The model returns no usable plan** (text instead of a plan, after one retry) | Stopped; not sent to the fallback, which is for provider failures only | `internal_error` · `planner_invalid_output` (retryable) |
 | **No model configured** | The service still starts; every question explains which key is missing | `internal_error` · `planner_not_configured` |
 | **ClinicalTrials.gov** fails | Retries with backoff (honouring `Retry-After`), then stops with the reason | `upstream_error` · `source_unavailable` / `source_rate_limited` / `source_rejected` / `source_invalid_response` |
+| **Nothing to plot** (no trial reports a start date for a trend, the dates for a timeline, or enrollment for a scatter) | Stopped after full retrieval, naming the missing field | `no_data` |
 | **The chart cannot be built** (Vega-Lite fails to compile) | Checked at query time by compiling the chart (milliseconds, no drawing): the answer, specification and citations stand; `chart_url` is withheld with a warning | `success` + warning |
 | **Drawing the image fails or hangs** | Drawing runs off the event loop with a time limit; the image request fails in JSON, the run is unaffected | HTTP `500 render_failed` / `504 render_timeout` |
 | **The interactive chart cannot load** (offline, CDN blocked) | The web page shows the same data as a table, still clickable for citations | — |
