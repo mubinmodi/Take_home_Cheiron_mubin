@@ -78,6 +78,8 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
     elif plan.compare_sides:
         errors.append("compare_sides is only allowed with operation 'compare'")
 
+    if plan.view is not None and plan.operation is not Operation.PER_TRIAL:
+        errors.append("view is only allowed with operation 'per_trial'")
     if plan.operation is Operation.PER_TRIAL and plan.group_by is not None:
         errors.append("per_trial lists trials; set group_by to null")
     if plan.group_by is not None and plan.group_by not in DIMENSIONS:

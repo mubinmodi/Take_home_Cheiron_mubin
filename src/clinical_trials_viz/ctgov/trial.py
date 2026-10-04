@@ -30,7 +30,9 @@ class Trial:
     start_date: str | None  # "YYYY-MM-DD" or "YYYY-MM"
     start_date_type: str | None  # "ACTUAL" or "ESTIMATED"
     primary_completion_date: str | None
+    primary_completion_date_type: str | None
     completion_date: str | None
+    completion_date_type: str | None
     phases: tuple[str, ...]
     study_type: str | None
     lead_sponsor: str | None
@@ -96,7 +98,9 @@ def parse_trial(study: dict[str, Any]) -> Trial:
         start_date=_get(status, "startDateStruct", "date"),
         start_date_type=_get(status, "startDateStruct", "type"),
         primary_completion_date=_get(status, "primaryCompletionDateStruct", "date"),
+        primary_completion_date_type=_get(status, "primaryCompletionDateStruct", "type"),
         completion_date=_get(status, "completionDateStruct", "date"),
+        completion_date_type=_get(status, "completionDateStruct", "type"),
         phases=tuple(design.get("phases") or ()),
         study_type=design.get("studyType"),
         lead_sponsor=_get(sponsors, "leadSponsor", "name"),

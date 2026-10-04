@@ -6,6 +6,7 @@ from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import same_arm_pairs, trial_drugs
+from clinical_trials_viz.spec_builder import iso_date, trial_end
 
 
 def verify(
@@ -86,6 +87,19 @@ def verify(
                 != (d["enrollment_bin"], d["enrollment_type"])
             ],
         )
+
+    if spec.type is VisualizationType.TIMELINE:
+        wrong = []
+        for d in spec.rows():
+            trial = trials.get(d["nct_id"])
+            if trial is None:
+                continue
+            end, _ = trial_end(trial)
+            if (d["start"], d["end"]) != (iso_date(trial.start_date), iso_date(end)) or d["trial_ids"] != [
+                trial.nct_id
+            ]:
+                wrong.append(f"{d['nct_id']}: {d['start']}–{d['end']} does not match its record")
+        check("cited_values_match_source", wrong)
 
     # Every cited trial meets the filters, checked against its own source values (not the API's word).
     check("cited_trials_meet_filters", [

@@ -13,11 +13,12 @@ from clinical_trials_viz.catalog import (
     OTHER_BUCKET,
     PHASE_LABELS,
     TABLE_MAX_ROWS,
+    TIMELINE_MAX_ROWS,
     Dimension,
     study_url,
 )
 from clinical_trials_viz.ctgov.trial import Trial, dimension_evidence
-from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation
+from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation, PerTrialView
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry
 from clinical_trials_viz.models.spec import (
     Channel,
@@ -36,7 +37,7 @@ COUNT = Channel(field="trial_count", type=FieldType.QUANTITATIVE, title="Trials"
 def chart_type_for(plan: AnswerPlan) -> VisualizationType:
     """Which visualization answers a plan. Decided by code, so the same plan always gets the same chart."""
     if plan.operation is Operation.PER_TRIAL:
-        return VisualizationType.TABLE
+        return VisualizationType.TIMELINE if plan.view is PerTrialView.TIMELINE else VisualizationType.TABLE
     if plan.operation is Operation.RELATE:
         return VisualizationType.NETWORK_GRAPH
     if plan.operation is Operation.BIN:
@@ -316,6 +317,66 @@ def filter_dimensions(filters: AppliedFilters) -> list[Dimension]:
         Dimension.START_YEAR: bool(filters.start_year_from or filters.start_year_to),
     }
     return [d for d, on in used.items() if on]
+
+
+def iso_date(value: str | None) -> str | None:
+    """Registry dates are "YYYY-MM-DD" or "YYYY-MM"; month-only dates plot from the 1st."""
+    if not value:
+        return None
+    return value if len(value) == 10 else f"{value}-01"
+
+
+def trial_end(trial: Trial) -> tuple[str | None, str | None]:
+    """Primary completion (when the main outcome is measured), else overall completion."""
+    if trial.primary_completion_date:
+        return trial.primary_completion_date, trial.primary_completion_date_type
+    return trial.completion_date, trial.completion_date_type
+
+
+def timeline_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[VisualizationSpec, list[str]]:
+    dated = [t for t in trials if t.start_date and trial_end(t)[0]]
+    ordered = sorted(dated, key=lambda t: t.start_date or "", reverse=True)[:TIMELINE_MAX_ROWS]
+    ordered.sort(key=lambda t: (t.start_date or "", t.nct_id))
+    rows = []
+    for t in ordered:
+        end, end_type = trial_end(t)
+        estimated = "ESTIMATED" in (t.start_date_type, end_type)
+        rows.append({
+            "trial": f"{t.nct_id} · {t.title[:50]}",
+            "nct_id": t.nct_id,
+            "start": iso_date(t.start_date),
+            "end": iso_date(end),
+            "dates": "Includes estimated dates" if estimated else "Actual dates",
+            "status": t.overall_status,
+            "trial_ids": [t.nct_id],
+        })  # fmt: skip
+    notes = ["Bars run from the start date to the primary completion date (or completion date when missing)."]
+    if missing := len(trials) - len(dated):
+        notes.append(f"{missing} trials lack a start or completion date and are not shown.")
+    if len(dated) > TIMELINE_MAX_ROWS:
+        notes.append(f"Showing the {TIMELINE_MAX_ROWS} most recently started of {len(dated)} trials with both dates.")
+    trial_channel = Channel(field="trial", type=FieldType.NOMINAL, title="Trial")
+    dates_channel = Channel(field="dates", type=FieldType.NOMINAL, title="Dates")
+    start = Channel(field="start", type=FieldType.TEMPORAL, title="Start")
+    end_channel = Channel(field="end", type=FieldType.TEMPORAL, title="Primary completion")
+    spec = VisualizationSpec(
+        type=VisualizationType.TIMELINE,
+        title=f"Trial timeline: {describe_filters(filters)}",
+        subtitle=f"{len(rows)} of {len(trials)} trials",
+        encoding=Encoding(
+            x=start, x2=end_channel, y=trial_channel, color=dates_channel,
+            tooltip=[trial_channel, start, end_channel, dates_channel,
+                     Channel(field="status", type=FieldType.NOMINAL, title="Status")],
+        ),
+        data=rows,
+        metadata=RenderMetadata(
+            category_order=[r["trial"] for r in rows],
+            series_order=["Actual dates", "Includes estimated dates"],
+            cohort_size=len(trials),
+            total_rows=len(dated),
+        ),
+    )  # fmt: skip
+    return spec, notes
 
 
 def build_evidence(

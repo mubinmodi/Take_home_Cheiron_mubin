@@ -119,6 +119,9 @@ def _data_lines(spec: dict[str, Any]) -> list[str]:
         return [f"  {len(data['nodes'])} nodes, {len(data['edges'])} links (heaviest first):", *rows] + (
             [f"  … {more} more links"] if more > 0 else []
         )
+    if spec["type"] == "timeline":
+        rows = [f"  {d['start']} → {d['end']}  {d['trial'][:90]}" for d in data[:MAX_ROWS]]
+        return rows + ([f"  … {len(data) - MAX_ROWS} more"] if len(data) > MAX_ROWS else [])
     if spec["type"] == "table":
         rows = [f"  {d['nct_id']}  {d.get('start_date') or '':<10}  {d['title'][:80]}" for d in data[:MAX_ROWS]]
         total = spec["metadata"].get("total_rows") or len(data)

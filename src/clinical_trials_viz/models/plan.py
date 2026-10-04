@@ -25,6 +25,11 @@ class NetworkKind(StrEnum):
     DRUG_DRUG = "drug_drug"  # drugs given together in the same trial arm
 
 
+class PerTrialView(StrEnum):
+    TABLE = "table"  # "list the trials"
+    TIMELINE = "timeline"  # "timeline", "when did they run", "durations"
+
+
 class Filters(BaseModel):
     """Constraints that select the Cohort. Leave a field empty when the question does not mention it."""
 
@@ -86,6 +91,7 @@ class AnswerPlan(BaseModel):
     top_n: int | None = Field(
         default=None, ge=1, le=50, description="Only when the user asks for a number, e.g. 'top 5 countries'."
     )
+    view: PerTrialView | None = Field(default=None, description="per_trial only: table (default) or timeline.")
     network: NetworkKind | None = Field(default=None, description="relate only: which entities the network links.")
 
 

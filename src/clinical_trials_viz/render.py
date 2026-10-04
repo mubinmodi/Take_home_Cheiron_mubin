@@ -93,6 +93,22 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
                 },
             }
 
+        case VisualizationType.TIMELINE:
+            assert enc.x and enc.x2 and enc.y and enc.color
+            return {
+                **base,
+                "width": _WIDTH,
+                "height": max(120, 18 * len(spec.rows())),
+                "mark": {"type": "bar", "cornerRadius": 2},
+                "encoding": {
+                    "x": _channel(enc.x, title="Start → primary completion"),
+                    "x2": {"field": enc.x2.field},
+                    "y": _channel(enc.y, sort=meta.category_order, axis={"labelLimit": 320, "title": None}),
+                    "color": _channel(enc.color, sort=meta.series_order),
+                    "tooltip": _tooltip(spec),
+                },
+            }
+
         case VisualizationType.HISTOGRAM:
             assert enc.x and enc.y and enc.color
             return {

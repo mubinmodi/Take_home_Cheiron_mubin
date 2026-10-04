@@ -242,6 +242,7 @@ MAX_TOP_N = 50
 MAX_COMPARE_SIDES = 5
 PAGE_SIZE = 1000
 TABLE_MAX_ROWS = 100
+TIMELINE_MAX_ROWS = 50
 
 # Drug identity: the MeSH term shared by at least this share of search matches.
 DRUG_IDENTITY_MIN_SHARE = 0.5
@@ -257,7 +258,9 @@ TRIAL_FIELDS = [
     "StartDate",
     "StartDateType",
     "PrimaryCompletionDate",
+    "PrimaryCompletionDateType",
     "CompletionDate",
+    "CompletionDateType",
     "Phase",
     "StudyType",
     "LeadSponsorName",

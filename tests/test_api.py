@@ -19,6 +19,7 @@ from clinical_trials_viz.models.plan import (
     Filters,
     NetworkKind,
     Operation,
+    PerTrialView,
     UnsupportedPlan,
 )
 from clinical_trials_viz.planner import LLMPlanner
@@ -396,3 +397,32 @@ def test_histogram_verifier_catches_a_trial_in_the_wrong_bin(trials):
     result = verify(spec, build_evidence(spec, by_id, None, AppliedFilters()), by_id, None,
                     VisualizationType.HISTOGRAM, AppliedFilters())  # fmt: skip
     assert not next(c for c in result.checks if c.name == "cited_values_match_source").passed
+
+
+async def test_trial_timeline_end_to_end(make_client, trials):
+    plan = AnswerPlan(
+        operation=Operation.PER_TRIAL, view=PerTrialView.TIMELINE, filters=Filters(drugs=["pembrolizumab"])
+    )
+    async for client in make_client(ScriptedPlanner(plan)):
+        body = (await client.post("/v1/query", json={"query": "Timeline of pembrolizumab trials"})).json()
+        assert body["outcome"] == "success", body.get("message")
+        spec = body["visualization"]
+        assert spec["type"] == "timeline"
+        rows = spec["data"]
+        assert 0 < len(rows) <= 50
+        assert all(r["start"] <= r["end"] for r in rows)
+        assert [r["start"] for r in rows] == sorted(r["start"] for r in rows)
+        assert spec["encoding"]["x2"]["field"] == "end"
+        assert body["verification"]["passed"]
+        assert any("start date to the primary completion date" in a for a in body["assumptions"])
+        entry = body["evidence"][rows[0]["nct_id"]]
+        assert "protocolSection.statusModule.primaryCompletionDateStruct" in entry["fields"]
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")
+
+
+async def test_view_only_for_per_trial(make_client):
+    bad = AnswerPlan(operation=Operation.AGGREGATE, view=PerTrialView.TIMELINE)
+    planner = ScriptedPlanner(bad, TREND)
+    await ask(make_client, planner, query="x")
+    assert "view is only allowed" in planner.calls[1]["repair"][1][0]

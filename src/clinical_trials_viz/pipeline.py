@@ -18,7 +18,15 @@ from clinical_trials_viz.catalog import DEFAULT_TOP_N, ENROLLMENT_FIELD, Dimensi
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
 from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError
 from clinical_trials_viz.ctgov.trial import Trial
-from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, NetworkKind, Operation, QueryPlan, UnsupportedPlan
+from clinical_trials_viz.models.plan import (
+    AnswerPlan,
+    ClarifyPlan,
+    NetworkKind,
+    Operation,
+    PerTrialView,
+    QueryPlan,
+    UnsupportedPlan,
+)
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import AppliedFilters, Outcome, QueryResponse, SourceInfo
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
@@ -34,11 +42,15 @@ from clinical_trials_viz.spec_builder import (
     network_spec,
     single_value_spec,
     table_spec,
+    timeline_spec,
 )
 from clinical_trials_viz.validate import check_plan
 from clinical_trials_viz.verify import verify
 
 MAX_MODEL_CALLS = 3
+START_FIELD = "protocolSection.statusModule.startDateStruct"
+PRIMARY_COMPLETION_FIELD = "protocolSection.statusModule.primaryCompletionDateStruct"
+COMPLETION_FIELD = "protocolSection.statusModule.completionDateStruct"
 ARM_FIELD = "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)"
 log = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -219,7 +231,8 @@ class Pipeline:
         self, run: _Run, plan: AnswerPlan, filters: AppliedFilters, cohort: Cohort
     ) -> tuple[VisualizationSpec, Dimension | None]:
         if plan.operation is Operation.PER_TRIAL:
-            spec, notes = table_spec(cohort.trials, filters)
+            build = timeline_spec if plan.view is PerTrialView.TIMELINE else table_spec
+            spec, notes = build(cohort.trials, filters)
             run.response.assumptions.extend(notes)
             return spec, None
         if plan.operation is Operation.BIN:
@@ -280,6 +293,15 @@ class Pipeline:
             filters = response.applied_filters or AppliedFilters()
             sides = tuple(_cited_dimensions(plan))
             evidence = build_evidence(spec, trials, dimension, filters, sides)
+            if spec.type is VisualizationType.TIMELINE:
+                for nct_id, entry in evidence.items():
+                    trial = trials[nct_id]
+                    entry.fields[START_FIELD] = {"date": trial.start_date, "type": trial.start_date_type}
+                    entry.fields[PRIMARY_COMPLETION_FIELD] = {
+                        "date": trial.primary_completion_date,
+                        "type": trial.primary_completion_date_type,
+                    }
+                    entry.fields[COMPLETION_FIELD] = {"date": trial.completion_date, "type": trial.completion_date_type}
             if plan.operation is Operation.BIN:
                 for nct_id, entry in evidence.items():
                     trial = trials[nct_id]

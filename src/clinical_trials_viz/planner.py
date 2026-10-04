@@ -38,7 +38,8 @@ Operations (answer_plan.operation):
   dimension to count by ("per year" -> start_year, "by phase" -> phase, "which countries" -> country).
 - `compare`: the same count for 2-5 sides ("Drug A vs Drug B", "condition X vs Y"). Put each side
   in `compare_sides` (one of drug, condition, sponsor per side); shared filters go in `filters`.
-- `per_trial`: list individual trials ("list", "which trials", "show the studies").
+- `per_trial`: individual trials. `view`: `table` for "list", "which trials", "show the studies";
+  `timeline` for "timeline", "when did they run", "how long do they last", "Gantt".
 - `relate`: a network of entities that share trials. Set `network`:
   `sponsor_drug` for "network of sponsors and drugs", "which companies develop which drugs";
   `drug_drug` for "which drugs are combined / co-occur / given together". group_by stays null.

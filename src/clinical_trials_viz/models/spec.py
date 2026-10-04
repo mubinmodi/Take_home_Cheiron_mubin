@@ -14,6 +14,7 @@ class VisualizationType(StrEnum):
     TABLE = "table"
     NETWORK_GRAPH = "network_graph"
     HISTOGRAM = "histogram"
+    TIMELINE = "timeline"
 
 
 class FieldType(StrEnum):
@@ -35,6 +36,7 @@ class Encoding(BaseModel):
     """Which datum fields drive which channels. Unused channels are omitted."""
 
     x: Channel | None = None
+    x2: Channel | None = Field(default=None, description="timeline: bar end (x is the start).")
     y: Channel | None = None
     color: Channel | None = Field(default=None, description="Series / comparison group.")
     value: Channel | None = Field(default=None, description="single_value: the number shown.")
