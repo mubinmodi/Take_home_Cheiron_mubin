@@ -173,6 +173,26 @@ def test_verifier_catches_a_trial_wrongly_counted_in_other(trials):
     assert not next(c for c in result.checks if c.name == "cited_values_match_source").passed
 
 
+def test_verifier_catches_a_count_that_leaves_out_part_of_the_cohort(trials):
+    cohort = {t.nct_id: t for t in trials[:2]}
+    spec = single_value_spec(list(cohort.values()), AppliedFilters())
+    datum = spec.data[0]
+    datum["trial_ids"] = datum["trial_ids"][:1]
+    datum["trial_count"] = 1
+    evidence = build_evidence(spec, cohort, None, AppliedFilters())
+    result = verify(spec, evidence, cohort, None, VisualizationType.SINGLE_VALUE, AppliedFilters())
+    assert not next(c for c in result.checks if c.name == "cohort_covered").passed
+
+
+def test_verifier_catches_a_bar_chart_that_drops_a_category(trials):
+    by_id = {t.nct_id: t for t in trials}
+    spec = breakdown_spec(breakdown(trials, Dimension.PHASE, None), AppliedFilters(), len(trials))
+    spec.data = [d for d in spec.data if d["phase"] != "Phase 1"]
+    evidence = build_evidence(spec, by_id, Dimension.PHASE, AppliedFilters())
+    result = verify(spec, evidence, by_id, Dimension.PHASE, VisualizationType.BAR_CHART, AppliedFilters())
+    assert not next(c for c in result.checks if c.name == "cohort_covered").passed
+
+
 def test_evidence_cites_the_source_field(trials):
     spec, evidence = _time_series(trials)
     entry = evidence[spec.data[-1]["trial_ids"][0]]
@@ -207,7 +227,7 @@ def test_filtered_answer_cites_and_checks_filter_fields(trials):
     phase3 = [t for t in trials if "PHASE3" in t.phases]
     filters = AppliedFilters(drugs=["pembrolizumab"], phases=[Phase.PHASE3])
     spec = single_value_spec(phase3, filters)
-    by_id = {t.nct_id: t for t in trials}
+    by_id = {t.nct_id: t for t in phase3}  # the cohort, as the pipeline passes it
     evidence = build_evidence(spec, by_id, None, filters)
     entry = evidence[phase3[0].nct_id]
     assert "PHASE3" in entry.fields["protocolSection.designModule.phases"]
@@ -217,6 +237,7 @@ def test_filtered_answer_cites_and_checks_filter_fields(trials):
     # A trial that fails the phase filter must not be counted.
     other = next(t for t in trials if "PHASE3" not in t.phases)
     bad = single_value_spec([*phase3, other], filters)
+    by_id = {t.nct_id: t for t in [*phase3, other]}
     result = verify(
         bad, build_evidence(bad, by_id, None, filters), by_id, None, VisualizationType.SINGLE_VALUE, filters
     )

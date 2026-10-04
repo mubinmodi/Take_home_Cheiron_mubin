@@ -8,6 +8,11 @@ from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, Visu
 from clinical_trials_viz.network import same_arm_pairs, trial_drugs
 from clinical_trials_viz.spec_builder import cited_value, duration_months, iso_date, trial_end
 
+_WHOLE_COHORT = frozenset({
+    VisualizationType.SINGLE_VALUE, VisualizationType.BAR_CHART, VisualizationType.TIME_SERIES,
+    VisualizationType.GROUPED_BAR_CHART, VisualizationType.HISTOGRAM,
+})  # fmt: skip
+
 
 def verify(
     spec: VisualizationSpec,
@@ -53,6 +58,14 @@ def verify(
             if "trial_count" in d and d["trial_count"] != len(set(d["trial_ids"]))
         ],
     )
+
+    # Charts that count the whole cohort leave no trial out: missing values have their own bar, and
+    # the long tail is in "Other". (Tables, timelines, scatters and networks show a subset, and say so.)
+    if spec.type in _WHOLE_COHORT:
+        cited_ids = {i for d in datums for i in d["trial_ids"]}
+        left_out = sorted(set(trials) - cited_ids)
+        check("cohort_covered", [f"{len(left_out)} of {len(trials)} trials not counted: {', '.join(left_out[:5])}"]
+              if left_out else [])  # fmt: skip
 
     # Every cited trial resolves in the evidence and in the retrieved cohort.
     cited = {i for d in datums for i in d["trial_ids"]}

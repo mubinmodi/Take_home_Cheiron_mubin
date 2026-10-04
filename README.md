@@ -116,7 +116,7 @@ question ─► PLAN (the only model step) ─► GATE ─► RETRIEVE ─► CO
 - **Verifier**, a gate before every successful response. It checks that:
   - the chart answers the plan: its type, grouped by the plan's dimensions
   - every encoded field exists
-  - each count equals its distinct cited trials
+  - each count equals its distinct cited trials, and a chart of the whole cohort (single value, bar, time series, grouped bar, histogram) counts every trial in it
   - every citation resolves, and every value it quotes is re-derived from the trial record
   - each cited trial really has its bucket's value, re-derived from its own record
   - each cited trial meets every filter
@@ -373,7 +373,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - every failure point in §7 (23 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
   - the hosted mode (36 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits (per user, and Idempotency-Keys scoped per user), open access, circuit breakers opening and closing, the run deadline keeping finished parts and covering a slow run store
   - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other with "Not reported" kept separate, missing values as their own state, the drug filter keeping only drug-type interventions), with property tests showing input order and duplicates do not change counts
-  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, a trial wrongly counted in "Other", an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
+  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, a count that leaves out part of the cohort, a trial wrongly counted in "Other", an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
 - **Live tests** against ClinicalTrials.gov (`pytest -m live`), and every answer type run end to end with the real models, with the images inspected (tables have none).
 - **Planner eval** (`evals/`): 42 questions modelled on the assignment's appendix, scored per question family per model.
 - **An external code review** by a second model, every finding checked against the code. Ten were real and are fixed, each with a regression test that failed first. Among them: the drug filter kept trials that gave the drug only as a device or tracer; fallback attempts escaped the 3-call limit; the verifier missed a wrong grouping and altered citations; "Not reported" was folded into "Other"; and picking your own filter's value in a conflict clarification asked again forever.
