@@ -35,7 +35,8 @@ def build_params(filters: AppliedFilters, drug: str | None = None) -> dict[str, 
         if filters.sponsor_role == "any":
             params["query.spons"] = filters.sponsor
         elif filters.sponsor_exact:
-            advanced.append(f"AREA[LeadSponsorName]{_quote(filters.sponsor)}")
+            names = filters.exact_sponsors or [filters.sponsor]
+            advanced.append("AREA[LeadSponsorName](" + " OR ".join(_quote(n) for n in names) + ")")
         else:
             advanced.append(f"AREA[LeadSponsorName]({filters.sponsor})")
     if filters.phases:
@@ -107,6 +108,6 @@ async def fetch_cohort(client: CtGovClient, filters: AppliedFilters) -> Cohort:
         cohort = Cohort(list(by_id.values()), matches, assumptions)
 
     if filters.sponsor and filters.sponsor_exact:
-        wanted = filters.sponsor.lower()
-        cohort.trials = [t for t in cohort.trials if (t.lead_sponsor or "").lower() == wanted]
+        wanted = {n.lower() for n in (filters.exact_sponsors or [filters.sponsor])}
+        cohort.trials = [t for t in cohort.trials if (t.lead_sponsor or "").lower() in wanted]
     return cohort

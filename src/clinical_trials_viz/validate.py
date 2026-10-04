@@ -47,8 +47,9 @@ def merge_filters(plan: AnswerPlan, request: QueryRequest) -> AppliedFilters:
         if value:
             setattr(applied, filter_field, value)
             applied.from_request.append(filter_field)
-    if request.sponsor:  # a structured sponsor is an exact lead sponsor name (e.g. a Clarification answer)
-        applied.sponsor, applied.sponsor_role, applied.sponsor_exact = request.sponsor, "lead", True
+    if request.sponsor:  # structured sponsors are exact lead sponsor names (e.g. a Clarification answer)
+        applied.exact_sponsors = list(request.sponsor)
+        applied.sponsor, applied.sponsor_role, applied.sponsor_exact = " or ".join(request.sponsor), "lead", True
         applied.from_request.append("sponsor")
     return applied
 

@@ -62,7 +62,9 @@ def test_build_params_compiles_every_filter():
 
 def test_exact_and_any_sponsor_roles():
     exact = build_params(AppliedFilters(sponsor="Merck Sharp & Dohme LLC", sponsor_exact=True))
-    assert exact["filter.advanced"] == 'AREA[LeadSponsorName]"Merck Sharp & Dohme LLC"'
+    assert exact["filter.advanced"] == 'AREA[LeadSponsorName]("Merck Sharp & Dohme LLC")'
+    both = build_params(AppliedFilters(sponsor="x", sponsor_exact=True, exact_sponsors=["A Inc", "B AG"]))
+    assert both["filter.advanced"] == 'AREA[LeadSponsorName]("A Inc" OR "B AG")'
     assert build_params(AppliedFilters(sponsor="Merck", sponsor_role="any")) == {"query.spons": "Merck"}
 
 

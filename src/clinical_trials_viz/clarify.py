@@ -66,7 +66,11 @@ def sponsor_ambiguity(trials: list[Trial], term: str) -> Clarification | None:
     major = [(name, n) for name, n in counts.most_common() if n / total >= SPONSOR_AMBIGUITY_MIN_SHARE]
     if len(major) < 2:
         return None
-    options = [ClarificationOption(label=f"{name} ({n} trials)", value=name, trial_count=n) for name, n in major[:4]]
+    shown = major[:4]
+    options = [ClarificationOption(label=f"{name} ({n} trials)", value=name, trial_count=n) for name, n in shown]
+    combined = sum(n for _, n in shown)  # each trial has one lead sponsor, so counts add up
+    options.append(ClarificationOption(label=f"All of these ({combined} trials)", value=[name for name, _ in shown],
+                                       trial_count=combined))  # fmt: skip
     return Clarification(
         field="sponsor",
         question=f"'{term}' matches more than one lead sponsor. Which one do you mean?",

@@ -87,7 +87,8 @@ def summarize(r: dict[str, Any], chart_path: Path | None = None) -> str:
         lines.append(f"Answer with --previous {r['run_id']} --fields '{{\"{clarification['field']}\": ...}}' ({hint})")
 
     if filters := r.get("applied_filters"):
-        shown = {k: v for k, v in filters.items() if v and k not in ("sponsor_role", "sponsor_exact", "from_request")}
+        hidden = ("sponsor_role", "sponsor_exact", "exact_sponsors", "from_request")
+        shown = {k: v for k, v in filters.items() if v and k not in hidden}
         if shown:
             lines += ["", "Filters: " + "; ".join(f"{k}={_fmt(v)}" for k, v in shown.items())]
     if assumptions := r.get("assumptions"):

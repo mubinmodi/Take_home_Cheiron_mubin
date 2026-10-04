@@ -45,8 +45,9 @@ class QueryRequest(BaseModel):
     trial_phase: Annotated[list[Phase] | None, BeforeValidator(_as_upper_list)] = Field(
         default=None, description="Phase(s), e.g. PHASE3."
     )
-    sponsor: Name | None = Field(
-        default=None, description="Lead sponsor name, matched exactly (e.g. 'Merck Sharp & Dohme LLC')."
+    sponsor: Annotated[Annotated[list[Name], Field(max_length=10)] | None, BeforeValidator(_as_list)] = Field(
+        default=None,
+        description="Lead sponsor name(s), matched exactly (e.g. 'Merck Sharp & Dohme LLC'); a list means any of them.",
     )
     country: Annotated[Annotated[list[Name], Field(max_length=10)] | None, BeforeValidator(_as_list)] = Field(
         default=None, description="Country name(s) with a trial site."

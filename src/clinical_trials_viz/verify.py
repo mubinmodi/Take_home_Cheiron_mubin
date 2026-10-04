@@ -142,7 +142,8 @@ def filter_violations(trial: Trial, filters: AppliedFilters) -> list[str]:
         problems.append(f"no site in {filters.countries}")
     if filters.nct_ids and trial.nct_id not in filters.nct_ids:
         problems.append("not one of the requested NCT IDs")
-    if filters.sponsor_exact and (trial.lead_sponsor or "").lower() != (filters.sponsor or "").lower():
+    wanted = {n.lower() for n in (filters.exact_sponsors or [filters.sponsor or ""])}
+    if filters.sponsor_exact and (trial.lead_sponsor or "").lower() not in wanted:
         problems.append(f"lead sponsor {trial.lead_sponsor!r} is not {filters.sponsor!r}")
     if filters.start_year_from or filters.start_year_to:
         year = trial.start_year

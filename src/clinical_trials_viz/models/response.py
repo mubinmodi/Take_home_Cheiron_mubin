@@ -31,6 +31,9 @@ class AppliedFilters(BaseModel):
     study_types: list[StudyType] = Field(default_factory=list)
     sponsor: str | None = None
     sponsor_role: Literal["lead", "any"] = "lead"
+    exact_sponsors: list[str] = Field(
+        default_factory=list, description="Lead sponsor names matched exactly (any of them), from a structured field."
+    )
     sponsor_exact: bool = Field(
         default=False, description="Sponsor came from a structured field and is matched exactly."
     )
@@ -43,7 +46,7 @@ class AppliedFilters(BaseModel):
 
 class ClarificationOption(BaseModel):
     label: str
-    value: str
+    value: str | list[str] = Field(description="Send back as-is in the Clarification's field.")
     trial_count: int | None = None
 
 
