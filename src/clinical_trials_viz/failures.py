@@ -11,7 +11,13 @@ from pydantic_ai import FallbackExceptionGroup, ModelAPIError, UnexpectedModelBe
 
 from clinical_trials_viz.ctgov.client import ScopeTooLarge, UpstreamError
 from clinical_trials_viz.models.response import ErrorCode, ErrorInfo, Outcome
-from clinical_trials_viz.planner import PlannerNotConfigured, PlannerTimeout, describe_model_error, is_outage
+from clinical_trials_viz.planner import (
+    CallBudgetExhausted,
+    PlannerNotConfigured,
+    PlannerTimeout,
+    describe_model_error,
+    is_outage,
+)
 
 log = logging.getLogger(__name__)
 
@@ -70,6 +76,14 @@ def classify(exc: BaseException, run_id: str) -> Failure:
         return _failure(Outcome.UPSTREAM_ERROR, ErrorCode.PLANNER_TIMEOUT, f"{exc}. Please try again.", True)
     if isinstance(exc, PlannerNotConfigured):
         return _failure(Outcome.INTERNAL_ERROR, ErrorCode.PLANNER_NOT_CONFIGURED, str(exc), retryable=False)
+    if isinstance(exc, CallBudgetExhausted):  # a model failed, and the fallback had no call left
+        log.warning("run %s: model call budget used up after a provider failure", run_id)
+        return _failure(
+            Outcome.UPSTREAM_ERROR,
+            ErrorCode.PLANNER_UNAVAILABLE,
+            "The planning model failed and this question's model calls are used up. Please try again.",
+            retryable=True,
+        )
     if isinstance(exc, UnexpectedModelBehavior | UsageLimitExceeded):
         log.warning("run %s: unusable plan: %s", run_id, exc)
         return _failure(

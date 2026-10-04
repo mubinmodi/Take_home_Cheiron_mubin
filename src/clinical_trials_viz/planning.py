@@ -11,7 +11,7 @@ from pydantic_ai import FallbackExceptionGroup, ModelAPIError, UnexpectedModelBe
 
 from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, MultiAnswerPlan, QueryPlan, UnsupportedPlan
 from clinical_trials_viz.models.request import QueryRequest
-from clinical_trials_viz.planner import Planner, PlannerResult, PlannerTimeout
+from clinical_trials_viz.planner import Planner, PlannerResult, PlannerTimeout, run_scope
 from clinical_trials_viz.validate import GateResult, check_plan, separate_requests
 
 MAX_MODEL_CALLS = 3
@@ -52,6 +52,17 @@ async def plan_question(
 ) -> Planning:
     """Plan a Question. Planner failures on a single question propagate (the caller classifies them);
     on a multi-part message they are kept per part in `part_errors`."""
+    with run_scope():
+        return await _plan(planner, request, previous, previous_request, countries)
+
+
+async def _plan(
+    planner: Planner,
+    request: QueryRequest,
+    previous: QueryPlan | None,
+    previous_request: QueryRequest | None,
+    countries: set[str],
+) -> Planning:
     if isinstance(previous, MultiAnswerPlan):
         # A Follow-up on a multi-part Run answers one of its parts (e.g. a Clarification for that part),
         # sent as that part's own request: plan it as a fresh question.

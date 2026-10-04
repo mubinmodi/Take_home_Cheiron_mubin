@@ -67,6 +67,37 @@ async def test_primary_model_failure_falls_back_and_says_so(make_client):
     assert any("primary planning model failed (primary-model: HTTP 503)" in w for w in body["warnings"])
 
 
+async def test_a_fallback_attempt_counts_as_a_model_call(make_client):
+    planner = LLMPlanner(failing("primary-model", 503), answering("fallback-model"))
+    body = await ask(make_client, planner, query="Keytruda trials per year")
+    assert body["outcome"] == "success"
+    assert body["model_calls"] == 2  # the failed primary attempt and the fallback's answer
+
+
+async def test_a_failing_primary_cannot_push_a_run_past_three_model_calls(make_client):
+    calls: list[str] = []
+
+    def counted(model: FunctionModel) -> FunctionModel:
+        inner = model.function
+        assert inner is not None
+
+        def call(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+            calls.append(model.model_name)
+            return inner(messages, info)  # type: ignore[return-value]
+
+        return FunctionModel(call, model_name=model.model_name)
+
+    planner = LLMPlanner(counted(failing("primary-model", 503)), counted(answering("fallback-model")))
+    three_parts = TWO_PARTS + ", and list pembrolizumab trials in Germany"
+    body = await ask(make_client, planner, query=three_parts)
+    assert len(calls) <= 3, calls
+    assert body["model_calls"] == len(calls)
+    # Once the primary has failed, later parts of the run go straight to the fallback.
+    assert calls.count("primary-model") == 1, calls
+    answered = [body["outcome"], *(a["outcome"] for a in body["additional_answers"])]
+    assert "success" in answered, answered
+
+
 async def test_every_model_failing_is_a_retryable_upstream_error(make_client):
     planner = LLMPlanner(failing("primary-model", 503), failing("fallback-model", None))
     body = await ask(make_client, planner, query="Keytruda trials per year")

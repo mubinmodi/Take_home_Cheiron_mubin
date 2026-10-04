@@ -8,13 +8,24 @@ import asyncio
 import json
 import logging
 import os
+from collections.abc import Iterator
+from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from anthropic import AsyncAnthropic
 from openai import AsyncOpenAI
-from pydantic_ai import Agent, ModelAPIError, ModelHTTPError, ModelSettings, ToolOutput, UsageLimits, UserError
+from pydantic_ai import (
+    Agent,
+    ModelAPIError,
+    ModelHTTPError,
+    ModelSettings,
+    ToolOutput,
+    UsageLimitExceeded,
+    UsageLimits,
+    UserError,
+)
 from pydantic_ai.messages import ModelMessage, ModelResponse
 from pydantic_ai.models import Model, ModelRequestParameters, infer_model
 from pydantic_ai.models.fallback import FallbackModel
@@ -180,6 +191,37 @@ def describe_model_error(exc: ModelAPIError) -> str:
 _model_failures: ContextVar[list[str] | None] = ContextVar("planner_model_failures", default=None)
 
 
+class CallBudgetExhausted(UsageLimitExceeded):
+    """A model attempt refused because this plan() call's budget is spent. Not a provider error, so
+    the FallbackModel does not move on to the next model."""
+
+
+@dataclass
+class _CallBudget:
+    """Provider attempts in one plan() call. pydantic-ai counts a request answered by the fallback
+    once; this counts every attempt, the failed ones included (harness-design: every attempt counts)."""
+
+    limit: int
+    used: int = 0
+
+
+_call_budget: ContextVar[_CallBudget | None] = ContextVar("planner_call_budget", default=None)
+
+# Models that failed with an outage earlier in this Run: later plan() calls (the other parts of a
+# multi-part Question) skip them without spending a call, as an open circuit breaker would.
+_failed_in_run: ContextVar[set[str] | None] = ContextVar("planner_failed_in_run", default=None)
+
+
+@contextmanager
+def run_scope() -> Iterator[None]:
+    """Share provider failures between the plan() calls of one Run."""
+    token = _failed_in_run.set(set())
+    try:
+        yield
+    finally:
+        _failed_in_run.reset(token)
+
+
 class _ReportingModel(WrapperModel):
     """One planner model behind its circuit breaker. Notes a provider failure (log and response
     warning), then re-raises it so the FallbackModel moves on to the next model; while the breaker is
@@ -195,6 +237,13 @@ class _ReportingModel(WrapperModel):
         model_settings: ModelSettings | None,
         model_request_parameters: ModelRequestParameters,
     ) -> ModelResponse:
+        if (budget := _call_budget.get()) is not None and budget.used >= budget.limit:
+            raise CallBudgetExhausted(f"The {budget.limit} model call(s) allowed for this question are used up.")
+        failed_in_run = _failed_in_run.get()
+        if failed_in_run is not None and self.model_name in failed_in_run:
+            skipped = ModelAPIError(self.model_name, "not called again, it failed earlier in this run")
+            self._note(skipped)
+            raise skipped
         try:
             self._breaker.check()
         except CircuitOpen as exc:
@@ -203,11 +252,15 @@ class _ReportingModel(WrapperModel):
             )
             self._note(skipped)
             raise skipped from exc
+        if budget is not None:
+            budget.used += 1
         try:
             response = await super().request(messages, model_settings, model_request_parameters)
         except ModelAPIError as exc:
             if is_outage(exc):
                 self._breaker.failure()
+                if failed_in_run is not None:
+                    failed_in_run.add(self.model_name)
             else:
                 self._breaker.success()  # it answered; the configuration is at fault
             self._note(exc)
@@ -328,7 +381,8 @@ class LLMPlanner:
         else:
             history, prompt = None, build_prompt(question, structured, previous_plan, context)
         failures: list[str] = []
-        token = _model_failures.set(failures)
+        budget = _CallBudget(max_calls)
+        token, budget_token = _model_failures.set(failures), _call_budget.set(budget)
         try:
             async with asyncio.timeout(self._deadline):  # None: no deadline
                 result = await self._agent.run(prompt, message_history=history, usage_limits=limits)
@@ -336,5 +390,6 @@ class LLMPlanner:
             raise PlannerTimeout(f"Planning took longer than {self._deadline:g} s") from exc
         finally:
             _model_failures.reset(token)
+            _call_budget.reset(budget_token)
         response_model = result.response.model_name if result.response else None
-        return PlannerResult(result.output, result.usage.requests, response_model, result.all_messages(), failures)
+        return PlannerResult(result.output, budget.used, response_model, result.all_messages(), failures)
