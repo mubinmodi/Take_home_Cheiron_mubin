@@ -37,7 +37,8 @@ async def test_trend_question_end_to_end(make_client):
         assert any("excluded" in a for a in body["assumptions"])
         assert any("'pembrolizumab'" in a for a in body["assumptions"])
 
-        chart = await client.get(body["chart_url"].replace("http://localhost:8000", ""))
+        assert body["chart_url"] == f"http://test/v1/runs/{body['run_id']}/chart.png"  # the address asked
+        chart = await client.get(body["chart_url"])
         assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")
         record = await client.get(f"/v1/runs/{body['run_id']}")
         assert record.json()["plan"]["group_by"] == "start_year"

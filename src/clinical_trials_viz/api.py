@@ -90,6 +90,7 @@ def create_app(
     async def query(
         request: QueryRequest,
         response: Response,
+        http_request: Request,
         idempotency_key: Annotated[
             str | None,
             Header(
@@ -119,7 +120,7 @@ def create_app(
                 response.headers["Idempotent-Replayed"] = "true"
                 return record.response
         try:
-            result = await pipeline().run(request)
+            result = await pipeline().run(request, base_url=str(http_request.base_url))
         except RunNotFound as exc:
             if idempotency_key:
                 keys.abandon(idempotency_key)

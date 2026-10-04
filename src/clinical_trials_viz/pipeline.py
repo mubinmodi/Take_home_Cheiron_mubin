@@ -68,6 +68,9 @@ log = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
 
+DEFAULT_BASE_URL = "http://localhost:8000"  # chart links when neither the settings nor the caller give one
+
+
 class RunNotFound(Exception):
     pass
 
@@ -75,8 +78,11 @@ class RunNotFound(Exception):
 class _Run:
     """Mutable state of one Run."""
 
-    def __init__(self, request: QueryRequest, api_requests_before: int, previous_request: QueryRequest | None):
+    def __init__(
+        self, request: QueryRequest, api_requests_before: int, previous_request: QueryRequest | None, base_url: str
+    ):
         self.request = request
+        self.base_url = base_url  # of chart_url links
         self.previous_request = previous_request  # for Follow-ups: carried over when the plan refines
         self.response = QueryResponse(run_id=new_run_id(), outcome=Outcome.INTERNAL_ERROR)
         self.model_calls = 0
@@ -104,11 +110,11 @@ def _fail(target: Answer, failure: Failure) -> None:
 
 
 class Pipeline:
-    def __init__(self, client: CtGovClient, planner: Planner, runs: RunStore, public_base_url: str):
+    def __init__(self, client: CtGovClient, planner: Planner, runs: RunStore, public_base_url: str | None = None):
         self.client = client
         self.planner = planner
         self.runs = runs
-        self.public_base_url = public_base_url.rstrip("/")
+        self.public_base_url = public_base_url
         self._countries: set[str] | None = None
 
     async def known_countries(self) -> set[str]:
@@ -119,7 +125,9 @@ class Pipeline:
                 return set()  # validate country names later instead of failing the Run
         return self._countries
 
-    async def run(self, request: QueryRequest) -> QueryResponse:
+    async def run(self, request: QueryRequest, *, base_url: str | None = None) -> QueryResponse:
+        """Answer one request. `base_url` is the address it arrived on, for chart links when the
+        settings give no public address."""
         previous: QueryPlan | None = None
         previous_request: QueryRequest | None = None
         if request.previous_run_id:
@@ -128,7 +136,8 @@ class Pipeline:
                 raise RunNotFound(request.previous_run_id)
             previous, previous_request = record.plan, record.request
 
-        run = _Run(request, self.client.requests_made, previous_request)
+        links = (self.public_base_url or base_url or DEFAULT_BASE_URL).rstrip("/")
+        run = _Run(request, self.client.requests_made, previous_request, links)
         with tracer.start_as_current_span("run") as span:
             span.set_attribute("run.id", run.response.run_id)
             try:
@@ -347,7 +356,7 @@ class Pipeline:
                 )
             else:
                 part = f"?part={index}" if index else ""
-                target.chart_url = f"{self.public_base_url}/v1/runs/{run.response.run_id}/chart.png{part}"
+                target.chart_url = f"{run.base_url}/v1/runs/{run.response.run_id}/chart.png{part}"
         _finish(target, Outcome.SUCCESS)
 
 

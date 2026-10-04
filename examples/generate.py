@@ -35,7 +35,7 @@ async def main() -> None:
     index = []
     async with (
         app.router.lifespan_context(app),
-        AsyncClient(transport=ASGITransport(app=app), base_url="http://local", timeout=180) as client,
+        AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost:8000", timeout=180) as client,
     ):
         for name, request in EXAMPLES:
             folder = HERE / name

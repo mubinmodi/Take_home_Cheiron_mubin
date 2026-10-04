@@ -16,7 +16,7 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     serve = sub.add_parser("serve", help="run the HTTP API")
     serve.add_argument("--host", default="127.0.0.1")
-    serve.add_argument("--port", type=int, default=8000)
+    serve.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))  # PORT: set by Cloud Run
     serve.add_argument("--reload", action="store_true")
     ask = sub.add_parser("ask", help="answer one question and print a summary (or --json for the full response)")
     ask.add_argument("query")
@@ -48,7 +48,7 @@ async def _ask(body: dict[str, Any], *, full_json: bool, save_chart: bool) -> No
     app = create_app()
     async with (
         app.router.lifespan_context(app),
-        AsyncClient(transport=ASGITransport(app=app), base_url="http://local", timeout=120) as client,
+        AsyncClient(transport=ASGITransport(app=app), base_url="http://localhost:8000", timeout=120) as client,
     ):
         response = await client.post("/v1/query", json=body)
         if response.status_code != 200:

@@ -71,7 +71,10 @@ def http() -> httpx.AsyncClient:
 
 @pytest.fixture
 def settings(tmp_path) -> Settings:
-    return Settings(runs_dir=tmp_path / "runs", otel_exporter="none", ctgov_requests_per_minute=1000)
+    # Not the developer's .env: tests must not depend on local settings.
+    return Settings(  # type: ignore[call-arg]
+        _env_file=None, runs_dir=tmp_path / "runs", otel_exporter="none", ctgov_requests_per_minute=1000
+    )
 
 
 @pytest.fixture
