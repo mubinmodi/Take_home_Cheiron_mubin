@@ -28,6 +28,7 @@ DATUM_INDEX = "_datum"  # position in spec.datums(), so an interactive page can 
 # The image renderer and the web page (web/index.html) use the same Vega-Lite release.
 VEGA_LITE_VERSION = "6.4"
 _SCHEMA = "https://vega.github.io/schema/vega-lite/v6.json"
+LEGEND_GREY = "#8a8a8a"  # size and width legend symbols: visible on light and dark backgrounds
 
 
 def _values(spec: VisualizationSpec) -> list[dict[str, Any]]:
@@ -142,7 +143,8 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
                 "height": 320,
                 "mark": "bar",
                 "encoding": {
-                    "x": _channel(enc.x, sort=meta.category_order, axis={"labelAngle": 0}),
+                    # Tilted: bucket names ("101–200", "Not reported") overlap when level at page widths.
+                    "x": _channel(enc.x, sort=meta.category_order, axis={"labelAngle": -30}),
                     "y": _channel(enc.y, stack="zero"),
                     "color": _channel(enc.color, sort=meta.series_order),
                     "order": {"field": enc.color.field, "sort": "ascending"},
@@ -225,7 +227,7 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
                       DATUM_INDEX: i})  # fmt: skip
     edges = [
         {"x": position[e["source"]][0], "y": position[e["source"]][1],
-         "x2": position[e["target"]][0], "y2": position[e["target"]][1], "trial_count": e["trial_count"],
+         "x2": position[e["target"]][0], "y2": position[e["target"]][1], "shared_trials": e["trial_count"],
          DATUM_INDEX: len(data.nodes) + j}
         for j, e in enumerate(data.edges)
     ]  # fmt: skip
@@ -248,8 +250,9 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
                     "y": {"field": "y", "type": "quantitative", "scale": y_scale, **axis_off},
                     "x2": {"field": "x2"},
                     "y2": {"field": "y2"},
-                    "strokeWidth": {"field": "trial_count", "type": "quantitative", "title": "Shared trials",
-                                    "scale": {"range": [0.5, 6]}},
+                    # Its own field: legends on the same field get merged (link widths drawn as huge circles).
+                    "strokeWidth": {"field": "shared_trials", "type": "quantitative", "title": "Shared trials",
+                                    "scale": {"range": [0.5, 6]}, "legend": {"symbolStrokeColor": LEGEND_GREY}},
                 },
             },
             {
@@ -259,7 +262,7 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
                     "x": {"field": "x", "type": "quantitative", "scale": x_scale, **axis_off},
                     "y": {"field": "y", "type": "quantitative", "scale": y_scale, **axis_off},
                     "size": {"field": "trial_count", "type": "quantitative", "title": "Trials",
-                             "scale": {"range": [40, 600]}},
+                             "scale": {"range": [40, 600]}, "legend": {"symbolFillColor": LEGEND_GREY}},
                     "color": {"field": "kind", "type": "nominal", "title": "Entity", "sort": kinds},
                 },
             },

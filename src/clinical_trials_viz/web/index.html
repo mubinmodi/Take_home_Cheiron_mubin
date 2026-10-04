@@ -10,8 +10,14 @@
     --accent: #185fa5; --accent-bg: #e6f1fb; --ok: #2f6b14; --ok-bg: #eaf3de;
     --warn: #854f0b; --warn-bg: #faeeda; --bad: #a32d2d; --bad-bg: #fcebeb; --radius: 8px;
   }
+  /* Dark: chosen with the theme switch, or "Auto" following the system setting. */
+  :root[data-theme="dark"] {
+    --bg: #1b1b1a; --panel: #242423; --text: #ecebe6; --muted: #aaa9a2; --border: #3a3a37;
+    --accent: #85b7eb; --accent-bg: #10263a; --ok: #97c459; --ok-bg: #1f2e12;
+    --warn: #fac775; --warn-bg: #3a2a10; --bad: #f09595; --bad-bg: #3a1717;
+  }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --bg: #1b1b1a; --panel: #242423; --text: #ecebe6; --muted: #aaa9a2; --border: #3a3a37;
       --accent: #85b7eb; --accent-bg: #10263a; --ok: #97c459; --ok-bg: #1f2e12;
       --warn: #fac775; --warn-bg: #3a2a10; --bad: #f09595; --bad-bg: #3a1717;
@@ -22,7 +28,11 @@
   body { margin: 0; background: var(--bg); color: var(--text);
          font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   header, main { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
-  header { padding-top: 24px; }
+  header { padding-top: 24px; position: relative; }
+  .theme { position: absolute; top: 24px; right: 16px; display: flex; gap: 2px; font-size: 13px; }
+  .theme button { padding: 3px 10px; }
+  .theme button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+  @media (max-width: 600px) { .theme { position: static; margin-bottom: 8px; } }
   h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
   h2 { font-size: 18px; font-weight: 600; margin: 0; }
   h3 { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
@@ -84,6 +94,7 @@
 </head>
 <body>
 <header>
+  <div class="theme" id="theme" role="group" aria-label="Colour theme"></div>
   <h1>Clinical Trials Explorer</h1>
   <p class="muted">Ask a question about trials registered on ClinicalTrials.gov. Every number is computed from the
     registry and cited: click a bar, point, node or link to see the trials behind it.</p>
@@ -429,9 +440,13 @@ async function drawVegaLite(v, spec) {
   vl.width = "container";  // fill the column; positions are in data units, so networks scale too
   vl.autosize = { type: "fit-x", contains: "padding" };
   const network = spec.type === "network_graph";
-  v.layoutEl.classList.toggle("stacked", network);  // networks need the full width; citations go below
+  // Networks and timelines (long trial names beside the bars) need the full width; citations go below.
+  v.layoutEl.classList.toggle("stacked", network || spec.type === "timeline");
   if (network) vl.config = { ...(vl.config || {}), legend: { orient: "bottom", direction: "horizontal" } };
-  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const dark = isDark();
+  vl.background = "transparent";  // the page's panel colour shows through, in both themes
+  // Text marks (network labels) default to black, which the dark theme does not change.
+  if (dark) vl.config = { ...(vl.config || {}), text: { color: "#e6e6e6" } };
   const result = await vegaEmbed(v.chartEl, vl, { actions: false, theme: dark ? "dark" : undefined, renderer: "svg" });
   result.view.addEventListener("click", (_event, item) => {
     const index = item && item.datum && item.datum._datum;
@@ -554,6 +569,27 @@ $("refine").addEventListener("submit", (e) => {
 for (const text of FOLLOW_UPS) {
   $("followup-examples").append(el("button", { type: "button", class: "chip", onclick: () => askFollowUp(text) }, text));
 }
+// Colour theme: Auto follows the system setting; Light and Dark override it. Charts are redrawn on change.
+const THEME_STORAGE = "clinical-trials-theme";
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+function chosenTheme() {
+  try { return localStorage.getItem(THEME_STORAGE) || "auto"; } catch (e) { return "auto"; }
+}
+function isDark() {
+  const theme = document.documentElement.dataset.theme || "auto";
+  return theme === "dark" || (theme === "auto" && systemDark.matches);
+}
+async function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem(THEME_STORAGE, theme); } catch (e) { /* this page only */ }
+  for (const b of $("theme").children) b.setAttribute("aria-pressed", String(b.dataset.value === theme));
+  for (const turn of thread) if (turn.response) await renderAnswer(turn);
+}
+for (const [value, label] of [["auto", "Auto"], ["light", "Light"], ["dark", "Dark"]]) {
+  $("theme").append(el("button", { type: "button", "data-value": value, onclick: () => applyTheme(value) }, label));
+}
+systemDark.addEventListener("change", () => { if (chosenTheme() === "auto") applyTheme("auto"); });
+applyTheme(chosenTheme());
 for (const q of EXAMPLES) {
   $("examples").append(el("button", { type: "button", class: "chip", onclick: () => { $("query").value = q; ask(requestBody()); } }, q));
 }

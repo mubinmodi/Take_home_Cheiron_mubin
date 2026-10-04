@@ -251,7 +251,9 @@ def create_app(
 
     @app.get("/", include_in_schema=False)
     async def page() -> FileResponse:
-        return FileResponse(WEB_PAGE, media_type="text/html")
+        # Revalidate on every load (a 304 when unchanged): otherwise browsers keep showing the previous
+        # page for a while after a release.
+        return FileResponse(WEB_PAGE, media_type="text/html", headers={"Cache-Control": "no-cache"})
 
     @app.get("/v1/schema")
     async def schema() -> dict[str, Any]:
