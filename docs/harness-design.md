@@ -155,7 +155,7 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 | Model routing | Skip | There is only one model step |
 | Multi-agent, MCP, semantic caching | Skip | No benefit within 24 hours; list under future work (MCP was considered and dropped: the need was model swapping, met by pydantic-ai configuration) |
 | Graph database (Neo4j / Cypher) | Skip | Networks are small and built per question in Python from the live API; a graph store would add a second data copy and generated queries |
-| LangGraph | Optional | Plain Python is enough; each step stays an ordinary testable function |
+| LangGraph | Optional (not used) | Plain Python is enough; each step stays an ordinary testable function |
 
 ## 7. Order to work in
 

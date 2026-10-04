@@ -1,6 +1,7 @@
 # Harness System Design — Research Round 2
 
 **Date:** 2026-10-03
+**Note:** research done before the design was settled. It weighs options and names tools that were not used; what was built is in the README and `docs/harness-design.md`.
 **Question:** What do published engineering guides, research, and open-source systems suggest for designing a robust harness for the ClinicalTrials.gov query-to-visualization take-home?
 **Builds on:** [query-to-visualization-workflow-design.md](query-to-visualization-workflow-design.md), which already covers NL4DV, LIDA, Data Formulator/Flint, Draco, Vega-Lite, Snowflake Cortex Analyst, Databricks Genie, Uber QueryGPT, Pinterest, dbt MetricFlow, and OpenAI Structured Outputs. This note adds only sources that the earlier note did not cover.
 

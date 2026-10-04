@@ -9,6 +9,8 @@ Third-party documentation reports that ClinicalTrials.gov allows about **50 requ
 
 ## Infrastructure
 
+The plan as first written (2026-10-03), before AWS was chosen. What was actually built is in "AWS deployment (2026-10-04)" below: ECS Express Mode, ElastiCache Serverless (Valkey), RDS for PostgreSQL and Secrets Manager. None of the other products named in this table (Cloud Run, Fly.io, Render, Upstash, Neon, Supabase, Cloud SQL, S3, R2, arq, RQ) was used.
+
 | Need | Recommendation | Why | Required? |
 |---|---|---|---|
 | API container | Cloud Run, Fly.io or Render (Docker) | Scales to zero, HTTPS included | Yes |
@@ -25,13 +27,15 @@ Not needed: vector database, run checkpointer, Kubernetes, separate API gateway.
 
 ## Python packages
 
-- **Core:** `fastapi`, `uvicorn`, `pydantic` v2, `pydantic-settings`, `httpx` (async), `tenacity`.
-- **Model layer:** `pydantic-ai-slim[openai,anthropic,google]` `FallbackModel` (OpenAI primary, Anthropic fallback by default, Gemini available; chosen by configuration), tool-based output mode.
-- **Chart and analysis:** our own visualization schema (pydantic models exported as JSON Schema); `vl-convert-python` to render Vega-Lite to PNG/SVG; plain Python for counting (`pandas` optional).
-- **Storage and cache:** `redis` (asyncio), `sqlalchemy` 2.x, `asyncpg`, `alembic`, `boto3`/`aioboto3`.
-- **Observability:** `opentelemetry-sdk` with FastAPI and httpx instrumentation (pydantic-ai emits OpenTelemetry spans too); `structlog`.
-- **Optional:** `langgraph`.
-- **Dev and test:** `uv`, `ruff`, `pyright` or `mypy`, `pytest`, `pytest-asyncio`, `respx` (replay saved API responses), `hypothesis` (property tests: input order and duplicate sites don't change counts).
+What the project uses (`pyproject.toml`):
+- **Core:** `fastapi`, `uvicorn`, `pydantic` v2, `pydantic-settings`, `httpx` (async).
+- **Model layer:** `pydantic-ai-slim[openai,anthropic,google]` with `FallbackModel` (OpenAI primary, Anthropic fallback; Gemini wired in but never run), tool-based output mode.
+- **Charts:** our own visualization schema (pydantic models exported as JSON Schema); `vl-convert-python` renders Vega-Lite to PNG/SVG; counting is plain Python.
+- **Storage and cache (hosted):** `redis` (asyncio), `sqlalchemy` 2.x with `asyncpg`.
+- **Observability:** `opentelemetry-sdk` with the FastAPI and httpx instrumentation and the OTLP HTTP exporter; pydantic-ai emits model spans. Logs use the standard `logging` module.
+- **Dev and test:** `uv`, `ruff`, `pyright`, `pytest`, `pytest-asyncio`, `respx` (replays saved API responses), `hypothesis` (property tests), `fakeredis` and `aiosqlite` (the hosted mode without servers).
+
+Planned at first but not used: `tenacity` (the client's own retry), `alembic` (one table so far), `boto3` (no object storage yet), `structlog`, `pandas`, `langgraph`, `networkx`, `mypy`.
 
 ## Design changes that come with hosting
 

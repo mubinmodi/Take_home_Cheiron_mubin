@@ -1,6 +1,6 @@
 # Query-to-Visualization Workflow Design for ClinicalTrials.gov
 
-> **Research proposal, not fixed scope.** The user wants to explore the complete take-home and useful extensions. Assess these recommendations against [the source assignment](../take-home-assignment.md), [rubric](../take-home-rubric.md), and [exploration agenda](../take-home-exploration.md). The four-workflow recommendation below is a baseline; networks and the other named chart forms remain explicit exploration priorities.
+> **Research done before the design was settled, not a record of what was built.** It weighs options and names tools that were not used; what was built is in the README and `docs/harness-design.md`. The four-workflow recommendation below is a baseline; networks and the other named chart forms remain explicit exploration priorities.
 
 **Research date:** 2026-10-03  
 **Scope:** A backend that turns a natural-language clinical-trial question into a structured, frontend-renderable visualization backed by the ClinicalTrials.gov API.  

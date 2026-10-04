@@ -7,18 +7,59 @@ POST /v1/query  {"query": "How has the number of trials for this drug changed ov
 → time_series of trials per start year · 2,620 cited trials · verified · chart at /v1/runs/{id}/chart.png
 ```
 
-Supported answers:
-- trends: `time_series`
-- distributions and geography: `bar_chart`
-- comparisons: `grouped_bar_chart`, with an overlap group
-- single counts: `single_value`
-- trial lists: `table`
-- trial timelines: `timeline`
-- enrollment vs duration: `scatter_plot`
-- enrollment distributions: `histogram`
-- sponsor ↔ drug networks and same-arm drug ↔ drug combination networks: `network_graph`
+## The task, as I understood it
 
-The service asks a multiple-choice clarification when a question is genuinely ambiguous, and refuses questions the registry cannot answer.
+A user asks a question about clinical trials in plain English ("How has the number of Keytruda trials changed since 2015?"), optionally with structured fields such as `drug_name` or `trial_phase`. The service must answer with a **visualization specification** that a frontend can draw without further work: the chart type, title, encoding, data and metadata. Every number must come from the live ClinicalTrials.gov API, and the bonus asks that each data point cite the trials behind it.
+
+What makes it hard:
+- **Questions are ambiguous.** "Merck" is two companies, "PD-1 inhibitors" is a class rather than a drug, and a structured field can contradict the question.
+- **Counting needs definitions.** A trial with two phases, a trial with sites in ten countries, a trial that only *mentions* a drug: the answer depends on rules someone has to choose and state.
+- **The registry is messy.** Start dates are often estimated, one drug appears under hundreds of spellings, and an arm can list alternatives ("cisplatin or carboplatin") that look like combinations.
+- **A language model must not invent numbers.** Any count, trial ID or citation it produced would be unverifiable.
+
+## My approach
+
+**The model plans; code does everything else.** One model call turns the question into a typed **Query Plan**: the filters, an operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`) and what to group by. From there plain, tested code takes over:
+- it fetches **every** matching trial from the live API, and never samples;
+- it counts distinct trials under documented rules;
+- it chooses the chart type from the plan;
+- it builds the specification with citations.
+
+A **verifier** then re-derives every count and cited value from the trial records before any answer is returned. When there is no sensible default the service asks a multiple-choice question built from the data; otherwise it states its default in the answer's assumptions. Every run ends in one explicit outcome, such as `success`, `clarification_required` or `no_data`, and the model never sees trial records.
+
+**What I built:**
+- nine answer types:
+  - trends: `time_series`
+  - distributions and geography: `bar_chart`
+  - comparisons with an overlap group: `grouped_bar_chart`
+  - single counts: `single_value`
+  - trial lists: `table`
+  - trial timelines: `timeline`
+  - enrollment against duration: `scatter_plot`
+  - enrollment distributions: `histogram`
+  - sponsor ↔ drug networks and same-arm drug ↔ drug combination networks: `network_graph`
+- deep citations: every data point lists its trials, and each trial carries the source field values that placed it there;
+- clarifications for ambiguous sponsors, drug classes, missing references and fields that contradict the question;
+- follow-ups and corrections ("only phase 3") through `previous_run_id`, and questions that ask several things at once;
+- PNG/SVG images, and a web page where clicking any bar, point, node or link shows its trials;
+- a hosted version on AWS: a [live demo](https://cl-f44fdf3287b047ef971affaa8d767246.ecs.us-east-2.on.aws), no key needed.
+
+**What I chose not to build:**
+- **No agent loop:** a fixed workflow keeps cost bounded (at most 3 model calls) and every step testable.
+- **No RAG or vector database:** the data is structured and queried live.
+- **No local copy of the registry:** answers reflect today's data.
+- **Not needed for this task:** conversation memory beyond the previous answer, an MCP server, a graph database.
+- **Not in the data, or left for later (§8):** investigator and site networks, maps, and efficacy questions, which the registry cannot answer.
+
+**Where to read more:**
+- §1: running it
+- §2: the system design
+- §3–§4: the request and response schemas
+- §5: example runs
+- §6: key decisions and their tradeoffs
+- §7: failure handling
+- §8: what I would improve with more time
+- §9: how correctness was checked
 
 ---
 
@@ -375,7 +416,7 @@ Example 02, "Which countries have the most recruiting trials for melanoma?":
 | **Clarify only without a sensible default** | "Year" = start year and "sponsor" = lead sponsor are reported as assumptions instead of asked. | Users must read assumptions to see defaults. |
 | **Follow-ups via `previous_run_id`** | No conversation memory: the earlier plan is loaded from the run record, and the response says whether it was refined or replaced. A refinement also keeps the earlier request's structured fields (such as a Clarification answer), reported as an assumption; a new topic starts clean. | One step back only; the client holds the conversation. |
 | **Hosted mode by configuration** | One codebase: local files and in-process state by default; Redis, Postgres and API keys are switched on by settings, and `DEPLOYMENT=hosted` refuses to start without them. | Two implementations of each store to keep in step (both tested). Breakers and caches of process-local state stay per instance. |
-| **pydantic-ai `FallbackModel`, tool-based output** | Swap OpenAI, Anthropic or Gemini by configuration. Tool output avoids a known issue with native structured output inside fallbacks. | Fallback only on provider errors, so a weak plan from the primary is repaired, not re-asked elsewhere. |
+| **pydantic-ai `FallbackModel`, tool-based output** | Swap models by configuration: OpenAI and Anthropic were run; Gemini is wired in but untested. Tool output avoids a known issue with native structured output inside fallbacks. | Fallback only on provider errors, so a weak plan from the primary is repaired, not re-asked elsewhere. |
 
 ---
 
@@ -452,7 +493,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 
 ## 10. Tools used, and what was designed vs generated
 
-**Tools:** Claude Code as the coding assistant; pydantic-ai with OpenAI, Anthropic and Gemini models for the planner; Vega-Lite (`vl-convert`) for charts; uv, ruff, pyright, pytest; Docker and the AWS CLI for the hosted version.
+**Tools:** Claude Code as the coding assistant; pydantic-ai with an OpenAI model (primary) and an Anthropic model (fallback) for the planner (Gemini can be configured but was never run); Vega-Lite (`vl-convert`) for charts; uv, ruff, pyright, pytest; Docker and the AWS CLI for the hosted version.
 
 **How we worked:** I directed the work. I chose what to research and set the architecture; the assistant researched what I asked and laid out the trade-offs for each open question. I made the decisions, and they are recorded in [`docs/harness-design.md`](docs/harness-design.md) and [`docs/hosted-deployment.md`](docs/hosted-deployment.md). The assistant then wrote the code, tests and docs to that architecture.
 
@@ -462,7 +503,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 - **Data:** the live API only, with no local copy, and citations as trial IDs on every data point.
 - **Charts:** our own spec is the contract. Counting stays in our code and Vega-Lite only draws, so no library does the analysis. Images by default, plus an interactive page.
 - **Networks:** modelled on a gene-network viewer I used as a reference; drugs, sponsors and conditions, because the source has no gene data.
-- **Models:** OpenAI first, Anthropic as fallback, Gemini optional, all changed by configuration; the allowed OpenAI model list.
+- **Models:** OpenAI first, Anthropic as fallback, Gemini as an untested option, all changed by configuration; the allowed OpenAI model list.
 - **Left out:** MCP, Neo4j, CI and full run bundles.
 - **Hosting:** OpenTelemetry without a vendor; a working local version before any hosting; AWS for the hosted version.
 - **Web page and failures:** follow-ups added below as a thread; light and dark themes; explicit handling of model and chart failures.
