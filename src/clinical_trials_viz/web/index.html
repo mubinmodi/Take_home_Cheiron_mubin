@@ -229,17 +229,24 @@ function requestBody() {
   return body;
 }
 
+// The hosted service needs an API key (X-API-Key); it is kept in this browser only.
+const KEY_STORAGE = "clinical-trials-api-key";
+function savedKey() {
+  try { return localStorage.getItem(KEY_STORAGE) || ""; } catch (e) { return ""; }
+}
+function saveKey(key) {
+  try { localStorage.setItem(KEY_STORAGE, key); } catch (e) { /* private window: asked again next time */ }
+}
+
 async function ask(body, kind = "new") {
   lastBody = body;
   lastKind = kind;
   $("submit").disabled = true;
   $("loading").classList.add("on");
   try {
-    const response = await fetch("/v1/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() },
-      body: JSON.stringify(body),
-    });
+    const headers = { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() };
+    if (savedKey()) headers["X-API-Key"] = savedKey();
+    const response = await fetch("/v1/query", { method: "POST", headers, body: JSON.stringify(body) });
     const data = await response.json();
     if (!response.ok) {
       showError(data.detail);
@@ -267,9 +274,20 @@ function showError(detail) {
   $("message").replaceChildren(d.message || "", el("br"),
     el("span", { class: "muted" }, `${lastKind === "new" ? "Question" : "Follow-up"}: ${lastBody.query}`));
   for (const id of ["clarification", "title", "subtitle", "chart"]) $(id).replaceChildren();
+  if (d.code === "unauthorized") $("clarification").append(keyForm());
   for (const id of ["warnings", "layout", "refine", "details"]) $(id).hidden = true;
   $("more-answers").replaceChildren();
   renderTrail(-1);  // every earlier answer stays one click away
+}
+
+function keyForm() {
+  const input = el("input", { type: "password", placeholder: "API key", "aria-label": "API key", autocomplete: "off" });
+  return el("form", { class: "row", onsubmit: (e) => {
+    e.preventDefault();
+    if (!input.value.trim()) return;
+    saveKey(input.value.trim());
+    ask(lastBody, lastKind);
+  } }, input, el("button", { type: "submit", class: "primary" }, "Save key and ask"));
 }
 
 function retryButton() {

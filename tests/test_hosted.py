@@ -16,7 +16,7 @@ from clinical_trials_viz.idempotency import KeyInProgress, KeyReused
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.runs import async_database_url, runs_table
-from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisRateLimiter
+from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisRateLimiter, RedisUserLimiter
 from tests.conftest import ScriptedPlanner, ask
 
 TREND = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"]), group_by=Dimension.START_YEAR)
@@ -187,3 +187,61 @@ async def test_api_requests_are_counted_once_by_the_run_that_made_them(make_clie
     counts = [reply.json()["source"]["api_requests"] for reply in replies]
     # A shared counter would credit each run with the other's requests too, so the sum would exceed the calls.
     assert all(counts) and sum(counts) == len(ctgov.calls)
+
+
+# --- API keys and the per-user limit ----------------------------------------------------------------
+
+ALICE, BOB = "a" * 20, "b" * 20
+QUESTION = {"query": "Keytruda trials per year"}
+
+
+async def test_with_api_keys_a_question_needs_a_valid_key(make_client, settings, tmp_path, caplog):
+    caplog.set_level("DEBUG")
+    settings.api_keys = SecretStr(f"alice:{ALICE},bob:{BOB}")
+    settings.database_url = SecretStr(f"sqlite+aiosqlite:///{tmp_path}/runs.db")
+    async for client in make_client(ScriptedPlanner(TREND)):
+        for headers in ({}, {"X-API-Key": "not-a-key"}):
+            refused = await client.post("/v1/query", json=QUESTION, headers=headers)
+            assert refused.status_code == 401
+            assert refused.json()["detail"]["code"] == "unauthorized" and not refused.json()["detail"]["retryable"]
+        answered = await client.post("/v1/query", json=QUESTION, headers={"X-API-Key": ALICE})
+        assert answered.status_code == 200
+        assert (await client.get(f"/v1/runs/{answered.json()['run_id']}")).status_code == 200  # reads stay open
+
+    engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path}/runs.db")
+    async with engine.connect() as conn:
+        assert (await conn.execute(select(runs_table.c.user_name))).scalars().all() == ["alice"]
+    await engine.dispose()
+    assert ALICE not in caplog.text and "not-a-key" not in caplog.text
+
+
+async def test_each_user_has_an_hourly_question_limit(make_client, settings):
+    settings.api_keys = SecretStr(f"alice:{ALICE},bob:{BOB}")
+    settings.user_queries_per_hour = 2
+    async for client in make_client(ScriptedPlanner(TREND, TREND, TREND)):
+        alice = {"X-API-Key": ALICE}
+        assert [(await client.post("/v1/query", json=QUESTION, headers=alice)).status_code for _ in "12"] == [200, 200]
+        over = await client.post("/v1/query", json=QUESTION, headers=alice)
+        assert over.status_code == 429
+        assert over.json()["detail"]["code"] == "rate_limited" and over.json()["detail"]["retryable"]
+        assert 0 < int(over.headers["Retry-After"]) <= 3600
+        assert (await client.post("/v1/query", json=QUESTION, headers={"X-API-Key": BOB})).status_code == 200
+
+
+async def test_a_replay_does_not_count_against_the_limit(make_client, settings):
+    settings.user_queries_per_hour = 1
+    async for client in make_client(ScriptedPlanner(TREND)):
+        once = {"Idempotency-Key": "once"}
+        first = await client.post("/v1/query", json=QUESTION, headers=once)
+        again = await client.post("/v1/query", json=QUESTION, headers=once)
+        assert first.status_code == again.status_code == 200 and again.headers["Idempotent-Replayed"] == "true"
+        assert (await client.post("/v1/query", json=QUESTION)).status_code == 429  # a new question is over
+
+
+async def test_user_limits_hold_across_instances():
+    redis = fakeredis.FakeAsyncRedis()
+    one, other = RedisUserLimiter(redis, per_hour=2), RedisUserLimiter(redis, per_hour=2)
+    assert [await one.spend("alice"), await other.spend("alice")] == [None, None]
+    wait = await one.spend("alice")  # the third question this hour, whichever instance takes it
+    assert wait is not None and 0 < wait <= 3600
+    assert await other.spend("bob") is None

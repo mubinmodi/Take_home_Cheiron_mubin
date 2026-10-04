@@ -2,10 +2,11 @@
 
 - one ClinicalTrials.gov request budget, because every instance shares the registry's per-IP limit;
 - the page cache, so a page one instance fetched serves the others;
-- Idempotency-Keys, so a retry that reaches another instance still replays.
+- Idempotency-Keys, so a retry that reaches another instance still replays;
+- each user's questions this hour.
 
-A Redis failure degrades instead of failing questions: the budget falls back to this instance's own
-bucket, the cache misses, and idempotency is skipped. Each logs once when Redis fails and once when
+A Redis failure degrades instead of failing questions: the budget and the user limits fall back to this
+instance's own counts, the cache misses, and idempotency is skipped. Each logs once when Redis fails and once when
 it recovers.
 """
 
@@ -20,6 +21,7 @@ from typing import Any
 from redis.asyncio import Redis
 from redis.exceptions import RedisError
 
+from clinical_trials_viz.access import MemoryUserLimiter, hour_window
 from clinical_trials_viz.ctgov.client import RateLimiter
 from clinical_trials_viz.idempotency import KEY_TTL, KeyInProgress, KeyReused, fingerprint
 from clinical_trials_viz.models.request import QueryRequest
@@ -183,3 +185,25 @@ class RedisIdempotencyStore:
             await self._redis.delete(self._key(key))
         except RedisError as exc:
             self._health.failed(exc)
+
+
+class RedisUserLimiter:
+    """Questions per user per hour, counted across every instance."""
+
+    def __init__(self, redis: Redis, per_hour: int):
+        self._redis = redis
+        self._per_hour = per_hour
+        self._fallback = MemoryUserLimiter(per_hour)
+        self._health = _Health("per-user limits")
+
+    async def spend(self, user: str) -> float | None:
+        hour, left = hour_window(time.time())
+        key = f"questions:{user}:{hour}"
+        try:
+            await self._redis.set(key, 0, ex=3600, nx=True)  # the hour's counter, created with its expiry
+            count = await self._redis.incr(key)
+        except RedisError as exc:
+            self._health.failed(exc)
+            return await self._fallback.spend(user)
+        self._health.ok()
+        return left if count > self._per_hour else None

@@ -13,6 +13,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
 from redis.asyncio import Redis
 
+from clinical_trials_viz.access import MemoryUserLimiter, UserLimiter, identify
 from clinical_trials_viz.config import Settings, get_settings
 from clinical_trials_viz.ctgov.client import CtGovClient, MemoryPageCache, RateLimiter
 from clinical_trials_viz.idempotency import MAX_KEY_LENGTH, FileIdempotencyStore, KeyInProgress, KeyReused, KeyStore
@@ -23,16 +24,18 @@ from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
 from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
 from clinical_trials_viz.runs import RunRecord, StoreUnavailable, run_store
-from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisPageCache, RedisRateLimiter
+from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisPageCache, RedisRateLimiter, RedisUserLimiter
 from clinical_trials_viz.telemetry import configure_logging, setup_tracing
 
 WEB_PAGE = Path(__file__).parent / "web" / "index.html"
 log = logging.getLogger(__name__)
 
 
-def http_error(status: int, code: str, message: str, retryable: bool = False) -> HTTPException:
+def http_error(
+    status: int, code: str, message: str, retryable: bool = False, headers: dict[str, str] | None = None
+) -> HTTPException:
     """HTTP errors share one JSON shape: {"detail": {"code", "message", "retryable"}}."""
-    return HTTPException(status, {"code": code, "message": message, "retryable": retryable})
+    return HTTPException(status, {"code": code, "message": message, "retryable": retryable}, headers)
 
 
 def create_app(
@@ -43,6 +46,7 @@ def create_app(
 ) -> FastAPI:
     """Build the app. Tests pass a fake planner, a mocked HTTP client and an in-memory Redis."""
     settings = settings or get_settings()
+    users = settings.api_users()  # API key -> user name; empty: no key needed
     configure_logging(settings.log_level)
     setup_tracing(settings.otel_exporter)
 
@@ -76,6 +80,10 @@ def create_app(
         )
         app.state.idempotency = (
             RedisIdempotencyStore(shared) if shared else FileIdempotencyStore(settings.runs_dir / "idempotency")
+        )
+        per_hour = settings.user_queries_per_hour
+        app.state.user_limiter = (
+            (RedisUserLimiter(shared, per_hour) if shared else MemoryUserLimiter(per_hour)) if per_hour else None
         )
         yield
         await runs.close()
@@ -127,7 +135,14 @@ def create_app(
                 "without running again; the same key with a different request is rejected (422).",
             ),
         ] = None,
+        api_key: Annotated[
+            str | None,
+            Header(alias="X-API-Key", description="Required when the service is configured with API keys (hosted)."),
+        ] = None,
     ) -> QueryResponse:
+        user = identify(api_key, users)
+        if users and user is None:
+            raise http_error(401, "unauthorized", "Send a valid API key in the X-API-Key header.")
         keys: KeyStore = app.state.idempotency
         if idempotency_key:
             try:
@@ -145,9 +160,22 @@ def create_app(
                 ) from exc
             if replay is not None and (record := await pipeline().runs.load(replay)) is not None:
                 response.headers["Idempotent-Replayed"] = "true"
-                return record.response
+                return record.response  # a replay is free: it does not count against the user's limit
+        limiter: UserLimiter | None = app.state.user_limiter
+        if limiter is not None and (wait := await limiter.spend(user or "anonymous")) is not None:
+            if idempotency_key:
+                await keys.abandon(idempotency_key)
+            minutes = max(1, round(wait / 60))
+            raise http_error(
+                429,
+                "rate_limited",
+                f"You have asked {settings.user_queries_per_hour} questions this hour; try again in about "
+                f"{minutes} minute{'s' if minutes != 1 else ''}.",
+                True,
+                {"Retry-After": str(int(wait) + 1)},
+            )
         try:
-            result = await pipeline().run(request, base_url=str(http_request.base_url))
+            result = await pipeline().run(request, base_url=str(http_request.base_url), user=user)
         except RunNotFound as exc:
             if idempotency_key:
                 await keys.abandon(idempotency_key)
