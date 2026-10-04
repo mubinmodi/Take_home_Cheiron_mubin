@@ -110,6 +110,7 @@ question ─► PLAN (the only model step) ─► GATE ─► RETRIEVE ─► CO
   - chooses the chart type deterministically from the plan
   - builds the spec and evidence
   - verifies
+- **When the answer is a chart** (the assignment asks both to judge whether a visualization fits and for a visualization as the answer). Every successful analytical answer is a visualization specification; a single number is a `single_value` and a list of trials a `table`, so a renderer handles every answer the same way. Code picks the type from the plan: counts over start years → `time_series`; a breakdown → `bar_chart`; a comparison or a crossed breakdown → `grouped_bar_chart`; enrollment distribution → `histogram`; trial by trial → `table`, `timeline` or `scatter_plot`; relationships → `network_graph`. Outcomes that are not answers (clarification, unsupported, no data, scope required, errors) carry no visualization; they say why and what to do next.
 - **Bounded:** at most 3 model calls per run (plan, one repair with the validator's errors, one provider fallback on transport errors only). Every run ends in exactly one **outcome**: `success`, `no_data`, `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error`, `internal_error`.
 - **Verifier**, a gate before every successful response. It checks that:
   - the chart answers the plan
@@ -128,6 +129,7 @@ Code map (`src/clinical_trials_viz/`):
 | Module | Role |
 |---|---|
 | `pipeline.py` | The fixed workflow and outcomes |
+| `planning.py` | Split a multi-part question; plan each part; gate and one repair |
 | `planner.py` | The model step |
 | `validate.py` | Merge structured fields; semantic gate |
 | `cohort.py` | Compile filters, retrieve, drug match check |
@@ -138,7 +140,13 @@ Code map (`src/clinical_trials_viz/`):
 | `clarify.py` | Clarification options built from data |
 | `catalog.py` | The versioned capability catalog: dimensions, enums, counting constants |
 | `ctgov/` | API client and the typed trial record |
-| `api.py`, `cli.py` | HTTP API and command line |
+| `failures.py` | Any exception → one outcome and a structured error |
+| `runs.py`, `idempotency.py` | Run records (files, or Postgres when hosted) and Idempotency-Keys |
+| `shared_state.py`, `access.py`, `breaker.py` | Hosted mode: Redis-backed shared state, API keys and limits, circuit breakers |
+| `config.py`, `telemetry.py` | Settings; logging and OpenTelemetry |
+| `api.py`, `cli.py`, `web/index.html` | HTTP API, command line, web page |
+
+**Extending.** Adding a dimension (say, primary purpose) touches three places: an entry in `catalog.py` (label, the description the planner prompt shows, the source field to cite, and whether it is multi-valued, ordered or long-tailed); one case in `ctgov/trial.py` that reads the value and its citation from a trial record (plus the API field in `TRIAL_FIELDS`); and a fixture test with an eval question. Counting (`analyze.py`), chart choice and spec building (`spec_builder.py`), the verifier and the plan gate all work from the catalog, so they need no change. A new chart type touches `spec_builder.py` (its data shape), `render.py` (its Vega-Lite) and `verify.py` (its checks).
 
 Design notes: [`docs/harness-design.md`](docs/harness-design.md). API findings: [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md). Glossary: [`CONTEXT.md`](CONTEXT.md).
 
@@ -161,7 +169,7 @@ Only `query` is required. Every other field pins a filter, so the model does not
 | `nct_id` | string or list | `NCT` + 8 digits; ≤ 20 | Specific trial(s) |
 | `previous_run_id` | string | must exist (404 otherwise) | Follow-up, correction, or clarification answer |
 
-If a structured field and the question name different values for the same filter, the service asks rather than picking one.
+If a structured field and the question name different values for the same filter, the planner asks which one you mean (a multiple-choice clarification listing both; eval case `clarify-03`). If it does not flag the conflict, the structured field is used and the answer says so in its assumptions ("Used your drug_name field (pembrolizumab); the question says nivolumab.").
 
 **Idempotent retries.** Send an optional `Idempotency-Key` header (up to 255 characters) to make retries safe:
 
@@ -262,6 +270,37 @@ The images are produced by translating this spec, and only this spec, into Vega-
 
 Regenerate with `uv run python -m examples.generate`.
 
+### The assignment's nine example questions
+
+All nine are supported. The eval (`evals/questions.json`) checks the planner on each family with different drugs, conditions and phrasings, none of them copied into the prompt.
+
+| # | Example | Answer | What defines it | Eval cases |
+|---|---|---|---|---|
+| Q-01 | Trials for a drug per year since 2015 | `time_series` | trial start year (estimated dates flagged); years without trials shown as zero; the current year marked incomplete; the drug must be an intervention, not just mentioned | trend-01, trend-02, trend-05 |
+| Q-02 | Trials started each year for a condition | `time_series` | start date; the API's condition search is trusted (it includes basket trials) | trend-03, trend-04 |
+| Q-03 | A condition's trials across phases | `bar_chart` | a multi-phase trial counts under each of its phases (disclosed); "Not applicable" and missing phases keep their own bars | dist-01, dist-02 |
+| Q-04 | Most common intervention types | `bar_chart` | distinct trials per type: a trial with two drugs counts once for "Drug" | dist-03, dist-04 |
+| Q-05 | Phases for drug A vs drug B | `grouped_bar_chart` | groups "A only", "B only" and "Both", so no trial is counted twice | cmp-01, cmp-02; example 03 |
+| Q-06 | Sponsor categories across two conditions | `grouped_bar_chart` | the lead sponsor's class (industry, NIH, other…); conditions as the sides, with an overlap group | cmp-03, cmp-04 |
+| Q-07 | Countries with the most recruiting trials for a condition | `bar_chart` | "recruiting" is the trial's overall status; a trial counts once per country with a current site; top 10 + Other | geo-01, geo-02, series-02; example 02 |
+| Q-08 | Sponsor ↔ drug network for a condition | `network_graph` (two columns) | lead sponsor; drug identity from MeSH terms of drug interventions; an edge = trials sharing both, at least 2; top 15 sponsors and 25 drugs | net-01, net-03; example 04 |
+| Q-09 | Drugs that co-occur in combination studies | `network_graph` (circle) | a combination means the same arm, not just the same trial; alternatives within an arm ("A or B") are excluded using the arm text | net-02 |
+
+Also supported: the enrollment `histogram` (actual vs estimated), enrollment vs duration `scatter_plot`, trial `timeline` and `table`, single counts, crossed charts ("phases per year"), questions that ask several things, follow-ups and corrections. Not supported, by design or by the data: investigator and site networks, geographic maps, efficacy or results questions (answered as `unsupported_query`), and cohorts over 20,000 trials (`scope_required`).
+
+### Walkthrough: from a source record to a cited bar
+
+Example 02, "Which countries have the most recruiting trials for melanoma?":
+
+1. **Plan.** The model returns a typed plan: `aggregate` by `country`, filters `conditions: ["melanoma"]` and `statuses: ["RECRUITING"]`. It produces no numbers and no trial IDs.
+2. **Retrieve.** Code compiles the filters into one ClinicalTrials.gov request, `GET /api/v2/studies?query.cond=(melanoma)&filter.overallStatus=RECRUITING&fields=…&pageSize=1000&countTotal=true`. It reports 480 matches and fetches all of them, so the cohort is complete; 480 trials remain after the match checks.
+3. **Count.** Each trial is placed under every country where it has a current site, once per country. China gets 59 distinct trials.
+4. **Datum.** `{"country": "China", "trial_count": 59, "trial_ids": ["NCT03340506", …]}`. `trial_count` always equals the number of `trial_ids`.
+5. **Citation.** `evidence["NCT03340506"]` ("Dabrafenib and/or Trametinib Rollover Study") holds the source values behind it: `overallStatus = "RECRUITING"` (the status filter), `locations.country` including `"China"` (its bar), and condition MeSH terms including `"Melanoma"` (the condition search). In the web page, clicking the China bar lists all 59 trials with these values.
+6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" from each cited trial's own record, and checks every cited trial meets both filters. All six checks passed (`verification` in the response).
+
+**A limitation, made visible:** example 05, "What phases are Merck's trials in?". Two different lead sponsors match "Merck". Rather than pick one, the service asks, offering options built from the data: Merck Sharp & Dohme (2,151 trials), Merck KGaA (275) or both.
+
 ---
 
 ## 6. Key design decisions and tradeoffs
@@ -326,11 +365,11 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 ## 9. How correctness was validated
 
 - **API spike before design.** Every filter was checked against the live API, and local counts reproduce the API's own totals exactly: start year 2020 = 263, Phase 3 = 367, Germany = 326, recruiting = 712. Findings and data-quality measurements are in [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md).
-- **161 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
+- **168 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
   - every chart type, clarifications, follow-ups, repair
   - `scope_required`, `no_data`, upstream errors, rate-limit retries
   - every failure point in §7 (21 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
-  - the hosted mode (26 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits, circuit breakers opening and closing, and the run deadline keeping finished parts
+  - the hosted mode (30 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits, circuit breakers opening and closing, and the run deadline keeping finished parts
   - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other, missing values as their own state), with property tests showing input order and duplicates do not change counts
   - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
 - **Live tests** against ClinicalTrials.gov (`pytest -m live`), and every answer type run end to end with the real models, with the images inspected (tables have none).
@@ -344,6 +383,11 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - shallow citations → per-filter source values with a verifier check
   - multi-part questions: one unrelated question silently merged with another into a wrong single number, and second requests were dropped. Asking the model to produce a multi-part plan was unreliable (about 50% across repeated runs, and its repair turn confused it), so code now splits the message and the model plans each part as a normal question: 20/20 across repeated runs, with the eval otherwise unchanged
   - a refinement in the web page silently dropped the user's Clarification answer (the exact Merck companies) → refining Follow-ups now inherit the earlier structured fields
+  - the first AWS deployment ([details](docs/hosted-deployment.md#first-deployment-what-went-wrong-and-the-fixes)):
+    - it was rolled back because new service roles were used in the same second they were created; the fix was to create them in setup
+    - every task waited a minute on the database's closed firewall and was replaced → the table is now created in the background, with second-scale connection timeouts (regression tests added)
+    - keys pasted through a notes app were refused → case, quotes and invisible characters are ignored
+  - network charts in dark mode had black labels and a merged, oversized legend → theme-aware labels and separate legends, checked for every chart type in both themes
 
 ---
 
@@ -354,6 +398,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - pydantic-ai with OpenAI and Anthropic models as the service's planner
   - Vega-Lite via `vl-convert` for rendering
   - uv, ruff, pyright, pytest, respx, hypothesis, fakeredis; Docker for the container
+  - AWS for the hosted version: ECS Express Mode, ECR, RDS, ElastiCache, Secrets Manager, through the AWS CLI
 - **Designed deliberately by the author**, decided in design reviews before and during implementation (recorded in [`docs/harness-design.md`](docs/harness-design.md)):
   - the one-model-step workflow and its limits
   - the live-API decision
@@ -363,7 +408,10 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - OpenAI primary with Anthropic fallback and Gemini as an option
   - the request fields
   - the order of work
+  - the hosted design ([`docs/hosted-deployment.md`](docs/hosted-deployment.md)): API keys and per-user limits, Redis and Postgres, plain OpenTelemetry tracing with no vendor, and the switch from the planned Cloud Run to AWS
+  - how the web page behaves: follow-ups added below as a thread, and a light/dark switch
 - **Generated with the assistant, then reviewed and adapted:**
   - most of the code, tests and documentation, written by Claude Code against those decisions
   - outputs and charts were inspected after each feature, and several defects found that way were fixed (section 9)
   - the eval set's expected plans were drafted by the assistant for the author's review
+  - the AWS deployment was carried out by the author, step by step, following the assistant's instructions; the assistant wrote the deploy scripts and diagnosed the first deployment's failures from CloudTrail and the service logs

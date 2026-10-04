@@ -68,19 +68,19 @@
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T08:59:55.948695Z",
+    "retrieved_at": "2026-10-04T12:48:49.691756Z",
     "search_matches": 2750,
     "cohort_size": 2750,
     "api_requests": 3
   },
   "warnings": [],
-  "run_id": "run_353f9eb630f345059f14342d9f942b49",
+  "run_id": "run_b2e0d25b56104a849ffaed98de595710",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 1,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1434.4,
-    "retrieve": 2660.3
+    "plan": 900.1,
+    "retrieve": 2558.1
   }
 }

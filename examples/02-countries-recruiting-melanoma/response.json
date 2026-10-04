@@ -20,8 +20,7 @@
       "nct_ids": []
     },
     "group_by": "country",
-    "compare_sides": [],
-    "top_n": 10
+    "compare_sides": []
   },
   "applied_filters": {
     "drugs": [],
@@ -862,7 +861,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_9d7528880fd84c4081fa779b2d97c02e/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_bdb9a7f2e46c4cd38a500137f43a1862/chart.png",
   "evidence": {
     "NCT00001823": {
       "nct_id": "NCT00001823",
@@ -9902,13 +9901,14 @@
   },
   "assumptions": [
     "Countries count trials with a current site there; a trial counts once per country.",
+    "Status filters use the trial's overall status; its sites are counted whatever their own status.",
     "Showing the top 10 country categories; 41 others are combined in 'Other'.",
     "A trial can have several country values, so categories can add up to more than the total."
   ],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T08:59:47.345798Z",
+    "retrieved_at": "2026-10-04T12:48:42.677200Z",
     "search_matches": 480,
     "cohort_size": 480,
     "api_requests": 1
@@ -9943,15 +9943,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_9d7528880fd84c4081fa779b2d97c02e",
+  "run_id": "run_bdb9a7f2e46c4cd38a500137f43a1862",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 1,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1111.6,
-    "retrieve": 564.2,
+    "plan": 1240.5,
+    "retrieve": 393.4,
     "analyze": 1.2,
-    "verify": 1.8
+    "verify": 5.7
   }
 }

@@ -72,6 +72,26 @@ def merge_filters(plan: AnswerPlan, request: QueryRequest) -> AppliedFilters:
     return applied
 
 
+def _as_set(value: object) -> set[str]:
+    values = value if isinstance(value, list) else [value]
+    words = (str(getattr(v, "value", v)).strip().lower() for v in values)
+    return {COUNTRY_ALIASES.get(w, w).lower() for w in words}  # "USA" and "United States" agree
+
+
+def _overridden_by_fields(plan: AnswerPlan, request: QueryRequest) -> list[str]:
+    """Structured fields win over the question. When the planner read a different value from the question
+    and did not ask (a conflict it should flag), say which value was used rather than override silently."""
+    notes = []
+    for request_field, filter_field in _PINNED_FIELDS.items():
+        asked, given = getattr(plan.filters, filter_field), getattr(request, request_field)
+        if asked and given and _as_set(asked) != _as_set(given):
+            shown = ", ".join(sorted(_as_set(asked)))
+            notes.append(
+                f"Used your {request_field} field ({', '.join(sorted(_as_set(given)))}); the question says {shown}."
+            )
+    return notes
+
+
 def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str]) -> GateResult:
     filters = merge_filters(plan, request)
     result = GateResult(filters)
@@ -139,6 +159,11 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
         )
     if plan.group_by is Dimension.COUNTRY:
         result.assumptions.append("Countries count trials with a current site there; a trial counts once per country.")
+        if filters.statuses:
+            result.assumptions.append(
+                "Status filters use the trial's overall status; its sites are counted whatever their own status."
+            )
+    result.assumptions.extend(_overridden_by_fields(plan, request))
     if filters.sponsor and not filters.sponsor_exact and filters.sponsor_role == "lead":
         result.assumptions.append(f"'{filters.sponsor}' is matched as the lead sponsor (collaborators not included).")
     return result

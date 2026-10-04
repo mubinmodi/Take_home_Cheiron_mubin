@@ -2,7 +2,7 @@
 
 **Authority:** [Transcribed assignment](take-home-assignment.md), visually checked against all six images on 2026-10-03.  
 **Purpose:** Use during design, implementation, review, and submission.  
-**Current assessment:** Unassessed. Capturing a requirement or proposing an architecture is not evidence of implemented behavior.
+**Current assessment:** Reviewed 2026-10-04 against code, tests and real outputs: [rubric-review.md](rubric-review.md). Capturing a requirement or proposing an architecture is not evidence of implemented behavior.
 
 ## Classification and review procedure
 
@@ -178,15 +178,15 @@ These are proposed evidence standards for SD-03, AI-01/02, CODE-02, IO-01/02, an
 - [ ] Final zip includes required source and declared dependency/configuration information, excludes credentials/local clutter, and runs after extraction using README instructions.
 - [ ] The final walkthrough demonstrates source data → calculation → visual datum → citation, and one meaningful failure or limitation.
 
-## Decisions still open
+## Decisions (all made; open when this rubric was written)
 
-- Actual deadline and available implementation time beyond the stated ~24-hour expectation.
-- Final query and chart coverage; all named examples are in the exploration agenda.
-- Interpretation/clarification rules and structured-field precedence.
-- Network relationship semantics and feasible entity resolution.
-- Rendering contract and whether to use Vega-Lite, another grammar, or a custom schema.
-- LLM/tool/orchestration choices, including the previously requested OpenAI fallback.
-- Evidence packaging and pagination/cap policy for large results.
-- Which optional demonstrations and extra features earn their cost.
+- Timebox: about 24 hours of work, with achieved scope stated in the README.
+- Query and chart coverage: all nine appendix questions plus histogram, scatter, timeline and table (README §5).
+- Interpretation and clarification rules, structured-field precedence: `docs/harness-design.md`; README §3.
+- Network semantics: lead sponsor ↔ drug, and drug ↔ drug in the same arm (README §4–5).
+- Rendering contract: our own specification, with Vega-Lite only as renderer.
+- Model choices: OpenAI primary with an Anthropic fallback, Gemini optional (`config.py`).
+- Evidence and paging: per-Datum citations with source values; complete retrieval up to 20,000 trials, otherwise `scope_required`.
+- Optional demonstrations: a web page and a deployed endpoint on AWS.
 
 The prior four-workflow recommendation is a baseline proposal. It is not the assignment's ceiling, an approved final scope, or evidence that networks/scatter/histograms can be ignored.
