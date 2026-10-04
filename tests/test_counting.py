@@ -1,12 +1,14 @@
 """Counting rules from docs/harness-design.md section 3, checked on real records."""
 
+from dataclasses import replace
+
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from clinical_trials_viz.analyze import breakdown, comparison_groups
 from clinical_trials_viz.catalog import DRUG_INTERVENTION_TYPES, NOT_REPORTED, OTHER_BUCKET, Dimension
 from clinical_trials_viz.cohort import lists_drug, resolve_drug_identity
-from clinical_trials_viz.ctgov.trial import clean_drug_name, dimension_values
+from clinical_trials_viz.ctgov.trial import Intervention, clean_drug_name, dimension_values
 
 
 def test_multi_phase_trial_counts_under_each_phase(trials):
@@ -91,6 +93,24 @@ def test_match_check_requires_a_drug_type_intervention(trials):
     by_id = {t.nct_id: t for t in trials}
     for nct_id in kept:
         assert any(i.type in DRUG_INTERVENTION_TYPES for i in by_id[nct_id].interventions)
+
+
+def test_a_drug_given_only_as_a_non_drug_intervention_does_not_match(trials):
+    """NCT03158935 (live record): pembrolizumab is a PROCEDURE; the drug-type interventions are other
+    treatments, yet the trial-wide MeSH list names pembrolizumab."""
+    base = next(t for t in trials if t.nct_id == "NCT02178722")
+    record = replace(
+        base,
+        nct_id="NCT03158935",
+        interventions=(
+            Intervention(type="DRUG", name="Cyclophosphamide", other_names=("Cytoxan",), arm_labels=()),
+            Intervention(type="PROCEDURE", name="Pembrolizumab", other_names=("Keytruda, MK-3475",), arm_labels=()),
+            Intervention(type="BIOLOGICAL", name="Interleukin-2 (IL-2)", other_names=("Aldesleukin",), arm_labels=()),
+        ),
+        intervention_mesh_terms=("Cyclophosphamide", "pembrolizumab", "Interleukin-2", "aldesleukin"),
+    )
+    assert not lists_drug(record, "Keytruda", "pembrolizumab")
+    assert lists_drug(base, "Keytruda", "pembrolizumab")  # DRUG "MK-3475": the MeSH term is its
 
 
 def test_clean_drug_name():
