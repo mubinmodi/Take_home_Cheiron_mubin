@@ -177,7 +177,7 @@ Exits (each part ends in exactly one outcome):
   - every encoded field exists
   - each count equals its distinct cited trials, and a chart of the whole cohort (single value, bar, time series, grouped bar, histogram) counts every trial in it
   - every citation resolves, and every value it quotes is re-derived from the trial record
-  - each cited trial really has its bucket's value, re-derived from its own record
+  - each cited trial really has its bucket's value, re-derived from its own record, and every trial with that value is in the bucket (a multi-phase trial under each of its phases)
   - each cited trial meets every filter
   - network edges join existing nodes, and every cited trial has both ends (or a shared arm, for combinations)
   - time series have no gaps
@@ -415,7 +415,7 @@ Example 02, "Which countries have the most recruiting trials for melanoma?":
 3. **Count.** Each trial is placed under every country where it has a current site, once per country. China gets 59 distinct trials.
 4. **Datum.** `{"country": "China", "trial_count": 59, "trial_ids": ["NCT03340506", …]}`. `trial_count` always equals the number of `trial_ids`.
 5. **Citation.** `evidence["NCT03340506"]` ("Dabrafenib and/or Trametinib Rollover Study") holds the source values behind it: `overallStatus = "RECRUITING"` (the status filter), `locations.country` including `"China"` (its bar), and condition MeSH terms including `"Melanoma"` (the condition search). In the web page, clicking the China bar lists all 59 trials with these values.
-6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" and every quoted citation value from each cited trial's own record, and checks every cited trial meets both filters. All eight checks passed (`verification` in the response).
+6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" and every quoted citation value from each cited trial's own record, and checks every cited trial meets both filters. All nine checks passed (`verification` in the response).
 
 **A limitation, made visible:** example 05, "What phases are Merck's trials in?". Two different lead sponsors match "Merck". Rather than pick one, the service asks, offering options built from the data: Merck Sharp & Dohme (2,151 trials), Merck KGaA (275) or both.
 
@@ -492,7 +492,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - every failure point in §7 (23 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
   - the hosted mode (36 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits (per user, and Idempotency-Keys scoped per user), open access, circuit breakers opening and closing, the run deadline keeping finished parts and covering a slow run store
   - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other with "Not reported" kept separate, missing values as their own state, the drug filter keeping only drug-type interventions), with property tests showing input order and duplicates do not change counts
-  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, a count that leaves out part of the cohort, a trial wrongly counted in "Other", an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
+  - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, a count that leaves out part of the cohort, a multi-phase trial missing from one of its phase bars, a trial wrongly counted in "Other", an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
 - **Live tests** against ClinicalTrials.gov (`pytest -m live`), and every answer type run end to end with the real models, with the images inspected (tables have none).
 - **Planner eval** (`evals/`): 46 questions modelled on the assignment's appendix, scored per question family per model.
 - **An external code review** by a second model, every finding checked against the code. Ten were real and are fixed, each with a regression test that failed first. Among them: the drug filter kept trials that gave the drug only as a device or tracer; fallback attempts escaped the 3-call limit; the verifier missed a wrong grouping and altered citations; "Not reported" was folded into "Other"; and picking your own filter's value in a conflict clarification asked again forever.

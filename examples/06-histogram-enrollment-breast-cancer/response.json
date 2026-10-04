@@ -17228,7 +17228,7 @@
       ]
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_2fcdb765b7c045209196221a23c07429/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_91970cd501b04816a6d2210c7e77e639/chart.png",
   "evidence": {
     "NCT00003455": {
       "nct_id": "NCT00003455",
@@ -291526,13 +291526,14 @@
     "Enrollment is the number of participants; 'Estimated' is the planned enrollment of trials that have not finished recruiting, 'Actual' is the final number.",
     "239 trials do not report enrollment; they are shown as 'Not reported'."
   ],
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:16:45.529509Z",
+    "retrieved_at": "2026-10-04T16:10:34.946841Z",
     "search_matches": 16873,
     "cohort_size": 16873,
-    "api_requests": 18
+    "api_requests": 19
   },
   "verification": {
     "passed": true,
@@ -291572,15 +291573,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_2fcdb765b7c045209196221a23c07429",
+  "run_id": "run_91970cd501b04816a6d2210c7e77e639",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 3,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 819.5,
-    "retrieve": 14961.2,
+    "plan": 3586.7,
+    "retrieve": 19586.2,
     "analyze": 7.9,
-    "verify": 55.2
+    "verify": 56.4
   }
 }

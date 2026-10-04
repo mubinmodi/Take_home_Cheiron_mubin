@@ -2477,7 +2477,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_055a4a15873847adae7c5e61c58ca4f9/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_d80d895002f4434893b2e1e21887aa95/chart.png",
   "evidence": {
     "NCT00004028": {
       "nct_id": "NCT00004028",
@@ -20881,10 +20881,11 @@
     "7 top sponsors or drugs had no link above the threshold and are not shown.",
     "533 trials have no drug intervention (or no lead sponsor) and are not in the network."
   ],
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:16:39.303343Z",
+    "retrieved_at": "2026-10-04T16:10:24.858721Z",
     "search_matches": 2269,
     "cohort_size": 2269,
     "api_requests": 3
@@ -20923,15 +20924,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_055a4a15873847adae7c5e61c58ca4f9",
+  "run_id": "run_d80d895002f4434893b2e1e21887aa95",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1081.4,
-    "retrieve": 1847.8,
-    "analyze": 16.0,
-    "verify": 15.4
+    "plan": 2010.5,
+    "retrieve": 1712.8,
+    "analyze": 16.4,
+    "verify": 15.5
   }
 }

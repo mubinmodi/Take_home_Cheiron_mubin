@@ -862,7 +862,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_22e1478838fc4f7c869264dfa60ff00f/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_5a84acee71764142ac63bcdd23ed4cbf/chart.png",
   "evidence": {
     "NCT00001823": {
       "nct_id": "NCT00001823",
@@ -9906,10 +9906,11 @@
     "Showing the top 10 country categories; 41 others are combined in 'Other'.",
     "A trial can have several country values, so categories can add up to more than the total."
   ],
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:16:35.274218Z",
+    "retrieved_at": "2026-10-04T16:10:18.706917Z",
     "search_matches": 480,
     "cohort_size": 480,
     "api_requests": 1
@@ -9938,6 +9939,10 @@
         "passed": true
       },
       {
+        "name": "buckets_complete",
+        "passed": true
+      },
+      {
         "name": "cited_values_match_source",
         "passed": true
       },
@@ -9952,15 +9957,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_22e1478838fc4f7c869264dfa60ff00f",
+  "run_id": "run_5a84acee71764142ac63bcdd23ed4cbf",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1190.3,
-    "retrieve": 517.8,
-    "analyze": 1.2,
-    "verify": 7.0
+    "plan": 2700.0,
+    "retrieve": 578.8,
+    "analyze": 4.9,
+    "verify": 111.3
   }
 }

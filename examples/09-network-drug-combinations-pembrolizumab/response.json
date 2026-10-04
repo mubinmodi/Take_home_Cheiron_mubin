@@ -7179,7 +7179,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_5f63197935d1407db7491c71a37f8e0c/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_0b907e57160a41a58cc417197738a73a/chart.png",
   "evidence": {
     "NCT01174121": {
       "nct_id": "NCT01174121",
@@ -69208,10 +69208,11 @@
     "408 drug pairs appear in an arm only as alternatives and are not counted as combinations.",
     "7 trials list two or more drugs but do not record which arm receives them, so they cannot show a combination and are left out."
   ],
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:17:05.151304Z",
+    "retrieved_at": "2026-10-04T16:11:03.191549Z",
     "search_matches": 2968,
     "cohort_size": 2620,
     "api_requests": 3
@@ -69250,15 +69251,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_5f63197935d1407db7491c71a37f8e0c",
+  "run_id": "run_0b907e57160a41a58cc417197738a73a",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 932.6,
-    "retrieve": 2973.3,
-    "analyze": 865.1,
-    "verify": 4206.2
+    "plan": 1761.9,
+    "retrieve": 2729.5,
+    "analyze": 865.6,
+    "verify": 4249.2
   }
 }

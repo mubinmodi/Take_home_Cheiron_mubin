@@ -65,22 +65,23 @@
     "multi_select": false,
     "allow_free_text": false
   },
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:16:42.427589Z",
+    "retrieved_at": "2026-10-04T16:10:29.025615Z",
     "search_matches": 2750,
     "cohort_size": 2750,
     "api_requests": 3
   },
   "warnings": [],
-  "run_id": "run_9a1f2eebcbad47d4a50212642dfe514b",
+  "run_id": "run_0a94d38eb24e4c27a62c35752d69ab95",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 943.8,
-    "retrieve": 2279.8
+    "plan": 2124.8,
+    "retrieve": 2330.8
   }
 }

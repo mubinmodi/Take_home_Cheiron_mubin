@@ -8,7 +8,7 @@
     "cited_trials": 2620,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": "chart.png"
   },
   {
@@ -20,7 +20,7 @@
     "cited_trials": 480,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": "chart.png"
   },
   {
@@ -28,11 +28,11 @@
     "question": "Compare phases for trials involving semaglutide vs tirzepatide",
     "outcome": "success",
     "type": "grouped_bar_chart",
-    "title": "Trials by phase: semaglutide vs tirzepatide: interventional, observational, expanded access",
+    "title": "Trials by phase: semaglutide vs tirzepatide",
     "cited_trials": 824,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": "chart.png"
   },
   {
@@ -44,7 +44,7 @@
     "cited_trials": 975,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": "chart.png"
   },
   {
@@ -56,7 +56,7 @@
     "cited_trials": 0,
     "verification": null,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": null
   },
   {
@@ -68,7 +68,7 @@
     "cited_trials": 16873,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 3,
     "chart": "chart.png"
   },
   {
@@ -80,7 +80,7 @@
     "cited_trials": 50,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": "chart.png"
   },
   {
@@ -92,7 +92,7 @@
     "cited_trials": 309,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": "chart.png"
   },
   {
@@ -104,7 +104,7 @@
     "cited_trials": 1776,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 1,
+    "model_calls": 2,
     "chart": "chart.png"
   }
 ]

@@ -2873,7 +2873,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_e2148390d65245dabd9d8f40a6f0cd27/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_a713cad849be495aa670164fed0ea4e1/chart.png",
   "evidence": {
     "NCT04898751": {
       "nct_id": "NCT04898751",
@@ -47562,10 +47562,11 @@
     "Counts from 2026 on are incomplete: they include only trials already registered, mostly with planned start dates.",
     "4 trials have no start date; they are listed as 'Not reported' and not plotted on the time axis."
   ],
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:16:31.159457Z",
+    "retrieved_at": "2026-10-04T16:10:12.557677Z",
     "search_matches": 2968,
     "cohort_size": 2620,
     "api_requests": 5
@@ -47594,6 +47595,10 @@
         "passed": true
       },
       {
+        "name": "buckets_complete",
+        "passed": true
+      },
+      {
         "name": "cited_values_match_source",
         "passed": true
       },
@@ -47612,15 +47617,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_e2148390d65245dabd9d8f40a6f0cd27",
+  "run_id": "run_a713cad849be495aa670164fed0ea4e1",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1617.0,
-    "retrieve": 2545.5,
-    "analyze": 1.3,
-    "verify": 8.2
+    "plan": 3042.9,
+    "retrieve": 3137.3,
+    "analyze": 1.2,
+    "verify": 30.1
   }
 }

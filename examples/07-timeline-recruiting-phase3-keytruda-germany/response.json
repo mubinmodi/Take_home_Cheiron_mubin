@@ -720,7 +720,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_33fc8d582edc40eaa541e62f568a5411/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_d554c8bb723644758c6d3ac4689a1758/chart.png",
   "evidence": {
     "NCT05899608": {
       "nct_id": "NCT05899608",
@@ -3557,10 +3557,11 @@
     "Bars run from the start date to the primary completion date (or completion date when missing).",
     "Showing the 50 most recently started of 55 trials with both dates."
   ],
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:17:01.915451Z",
+    "retrieved_at": "2026-10-04T16:10:57.839378Z",
     "search_matches": 56,
     "cohort_size": 55,
     "api_requests": 1
@@ -3599,15 +3600,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_33fc8d582edc40eaa541e62f568a5411",
+  "run_id": "run_d554c8bb723644758c6d3ac4689a1758",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1139.8,
-    "retrieve": 189.4,
-    "analyze": 0.3,
-    "verify": 0.8
+    "plan": 3026.1,
+    "retrieve": 198.2,
+    "analyze": 0.2,
+    "verify": 0.6
   }
 }

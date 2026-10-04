@@ -3194,7 +3194,7 @@
       "y_scale": "symlog"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_eb02f994fce044819f73f80d2b2c82da/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_5099b6294b1545a8b36b370297546555/chart.png",
   "evidence": {
     "NCT00696657": {
       "nct_id": "NCT00696657",
@@ -12033,10 +12033,11 @@
     "40 of 349 search matches for 'semaglutide' were excluded because 'semaglutide' is not one of their drug interventions.",
     "Duration runs from the start date to the primary completion date (or completion date when missing); enrollment uses a symmetric log scale."
   ],
+  "suggestions": [],
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T15:17:03.602739Z",
+    "retrieved_at": "2026-10-04T16:11:00.899254Z",
     "search_matches": 349,
     "cohort_size": 309,
     "api_requests": 1
@@ -12075,15 +12076,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_eb02f994fce044819f73f80d2b2c82da",
+  "run_id": "run_5099b6294b1545a8b36b370297546555",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 1,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 834.1,
-    "retrieve": 534.9,
-    "analyze": 0.8,
-    "verify": 2.0
+    "plan": 2202.4,
+    "retrieve": 446.9,
+    "analyze": 1.1,
+    "verify": 2.4
   }
 }
