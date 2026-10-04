@@ -74,7 +74,7 @@ uv run ruff check src tests && uv run pyright
 **Hosted version (AWS).** The same container runs on AWS in us-east-2, as decided in [`docs/hosted-deployment.md`](docs/hosted-deployment.md). `DEPLOYMENT=hosted` switches on:
 - **Shared state in Redis** (`REDIS_URL`; ElastiCache Serverless for Valkey): one ClinicalTrials.gov request budget for all instances (the registry's limit is per IP), the page cache, Idempotency-Keys and per-user counts. If Redis fails, each falls back to working per instance.
 - **Run history in Postgres** (`DATABASE_URL`; RDS for PostgreSQL, not public): any instance can serve a Follow-up or a chart. Each row records the user, outcome, model calls and latency.
-- **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header (the key alone or as `name:key`), and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once.
+- **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header (the key alone or as `name:key`; case, quotes and stray spaces from a pasted key are ignored), and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once.
 - **Circuit breakers** for ClinicalTrials.gov and each model, and a **30 s run deadline** (`RUN_DEADLINE_SECONDS`).
 - **Traces:** OpenTelemetry spans per stage (plus HTTP and model calls), exported over OTLP when `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
 

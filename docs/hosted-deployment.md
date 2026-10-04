@@ -111,13 +111,13 @@ deploy/aws/create-service.sh
 deploy/smoke-test.sh https://SERVICE_ENDPOINT
 ```
 
-New code goes out with `TAG=v2 deploy/aws/update-service.sh`: build, push, and a rolling update that changes only the image (rolled back automatically if the new tasks fail their health checks).
+New code goes out with `TAG=vN deploy/aws/update-service.sh`: build, push, and a rolling update that changes only the image (rolled back automatically if the new tasks fail their health checks). Live as of 2026-10-04: v4 (v2 startup fix, v3 threaded web page, v4 tolerant key check).
 
 ### First deployment: what went wrong and the fixes
 
 1. **Express Mode's first attempt was rolled back** ("the infrastructure role doesn't have enough permission"). CloudTrail showed `CreateLoadBalancer` refused in the same second the load-balancing service-linked role was created. Auto scaling failed the same way. The account had never used either service. A retry succeeded once the roles existed; setup step 2 now creates them first.
 2. **Every task took a minute to start, failed its health checks and was replaced,** so the first deployment never shifted traffic and the address answered 503. At startup the app created its table in Postgres before serving, and the database's security group did not yet admit the service (asyncpg waits 60 s by default). Fixed in v2: the table is created in the background, Postgres connections give up after 5 s and Redis after 2 s, and `create-service.sh` opens the security group itself.
-3. Web page requests were refused (401) when the stored `mubin:...` value was pasted as the key. The service now accepts the key with or without its name.
+3. Web page requests were refused (401) when the key was pasted as the stored `mubin:...` value, or from a notes app that capitalized it or added quotes or invisible characters. The service now accepts the key with or without its name and ignores case, quotes and invisible characters (v4); a key that differs in any real character is still refused.
 
 Verified live: `/health`, a question (melanoma trials by country), a follow-up refined from the Postgres run history ("only phase 3"), and a chart image over HTTPS.
 
