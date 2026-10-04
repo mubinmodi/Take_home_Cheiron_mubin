@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Check a deployed service end to end: health, a question, a follow-up and a chart image.
-#   deploy/smoke-test.sh https://clinical-trials-viz-xxxx.a.run.app
-# Asks for an API key (input hidden) unless API_KEY is exported.
+#   deploy/smoke-test.sh https://<name>.ecs.us-east-2.on.aws
+# Asks for an API key (input hidden) unless API_KEY is exported; with OPEN_ACCESS, press Enter.
 set -euo pipefail
 URL=${1:?usage: deploy/smoke-test.sh SERVICE_URL}
 URL=${URL%/}

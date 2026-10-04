@@ -72,10 +72,10 @@ uv run python -m evals.run       # score the configured planner on 42 questions 
 uv run ruff check src tests && uv run pyright
 ```
 
-**Hosted version (AWS).** Live demo: https://cl-f44fdf3287b047ef971affaa8d767246.ecs.us-east-2.on.aws (the page asks for an API key, which comes with the submission). The same container runs on AWS in us-east-2, as decided in [`docs/hosted-deployment.md`](docs/hosted-deployment.md). `DEPLOYMENT=hosted` switches on:
+**Hosted version (AWS).** Live demo: https://cl-f44fdf3287b047ef971affaa8d767246.ecs.us-east-2.on.aws (open for the review: no API key needed). The same container runs on AWS in us-east-2, as decided in [`docs/hosted-deployment.md`](docs/hosted-deployment.md). `DEPLOYMENT=hosted` switches on:
 - **Shared state in Redis** (`REDIS_URL`; ElastiCache Serverless for Valkey): one ClinicalTrials.gov request budget for all instances (the registry's limit is per IP), the page cache, Idempotency-Keys and per-user counts. If Redis fails, each falls back to working per instance.
 - **Run history in Postgres** (`DATABASE_URL`; RDS for PostgreSQL, not public): any instance can serve a Follow-up or a chart. Each row records the user, outcome, model calls and latency.
-- **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header (the key alone or as `name:key`; case, quotes and stray spaces from a pasted key are ignored), and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once.
+- **API keys** (`API_KEYS`, `name:key` pairs): `POST /v1/query` needs an `X-API-Key` header (the key alone or as `name:key`; case, quotes and stray spaces from a pasted key are ignored), and each user may ask 30 questions an hour (`USER_QUERIES_PER_HOUR`). Reading runs and charts stays open (run IDs are random). The web page asks for the key once. For the review, the live demo runs with `OPEN_ACCESS=true`: no key is needed and there is no hourly limit (a key that is sent still names its user).
 - **Circuit breakers** for ClinicalTrials.gov and each model, and a **30 s run deadline** (`RUN_DEADLINE_SECONDS`). It covers loading a Follow-up's earlier run through verification. Saving the run comes after it, with its own 5 s limit; a save that runs out of time still returns the answer, with a warning that its image and follow-ups are unavailable.
 - **Traces:** OpenTelemetry spans per stage (plus HTTP and model calls), exported over OTLP when `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
 

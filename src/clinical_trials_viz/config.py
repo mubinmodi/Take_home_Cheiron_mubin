@@ -78,6 +78,9 @@ class Settings(BaseSettings):
     database_url: SecretStr | None = None  # run history, e.g. postgresql+asyncpg://user:password@host/db
     api_keys: SecretStr | None = None  # "name:key,name:key"; POST /v1/query then needs an X-API-Key header
     user_queries_per_hour: int | None = None  # per API-key user
+    # A demo for reviewers (author's decision, 2026-10-04): no key needed and no hourly limit. Keys still
+    # name their users when sent; a wrong one is treated as a guest.
+    open_access: bool = False
     run_deadline_seconds: float | None = None  # a whole Run: planning, retrieval and every part
     breaker_failures: int = 5  # outage-type failures in a row that open a circuit breaker
     breaker_cooldown_seconds: float = 30.0  # how long an open breaker fails fast before one trial call
@@ -86,12 +89,16 @@ class Settings(BaseSettings):
     def _check_hosted(self) -> Self:
         """Hosted mode refuses to start without its dependencies, naming each missing setting."""
         if self.deployment == "hosted":
-            required = {"REDIS_URL": self.redis_url, "DATABASE_URL": self.database_url, "API_KEYS": self.api_keys}
+            required = {"REDIS_URL": self.redis_url, "DATABASE_URL": self.database_url}
+            if not self.open_access:
+                required["API_KEYS"] = self.api_keys
             missing = [name for name, value in required.items() if value is None or not value.get_secret_value()]
             if missing:
                 raise ValueError(f"DEPLOYMENT=hosted needs {', '.join(missing)} (see docs/hosted-deployment.md)")
             self.user_queries_per_hour = self.user_queries_per_hour or HOSTED_QUERIES_PER_HOUR
             self.run_deadline_seconds = self.run_deadline_seconds or HOSTED_RUN_DEADLINE_SECONDS
+        if self.open_access:  # no hourly limit, even when USER_QUERIES_PER_HOUR is set
+            self.user_queries_per_hour = None
         self.api_users()  # reject a malformed API_KEYS at startup
         return self
 

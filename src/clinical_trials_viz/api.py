@@ -151,7 +151,7 @@ def create_app(
         ] = None,
     ) -> QueryResponse:
         user = identify(api_key, users)
-        if users and user is None:
+        if users and user is None and not settings.open_access:
             raise http_error(401, "unauthorized", "Send a valid API key in the X-API-Key header.")
         keys: KeyStore = app.state.idempotency
         if idempotency_key:  # scoped per user, so one user's key never replays another user's run

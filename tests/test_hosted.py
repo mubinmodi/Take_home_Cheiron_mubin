@@ -65,6 +65,12 @@ def test_hosted_mode_defaults_the_per_user_limit_and_the_deadline():
     assert settings.api_users() == {KEY: "alice"}
 
 
+def test_open_access_runs_hosted_without_keys_or_an_hourly_limit():
+    settings = hosted(redis_url="redis://cache", database_url="postgresql+asyncpg://db", open_access=True)
+    assert settings.api_users() == {} and settings.user_queries_per_hour is None
+    assert settings.run_deadline_seconds == HOSTED_RUN_DEADLINE_SECONDS
+
+
 def test_a_malformed_api_key_entry_is_rejected_without_quoting_any_key():
     with pytest.raises(ValidationError) as info:
         local(api_keys=f"alice:{KEY}, bob:too-short")
@@ -247,6 +253,15 @@ async def test_a_replay_does_not_count_against_the_limit(make_client, settings):
         again = await client.post("/v1/query", json=QUESTION, headers=once)
         assert first.status_code == again.status_code == 200 and again.headers["Idempotent-Replayed"] == "true"
         assert (await client.post("/v1/query", json=QUESTION)).status_code == 429  # a new question is over
+
+
+async def test_with_open_access_anyone_can_ask_even_with_a_stale_key(make_client, settings):
+    settings.api_keys = SecretStr(f"alice:{ALICE}")
+    settings.open_access = True
+    async for client in make_client(ScriptedPlanner(TREND, TREND)):
+        assert (await client.post("/v1/query", json=QUESTION)).status_code == 200
+        stale = await client.post("/v1/query", json=QUESTION, headers={"X-API-Key": "an-old-key-from-last-week"})
+        assert stale.status_code == 200
 
 
 async def test_idempotency_keys_are_scoped_per_user(make_client, settings):
