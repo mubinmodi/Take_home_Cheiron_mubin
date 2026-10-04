@@ -24,6 +24,13 @@ EXAMPLES: list[tuple[str, dict[str, Any]]] = [
      {"query": "Compare phases for trials involving semaglutide vs tirzepatide"}),
     ("04-network-sponsors-drugs-glioblastoma", {"query": "Show a network of sponsors and drugs for glioblastoma trials"}),
     ("05-clarification-merck", {"query": "What phases are Merck's trials in?"}),
+    ("06-histogram-enrollment-breast-cancer", {"query": "What is the enrollment distribution of breast cancer trials?"}),
+    ("07-timeline-recruiting-phase3-keytruda-germany",
+     {"query": "Show a timeline of recruiting phase 3 Keytruda trials in Germany"}),
+    ("08-scatter-enrollment-duration-semaglutide",
+     {"query": "Plot enrollment against duration for completed semaglutide trials"}),
+    ("09-network-drug-combinations-pembrolizumab",
+     {"query": "Which drugs are most often combined with pembrolizumab?"}),
 ]  # fmt: skip
 
 

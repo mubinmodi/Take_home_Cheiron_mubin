@@ -28,7 +28,7 @@
     "question": "Compare phases for trials involving semaglutide vs tirzepatide",
     "outcome": "success",
     "type": "grouped_bar_chart",
-    "title": "Trials by phase: semaglutide vs tirzepatide",
+    "title": "Trials by phase: semaglutide vs tirzepatide: interventional, observational, expanded access",
     "cited_trials": 824,
     "verification": true,
     "data_timestamp": "2026-10-02T09:00:04",
@@ -58,5 +58,53 @@
     "data_timestamp": "2026-10-02T09:00:04",
     "model_calls": 1,
     "chart": null
+  },
+  {
+    "example": "06-histogram-enrollment-breast-cancer",
+    "question": "What is the enrollment distribution of breast cancer trials?",
+    "outcome": "success",
+    "type": "histogram",
+    "title": "Trials by enrollment: breast cancer",
+    "cited_trials": 16873,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
+  },
+  {
+    "example": "07-timeline-recruiting-phase3-keytruda-germany",
+    "question": "Show a timeline of recruiting phase 3 Keytruda trials in Germany",
+    "outcome": "success",
+    "type": "timeline",
+    "title": "Trial timeline: Keytruda; Phase 3; recruiting; in Germany",
+    "cited_trials": 50,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
+  },
+  {
+    "example": "08-scatter-enrollment-duration-semaglutide",
+    "question": "Plot enrollment against duration for completed semaglutide trials",
+    "outcome": "success",
+    "type": "scatter_plot",
+    "title": "Enrollment vs duration: semaglutide; completed",
+    "cited_trials": 309,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
+  },
+  {
+    "example": "09-network-drug-combinations-pembrolizumab",
+    "question": "Which drugs are most often combined with pembrolizumab?",
+    "outcome": "success",
+    "type": "network_graph",
+    "title": "Drugs given together in the same arm: pembrolizumab",
+    "cited_trials": 1776,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
   }
 ]

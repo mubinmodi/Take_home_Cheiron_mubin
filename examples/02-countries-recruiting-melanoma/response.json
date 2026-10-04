@@ -20,7 +20,8 @@
       "nct_ids": []
     },
     "group_by": "country",
-    "compare_sides": []
+    "compare_sides": [],
+    "top_n": 10
   },
   "applied_filters": {
     "drugs": [],
@@ -861,7 +862,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_4c9724e99ae54a47a706a28785a13689/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_22e1478838fc4f7c869264dfa60ff00f/chart.png",
   "evidence": {
     "NCT00001823": {
       "nct_id": "NCT00001823",
@@ -9908,7 +9909,7 @@
   "source": {
     "api_version": "2.0.5",
     "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T14:28:47.832127Z",
+    "retrieved_at": "2026-10-04T15:16:35.274218Z",
     "search_matches": 480,
     "cohort_size": 480,
     "api_requests": 1
@@ -9951,15 +9952,15 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_4c9724e99ae54a47a706a28785a13689",
+  "run_id": "run_22e1478838fc4f7c869264dfa60ff00f",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 1,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 813.8,
-    "retrieve": 475.3,
-    "analyze": 0.6,
-    "verify": 2.8
+    "plan": 1190.3,
+    "retrieve": 517.8,
+    "analyze": 1.2,
+    "verify": 7.0
   }
 }

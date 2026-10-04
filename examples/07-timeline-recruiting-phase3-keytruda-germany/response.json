@@ -1,0 +1,3613 @@
+{
+  "outcome": "success",
+  "plan": {
+    "kind": "answer",
+    "relation": "new",
+    "operation": "per_trial",
+    "filters": {
+      "drugs": [
+        "Keytruda"
+      ],
+      "conditions": [],
+      "keywords": [],
+      "phases": [
+        "PHASE3"
+      ],
+      "statuses": [
+        "RECRUITING"
+      ],
+      "study_types": [],
+      "sponsor_role": "lead",
+      "countries": [
+        "Germany"
+      ],
+      "nct_ids": []
+    },
+    "compare_sides": [],
+    "view": "timeline"
+  },
+  "applied_filters": {
+    "drugs": [
+      "Keytruda"
+    ],
+    "conditions": [],
+    "keywords": [],
+    "phases": [
+      "PHASE3"
+    ],
+    "statuses": [
+      "RECRUITING"
+    ],
+    "study_types": [],
+    "sponsor_role": "lead",
+    "exact_sponsors": [],
+    "sponsor_exact": false,
+    "countries": [
+      "Germany"
+    ],
+    "nct_ids": [],
+    "from_request": []
+  },
+  "visualization": {
+    "type": "timeline",
+    "title": "Trial timeline: Keytruda; Phase 3; recruiting; in Germany",
+    "subtitle": "50 of 55 trials",
+    "encoding": {
+      "x": {
+        "field": "start",
+        "type": "temporal",
+        "title": "Start"
+      },
+      "x2": {
+        "field": "end",
+        "type": "temporal",
+        "title": "Primary completion"
+      },
+      "y": {
+        "field": "trial",
+        "type": "nominal",
+        "title": "Trial"
+      },
+      "color": {
+        "field": "dates",
+        "type": "nominal",
+        "title": "Dates"
+      },
+      "tooltip": [
+        {
+          "field": "trial",
+          "type": "nominal",
+          "title": "Trial"
+        },
+        {
+          "field": "start",
+          "type": "temporal",
+          "title": "Start"
+        },
+        {
+          "field": "end",
+          "type": "temporal",
+          "title": "Primary completion"
+        },
+        {
+          "field": "dates",
+          "type": "nominal",
+          "title": "Dates"
+        },
+        {
+          "field": "status",
+          "type": "nominal",
+          "title": "Status"
+        }
+      ]
+    },
+    "data": [
+      {
+        "trial": "NCT05899608 \u00b7 Clinical Study of Ivonescimab for First-line Treat",
+        "nct_id": "NCT05899608",
+        "start": "2023-10-26",
+        "end": "2028-12-31",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT05899608"
+        ]
+      },
+      {
+        "trial": "NCT05920356 \u00b7 A Study Evaluating Sotorasib Platinum Doublet Comb",
+        "nct_id": "NCT05920356",
+        "start": "2023-11-16",
+        "end": "2027-06-30",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT05920356"
+        ]
+      },
+      {
+        "trial": "NCT06103864 \u00b7 A Phase III Study of Dato-DXd With or Without Durv",
+        "nct_id": "NCT06103864",
+        "start": "2023-11-23",
+        "end": "2027-07-28",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06103864"
+        ]
+      },
+      {
+        "trial": "NCT06170788 \u00b7 Sacituzumab Tirumotecan (MK-2870) in Combination W",
+        "nct_id": "NCT06170788",
+        "start": "2023-12-15",
+        "end": "2028-01-25",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06170788"
+        ]
+      },
+      {
+        "trial": "NCT06119581 \u00b7 A Study of First-Line Olomorasib (LY3537982) and P",
+        "nct_id": "NCT06119581",
+        "start": "2023-12-21",
+        "end": "2027-11-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06119581"
+        ]
+      },
+      {
+        "trial": "NCT06312137 \u00b7 A Study to Assess Efficacy and Safety of Pembroliz",
+        "nct_id": "NCT06312137",
+        "start": "2024-04-03",
+        "end": "2034-02-21",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06312137"
+        ]
+      },
+      {
+        "trial": "NCT06357533 \u00b7 Phase III, Open-label, Study of First-line Dato-DX",
+        "nct_id": "NCT06357533",
+        "start": "2024-04-11",
+        "end": "2029-12-28",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06357533"
+        ]
+      },
+      {
+        "trial": "NCT06312176 \u00b7 A Study of Sacituzumab Tirumotecan (MK-2870) as a ",
+        "nct_id": "NCT06312176",
+        "start": "2024-04-14",
+        "end": "2027-07-11",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06312176"
+        ]
+      },
+      {
+        "trial": "NCT06345729 \u00b7 A Study of Calderasib (MK-1084) Plus Pembrolizumab",
+        "nct_id": "NCT06345729",
+        "start": "2024-05-24",
+        "end": "2029-02-19",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06345729"
+        ]
+      },
+      {
+        "trial": "NCT06422143 \u00b7 Pembrolizumab With or Without Maintenance Sacituzu",
+        "nct_id": "NCT06422143",
+        "start": "2024-06-10",
+        "end": "2029-01-12",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06422143"
+        ]
+      },
+      {
+        "trial": "NCT06393374 \u00b7 Sacituzumab Tirumotecan (MK-2870) Plus Pembrolizum",
+        "nct_id": "NCT06393374",
+        "start": "2024-06-24",
+        "end": "2030-12-16",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06393374"
+        ]
+      },
+      {
+        "trial": "NCT06264180 \u00b7 VO and Nivolumab vs Physician's Choice in Advanced",
+        "nct_id": "NCT06264180",
+        "start": "2024-07-11",
+        "end": "2030-09-30",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06264180"
+        ]
+      },
+      {
+        "trial": "NCT06282575 \u00b7 Efficacy and Safety of Zanidatamab With Standard-o",
+        "nct_id": "NCT06282575",
+        "start": "2024-07-19",
+        "end": "2028-12-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06282575"
+        ]
+      },
+      {
+        "trial": "NCT06216301 \u00b7 LUNAR-2: TTFields With Pembrolizumab + Platinum-ba",
+        "nct_id": "NCT06216301",
+        "start": "2024-07-31",
+        "end": "2028-10-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06216301"
+        ]
+      },
+      {
+        "trial": "NCT06452277 \u00b7 A Study to Learn More About How Well Sevabertinib ",
+        "nct_id": "NCT06452277",
+        "start": "2024-08-28",
+        "end": "2027-10-28",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06452277"
+        ]
+      },
+      {
+        "trial": "NCT06561386 \u00b7 A Study to Compare the Efficacy of Nivolumab and R",
+        "nct_id": "NCT06561386",
+        "start": "2024-10-07",
+        "end": "2030-07-30",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06561386"
+        ]
+      },
+      {
+        "trial": "NCT06081244 \u00b7 NeoAdj. Therapy Comparing Sacituzumab Govitecan (S",
+        "nct_id": "NCT06081244",
+        "start": "2024-10-10",
+        "end": "2029-09-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06081244"
+        ]
+      },
+      {
+        "trial": "NCT06623422 \u00b7 A Study of Pembrolizumab (MK-3475) With or Without",
+        "nct_id": "NCT06623422",
+        "start": "2024-10-21",
+        "end": "2033-05-16",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06623422"
+        ]
+      },
+      {
+        "trial": "NCT06692738 \u00b7 A Global Phase III Study of Rilvegostomig or Pembr",
+        "nct_id": "NCT06692738",
+        "start": "2024-11-18",
+        "end": "2030-07-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06692738"
+        ]
+      },
+      {
+        "trial": "NCT06532006 \u00b7 A Phase \u2162 Clinical Study of HLX22 in Combination W",
+        "nct_id": "NCT06532006",
+        "start": "2024-11-22",
+        "end": "2027-06-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06532006"
+        ]
+      },
+      {
+        "trial": "NCT06627647 \u00b7 A Global Phase III Study of Rilvegostomig or Pembr",
+        "nct_id": "NCT06627647",
+        "start": "2024-11-27",
+        "end": "2030-11-18",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06627647"
+        ]
+      },
+      {
+        "trial": "NCT06712316 \u00b7 Safety, Efficacy, and Pharmacokinetics of BNT327 i",
+        "nct_id": "NCT06712316",
+        "start": "2025-01-07",
+        "end": "2029-01-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06712316"
+        ]
+      },
+      {
+        "trial": "NCT06743126 \u00b7 SUPRAME-ACTengine\u00ae IMA203 vs. Investigator's Choic",
+        "nct_id": "NCT06743126",
+        "start": "2025-01-14",
+        "end": "2028-01-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06743126"
+        ]
+      },
+      {
+        "trial": "NCT06788990 \u00b7 FORTIFI-HN01: A Study of Ficerafusp Alfa (BCA101) ",
+        "nct_id": "NCT06788990",
+        "start": "2025-01-28",
+        "end": "2028-04-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06788990"
+        ]
+      },
+      {
+        "trial": "NCT06556563 \u00b7 EF-41/KEYNOTE D58: Phase 3 Study of Optune Concomi",
+        "nct_id": "NCT06556563",
+        "start": "2025-02-03",
+        "end": "2029-04-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06556563"
+        ]
+      },
+      {
+        "trial": "NCT06731478 \u00b7 Study of TDXd, Chemotherapy, Pembrolizumab, and Tr",
+        "nct_id": "NCT06731478",
+        "start": "2025-02-27",
+        "end": "2028-06-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06731478"
+        ]
+      },
+      {
+        "trial": "NCT06767514 \u00b7 Clinical Study of Ivonescimab for First-line Treat",
+        "nct_id": "NCT06767514",
+        "start": "2025-02-27",
+        "end": "2028-04-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06767514"
+        ]
+      },
+      {
+        "trial": "NCT06764875 \u00b7 A Phase \u2162 Study of Rilvegostomig in Combination Wi",
+        "nct_id": "NCT06764875",
+        "start": "2025-03-01",
+        "end": "2029-04-27",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06764875"
+        ]
+      },
+      {
+        "trial": "NCT06841354 \u00b7 A Study of Sacituzumab Tirumotecan (Sac-TMT, MK-28",
+        "nct_id": "NCT06841354",
+        "start": "2025-03-16",
+        "end": "2030-05-18",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06841354"
+        ]
+      },
+      {
+        "trial": "NCT06890598 \u00b7 Study of Olomorasib (LY3537982) in Combination Wit",
+        "nct_id": "NCT06890598",
+        "start": "2025-03-27",
+        "end": "2029-05-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06890598"
+        ]
+      },
+      {
+        "trial": "NCT06989112 \u00b7 DESTINY-Endometrial01: A Phase III Study of Trastu",
+        "nct_id": "NCT06989112",
+        "start": "2025-03-27",
+        "end": "2029-01-19",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06989112"
+        ]
+      },
+      {
+        "trial": "NCT06868277 \u00b7 A Global Phase III Study of Rilvegostomig or Pembr",
+        "nct_id": "NCT06868277",
+        "start": "2025-04-10",
+        "end": "2030-01-17",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06868277"
+        ]
+      },
+      {
+        "trial": "NCT06875310 \u00b7 A Study of Adagrasib Plus Pembrolizumab Plus Chemo",
+        "nct_id": "NCT06875310",
+        "start": "2025-04-24",
+        "end": "2029-09-07",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06875310"
+        ]
+      },
+      {
+        "trial": "NCT06697301 \u00b7 Safety and Efficacy of EIK1001 in Combo With Pembr",
+        "nct_id": "NCT06697301",
+        "start": "2025-05-22",
+        "end": "2035-12-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06697301"
+        ]
+      },
+      {
+        "trial": "NCT06901531 \u00b7 A Study of Zolbetuximab Together With Pembrolizuma",
+        "nct_id": "NCT06901531",
+        "start": "2025-05-22",
+        "end": "2028-09-30",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06901531"
+        ]
+      },
+      {
+        "trial": "NCT06952504 \u00b7 A Study to Compare Sacituzumab Tirumotecan (MK-287",
+        "nct_id": "NCT06952504",
+        "start": "2025-05-22",
+        "end": "2032-05-24",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06952504"
+        ]
+      },
+      {
+        "trial": "NCT06966700 \u00b7 A Clinical Study of Sacituzumab Tirumotecan (Sac-T",
+        "nct_id": "NCT06966700",
+        "start": "2025-06-30",
+        "end": "2033-03-23",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06966700"
+        ]
+      },
+      {
+        "trial": "NCT06758401 \u00b7 This is a Study to Learn About How the Combination",
+        "nct_id": "NCT06758401",
+        "start": "2025-07-23",
+        "end": "2028-09-05",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06758401"
+        ]
+      },
+      {
+        "trial": "NCT06793215 \u00b7 A Study Evaluating the Efficacy and Safety of Diva",
+        "nct_id": "NCT06793215",
+        "start": "2025-10-24",
+        "end": "2028-11-30",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06793215"
+        ]
+      },
+      {
+        "trial": "NCT06899126 \u00b7 Study of Trastuzumab Deruxtecan, Pembrolizumab, an",
+        "nct_id": "NCT06899126",
+        "start": "2025-10-24",
+        "end": "2030-04-24",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT06899126"
+        ]
+      },
+      {
+        "trial": "NCT07026474 \u00b7 Re-Radiochemotherapy and Pembrolizumab vs. Immuno(",
+        "nct_id": "NCT07026474",
+        "start": "2025-10-30",
+        "end": "2032-12-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07026474"
+        ]
+      },
+      {
+        "trial": "NCT07276399 \u00b7 A Study of Amivantamab in Addition to Standard of ",
+        "nct_id": "NCT07276399",
+        "start": "2025-12-03",
+        "end": "2029-06-18",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07276399"
+        ]
+      },
+      {
+        "trial": "NCT07218380 \u00b7 A Study of Vepugratinib (LY3866288) in Participant",
+        "nct_id": "NCT07218380",
+        "start": "2025-12-12",
+        "end": "2029-10-01",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07218380"
+        ]
+      },
+      {
+        "trial": "NCT07063745 \u00b7 A Study to Compare the Combination of Navlimetosta",
+        "nct_id": "NCT07063745",
+        "start": "2026-01-02",
+        "end": "2031-08-12",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07063745"
+        ]
+      },
+      {
+        "trial": "NCT07222566 \u00b7 Symbiotic-Lung-01 : A Study to Learn About the Stu",
+        "nct_id": "NCT07222566",
+        "start": "2026-01-06",
+        "end": "2029-02-27",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07222566"
+        ]
+      },
+      {
+        "trial": "NCT07195695 \u00b7 Beamion LUNG-3: Adjuvant Zongertinib vs Standard T",
+        "nct_id": "NCT07195695",
+        "start": "2026-01-16",
+        "end": "2032-02-26",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07195695"
+        ]
+      },
+      {
+        "trial": "NCT07216703 \u00b7 A Clinical Study of Sacituzumab Tirumotecan (MK-28",
+        "nct_id": "NCT07216703",
+        "start": "2026-01-19",
+        "end": "2031-10-29",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07216703"
+        ]
+      },
+      {
+        "trial": "NCT07361510 \u00b7 A Study to Evaluate the Efficacy of Pumitamig Vers",
+        "nct_id": "NCT07361510",
+        "start": "2026-03-12",
+        "end": "2031-10-14",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07361510"
+        ]
+      },
+      {
+        "trial": "NCT07513376 \u00b7 A Clinical Trial of Adjuvant Intismeran (V940) Wit",
+        "nct_id": "NCT07513376",
+        "start": "2026-05-04",
+        "end": "2034-08-22",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07513376"
+        ]
+      },
+      {
+        "trial": "NCT07720284 \u00b7 An Open-label Study to Investigate the Efficacy an",
+        "nct_id": "NCT07720284",
+        "start": "2026-07-16",
+        "end": "2030-09-11",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07720284"
+        ]
+      }
+    ],
+    "metadata": {
+      "units": "trials",
+      "sort": "data_order",
+      "category_order": [
+        "NCT05899608 \u00b7 Clinical Study of Ivonescimab for First-line Treat",
+        "NCT05920356 \u00b7 A Study Evaluating Sotorasib Platinum Doublet Comb",
+        "NCT06103864 \u00b7 A Phase III Study of Dato-DXd With or Without Durv",
+        "NCT06170788 \u00b7 Sacituzumab Tirumotecan (MK-2870) in Combination W",
+        "NCT06119581 \u00b7 A Study of First-Line Olomorasib (LY3537982) and P",
+        "NCT06312137 \u00b7 A Study to Assess Efficacy and Safety of Pembroliz",
+        "NCT06357533 \u00b7 Phase III, Open-label, Study of First-line Dato-DX",
+        "NCT06312176 \u00b7 A Study of Sacituzumab Tirumotecan (MK-2870) as a ",
+        "NCT06345729 \u00b7 A Study of Calderasib (MK-1084) Plus Pembrolizumab",
+        "NCT06422143 \u00b7 Pembrolizumab With or Without Maintenance Sacituzu",
+        "NCT06393374 \u00b7 Sacituzumab Tirumotecan (MK-2870) Plus Pembrolizum",
+        "NCT06264180 \u00b7 VO and Nivolumab vs Physician's Choice in Advanced",
+        "NCT06282575 \u00b7 Efficacy and Safety of Zanidatamab With Standard-o",
+        "NCT06216301 \u00b7 LUNAR-2: TTFields With Pembrolizumab + Platinum-ba",
+        "NCT06452277 \u00b7 A Study to Learn More About How Well Sevabertinib ",
+        "NCT06561386 \u00b7 A Study to Compare the Efficacy of Nivolumab and R",
+        "NCT06081244 \u00b7 NeoAdj. Therapy Comparing Sacituzumab Govitecan (S",
+        "NCT06623422 \u00b7 A Study of Pembrolizumab (MK-3475) With or Without",
+        "NCT06692738 \u00b7 A Global Phase III Study of Rilvegostomig or Pembr",
+        "NCT06532006 \u00b7 A Phase \u2162 Clinical Study of HLX22 in Combination W",
+        "NCT06627647 \u00b7 A Global Phase III Study of Rilvegostomig or Pembr",
+        "NCT06712316 \u00b7 Safety, Efficacy, and Pharmacokinetics of BNT327 i",
+        "NCT06743126 \u00b7 SUPRAME-ACTengine\u00ae IMA203 vs. Investigator's Choic",
+        "NCT06788990 \u00b7 FORTIFI-HN01: A Study of Ficerafusp Alfa (BCA101) ",
+        "NCT06556563 \u00b7 EF-41/KEYNOTE D58: Phase 3 Study of Optune Concomi",
+        "NCT06731478 \u00b7 Study of TDXd, Chemotherapy, Pembrolizumab, and Tr",
+        "NCT06767514 \u00b7 Clinical Study of Ivonescimab for First-line Treat",
+        "NCT06764875 \u00b7 A Phase \u2162 Study of Rilvegostomig in Combination Wi",
+        "NCT06841354 \u00b7 A Study of Sacituzumab Tirumotecan (Sac-TMT, MK-28",
+        "NCT06890598 \u00b7 Study of Olomorasib (LY3537982) in Combination Wit",
+        "NCT06989112 \u00b7 DESTINY-Endometrial01: A Phase III Study of Trastu",
+        "NCT06868277 \u00b7 A Global Phase III Study of Rilvegostomig or Pembr",
+        "NCT06875310 \u00b7 A Study of Adagrasib Plus Pembrolizumab Plus Chemo",
+        "NCT06697301 \u00b7 Safety and Efficacy of EIK1001 in Combo With Pembr",
+        "NCT06901531 \u00b7 A Study of Zolbetuximab Together With Pembrolizuma",
+        "NCT06952504 \u00b7 A Study to Compare Sacituzumab Tirumotecan (MK-287",
+        "NCT06966700 \u00b7 A Clinical Study of Sacituzumab Tirumotecan (Sac-T",
+        "NCT06758401 \u00b7 This is a Study to Learn About How the Combination",
+        "NCT06793215 \u00b7 A Study Evaluating the Efficacy and Safety of Diva",
+        "NCT06899126 \u00b7 Study of Trastuzumab Deruxtecan, Pembrolizumab, an",
+        "NCT07026474 \u00b7 Re-Radiochemotherapy and Pembrolizumab vs. Immuno(",
+        "NCT07276399 \u00b7 A Study of Amivantamab in Addition to Standard of ",
+        "NCT07218380 \u00b7 A Study of Vepugratinib (LY3866288) in Participant",
+        "NCT07063745 \u00b7 A Study to Compare the Combination of Navlimetosta",
+        "NCT07222566 \u00b7 Symbiotic-Lung-01 : A Study to Learn About the Stu",
+        "NCT07195695 \u00b7 Beamion LUNG-3: Adjuvant Zongertinib vs Standard T",
+        "NCT07216703 \u00b7 A Clinical Study of Sacituzumab Tirumotecan (MK-28",
+        "NCT07361510 \u00b7 A Study to Evaluate the Efficacy of Pumitamig Vers",
+        "NCT07513376 \u00b7 A Clinical Trial of Adjuvant Intismeran (V940) Wit",
+        "NCT07720284 \u00b7 An Open-label Study to Investigate the Efficacy an"
+      ],
+      "series_order": [
+        "Actual dates",
+        "Includes estimated dates"
+      ],
+      "other_bucket": false,
+      "multi_valued": false,
+      "cohort_size": 55,
+      "total_rows": 55,
+      "bipartite": false,
+      "y_scale": "linear"
+    }
+  },
+  "chart_url": "http://localhost:8000/v1/runs/run_33fc8d582edc40eaa541e62f568a5411/chart.png",
+  "evidence": {
+    "NCT05899608": {
+      "nct_id": "NCT05899608",
+      "title": "Clinical Study of Ivonescimab for First-line Treatment of Metastatic NSCLC Patients",
+      "url": "https://clinicaltrials.gov/study/NCT05899608",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05899608",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Belgium",
+          "Canada",
+          "China",
+          "France",
+          "Germany",
+          "Greece",
+          "Ireland",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Poland",
+          "Serbia",
+          "Spain",
+          "Sweden",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2023-10-26",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-12-31",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-12-31",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT05920356": {
+      "nct_id": "NCT05920356",
+      "title": "A Study Evaluating Sotorasib Platinum Doublet Combination Versus Pembrolizumab Platinum Doublet Combination as a Front-Line Therapy in Participants With Stage IV or Advanced Stage IIIB/C Nonsquamous Non-Small Cell Lung Cancers (CodeBreaK 202)",
+      "url": "https://clinicaltrials.gov/study/NCT05920356",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05920356",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "sotorasib",
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "Denmark",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Hungary",
+          "Italy",
+          "Japan",
+          "Latvia",
+          "Malaysia",
+          "Mexico",
+          "Netherlands",
+          "Peru",
+          "Poland",
+          "Portugal",
+          "Puerto Rico",
+          "Romania",
+          "Singapore",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2023-11-16",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2027-06-30",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-06-29",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06103864": {
+      "nct_id": "NCT06103864",
+      "title": "A Phase III Study of Dato-DXd With or Without Durvalumab Compared With Investigator's Choice of Chemotherapy in Combination With Pembrolizumab in Patients With PD-L1 Positive Locally Recurrent Inoperable or Metastatic Triple-negative Breast Cancer (TROPION-Breast05)",
+      "url": "https://clinicaltrials.gov/study/NCT06103864",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06103864",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "durvalumab",
+          "Paclitaxel",
+          "130-nm albumin-bound paclitaxel",
+          "Gemcitabine",
+          "Carboplatin",
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Brazil",
+          "Canada",
+          "China",
+          "France",
+          "Germany",
+          "Hong Kong",
+          "India",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Philippines",
+          "Poland",
+          "Singapore",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2023-11-23",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2027-07-28",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-09-30",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06170788": {
+      "nct_id": "NCT06170788",
+      "title": "Sacituzumab Tirumotecan (MK-2870) in Combination With Pembrolizumab Versus Pembrolizumab Alone in Metastatic Non-small Cell Lung Cancer (NSCLC) With Programmed Cell Death Ligand 1 (PD-L1) Tumor Proportion Score (TPS) \u2265 50% (MK-2870-007)",
+      "url": "https://clinicaltrials.gov/study/NCT06170788",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06170788",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "Denmark",
+          "France",
+          "Germany",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "Peru",
+          "Poland",
+          "Portugal",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2023-12-15",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-01-25",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-05-27",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06119581": {
+      "nct_id": "NCT06119581",
+      "title": "A Study of First-Line Olomorasib (LY3537982) and Pembrolizumab With or Without Chemotherapy in Patients With Advanced KRAS G12C-Mutant Non-small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06119581",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06119581",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Cisplatin",
+          "Carboplatin",
+          "Pemetrexed"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "China",
+          "Czechia",
+          "Denmark",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "India",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "Norway",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2023-12-21",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2027-11",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-01",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06312137": {
+      "nct_id": "NCT06312137",
+      "title": "A Study to Assess Efficacy and Safety of Pembrolizumab With or Without Sacituzumab Tirumotecan (MK- 2870) in Adult Participants With Resectable Non Small Cell Lung Cancer (NSCLC) Not Achieving Pathological Complete Response (pCR) (MK-2870-019)",
+      "url": "https://clinicaltrials.gov/study/NCT06312137",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06312137",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Cisplatin",
+          "Pemetrexed",
+          "Gemcitabine",
+          "Carboplatin",
+          "Paclitaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Czechia",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "New Zealand",
+          "Norway",
+          "Peru",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-04-03",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2034-02-21",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2034-10-23",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06357533": {
+      "nct_id": "NCT06357533",
+      "title": "Phase III, Open-label, Study of First-line Dato-DXd in Combination With Rilvegostomig for Advanced Non-squamous NSCLC With High PD-L1 Expression (TC \u2265 50%) and Without Actionable Genomic Alterations",
+      "url": "https://clinicaltrials.gov/study/NCT06357533",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06357533",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "China",
+          "Germany",
+          "Hungary",
+          "India",
+          "Italy",
+          "Japan",
+          "Poland",
+          "Puerto Rico",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-04-11",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-12-28",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-12-28",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06312176": {
+      "nct_id": "NCT06312176",
+      "title": "A Study of Sacituzumab Tirumotecan (MK-2870) as a Single Agent and in Combination With Pembrolizumab (MK-3475) Versus Treatment of Physician's Choice in Participants With HR+/HER2- Unresectable Locally Advanced or Metastatic Breast Cancer (MK-2870-010)",
+      "url": "https://clinicaltrials.gov/study/NCT06312176",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06312176",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Paclitaxel",
+          "130-nm albumin-bound paclitaxel",
+          "Albumin-Bound Paclitaxel",
+          "Capecitabine",
+          "liposomal doxorubicin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "Colombia",
+          "Costa Rica",
+          "Czechia",
+          "Denmark",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Hungary",
+          "India",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Mexico",
+          "Netherlands",
+          "New Zealand",
+          "Peru",
+          "Philippines",
+          "Poland",
+          "Portugal",
+          "Puerto Rico",
+          "Romania",
+          "Singapore",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-04-14",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2027-07-11",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-04-12",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06345729": {
+      "nct_id": "NCT06345729",
+      "title": "A Study of Calderasib (MK-1084) Plus Pembrolizumab (MK-3475) in Participants With KRAS G12C Mutant Non-small Cell Lung Cancer (NSCLC) With Programmed Cell Death Ligand 1 (PD-L1) Tumor Proportion Score (TPS) \u226550% (MK-1084-004/KANDLELIT-004)",
+      "url": "https://clinicaltrials.gov/study/NCT06345729",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06345729",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "Chile",
+          "China",
+          "France",
+          "Georgia",
+          "Germany",
+          "Greece",
+          "India",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "New Zealand",
+          "Philippines",
+          "Poland",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Turkey (T\u00fcrkiye)",
+          "Ukraine",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-05-24",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-02-19",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-02-18",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06422143": {
+      "nct_id": "NCT06422143",
+      "title": "Pembrolizumab With or Without Maintenance Sacituzumab Tirumotecan (Sac-TMT; MK-2870) in Metastatic Squamous Non-small Cell Lung Cancer (NSCLC) [MK-2870-023]",
+      "url": "https://clinicaltrials.gov/study/NCT06422143",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06422143",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Carboplatin",
+          "Paclitaxel",
+          "130-nm albumin-bound paclitaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Austria",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "France",
+          "Germany",
+          "Hungary",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Peru",
+          "Poland",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Arab Emirates",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-06-10",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-01-12",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-08-15",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06393374": {
+      "nct_id": "NCT06393374",
+      "title": "Sacituzumab Tirumotecan (MK-2870) Plus Pembrolizumab Versus TPC in TNBC Who Did Not Achieve pCR (MK-2870-012)",
+      "url": "https://clinicaltrials.gov/study/NCT06393374",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06393374",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Capecitabine"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Colombia",
+          "Czechia",
+          "Denmark",
+          "Finland",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Mexico",
+          "Norway",
+          "Poland",
+          "Portugal",
+          "Singapore",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-06-24",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-12-16",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2037-12-14",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06264180": {
+      "nct_id": "NCT06264180",
+      "title": "VO and Nivolumab vs Physician's Choice in Advanced Melanoma That Progressed on Anti-PD-1 & Anti-CTLA-4 Drugs [IGNYTE-3]",
+      "url": "https://clinicaltrials.gov/study/NCT06264180",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06264180",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Nivolumab",
+          "relatlimab",
+          "Opdualag",
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "France",
+          "Germany",
+          "Greece",
+          "Poland",
+          "Spain",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-07-11",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-09-30",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-03-31",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06282575": {
+      "nct_id": "NCT06282575",
+      "title": "Efficacy and Safety of Zanidatamab With Standard-of-care Therapy Against Standard-of-care Therapy for Advanced HER2-positive Biliary Tract Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06282575",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06282575",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "zanidatamab",
+          "Cisplatin",
+          "Gemcitabine",
+          "pembrolizumab",
+          "durvalumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Czechia",
+          "Finland",
+          "France",
+          "Germany",
+          "India",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Portugal",
+          "Puerto Rico",
+          "Romania",
+          "Serbia",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-07-19",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-12-01",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-04-01",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06216301": {
+      "nct_id": "NCT06216301",
+      "title": "LUNAR-2: TTFields With Pembrolizumab + Platinum-based Chemotherapy for Metastatic NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT06216301",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06216301",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Platinum Compounds"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Austria",
+          "Belgium",
+          "Czechia",
+          "France",
+          "Germany",
+          "Hungary",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Netherlands",
+          "Poland",
+          "Singapore",
+          "Spain",
+          "Switzerland",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-07-31",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-10",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2028-10",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06452277": {
+      "nct_id": "NCT06452277",
+      "title": "A Study to Learn More About How Well Sevabertinib Works and How Safe it is Compared With Standard Treatment, in Participants Who Have Advanced Non-small Cell Lung Cancer (NSCLC) With Mutations of the Human Epidermal Growth Factor Receptor 2 (HER2)",
+      "url": "https://clinicaltrials.gov/study/NCT06452277",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06452277",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Cisplatin",
+          "Carboplatin",
+          "Pemetrexed"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "China",
+          "Czechia",
+          "Denmark",
+          "Finland",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Hungary",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Mexico",
+          "Netherlands",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "Singapore",
+          "Slovakia",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "Ukraine",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-08-28",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2027-10-28",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-06-27",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06561386": {
+      "nct_id": "NCT06561386",
+      "title": "A Study to Compare the Efficacy of Nivolumab and Relatlimab Plus Chemotherapy vs Pembrolizumab Plus Chemotherapy for Stage IV/Recurrent Non-squamous Non-small Cell Lung Cancer With PD-L1 Expression \u2265 1%",
+      "url": "https://clinicaltrials.gov/study/NCT06561386",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06561386",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Nivolumab",
+          "relatlimab",
+          "pembrolizumab",
+          "Carboplatin",
+          "Pemetrexed",
+          "Cisplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Denmark",
+          "France",
+          "Germany",
+          "India",
+          "Ireland",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "New Zealand",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "Saudi Arabia",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-10-07",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-07-30",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-08-04",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06081244": {
+      "nct_id": "NCT06081244",
+      "title": "NeoAdj. Therapy Comparing Sacituzumab Govitecan (SG) vs. SG+Pembrolizumab in Low-risk, Triple-neg. EBC (ADAPT-TN-III)",
+      "url": "https://clinicaltrials.gov/study/NCT06081244",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06081244",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "sacituzumab govitecan",
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "Germany"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-10-10",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-09",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-09",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06623422": {
+      "nct_id": "NCT06623422",
+      "title": "A Study of Pembrolizumab (MK-3475) With or Without Intismeran Autogene (V940) in Participants With Non-small Cell Lung Cancer (V940-009/INTerpath-009)",
+      "url": "https://clinicaltrials.gov/study/NCT06623422",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06623422",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Cisplatin",
+          "Carboplatin",
+          "Pemetrexed",
+          "Gemcitabine",
+          "Paclitaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "Chile",
+          "Colombia",
+          "Finland",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Netherlands",
+          "New Zealand",
+          "Peru",
+          "Poland",
+          "Romania",
+          "Singapore",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-10-21",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2033-05-16",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2038-01-26",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06692738": {
+      "nct_id": "NCT06692738",
+      "title": "A Global Phase III Study of Rilvegostomig or Pembrolizumab Plus Chemotherapy for First-Line Treatment of Locally Advanced or Metastatic Squamous Non-small Cell Lung Cancer (NSCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT06692738",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06692738",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Carboplatin",
+          "Paclitaxel",
+          "130-nm albumin-bound paclitaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "China",
+          "France",
+          "Germany",
+          "Hungary",
+          "India",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Netherlands",
+          "Peru",
+          "Poland",
+          "Puerto Rico",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-11-18",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-07-01",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-07-01",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06532006": {
+      "nct_id": "NCT06532006",
+      "title": "A Phase \u2162 Clinical Study of HLX22 in Combination With Trastuzumab and Chemotherapy for the Treatment of Gastroesophageal Junction and Gastric Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06532006",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06532006",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Trastuzumab",
+          "Oxaliplatin",
+          "Capecitabine"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Brazil",
+          "Chile",
+          "China",
+          "Georgia",
+          "Germany",
+          "Greece",
+          "Italy",
+          "Japan",
+          "Peru",
+          "Poland",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Turkey (T\u00fcrkiye)"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-11-22",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2027-06-01",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2028-09-01",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06627647": {
+      "nct_id": "NCT06627647",
+      "title": "A Global Phase III Study of Rilvegostomig or Pembrolizumab Plus Chemotherapy for First-Line Treatment of Locally Advanced or Metastatic Non-Squamous NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT06627647",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06627647",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Carboplatin",
+          "Cisplatin",
+          "Pemetrexed"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "China",
+          "France",
+          "Germany",
+          "Hungary",
+          "India",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Netherlands",
+          "Peru",
+          "Poland",
+          "Puerto Rico",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2024-11-27",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-11-18",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-11-18",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06712316": {
+      "nct_id": "NCT06712316",
+      "title": "Safety, Efficacy, and Pharmacokinetics of BNT327 in Combination With Chemotherapy and Other Investigational Agents for Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06712316",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06712316",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Carboplatin",
+          "Pemetrexed",
+          "Paclitaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2",
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Chile",
+          "China",
+          "France",
+          "Georgia",
+          "Germany",
+          "Hungary",
+          "Italy",
+          "Japan",
+          "Poland",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-01-07",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-01",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-12",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06743126": {
+      "nct_id": "NCT06743126",
+      "title": "SUPRAME-ACTengine\u00ae IMA203 vs. Investigator's Choice of Treatment in Previously Treated, Unresectable or Metastatic Cutaneous Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT06743126",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06743126",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Nivolumab",
+          "relatlimab",
+          "Opdualag",
+          "lifileucel",
+          "pembrolizumab",
+          "Ipilimumab",
+          "Dacarbazine",
+          "Temozolomide",
+          "Paclitaxel",
+          "Carboplatin",
+          "Albumin-Bound Paclitaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Canada",
+          "France",
+          "Germany",
+          "Netherlands",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-01-14",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-01",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-10",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06788990": {
+      "nct_id": "NCT06788990",
+      "title": "FORTIFI-HN01: A Study of Ficerafusp Alfa (BCA101) or Placebo in Combination With Pembrolizumab in First-Line PD-L1-pos, R or M HNSCC",
+      "url": "https://clinicaltrials.gov/study/NCT06788990",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06788990",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2",
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Czechia",
+          "France",
+          "Germany",
+          "Greece",
+          "India",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "New Zealand",
+          "Poland",
+          "Portugal",
+          "Singapore",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-01-28",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-04",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-07",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06556563": {
+      "nct_id": "NCT06556563",
+      "title": "EF-41/KEYNOTE D58: Phase 3 Study of Optune Concomitant With Temozolomide Plus Pembrolizumab in Newly Diagnosed Glioblastoma",
+      "url": "https://clinicaltrials.gov/study/NCT06556563",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06556563",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Temozolomide",
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Canada",
+          "Czechia",
+          "France",
+          "Germany",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Poland",
+          "Spain",
+          "Switzerland",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-02-03",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-04",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-04",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06731478": {
+      "nct_id": "NCT06731478",
+      "title": "Study of TDXd, Chemotherapy, Pembrolizumab, and Trastuzumab in First-Line Metastatic HER2-Positive Gastric or Gastroesophageal Junction Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06731478",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06731478",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "trastuzumab deruxtecan",
+          "pembrolizumab",
+          "Trastuzumab",
+          "Drug Therapy"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Czechia",
+          "France",
+          "Germany",
+          "Italy",
+          "Japan",
+          "Netherlands",
+          "Norway",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-02-27",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-06-01",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-02-01",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06767514": {
+      "nct_id": "NCT06767514",
+      "title": "Clinical Study of Ivonescimab for First-line Treatment of Metastatic NSCLC Patients With High PD-L1",
+      "url": "https://clinicaltrials.gov/study/NCT06767514",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06767514",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Belgium",
+          "Canada",
+          "China",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "Serbia",
+          "Spain",
+          "Turkey (T\u00fcrkiye)"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-02-27",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-04",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-06",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06764875": {
+      "nct_id": "NCT06764875",
+      "title": "A Phase \u2162 Study of Rilvegostomig in Combination With Fluoropyrimidine and Trastuzumab Deruxtecan as the First-line Treatment for HER2-positive Gastric Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06764875",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06764875",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "trastuzumab deruxtecan",
+          "Trastuzumab",
+          "pembrolizumab",
+          "Fluorouracil",
+          "Capecitabine",
+          "Cisplatin",
+          "Oxaliplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "France",
+          "Germany",
+          "Hong Kong",
+          "Hungary",
+          "India",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Netherlands",
+          "Peru",
+          "Poland",
+          "Puerto Rico",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-03-01",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-04-27",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-12-09",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06841354": {
+      "nct_id": "NCT06841354",
+      "title": "A Study of Sacituzumab Tirumotecan (Sac-TMT, MK-2870) as Monotherapy and in Combination With Pembrolizumab (MK-3475) in Participants With Triple-Negative Breast Cancer (MK-2870-011/TroFuse-011)",
+      "url": "https://clinicaltrials.gov/study/NCT06841354",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06841354",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Paclitaxel",
+          "130-nm albumin-bound paclitaxel",
+          "Albumin-Bound Paclitaxel",
+          "Gemcitabine",
+          "Carboplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "Denmark",
+          "Finland",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Hungary",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Mexico",
+          "Netherlands",
+          "New Zealand",
+          "Peru",
+          "Philippines",
+          "Poland",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "Ukraine",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-03-16",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-05-18",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-05-18",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06890598": {
+      "nct_id": "NCT06890598",
+      "title": "Study of Olomorasib (LY3537982) in Combination With Standard of Care in Participants With Resected or Unresectable KRAS G12C-mutant Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06890598",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06890598",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "durvalumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Chile",
+          "China",
+          "Czechia",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "India",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Netherlands",
+          "Norway",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "Slovakia",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-03-27",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-05",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-02",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06989112": {
+      "nct_id": "NCT06989112",
+      "title": "DESTINY-Endometrial01: A Phase III Study of Trastuzumab Deruxtecan Plus Rilvegostomig or Pembrolizumab as First-Line Treatment of HER2-Expressing (IHC 3+/2+), Mismatch Repair Proficient (pMMR) Endometrial Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06989112",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06989112",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "trastuzumab deruxtecan",
+          "pembrolizumab",
+          "Carboplatin",
+          "Paclitaxel",
+          "Docetaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "China",
+          "Denmark",
+          "Finland",
+          "France",
+          "Germany",
+          "Hungary",
+          "Italy",
+          "Japan",
+          "Netherlands",
+          "Norway",
+          "Poland",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Taiwan",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-03-27",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-01-19",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-02-19",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06868277": {
+      "nct_id": "NCT06868277",
+      "title": "A Global Phase III Study of Rilvegostomig or Pembrolizumab Monotherapy for First-Line Treatment of PD-L1-high Metastatic Non-small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06868277",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06868277",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Costa Rica",
+          "France",
+          "Georgia",
+          "Germany",
+          "Greece",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Portugal",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-04-10",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-01-17",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-12-02",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06875310": {
+      "nct_id": "NCT06875310",
+      "title": "A Study of Adagrasib Plus Pembrolizumab Plus Chemotherapy vs. Placebo Plus Pembrolizumab Plus Chemotherapy in Participants With Previously Untreated Non-squamous Non-small Cell Lung Cancer With KRAS G12C Mutation (KRYSTAL-4)",
+      "url": "https://clinicaltrials.gov/study/NCT06875310",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06875310",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "adagrasib",
+          "pembrolizumab",
+          "Carboplatin",
+          "Pemetrexed",
+          "Cisplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Croatia",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Hungary",
+          "India",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "Saudi Arabia",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-04-24",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-09-07",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-04-30",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06697301": {
+      "nct_id": "NCT06697301",
+      "title": "Safety and Efficacy of EIK1001 in Combo With Pembro Versus Placebo and Pembro as First-Line Therapy in Patients With Advanced Melanoma.",
+      "url": "https://clinicaltrials.gov/study/NCT06697301",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06697301",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2",
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Canada",
+          "Czechia",
+          "Denmark",
+          "Finland",
+          "France",
+          "Germany",
+          "Hungary",
+          "Israel",
+          "Italy",
+          "New Zealand",
+          "Norway",
+          "Poland",
+          "Portugal",
+          "Serbia",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-05-22",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2035-12",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2040-12",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06901531": {
+      "nct_id": "NCT06901531",
+      "title": "A Study of Zolbetuximab Together With Pembrolizumab and Chemotherapy in Adults With Gastric Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06901531",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06901531",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "zolbetuximab",
+          "pembrolizumab",
+          "Capecitabine",
+          "Oxaliplatin",
+          "Leucovorin",
+          "Fluorouracil"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Chile",
+          "China",
+          "Czechia",
+          "France",
+          "Germany",
+          "Italy",
+          "Japan",
+          "Lithuania",
+          "Mexico",
+          "Netherlands",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-05-22",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-09-30",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2028-09-30",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06952504": {
+      "nct_id": "NCT06952504",
+      "title": "A Study to Compare Sacituzumab Tirumotecan (MK-2870) in Combination With Pembrolizumab (MK-3475) Versus Pembrolizumab Alone as Treatment in Participants With Mismatch Repair Proficient Endometrial Cancer (MK-2870-033/TroFuse-033/GOG-3119/ENGOT-en29)",
+      "url": "https://clinicaltrials.gov/study/NCT06952504",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06952504",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Carboplatin",
+          "Paclitaxel",
+          "Docetaxel",
+          "Cisplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "Denmark",
+          "Finland",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "Norway",
+          "Peru",
+          "Poland",
+          "Puerto Rico",
+          "Singapore",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Taiwan",
+          "Thailand",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-05-22",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2032-05-24",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-05-24",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06966700": {
+      "nct_id": "NCT06966700",
+      "title": "A Clinical Study of Sacituzumab Tirumotecan (Sac-TMT, MK-2870) in People With Breast Cancer (MK-2870-032)",
+      "url": "https://clinicaltrials.gov/study/NCT06966700",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06966700",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Carboplatin",
+          "Paclitaxel",
+          "Doxorubicin",
+          "Epirubicin",
+          "Cyclophosphamide",
+          "Capecitabine",
+          "olaparib"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "Finland",
+          "France",
+          "Germany",
+          "Greece",
+          "Guatemala",
+          "Hong Kong",
+          "Hungary",
+          "India",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "New Zealand",
+          "Norway",
+          "Peru",
+          "Philippines",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "Singapore",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "Ukraine",
+          "United Kingdom",
+          "Vietnam"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-06-30",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2033-03-23",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2034-12-29",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06758401": {
+      "nct_id": "NCT06758401",
+      "title": "This is a Study to Learn About How the Combination of the Study Medicines Sigvotatug Vedotin Plus Pembrolizumab Works in People With Non-small Cell Lung Cancer With High Levels of PD-L1.",
+      "url": "https://clinicaltrials.gov/study/NCT06758401",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06758401",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "Chile",
+          "China",
+          "Czechia",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "India",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "Poland",
+          "Romania",
+          "Saudi Arabia",
+          "Slovakia",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-07-23",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-09-05",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-03-01",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06793215": {
+      "nct_id": "NCT06793215",
+      "title": "A Study Evaluating the Efficacy and Safety of Divarasib and Pembrolizumab Versus Pembrolizumab and Pemetrexed and Carboplatin or Cisplatin in Participants With Previously Untreated, KRAS G12C-Mutated, Advanced or Metastatic Non-Squamous Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06793215",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06793215",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Pemetrexed",
+          "Carboplatin",
+          "Cisplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "China",
+          "Denmark",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Hungary",
+          "Ireland",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "New Zealand",
+          "Poland",
+          "Portugal",
+          "Singapore",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Switzerland",
+          "Taiwan",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-10-24",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2028-11-30",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2030-10-31",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06899126": {
+      "nct_id": "NCT06899126",
+      "title": "Study of Trastuzumab Deruxtecan, Pembrolizumab, and Platinum-based Chemotherapy in First-line HER2 Overexpressing Non-small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06899126",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06899126",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "trastuzumab deruxtecan",
+          "pembrolizumab",
+          "Pemetrexed"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Belgium",
+          "Brazil",
+          "Chile",
+          "China",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "India",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-10-24",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-04-24",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-11-24",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07026474": {
+      "nct_id": "NCT07026474",
+      "title": "Re-Radiochemotherapy and Pembrolizumab vs. Immuno(Chemo)Therapy for Locoregionally Recurrent PD-L1 Positive (CPS\u22651) HNSCC",
+      "url": "https://clinicaltrials.gov/study/NCT07026474",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07026474",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Radiotherapy",
+          "Cisplatin",
+          "pembrolizumab",
+          "Fluorouracil"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "Germany",
+          "Switzerland"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-10-30",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2032-12",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-12-31",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07276399": {
+      "nct_id": "NCT07276399",
+      "title": "A Study of Amivantamab in Addition to Standard of Care Agents (SOC) Compared With SOC Alone in Participants With Recurrent/Metastatic Head and Neck Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07276399",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07276399",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "amivantamab",
+          "pembrolizumab",
+          "Carboplatin",
+          "Cisplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "China",
+          "Czechia",
+          "France",
+          "Germany",
+          "Hungary",
+          "India",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-12-03",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-06-18",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2029-06-18",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07218380": {
+      "nct_id": "NCT07218380",
+      "title": "A Study of Vepugratinib (LY3866288) in Participants With Cancer in the Urinary Tract",
+      "url": "https://clinicaltrials.gov/study/NCT07218380",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07218380",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Brazil",
+          "Canada",
+          "China",
+          "Czechia",
+          "Denmark",
+          "France",
+          "Germany",
+          "Hungary",
+          "Italy",
+          "Japan",
+          "Netherlands",
+          "Poland",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-12-12",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-10",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2033-05",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07063745": {
+      "nct_id": "NCT07063745",
+      "title": "A Study to Compare the Combination of Navlimetostat (BMS-986504) With Pembrolizumab and Chemotherapy Versus Placebo Plus Pembrolizumab and Chemotherapy in First-line Metastatic Non-small Cell Lung Cancer Participants With Homozygous MTAP Deletion",
+      "url": "https://clinicaltrials.gov/study/NCT07063745",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07063745",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Cisplatin",
+          "Carboplatin",
+          "Pemetrexed",
+          "Paclitaxel",
+          "130-nm albumin-bound paclitaxel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2",
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "Denmark",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Hungary",
+          "India",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Mexico",
+          "Netherlands",
+          "Norway",
+          "Poland",
+          "Romania",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-01-02",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2031-08-12",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-08-12",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07222566": {
+      "nct_id": "NCT07222566",
+      "title": "Symbiotic-Lung-01 : A Study to Learn About the Study Medicine Called PF-08634404 in Combination With Chemotherapy in Adult Participants With Locally Advanced or Metastatic Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07222566",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07222566",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Brazil",
+          "Canada",
+          "China",
+          "Czechia",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "India",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Poland",
+          "Puerto Rico",
+          "Spain",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-01-06",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2029-02-27",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-08-26",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07195695": {
+      "nct_id": "NCT07195695",
+      "title": "Beamion LUNG-3: Adjuvant Zongertinib vs Standard Treatment in People With Completely Resected Stage II-IIIB NSCLC Harboring Activating HER2 TKD Mutations",
+      "url": "https://clinicaltrials.gov/study/NCT07195695",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07195695",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "atezolizumab",
+          "durvalumab",
+          "Nivolumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "China",
+          "Denmark",
+          "France",
+          "Germany",
+          "Greece",
+          "Hong Kong",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "Portugal",
+          "Romania",
+          "Singapore",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-01-16",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2032-02-26",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2036-09-02",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07216703": {
+      "nct_id": "NCT07216703",
+      "title": "A Clinical Study of Sacituzumab Tirumotecan (MK-2870) in Combination With Pembrolizumab (MK-3475) as First-line Maintenance Treatment of Cervical Cancer (MK-2870-036/TroFuse-036/GOG-3123/ENGOT-cx22)",
+      "url": "https://clinicaltrials.gov/study/NCT07216703",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07216703",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Bevacizumab",
+          "Paclitaxel",
+          "Cisplatin",
+          "Carboplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "Colombia",
+          "Czechia",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "India",
+          "Ireland",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Philippines",
+          "Poland",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Taiwan",
+          "Thailand",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-01-19",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2031-10-29",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-10-29",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07361510": {
+      "nct_id": "NCT07361510",
+      "title": "A Study to Evaluate the Efficacy of Pumitamig Versus Pembrolizumab in Participants With Previously Untreated Advanced Non-Small Cell Lung Cancer and PD-L1 \u2265 50%. (ROSETTA Lung-202)",
+      "url": "https://clinicaltrials.gov/study/NCT07361510",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07361510",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Argentina",
+          "Australia",
+          "Austria",
+          "Belgium",
+          "Brazil",
+          "Bulgaria",
+          "Canada",
+          "Chile",
+          "China",
+          "Colombia",
+          "Czechia",
+          "Finland",
+          "France",
+          "Germany",
+          "Hungary",
+          "India",
+          "Italy",
+          "Japan",
+          "Malaysia",
+          "Mexico",
+          "Netherlands",
+          "Norway",
+          "Peru",
+          "Poland",
+          "Portugal",
+          "Romania",
+          "Singapore",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Taiwan",
+          "Thailand",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-03-12",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2031-10-14",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2031-10-14",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07513376": {
+      "nct_id": "NCT07513376",
+      "title": "A Clinical Trial of Adjuvant Intismeran (V940) With or Without Pembrolizumab Coformulated With Berahyaluronidase Alfa (MK-3475A) in High-Risk Stage I Non-Small Cell Lung Cancer (V940-014)",
+      "url": "https://clinicaltrials.gov/study/NCT07513376",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07513376",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Intismeran",
+          "Pembrolizumab coformulated with berahyaluronidase alfa",
+          "Placebo"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Brazil",
+          "Canada",
+          "Chile",
+          "France",
+          "Germany",
+          "Greece",
+          "Hungary",
+          "Israel",
+          "Italy",
+          "Japan",
+          "Netherlands",
+          "Poland",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Turkey (T\u00fcrkiye)",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-05-04",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2034-08-22",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2038-05-11",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07720284": {
+      "nct_id": "NCT07720284",
+      "title": "An Open-label Study to Investigate the Efficacy and Safety of Dato-DXd + Rilvegostomig vs SoC in Adult Participants With High-risk MIUC",
+      "url": "https://clinicaltrials.gov/study/NCT07720284",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07720284",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "durvalumab",
+          "Nivolumab",
+          "pembrolizumab",
+          "enfortumab vedotin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Brazil",
+          "Canada",
+          "China",
+          "France",
+          "Germany",
+          "India",
+          "Italy",
+          "Japan",
+          "Poland",
+          "South Korea",
+          "Spain",
+          "Taiwan",
+          "Thailand",
+          "United Kingdom"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-07-16",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2030-09-11",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2032-11-23",
+          "type": "ESTIMATED"
+        }
+      }
+    }
+  },
+  "assumptions": [
+    "'Keytruda' was matched as the standard drug name 'pembrolizumab' (MeSH).",
+    "1 of 56 search matches for 'Keytruda' were excluded because 'Keytruda' is not one of their drug interventions.",
+    "Bars run from the start date to the primary completion date (or completion date when missing).",
+    "Showing the 50 most recently started of 55 trials with both dates."
+  ],
+  "source": {
+    "api_version": "2.0.5",
+    "data_timestamp": "2026-10-02T09:00:04",
+    "retrieved_at": "2026-10-04T15:17:01.915451Z",
+    "search_matches": 56,
+    "cohort_size": 55,
+    "api_requests": 1
+  },
+  "verification": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "answers_plan",
+        "passed": true
+      },
+      {
+        "name": "encoded_fields_exist",
+        "passed": true
+      },
+      {
+        "name": "counts_match_citations",
+        "passed": true
+      },
+      {
+        "name": "citations_resolve",
+        "passed": true
+      },
+      {
+        "name": "cited_values_match_source",
+        "passed": true
+      },
+      {
+        "name": "evidence_matches_source",
+        "passed": true
+      },
+      {
+        "name": "cited_trials_meet_filters",
+        "passed": true
+      }
+    ]
+  },
+  "warnings": [],
+  "run_id": "run_33fc8d582edc40eaa541e62f568a5411",
+  "relation": "new",
+  "additional_answers": [],
+  "model_calls": 1,
+  "planner_model": "gpt-5.4-mini-2026-03-17",
+  "timings_ms": {
+    "plan": 1139.8,
+    "retrieve": 189.4,
+    "analyze": 0.3,
+    "verify": 0.8
+  }
+}

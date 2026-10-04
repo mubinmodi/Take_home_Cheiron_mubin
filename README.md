@@ -254,13 +254,64 @@ Each type, its data and its channels:
 | `scatter_plot` | one point per trial: `duration_months`, `enrollment`, `values` | `x`, `y` (`metadata.y_scale: "symlog"`), `color` |
 | `network_graph` | `{"nodes": [{id, label, kind, trial_count, trial_ids}], "edges": [{source, target, kind, trial_count, trial_ids}]}` | `label`, `size`, `color` (node kind), `source`, `target`, `weight`; `metadata.node_kinds`, `bipartite`, `min_edge_trials` |
 
+One real Datum of each type (`trial_ids` shortened). The numbers in brackets name the example in [`examples/`](examples/); the single value and the table come from the service's tests:
+
+```jsonc
+// single_value
+{"label": "Trials", "trial_count": 50, "trial_ids": ["NCT02122861", "…"]}
+// bar_chart (02)
+{"country": "United States", "trial_count": 246, "trial_ids": ["NCT00001823", "…"]}
+// time_series (01); a crossed chart adds the series field, e.g. "phase"
+{"start_year": "2008", "trial_count": 1, "estimated_count": 0, "trial_ids": ["NCT04898751"]}
+// grouped_bar_chart (03)
+{"phase": "Early Phase 1", "group": "semaglutide only", "trial_count": 5, "trial_ids": ["NCT05249881", "…"]}
+// histogram (06)
+{"enrollment_bin": "0", "enrollment_type": "Actual", "trial_count": 522, "trial_ids": ["NCT00003455", "…"]}
+// table: columns nct_id, title, status, phase, start_date, lead_sponsor, enrollment
+{"nct_id": "NCT05913388", "title": "GB1211 and Pembrolizumab …", "status": "ACTIVE_NOT_RECRUITING", "phase": "Phase 2",
+ "start_date": "2024-02-29", "lead_sponsor": "Providence Health & Services", "enrollment": 12, "trial_ids": ["NCT05913388"]}
+// timeline (07)
+{"trial": "NCT05899608 · Clinical Study of Ivonescimab …", "nct_id": "NCT05899608", "start": "2023-10-26",
+ "end": "2028-12-31", "dates": "Includes estimated dates", "status": "RECRUITING", "trial_ids": ["NCT05899608"]}
+// scatter_plot (08)
+{"nct_id": "NCT00696657", "title": "A Randomised Controlled Clinical Trial …", "duration_months": 8.1, "enrollment": 415,
+ "values": "Actual values", "trial_ids": ["NCT00696657"]}
+// network_graph (04): data is {"nodes": [...], "edges": [...]}
+{"id": "sponsor:National Cancer Institute (NCI)", "label": "National Cancer Institute (NCI)", "kind": "sponsor",
+ "trial_count": 128, "trial_ids": ["NCT00004028", "…"]}
+{"source": "sponsor:National Cancer Institute (NCI)", "target": "drug:temozolomide", "kind": "sponsors_trials_of",
+ "trial_count": 31, "trial_ids": ["NCT00039494", "…"]}
+```
+
+The encoding names these fields, e.g. a timeline's `{"x": {"field": "start"}, "x2": {"field": "end"}, "y": {"field": "trial"}, "color": {"field": "dates"}}`. A renderer reads `encoding` and `data` and needs nothing else.
+
 The images are produced by translating this spec, and only this spec, into Vega-Lite with finished values. That doubles as a check that the spec is complete.
+
+### Citations
+
+The assignment asks for references of the form `{nct_id, excerpt}` (or a field/value). Ours is the field/value form, split in two so each trial is described once however many Datums cite it:
+- each Datum lists the trials behind it in `trial_ids`;
+- `evidence[nct_id]` holds the trial's title, its ClinicalTrials.gov link, and `fields`: each API field path with the value it had in the record.
+
+For the "China" bar of example 02, `evidence["NCT03340506"]` is:
+
+```json
+{"nct_id": "NCT03340506", "title": "Dabrafenib and/or Trametinib Rollover Study",
+ "url": "https://clinicaltrials.gov/study/NCT03340506",
+ "fields": {
+   "protocolSection.identificationModule.nctId": "NCT03340506",
+   "protocolSection.statusModule.overallStatus": "RECRUITING",
+   "protocolSection.contactsLocationsModule.locations.country": ["United States", "Argentina", "…", "China", "…"],
+   "derivedSection.conditionBrowseModule.meshes.term": ["Melanoma", "…"]}}
+```
+
+`fields` holds the values that placed the trial in the answer: the field it is grouped by (countries: it is counted under each of them) and the field behind each filter (status, condition). The verifier re-derives every one of these values from the trial record before answering.
 
 ---
 
 ## 5. Example runs
 
-[`examples/`](examples/) holds five real runs of the service against the live ClinicalTrials.gov API, unedited: request, full JSON response and chart.
+[`examples/`](examples/) holds nine real runs of the service against the live ClinicalTrials.gov API, unedited: request, full JSON response and chart.
 
 | Example | Outcome |
 |---|---|
@@ -269,6 +320,10 @@ The images are produced by translating this spec, and only this spec, into Vega-
 | "Compare phases for trials involving semaglutide vs tirzepatide" | `grouped_bar_chart`, 824 |
 | "Show a network of sponsors and drugs for glioblastoma trials" | `network_graph`: 975 trials cited by the 52 links shown (of 2,269 matching trials, 1,736 with a drug and a lead sponsor) |
 | "What phases are Merck's trials in?" | `clarification_required`: Merck Sharp & Dohme (2,151) / Merck KGaA (275) / All of these (2,426) |
+| "What is the enrollment distribution of breast cancer trials?" | `histogram`, 16,873 |
+| "Show a timeline of recruiting phase 3 Keytruda trials in Germany" | `timeline`, the 50 most recently started of 55 |
+| "Plot enrollment against duration for completed semaglutide trials" | `scatter_plot`, 309 |
+| "Which drugs are most often combined with pembrolizumab?" | `network_graph` (drug ↔ drug, same arm), 1,776 |
 
 Regenerate with `uv run python -m examples.generate`.
 

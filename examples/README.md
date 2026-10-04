@@ -9,5 +9,9 @@ Real runs of the service against the live ClinicalTrials.gov API (data timestamp
 | [03-compare-phases-semaglutide-tirzepatide](03-compare-phases-semaglutide-tirzepatide/) | "Compare phases for trials involving semaglutide vs tirzepatide" | success | `grouped_bar_chart` | 824 |
 | [04-network-sponsors-drugs-glioblastoma](04-network-sponsors-drugs-glioblastoma/) | "Show a network of sponsors and drugs for glioblastoma trials" | success | `network_graph` | 975 |
 | [05-clarification-merck](05-clarification-merck/) | "What phases are Merck's trials in?" | `clarification_required` | — | — |
+| [06-histogram-enrollment-breast-cancer](06-histogram-enrollment-breast-cancer/) | "What is the enrollment distribution of breast cancer trials?" | success | `histogram` | 16,873 |
+| [07-timeline-recruiting-phase3-keytruda-germany](07-timeline-recruiting-phase3-keytruda-germany/) | "Show a timeline of recruiting phase 3 Keytruda trials in Germany" | success | `timeline` | 50 (of 55) |
+| [08-scatter-enrollment-duration-semaglutide](08-scatter-enrollment-duration-semaglutide/) | "Plot enrollment against duration for completed semaglutide trials" | success | `scatter_plot` | 309 |
+| [09-network-drug-combinations-pembrolizumab](09-network-drug-combinations-pembrolizumab/) | "Which drugs are most often combined with pembrolizumab?" | success | `network_graph` | 1,776 |
 
-All four successes passed every verifier check. The responses are large because every Datum cites its trials and the shared `evidence` map holds each cited trial once with its source field values.
+All eight successes passed every verifier check. The responses are large because every Datum cites its trials and the shared `evidence` map holds each cited trial once with its source field values.
