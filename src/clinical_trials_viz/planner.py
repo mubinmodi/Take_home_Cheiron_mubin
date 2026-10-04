@@ -42,7 +42,8 @@ Operations (answer_plan.operation):
 - `relate`: a network of entities that share trials. Set `network`:
   `sponsor_drug` for "network of sponsors and drugs", "which companies develop which drugs";
   `drug_drug` for "which drugs are combined / co-occur / given together". group_by stays null.
-- `bin`: histograms (e.g. enrollment distribution); use only for that question type.
+- `bin`: an enrollment histogram ("distribution of trial sizes", "how many participants do trials
+  enroll"). group_by stays null.
 
 Dimensions for group_by:
 {dimensions}

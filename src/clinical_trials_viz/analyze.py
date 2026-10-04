@@ -4,7 +4,14 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date
 
-from clinical_trials_viz.catalog import DIMENSIONS, NOT_REPORTED, OTHER_BUCKET, PHASE_LABELS, Dimension
+from clinical_trials_viz.catalog import (
+    DIMENSIONS,
+    ENROLLMENT_BINS,
+    NOT_REPORTED,
+    OTHER_BUCKET,
+    PHASE_LABELS,
+    Dimension,
+)
 from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 
 _PHASE_ORDER = list(PHASE_LABELS.values())
@@ -121,3 +128,48 @@ def comparison_groups(sides: dict[str, list[Trial]]) -> ComparisonGroups:
         key = f"{next(iter(labels))} only" if len(labels) == 1 else overlap_label
         groups[key].append(by_id[nct_id])
     return ComparisonGroups(list(groups), groups, overlap_label)
+
+
+ENROLLMENT_TYPES = {"ACTUAL": "Actual", "ESTIMATED": "Estimated"}
+
+
+def enrollment_bin(count: int | None) -> str:
+    if count is None:
+        return NOT_REPORTED
+    for label, low, high in ENROLLMENT_BINS:
+        if count >= low and (high is None or count <= high):
+            return label
+    return NOT_REPORTED  # negative counts do not occur in the registry
+
+
+def enrollment_type(trial: Trial) -> str:
+    return ENROLLMENT_TYPES.get(trial.enrollment_type or "", "Type not reported")
+
+
+@dataclass
+class Histogram:
+    """Trials per enrollment bin, split by actual vs estimated enrollment, in bin order."""
+
+    cells: list[tuple[str, str, list[str]]]  # (bin label, enrollment type, trial IDs)
+    series: list[str]
+    missing: int
+    assumptions: list[str] = field(default_factory=list)
+
+
+def enrollment_histogram(trials: list[Trial]) -> Histogram:
+    ids: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for trial in trials:
+        ids[(enrollment_bin(trial.enrollment), enrollment_type(trial))].add(trial.nct_id)
+    labels = [label for label, _, _ in ENROLLMENT_BINS] + [NOT_REPORTED]
+    present = {label for label, _ in ids}
+    series = [t for t in [*ENROLLMENT_TYPES.values(), "Type not reported"] if any(k[1] == t for k in ids)]
+    cells = [(label, t, sorted(ids.get((label, t), set()))) for label in labels if label in present or label != NOT_REPORTED
+             for t in series]  # fmt: skip
+    missing = sum(len(v) for (label, _), v in ids.items() if label == NOT_REPORTED)
+    assumptions = [
+        "Enrollment is the number of participants; 'Estimated' is the planned enrollment of trials that have not "
+        "finished recruiting, 'Actual' is the final number.",
+    ]
+    if missing:
+        assumptions.append(f"{missing} trials do not report enrollment; they are shown as '{NOT_REPORTED}'.")
+    return Histogram(cells, series, missing, assumptions)

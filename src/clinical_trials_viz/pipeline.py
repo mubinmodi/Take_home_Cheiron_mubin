@@ -13,8 +13,8 @@ from opentelemetry import trace
 from pydantic_ai import ModelAPIError, UnexpectedModelBehavior, UsageLimitExceeded
 
 from clinical_trials_viz import clarify
-from clinical_trials_viz.analyze import breakdown, comparison_groups
-from clinical_trials_viz.catalog import DEFAULT_TOP_N, Dimension
+from clinical_trials_viz.analyze import breakdown, comparison_groups, enrollment_histogram
+from clinical_trials_viz.catalog import DEFAULT_TOP_N, ENROLLMENT_FIELD, Dimension
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
 from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError
 from clinical_trials_viz.ctgov.trial import Trial
@@ -30,6 +30,7 @@ from clinical_trials_viz.spec_builder import (
     build_evidence,
     chart_type_for,
     comparison_spec,
+    histogram_spec,
     network_spec,
     single_value_spec,
     table_spec,
@@ -221,6 +222,10 @@ class Pipeline:
             spec, notes = table_spec(cohort.trials, filters)
             run.response.assumptions.extend(notes)
             return spec, None
+        if plan.operation is Operation.BIN:
+            histogram = enrollment_histogram(cohort.trials)
+            run.response.assumptions.extend(histogram.assumptions)
+            return histogram_spec(histogram, filters, len(cohort.trials)), None
         if plan.operation is Operation.RELATE:
             kind = plan.network or NetworkKind.SPONSOR_DRUG
             build = sponsor_drug_network if kind is NetworkKind.SPONSOR_DRUG else drug_drug_network
@@ -275,6 +280,10 @@ class Pipeline:
             filters = response.applied_filters or AppliedFilters()
             sides = tuple(_cited_dimensions(plan))
             evidence = build_evidence(spec, trials, dimension, filters, sides)
+            if plan.operation is Operation.BIN:
+                for nct_id, entry in evidence.items():
+                    trial = trials[nct_id]
+                    entry.fields[ENROLLMENT_FIELD] = {"count": trial.enrollment, "type": trial.enrollment_type}
             if plan.network is NetworkKind.DRUG_DRUG:
                 for nct_id, entry in evidence.items():  # the arms that make each link a combination
                     entry.fields[ARM_FIELD] = {

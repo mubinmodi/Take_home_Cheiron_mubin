@@ -1,5 +1,6 @@
 """The verifier: a gate before every successful response. Failing checks block the answer."""
 
+from clinical_trials_viz.analyze import enrollment_bin, enrollment_type
 from clinical_trials_viz.catalog import NOT_REPORTED, OTHER_BUCKET, Dimension
 from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
@@ -71,6 +72,20 @@ def verify(
             + [f"edge {i} lacks '{f}'" for i, e in enumerate(spec.data.edges) for f in edge_fields if f not in e],
         )
         check("network_matches_source", network_problems(spec.data, trials))
+
+    if spec.type is VisualizationType.HISTOGRAM:
+        check(
+            "cited_values_match_source",
+            [
+                f"{nct_id}: enrollment {trials[nct_id].enrollment} ({trials[nct_id].enrollment_type}) not in "
+                f"'{d['enrollment_bin']}' / {d['enrollment_type']}"
+                for d in spec.rows()
+                for nct_id in d["trial_ids"]
+                if nct_id in trials
+                and (enrollment_bin(trials[nct_id].enrollment), enrollment_type(trials[nct_id]))
+                != (d["enrollment_bin"], d["enrollment_type"])
+            ],
+        )
 
     # Every cited trial meets the filters, checked against its own source values (not the API's word).
     check("cited_trials_meet_filters", [

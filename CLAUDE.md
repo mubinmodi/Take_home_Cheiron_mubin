@@ -35,7 +35,7 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 
 ## Current state
 
-- Working local version (2026-10-03): FastAPI service with the full pipeline for `aggregate` (single value, bar, time series), `compare` (grouped bar with overlap group) and `per_trial` (table), data-built clarifications, verifier, Vega-Lite PNG/SVG rendering and run records. `relate` returns a `network_graph`: `sponsor_drug` (two-column image) or `drug_drug` same-arm combinations (circular image). `bin` (histogram) returns `unsupported_query` until built. Remaining work is ticketed under `.scratch/clinical-trials-viz-service/`. Git repository initialised, nothing committed yet.
+- Working local version (2026-10-03): FastAPI service with the full pipeline for `aggregate` (single value, bar, time series), `compare` (grouped bar with overlap group) and `per_trial` (table), data-built clarifications, verifier, Vega-Lite PNG/SVG rendering and run records. `relate` returns a `network_graph`: `sponsor_drug` (two-column image) or `drug_drug` same-arm combinations (circular image). `bin` returns an enrollment `histogram` (actual vs estimated). Remaining work is ticketed under `.scratch/clinical-trials-viz-service/`. Git repository initialised, nothing committed yet.
 - The six assignment screenshots are in `docs/assignment-images/`.
 - API spike done: findings in `docs/research/api-data-guide.md`, saved responses in `docs/research/api-spike/`. Scope and counting rules are decided (`harness-design.md` sections 2–3); the numeric goals in section 1 are still proposals.
 - Not yet run with a real model (no API keys were available); all model paths are tested with a scripted planner and pydantic-ai `FunctionModel`.

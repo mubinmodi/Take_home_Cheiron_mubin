@@ -58,12 +58,8 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
     result = GateResult(filters)
     errors = result.errors
 
-    if plan.operation is Operation.BIN:
-        result.unsupported = (
-            "Histograms are not available in this version yet. "
-            "Try counts by year, phase, status, country or sponsor, a comparison, a network or a list of trials."
-        )
-        return result
+    if plan.operation is Operation.BIN and plan.group_by is not None:
+        errors.append("bin makes an enrollment histogram; set group_by to null")
     if plan.operation is Operation.RELATE:
         if plan.network is None:
             errors.append("relate needs network: sponsor_drug or drug_drug")

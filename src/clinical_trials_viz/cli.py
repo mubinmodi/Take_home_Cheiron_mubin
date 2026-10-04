@@ -125,6 +125,8 @@ def _data_lines(spec: dict[str, Any]) -> list[str]:
         return rows + ([f"  … {total - MAX_ROWS} more"] if total > MAX_ROWS else [])
     x = enc["x"]["field"]
     color = (enc.get("color") or {}).get("field")
+    if color:  # split charts: empty combinations add noise in a text summary
+        data = [d for d in data if d["trial_count"]]
     labels = [f"{d[x]} / {d[color]}" if color else str(d[x]) for d in data]
     width = min(max(map(len, labels), default=0), 50)
     rows = [f"  {label[:50]:<{width}}  {d['trial_count']:>6,}" for label, d in zip(labels, data, strict=True)]

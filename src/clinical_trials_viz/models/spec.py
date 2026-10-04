@@ -13,6 +13,7 @@ class VisualizationType(StrEnum):
     SINGLE_VALUE = "single_value"
     TABLE = "table"
     NETWORK_GRAPH = "network_graph"
+    HISTOGRAM = "histogram"
 
 
 class FieldType(StrEnum):
@@ -69,6 +70,9 @@ class RenderMetadata(BaseModel):
     )
     bipartite: bool = Field(default=False, description="network_graph: edges only join different node kinds.")
     min_edge_trials: int | None = Field(default=None, description="network_graph: edges need this many trials.")
+    bins: list[dict[str, Any]] | None = Field(
+        default=None, description="histogram: bins in order, each {label, min, max}; max null = no upper limit."
+    )
 
 
 class NetworkData(BaseModel):

@@ -93,6 +93,22 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
                 },
             }
 
+        case VisualizationType.HISTOGRAM:
+            assert enc.x and enc.y and enc.color
+            return {
+                **base,
+                "width": _WIDTH,
+                "height": 320,
+                "mark": "bar",
+                "encoding": {
+                    "x": _channel(enc.x, sort=meta.category_order, axis={"labelAngle": 0}),
+                    "y": _channel(enc.y, stack="zero"),
+                    "color": _channel(enc.color, sort=meta.series_order),
+                    "order": {"field": enc.color.field, "sort": "ascending"},
+                    "tooltip": _tooltip(spec),
+                },
+            }
+
         case VisualizationType.GROUPED_BAR_CHART:
             assert enc.x and enc.y and enc.color
             categories = meta.category_order or []

@@ -124,9 +124,6 @@ async def test_unsupported_and_not_yet_available(make_client):
         make_client, ScriptedPlanner(UnsupportedPlan(reason="Efficacy is not in the registry.")), query="Does it work?"
     )
     assert body["outcome"] == "unsupported_query"
-    histogram = AnswerPlan(operation=Operation.BIN, group_by=None)
-    body = await ask(make_client, ScriptedPlanner(histogram), query="Enrollment histogram")
-    assert body["outcome"] == "unsupported_query"
 
 
 async def test_invalid_plan_is_repaired_once(make_client):
@@ -362,3 +359,40 @@ async def test_rate_limited_requests_are_retried(make_client, ctgov, page, monke
     )
     body = await ask(make_client, ScriptedPlanner(TREND), query="Keytruda per year")
     assert body["outcome"] == "success"
+
+
+async def test_enrollment_histogram_end_to_end(make_client, trials):
+    plan = AnswerPlan(operation=Operation.BIN, filters=Filters(drugs=["pembrolizumab"]))
+    async for client in make_client(ScriptedPlanner(plan)):
+        body = (await client.post("/v1/query", json={"query": "Enrollment distribution"})).json()
+        assert body["outcome"] == "success", body.get("message")
+        spec = body["visualization"]
+        assert spec["type"] == "histogram"
+        assert spec["metadata"]["bins"][0] == {"label": "0", "min": 0, "max": 0}
+        assert set(spec["metadata"]["series_order"]) <= {"Actual", "Estimated", "Type not reported"}
+        assert sum(d["trial_count"] for d in spec["data"]) == spec["metadata"]["cohort_size"]  # one bin per trial
+        assert body["verification"]["passed"]
+        entry = next(iter(body["evidence"].values()))
+        assert "protocolSection.designModule.enrollmentInfo" in entry["fields"]
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")
+
+
+def test_histogram_verifier_catches_a_trial_in_the_wrong_bin(trials):
+    from clinical_trials_viz.analyze import enrollment_histogram
+    from clinical_trials_viz.models.response import AppliedFilters
+    from clinical_trials_viz.models.spec import VisualizationType
+    from clinical_trials_viz.spec_builder import build_evidence, histogram_spec
+    from clinical_trials_viz.verify import verify
+
+    spec = histogram_spec(enrollment_histogram(trials), AppliedFilters(), len(trials))
+    by_id = {t.nct_id: t for t in trials}
+    full = [d for d in spec.rows() if d["trial_ids"]]
+    moved = full[0]["trial_ids"].pop()
+    full[0]["trial_count"] -= 1
+    target = next(d for d in spec.rows() if d["enrollment_bin"] != full[0]["enrollment_bin"])
+    target["trial_ids"].append(moved)
+    target["trial_count"] += 1
+    result = verify(spec, build_evidence(spec, by_id, None, AppliedFilters()), by_id, None,
+                    VisualizationType.HISTOGRAM, AppliedFilters())  # fmt: skip
+    assert not next(c for c in result.checks if c.name == "cited_values_match_source").passed

@@ -223,6 +223,21 @@ NETWORK_TOP_SPONSORS = 15
 NETWORK_TOP_DRUGS = 25
 NETWORK_MIN_EDGE_TRIALS = 2
 NETWORK_MAX_EDGES = 60
+
+# Enrollment histogram bins (participants), chosen for a heavily skewed distribution.
+# Each bin is (label, lowest, highest); highest None means no upper limit.
+ENROLLMENT_BINS: list[tuple[str, int, int | None]] = [
+    ("0", 0, 0),
+    ("1–20", 1, 20),
+    ("21–50", 21, 50),
+    ("51–100", 51, 100),
+    ("101–200", 101, 200),
+    ("201–500", 201, 500),
+    ("501–1,000", 501, 1000),
+    ("1,001–5,000", 1001, 5000),
+    ("Over 5,000", 5001, None),
+]
+ENROLLMENT_FIELD = "protocolSection.designModule.enrollmentInfo"
 MAX_TOP_N = 50
 MAX_COMPARE_SIDES = 5
 PAGE_SIZE = 1000

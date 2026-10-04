@@ -5,9 +5,10 @@ The chart type follows deterministically from the Query Plan; the model does not
 
 from typing import Any
 
-from clinical_trials_viz.analyze import Breakdown, ComparisonGroups, breakdown
+from clinical_trials_viz.analyze import Breakdown, ComparisonGroups, Histogram, breakdown
 from clinical_trials_viz.catalog import (
     DIMENSIONS,
+    ENROLLMENT_BINS,
     NETWORK_MIN_EDGE_TRIALS,
     OTHER_BUCKET,
     PHASE_LABELS,
@@ -38,6 +39,8 @@ def chart_type_for(plan: AnswerPlan) -> VisualizationType:
         return VisualizationType.TABLE
     if plan.operation is Operation.RELATE:
         return VisualizationType.NETWORK_GRAPH
+    if plan.operation is Operation.BIN:
+        return VisualizationType.HISTOGRAM
     if plan.operation is Operation.COMPARE:
         return VisualizationType.GROUPED_BAR_CHART if plan.group_by else VisualizationType.BAR_CHART
     if plan.group_by is None:
@@ -231,6 +234,30 @@ def network_spec(
             cohort_size=cohort_size,
         ),
     )  # fmt: skip
+
+
+def histogram_spec(histogram: Histogram, filters: AppliedFilters, cohort_size: int) -> VisualizationSpec:
+    bin_channel = Channel(field="enrollment_bin", type=FieldType.ORDINAL, title="Enrollment (participants)")
+    type_channel = Channel(field="enrollment_type", type=FieldType.NOMINAL, title="Enrollment")
+    data = [
+        {"enrollment_bin": label, "enrollment_type": kind, "trial_count": len(ids), "trial_ids": ids}
+        for label, kind, ids in histogram.cells
+    ]
+    order = list(dict.fromkeys(label for label, _, _ in histogram.cells))
+    return VisualizationSpec(
+        type=VisualizationType.HISTOGRAM,
+        title=f"Trials by enrollment: {describe_filters(filters)}",
+        subtitle=f"{cohort_size:,} trials",
+        encoding=Encoding(x=bin_channel, y=COUNT, color=type_channel, tooltip=[bin_channel, type_channel, COUNT]),
+        data=data,
+        metadata=RenderMetadata(
+            units="trials",
+            category_order=order,
+            series_order=histogram.series,
+            bins=[{"label": label, "min": low, "max": high} for label, low, high in ENROLLMENT_BINS],
+            cohort_size=cohort_size,
+        ),
+    )
 
 
 TABLE_COLUMNS = [
