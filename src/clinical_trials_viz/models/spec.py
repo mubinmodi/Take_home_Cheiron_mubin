@@ -12,6 +12,7 @@ class VisualizationType(StrEnum):
     TIME_SERIES = "time_series"
     SINGLE_VALUE = "single_value"
     TABLE = "table"
+    NETWORK_GRAPH = "network_graph"
 
 
 class FieldType(StrEnum):
@@ -60,15 +61,35 @@ class RenderMetadata(BaseModel):
     total_rows: int | None = Field(default=None, description="table: rows available; data may show fewer.")
 
 
+class NetworkData(BaseModel):
+    """`network_graph` data. Nodes and edges are both Datums: each carries `trial_count` and `trial_ids`."""
+
+    nodes: list[dict[str, Any]]
+    edges: list[dict[str, Any]]
+
+
 class VisualizationSpec(BaseModel):
     """Type, title, encoding, data and metadata: renderable without any other context.
 
-    Every datum carries `trial_ids` (its Citation); details are in the response `evidence`.
+    Every Datum carries `trial_ids` (its Citation) and, when it shows a count, `trial_count`;
+    details are in the response `evidence`.
     """
 
     type: VisualizationType
     title: str
     subtitle: str | None = None
     encoding: Encoding
-    data: list[dict[str, Any]]
+    data: list[dict[str, Any]] | NetworkData = Field(description="Rows, or nodes and edges for a network.")
     metadata: RenderMetadata
+
+    def datums(self) -> list[dict[str, Any]]:
+        """Every Datum, whatever the data's shape: the rows, or the nodes followed by the edges."""
+        if isinstance(self.data, NetworkData):
+            return [*self.data.nodes, *self.data.edges]
+        return self.data
+
+    def rows(self) -> list[dict[str, Any]]:
+        """Row-shaped data (every type except networks)."""
+        if isinstance(self.data, NetworkData):
+            raise TypeError(f"{self.type} data is nodes and edges, not rows")
+        return self.data

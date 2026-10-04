@@ -169,3 +169,39 @@ def test_filtered_answer_cites_and_checks_filter_fields(trials):
         bad, build_evidence(bad, by_id, None, filters), by_id, None, VisualizationType.SINGLE_VALUE, filters
     )
     assert not next(c for c in result.checks if c.name == "cited_trials_meet_filters").passed
+
+
+def test_network_datums_get_citations_and_count_checks(trials):
+    """Nodes and edges are Datums: evidence and the verifier treat them like bars."""
+    from clinical_trials_viz.models.spec import Encoding, NetworkData, RenderMetadata, VisualizationSpec
+
+    a, b, c = (t.nct_id for t in trials[:3])
+    edge = {"source": "s", "target": "d", "trial_count": 2, "trial_ids": [a, b]}
+    spec = VisualizationSpec(
+        type=VisualizationType.NETWORK_GRAPH,
+        title="t",
+        encoding=Encoding(),
+        data=NetworkData(
+            nodes=[
+                {"id": "s", "trial_count": 3, "trial_ids": [a, b, c]},
+                {"id": "d", "trial_count": 2, "trial_ids": [a, b]},
+            ],
+            edges=[edge],
+        ),
+        metadata=RenderMetadata(cohort_size=3),
+    )
+    assert len(spec.datums()) == 3
+    by_id = {t.nct_id: t for t in trials}
+    evidence = build_evidence(spec, by_id, None, AppliedFilters())
+    assert set(evidence) == {a, b, c}
+    filters = AppliedFilters()
+    assert verify(spec, evidence, by_id, None, VisualizationType.NETWORK_GRAPH, filters).passed
+
+    assert isinstance(spec.data, NetworkData)
+    spec.data.edges[0]["trial_count"] = 3  # an edge weight that its citations do not support
+    result = verify(spec, evidence, by_id, None, VisualizationType.NETWORK_GRAPH, filters)
+    assert not next(c for c in result.checks if c.name == "counts_match_citations").passed
+    with pytest.raises(NotRenderable):
+        render(spec, "png")
+    with pytest.raises(TypeError):
+        spec.rows()

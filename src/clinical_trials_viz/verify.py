@@ -23,32 +23,35 @@ def verify(
 
     check("answers_plan", [] if spec.type is expected_type else [f"expected {expected_type}, built {spec.type}"])
 
-    # Validity: every encoded field exists in every datum.
-    enc = spec.encoding
-    channels = [c for c in (enc.x, enc.y, enc.color, enc.value) if c] + (enc.columns or []) + enc.tooltip
-    check(
-        "encoded_fields_exist",
-        [f"datum {i} lacks '{c.field}'" for i, d in enumerate(spec.data) for c in channels if c.field not in d],
-    )
+    datums = spec.datums()
 
-    # Citations add up: each count equals its distinct cited trials.
+    # Validity: every encoded field exists in every row.
+    if spec.type is not VisualizationType.NETWORK_GRAPH:
+        enc = spec.encoding
+        channels = [c for c in (enc.x, enc.y, enc.color, enc.value) if c] + (enc.columns or []) + enc.tooltip
+        check(
+            "encoded_fields_exist",
+            [f"datum {i} lacks '{c.field}'" for i, d in enumerate(spec.rows()) for c in channels if c.field not in d],
+        )
+
+    # Citations add up: each count (bar height, node size, edge weight) equals its distinct cited trials.
     check(
         "counts_match_citations",
         [
             f"datum {i}: count {d['trial_count']} but {len(set(d['trial_ids']))} cited trials"
-            for i, d in enumerate(spec.data)
+            for i, d in enumerate(datums)
             if "trial_count" in d and d["trial_count"] != len(set(d["trial_ids"]))
         ],
     )
 
     # Every cited trial resolves in the evidence and in the retrieved cohort.
-    cited = {i for d in spec.data for i in d["trial_ids"]}
+    cited = {i for d in datums for i in d["trial_ids"]}
     check("citations_resolve", [f"{i} missing" for i in sorted(cited) if i not in evidence or i not in trials])
 
     # Each cited trial really has the value of the bucket it is counted in.
-    if dimension is not None and spec.type is not VisualizationType.TABLE:
+    if dimension is not None and spec.type not in (VisualizationType.TABLE, VisualizationType.NETWORK_GRAPH):
         wrong = []
-        for d in spec.data:
+        for d in spec.rows():
             label = d.get(dimension.value)
             if label in (OTHER_BUCKET, None):
                 continue
@@ -65,7 +68,7 @@ def verify(
 
     # Readability: no silent gaps in a time series.
     if spec.type is VisualizationType.TIME_SERIES and dimension is Dimension.START_YEAR:
-        years = [int(d[dimension.value]) for d in spec.data if d[dimension.value] != NOT_REPORTED]
+        years = [int(d[dimension.value]) for d in spec.rows() if d[dimension.value] != NOT_REPORTED]
         check("no_time_gaps", [] if years == list(range(min(years), max(years) + 1)) else ["missing years"])
 
     return Verification(passed=all(c.passed for c in checks), checks=checks)

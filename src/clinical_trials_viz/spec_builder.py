@@ -249,7 +249,7 @@ def build_evidence(
     wanted: list[Dimension] = [*filter_dimensions(filters), *extra, *([dimension] if dimension else [])]
     cited = list(dict.fromkeys(wanted))
     evidence: dict[str, EvidenceEntry] = {}
-    for datum in spec.data:
+    for datum in spec.datums():
         for nct_id in datum["trial_ids"]:
             if nct_id in evidence:
                 continue

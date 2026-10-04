@@ -22,7 +22,7 @@ class NotRenderable(Exception):
 
 
 def _values(spec: VisualizationSpec) -> list[dict[str, Any]]:
-    data = spec.data
+    data = spec.rows()
     if spec.type is VisualizationType.TIME_SERIES and spec.encoding.x:
         # Undated trials stay in the data (and citations) but have no place on a time axis.
         data = [d for d in data if d[spec.encoding.x.field] != NOT_REPORTED]
@@ -38,6 +38,8 @@ def _tooltip(spec: VisualizationSpec) -> list[dict[str, Any]]:
 
 
 def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
+    if spec.type is VisualizationType.NETWORK_GRAPH:
+        raise NotRenderable("network graphs have no image form yet")
     enc, meta = spec.encoding, spec.metadata
     title: dict[str, Any] = {"text": spec.title, "anchor": "start"}
     if spec.subtitle:
@@ -77,7 +79,7 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
         case VisualizationType.BAR_CHART:
             assert enc.x and enc.y
             # Horizontal bars keep long category names readable.
-            height = max(120, 26 * len(spec.data))
+            height = max(120, 26 * len(spec.rows()))
             return {
                 **base,
                 "width": _WIDTH - 200,
@@ -93,7 +95,7 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
         case VisualizationType.GROUPED_BAR_CHART:
             assert enc.x and enc.y and enc.color
             categories = meta.category_order or []
-            height = max(160, 18 * len(spec.data) + 10 * len(categories))
+            height = max(160, 18 * len(spec.rows()) + 10 * len(categories))
             return {
                 **base,
                 "width": _WIDTH - 200,
