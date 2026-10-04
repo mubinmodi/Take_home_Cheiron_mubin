@@ -13,3 +13,6 @@ docs/agents/
 
 # Built submission archive
 dist/
+
+# The assignment screenshots stay on the author's machine only (not published)
+docs/assignment-images/
