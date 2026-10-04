@@ -70,10 +70,11 @@
   .notice ul { margin: 4px 0 0; padding-left: 18px; }
   .followup { border: 1px solid var(--accent); background: var(--accent-bg); border-radius: 12px; padding: 12px 16px; margin: 16px 0; }
   .followup h3 { margin: 0 0 2px; }
-  .trail { list-style: none; margin: 0 0 12px; padding: 0; font-size: 14px; }
-  .trail li { padding: 3px 0; }
-  .trail button { border: none; background: none; padding: 0; color: var(--accent); text-align: left; cursor: pointer; }
-  .trail .now { font-weight: 600; color: var(--text); }
+  .turn-head { margin-bottom: 8px; }
+  .turn-head .kind { font-size: 13px; color: var(--muted); }
+  .turn-head .question { font-size: 16px; font-weight: 600; margin: 2px 0 0; }
+  .turn.reply { border-left: 4px solid var(--accent); }
+  .part { border-top: 1px dashed var(--border); margin-top: 16px; padding-top: 12px; }
   #loading { display: none; }
   #loading.on { display: inline; }
 </style>
@@ -112,38 +113,16 @@
     </div>
   </form>
 
-  <section id="result" class="panel" hidden>
-    <ol class="trail" id="trail" hidden></ol>
-    <div class="row" id="status-line"></div>
-    <p id="message"></p>
-    <div class="notice" id="warnings" hidden></div>
-    <div id="clarification"></div>
-    <h2 id="title"></h2>
-    <p id="subtitle" class="muted"></p>
-    <div class="layout" id="layout">
-      <div id="chart"></div>
-      <aside>
-        <h3>Citations</h3>
-        <div id="citations"><p class="muted">Click any bar, point, node, link or row to see the trials behind it.</p></div>
-      </aside>
+  <div id="thread"></div>
+  <form id="refine" class="followup" hidden>
+    <h3>Ask a follow-up about the latest answer</h3>
+    <p class="muted" style="margin: 0 0 8px">It keeps that answer's question and filters; say only what to change. The answer appears below.</p>
+    <div class="row" id="followup-examples" style="margin-top: 0"></div>
+    <div class="row">
+      <input id="refine-text" aria-label="Follow-up" placeholder="e.g. “only phase 3”, “show it by start year instead”, “only in Germany”" style="flex:1; min-width:240px">
+      <button type="submit" class="primary" id="refine-submit">Ask follow-up</button>
     </div>
-    <form id="refine" class="followup">
-      <h3>Ask a follow-up about this answer</h3>
-      <p class="muted" style="margin: 0 0 8px">It keeps this answer's question and filters; say only what to change.</p>
-      <div class="row" id="followup-examples" style="margin-top: 0"></div>
-      <div class="row">
-        <input id="refine-text" aria-label="Follow-up" placeholder="e.g. “only phase 3”, “show it by start year instead”, “only in Germany”" style="flex:1; min-width:240px">
-        <button type="submit" class="primary">Ask follow-up</button>
-      </div>
-    </form>
-    <div id="details">
-      <details open><summary>Assumptions</summary><ul class="plain" id="assumptions"></ul></details>
-      <details><summary>Filters applied</summary><ul class="plain" id="filters"></ul></details>
-      <details><summary>Verification</summary><ul class="plain" id="checks"></ul></details>
-      <details><summary>Source</summary><ul class="plain" id="source"></ul></details>
-    </div>
-  </section>
-  <div id="more-answers"></div>
+  </form>
 </main>
 
 <script>
@@ -176,13 +155,10 @@ function fieldName(path) {
 }
 const $ = (id) => document.getElementById(id);
 const FOLLOW_UPS = ["only phase 3", "only recruiting trials", "show it by start year instead", "only in the United States"];
-let current = null;      // the response on screen
-let lastBody = null;     // last request body (for Retry)
-let lastKind = "new";    // "new" | "follow-up" | "clarification"
-// The conversation: one turn per request, so earlier answers stay reachable. A new question starts a
-// new conversation; a follow-up or clarification answer continues from the turn on screen.
-let conversation = [];   // [{query, kind, response}]
-let turn = -1;           // index of the turn on screen
+const TURN_LABELS = { new: "Question", "follow-up": "Follow-up", clarification: "Clarification answer" };
+// The conversation, oldest first: one turn per question, follow-up or clarification answer, each in its
+// own section. A new question starts a new conversation; follow-ups continue from the latest answer.
+const thread = [];  // [{body, kind, response, section}]
 
 /** Build DOM safely: text always via textContent, never innerHTML. */
 function el(tag, attrs = {}, ...children) {
@@ -242,49 +218,82 @@ function saveKey(key) {
   try { localStorage.setItem(KEY_STORAGE, key); } catch (e) { /* kept in this page only */ }
 }
 
+/** Ask: a new question starts a new conversation; a follow-up or clarification answer is added below. */
 async function ask(body, kind = "new") {
-  lastBody = body;
-  lastKind = kind;
-  $("submit").disabled = true;
-  $("loading").classList.add("on");
+  if (kind === "new") {
+    thread.length = 0;
+    $("thread").replaceChildren();
+  }
+  const section = el("section", { class: kind === "new" ? "panel turn" : "panel turn reply" });
+  const turn = { body, kind, response: null, section };
+  thread.push(turn);
+  $("thread").append(section);
+  await run(turn);
+}
+
+/** Send one turn's request and draw its answer (or error) in its own section. Retry runs it again. */
+async function run(turn) {
+  turn.response = null;
+  turn.section.replaceChildren(turnHeader(turn),
+    el("p", { class: "muted" }, "Planning, retrieving every matching trial, counting and verifying…"));
+  turn.section.scrollIntoView({ behavior: "smooth", block: "start" });
+  setBusy(true);
   try {
     const headers = { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() };
     if (savedKey()) headers["X-API-Key"] = savedKey();
-    const response = await fetch("/v1/query", { method: "POST", headers, body: JSON.stringify(body) });
+    const response = await fetch("/v1/query", { method: "POST", headers, body: JSON.stringify(turn.body) });
     const data = await response.json();
     if (!response.ok) {
-      showError(data.detail);
+      showError(turn, data.detail);
       return;
     }
-    conversation = kind === "new" ? [] : conversation.slice(0, turn + 1);
-    conversation.push({ query: body.query, kind, response: data });
-    turn = conversation.length - 1;
-    await render(data);
+    turn.response = data;
+    await renderAnswer(turn);
   } catch (e) {
-    showError({ message: `Request failed: ${e}`, retryable: true });
+    showError(turn, { message: `Request failed: ${e}`, retryable: true });
   } finally {
-    $("submit").disabled = false;
-    $("loading").classList.remove("on");
+    setBusy(false);
   }
 }
 
-/** A request-level error: `detail` is {code, message, retryable}, a string, or FastAPI's validation list. */
-function showError(detail) {
-  const d = detail && typeof detail === "object" && !Array.isArray(detail) ? detail
-    : { message: Array.isArray(detail) ? detail.map((x) => x.msg).join("; ") : String(detail) };
-  $("result").hidden = false;
-  $("status-line").replaceChildren(el("span", { class: "badge bad" }, "request failed"),
-    d.code ? el("span", { class: "muted" }, d.code) : "", d.retryable ? retryButton() : "");
-  $("message").replaceChildren(d.message || "", el("br"),
-    el("span", { class: "muted" }, `${lastKind === "new" ? "Question" : "Follow-up"}: ${lastBody.query}`));
-  for (const id of ["clarification", "title", "subtitle", "chart"]) $(id).replaceChildren();
-  if (d.code === "unauthorized") $("clarification").append(keyForm());
-  for (const id of ["warnings", "layout", "refine", "details"]) $(id).hidden = true;
-  $("more-answers").replaceChildren();
-  renderTrail(-1);  // every earlier answer stays one click away
+function setBusy(busy) {
+  for (const b of [$("submit"), $("refine-submit"), ...$("followup-examples").children]) b.disabled = busy;
+  $("loading").classList.toggle("on", busy);
+  $("refine").hidden = !latestAnswer();
 }
 
-function keyForm() {
+/** The newest turn with an answer: follow-ups continue from it. */
+function latestAnswer() {
+  for (let i = thread.length - 1; i >= 0; i--) if (thread[i].response) return thread[i];
+  return null;
+}
+
+function turnHeader(turn) {
+  const r = turn.response;
+  const how = turn.kind !== "follow-up" || !r ? ""
+    : r.relation === "refine" ? " · refined the previous answer" : " · treated as a new question";
+  return el("div", { class: "turn-head" }, el("div", { class: "kind" }, TURN_LABELS[turn.kind] + how),
+            el("p", { class: "question" }, turn.body.query));
+}
+
+function retryButton(turn) {
+  return el("button", { type: "button", onclick: () => run(turn) }, "Retry");
+}
+
+/** A request-level error: `detail` is {code, message, retryable}, a string, or FastAPI's validation list. */
+function showError(turn, detail) {
+  const d = detail && typeof detail === "object" && !Array.isArray(detail) ? detail
+    : { message: Array.isArray(detail) ? detail.map((x) => x.msg).join("; ") : String(detail) };
+  turn.section.replaceChildren(
+    turnHeader(turn),
+    el("div", { class: "row" }, el("span", { class: "badge bad" }, "request failed"),
+       d.code ? el("span", { class: "muted" }, d.code) : "", d.retryable ? retryButton(turn) : ""),
+    el("p", {}, d.message || ""),
+    d.code === "unauthorized" ? keyForm(turn) : null,
+  );
+}
+
+function keyForm(turn) {
   const input = el("input", { type: "password", placeholder: "API key", "aria-label": "API key", autocomplete: "off" });
   const hint = savedKey() ? "That key was not accepted. Paste it again (with or without the \"name:\" part)."
                           : "This service needs an API key.";
@@ -292,91 +301,94 @@ function keyForm() {
     e.preventDefault();
     if (!input.value.trim()) return;
     saveKey(input.value.trim());
-    ask(lastBody, lastKind);
+    run(turn);
   } }, input, el("button", { type: "submit", class: "primary" }, "Save key and ask")));
-}
-
-function retryButton() {
-  return el("button", { type: "button", onclick: () => ask(lastBody, lastKind) }, "Retry");
-}
-
-/** The question trail: earlier turns can be reopened, and a follow-up continues from the turn on screen.
- *  `onScreen` is -1 when none is (after a failed request). */
-function renderTrail(onScreen = turn) {
-  const box = $("trail");
-  box.hidden = conversation.length < (onScreen === -1 ? 1 : 2);
-  box.replaceChildren(...conversation.map((t, i) => {
-    const how = i === 0 ? "" : t.kind === "clarification" ? " — answered the clarification"
-      : t.response.relation === "refine" ? " — refined the previous answer" : " — treated as a new question";
-    const label = `${i + 1}. ${t.query}${how}`;
-    return el("li", {}, i === onScreen ? el("span", { class: "now" }, label)
-      : el("button", { type: "button", onclick: () => { turn = i; render(t.response); } }, label));
-  }));
-}
-
-function renderWarnings(box, warnings) {
-  box.hidden = !warnings.length;
-  box.replaceChildren(el("strong", {}, "Note"), el("ul", {}, warnings.map((w) => el("li", {}, w))));
 }
 
 function datums(spec) {
   return Array.isArray(spec.data) ? spec.data : [...spec.data.nodes, ...spec.data.edges];
 }
 
-async function render(r) {
-  current = r;
-  $("result").hidden = false;
+/** One turn's answer: the run's status line, then each part (one, or several for a multi-part question). */
+async function renderAnswer(turn) {
+  const r = turn.response;
   const seconds = Object.values(r.timings_ms || {}).reduce((a, b) => a + b, 0) / 1000;
   const links = [el("a", { href: `/v1/runs/${r.run_id}`, target: "_blank" }, "full JSON")];
   if (r.chart_url) links.push(el("a", { href: `/v1/runs/${r.run_id}/chart.png`, target: "_blank" }, "PNG"));
-  $("status-line").replaceChildren(
-    el("span", { class: `badge ${OUTCOME_STYLE[r.outcome] || "warn"}` }, r.outcome.replaceAll("_", " ")),
-    r.error ? el("span", { class: "muted" }, r.error.code) : "",
-    el("span", { class: "muted" },
-       `${r.model_calls} model call(s) · ${(r.source && r.source.api_requests) || 0} API request(s) · ${seconds.toFixed(1)} s`
-       + (r.planner_model ? ` · planned by ${r.planner_model}` : "")),
-    ...links.flatMap((a) => [el("span", { class: "muted" }, "·"), a]),
-    r.error && r.error.retryable ? retryButton() : "",
+  turn.section.replaceChildren(
+    turnHeader(turn),
+    el("div", { class: "row" },
+      el("span", { class: `badge ${OUTCOME_STYLE[r.outcome] || "warn"}` }, r.outcome.replaceAll("_", " ")),
+      r.error ? el("span", { class: "muted" }, r.error.code) : "",
+      el("span", { class: "muted" },
+         `${r.model_calls} model call(s) · ${(r.source && r.source.api_requests) || 0} API request(s) · ${seconds.toFixed(1)} s`
+         + (r.planner_model ? ` · planned by ${r.planner_model}` : "")),
+      ...links.flatMap((a) => [el("span", { class: "muted" }, "·"), a]),
+      r.error && r.error.retryable ? retryButton(turn) : ""),
   );
-  $("message").textContent = r.outcome === "clarification_required" ? "" : r.message || "";
-  renderWarnings($("warnings"), r.warnings || []);
-  renderTrail();
-  $("refine").hidden = !r.run_id;
-  $("details").hidden = false;
-  renderClarification($("clarification"), r, r, 0);
-  const spec = r.visualization;
-  $("title").textContent = spec ? spec.title : "";
-  $("subtitle").textContent = spec ? spec.subtitle || "" : "";
-  $("layout").hidden = !spec;
-  $("chart").replaceChildren();
-  $("citations").replaceChildren(el("p", { class: "muted" }, CITE_HINT));
-  if (spec) await renderChart(view(r, 0, $("chart"), $("citations"), $("layout")));
-  if ((r.additional_answers || []).length) {
-    $("title").textContent = `Part 1 of ${r.additional_answers.length + 1}: ${spec ? spec.title : r.outcome.replaceAll("_", " ")}`;
+  const answers = [r, ...(r.additional_answers || [])];
+  for (const [part, answer] of answers.entries()) {
+    const block = answerBlock(turn, answer, part, answers.length);
+    turn.section.append(block.box);
+    if (block.draw) await block.draw();  // after attaching: charts size themselves to the page width
   }
-  fillList("assumptions", r.assumptions || []);
-  const f = r.applied_filters || {};
+}
+
+function answerBlock(turn, a, part, total) {
+  const r = turn.response;
+  const box = el("div", { class: part ? "part" : "" });
+  if (total > 1) {
+    const png = a.chart_url ? [el("span", { class: "muted" }, "·"),
+      el("a", { href: `/v1/runs/${r.run_id}/chart.png${part ? `?part=${part}` : ""}`, target: "_blank" }, "PNG")] : [];
+    box.append(el("div", { class: "row" }, el("span", { class: "muted" }, `Part ${part + 1} of ${total}`),
+      el("span", { class: `badge ${OUTCOME_STYLE[a.outcome] || "warn"}` }, a.outcome.replaceAll("_", " ")),
+      a.error ? el("span", { class: "muted" }, a.error.code) : "", ...png));
+  }
+  if ((a.warnings || []).length) {
+    box.append(el("div", { class: "notice" }, el("strong", {}, "Note"), el("ul", {}, a.warnings.map((w) => el("li", {}, w)))));
+  }
+  if (a.message && a.outcome !== "clarification_required") box.append(el("p", {}, a.message));
+  const clarifyEl = el("div", {});
+  renderClarification(clarifyEl, a, turn, part);
+  box.append(clarifyEl);
+  let draw = null;
+  const spec = a.visualization;
+  if (spec) {
+    const chartEl = el("div", { class: "chart" });
+    const citeEl = el("div", {}, el("p", { class: "muted" }, CITE_HINT));
+    const layoutEl = el("div", { class: "layout" }, chartEl, el("aside", {}, el("h3", {}, "Citations"), citeEl));
+    box.append(el("h2", {}, spec.title), el("p", { class: "muted" }, spec.subtitle || ""), layoutEl);
+    draw = () => renderChart(view(a, part, chartEl, citeEl, layoutEl, r.run_id));
+  }
+  box.append(detailsBlock(a, r));
+  return { box, draw };
+}
+
+function detailsBlock(a, r) {
+  const f = a.applied_filters || {};
   const hidden = new Set(["sponsor_role", "sponsor_exact", "exact_sponsors", "from_request"]);
-  fillList("filters", Object.entries(f).filter(([k, v]) => !hidden.has(k) && v && (!Array.isArray(v) || v.length))
-    .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}${(f.from_request || []).includes(k) ? " (from your filters)" : ""}`));
-  fillList("checks", ((r.verification && r.verification.checks) || []).map((c) =>
-    el("li", { class: c.passed ? "check" : "check fail" }, `${c.passed ? "✓" : "✗"} ${c.name}${c.detail ? ` — ${c.detail}` : ""}`)));
-  const s = r.source || {};
-  fillList("source", s.data_timestamp ? [
+  const filters = Object.entries(f).filter(([k, v]) => !hidden.has(k) && v && (!Array.isArray(v) || v.length))
+    .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}${(f.from_request || []).includes(k) ? " (from your filters)" : ""}`);
+  const checks = ((a.verification && a.verification.checks) || []).map((c) =>
+    el("li", { class: c.passed ? "check" : "check fail" }, `${c.passed ? "✓" : "✗"} ${c.name}${c.detail ? ` — ${c.detail}` : ""}`));
+  const s = a.source || {};
+  const source = s.data_timestamp ? [
     `ClinicalTrials.gov API ${s.api_version}, data as of ${s.data_timestamp}`,
     `${s.search_matches} search matches → ${s.cohort_size} trials after match checks`,
     `Run ${r.run_id}`,
-  ] : [`Run ${r.run_id}`]);
-  await renderMoreAnswers(r);
+  ] : [`Run ${r.run_id}`];
+  return el("div", {}, detailsList("Assumptions", a.assumptions || [], true), detailsList("Filters applied", filters),
+            detailsList("Verification", checks), detailsList("Source", source));
 }
 
-function fillList(id, items) {
-  $(id).replaceChildren(...(items.length ? items : ["—"]).map((x) => (x instanceof Node ? x : el("li", {}, x))));
+function detailsList(title, items, open = false) {
+  return el("details", open ? { open: "" } : {}, el("summary", {}, title),
+    el("ul", { class: "plain" }, (items.length ? items : ["—"]).map((x) => (x instanceof Node ? x : el("li", {}, x)))));
 }
 
 /** A place to draw one answer: its chart, its citations panel and the layout around them. */
-function view(answer, part, chartEl, citeEl, layoutEl) {
-  return { answer, part, chartEl, citeEl, layoutEl };
+function view(answer, part, chartEl, citeEl, layoutEl, runId) {
+  return { answer, part, chartEl, citeEl, layoutEl, runId };
 }
 
 async function renderChart(v) {
@@ -408,7 +420,7 @@ async function renderChart(v) {
 
 async function drawVegaLite(v, spec) {
   if (typeof vegaEmbed !== "function") throw new Error("the charting library could not be loaded");
-  const response = await fetch(`/v1/runs/${current.run_id}/vega-lite.json?part=${v.part}`);
+  const response = await fetch(`/v1/runs/${v.runId}/vega-lite.json?part=${v.part}`);
   const vl = await response.json();
   if (!response.ok) throw new Error((vl.detail && vl.detail.message) || `HTTP ${response.status}`);
   delete vl.title;  // the page already shows the title and subtitle
@@ -483,58 +495,20 @@ function showCitation(v, index) {
 
 const CITE_HINT = "Click any bar, point, node, link or row to see the trials behind it.";
 
-/** Parts 2 and 3 of a multi-part question, each in its own panel. */
-async function renderMoreAnswers(r) {
-  const box = $("more-answers");
-  box.replaceChildren();
-  const more = r.additional_answers || [];
-  const total = more.length + 1;
-  for (const [i, a] of more.entries()) {
-    const part = i + 1;
-    const spec = a.visualization;
-    const chartEl = el("div", { class: "chart" });
-    const citeEl = el("div", {}, el("p", { class: "muted" }, CITE_HINT));
-    const layoutEl = el("div", { class: "layout" }, chartEl, el("aside", {}, el("h3", {}, "Citations"), citeEl));
-    const links = spec && a.chart_url ? [el("span", { class: "muted" }, "·"),
-      el("a", { href: `/v1/runs/${r.run_id}/chart.png?part=${part}`, target: "_blank" }, "PNG")] : [];
-    const checks = (a.verification && a.verification.checks) || [];
-    const clarifyEl = el("div", {});
-    renderClarification(clarifyEl, a, r, part);
-    box.append(el("section", { class: "panel" },
-      el("div", { class: "row" }, el("span", { class: "muted" }, `Part ${part + 1} of ${total}`),
-         el("span", { class: `badge ${OUTCOME_STYLE[a.outcome] || "warn"}` }, a.outcome.replaceAll("_", " ")),
-         a.error ? el("span", { class: "muted" }, a.error.code) : "", ...links,
-         a.error && a.error.retryable ? retryButton() : ""),
-      (a.warnings || []).length ? el("div", { class: "notice" }, el("strong", {}, "Note"),
-         el("ul", {}, a.warnings.map((w) => el("li", {}, w)))) : null,
-      a.message && !["success", "clarification_required"].includes(a.outcome) ? el("p", {}, a.message) : null,
-      clarifyEl,
-      spec ? el("h2", {}, spec.title) : null,
-      spec ? el("p", { class: "muted" }, spec.subtitle || "") : null,
-      spec ? layoutEl : null,
-      el("details", { open: "" }, el("summary", {}, "Assumptions"),
-         el("ul", { class: "plain" }, (a.assumptions || []).map((x) => el("li", {}, x)))),
-      checks.length ? el("p", { class: "muted" },
-        `Verification: ${a.verification.passed ? "passed" : "failed"} (${checks.length} checks)`) : null,
-    ));
-    if (spec) await renderChart(view(a, part, chartEl, citeEl, layoutEl));
-  }
-}
-
 /** The request text of one part: a multi-part message's Clarification re-asks only that part. */
-function partQuery(r, part) {
-  const requests = (r.plan && r.plan.requests) || [];
-  return requests.length > part ? requests[part] : lastBody.query;
+function partQuery(turn, part) {
+  const requests = (turn.response.plan && turn.response.plan.requests) || [];
+  return requests.length > part ? requests[part] : turn.body.query;
 }
 
-function renderClarification(box, answer, r, part) {
+function renderClarification(box, answer, turn, part) {
   box.replaceChildren();
   const c = answer.clarification;
   if (!c) return;
   box.append(el("p", {}, el("strong", {}, c.question)));
   const answerWith = (value) => {
-    const query = partQuery(r, part);
-    const body = { ...lastBody, query, previous_run_id: r.run_id };
+    const query = partQuery(turn, part);
+    const body = { ...turn.body, query, previous_run_id: turn.response.run_id };
     if (c.field === "query") body.query = `${query} (${value})`;
     else body[c.field] = value;
     ask(body, "clarification");
@@ -566,9 +540,10 @@ $("ask").addEventListener("submit", (e) => {
   if ($("query").value.trim()) ask(requestBody());
 });
 function askFollowUp(text) {
-  if (!text || !current) return;
+  const previous = latestAnswer();
+  if (!text || !previous) return;
   $("refine-text").value = "";
-  ask({ query: text, previous_run_id: current.run_id }, "follow-up");
+  return ask({ query: text, previous_run_id: previous.response.run_id }, "follow-up");
 }
 $("refine").addEventListener("submit", (e) => {
   e.preventDefault();

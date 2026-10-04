@@ -37,7 +37,7 @@ uv run clinical-trials-viz serve          # web page at http://127.0.0.1:8000, A
 - See the chart interactively (Vega-Lite in the browser, from the same translation as the PNG).
 - **Click any bar, point, node, link or table row to see its cited trials**, with links and the source values that placed each one there.
 - Clarifications appear as clickable options (multi-select where allowed).
-- **Follow-ups:** under each answer, "Ask a follow-up about this answer" takes a short change ("only phase 3", "show it by start year instead"; one-click examples are offered) and sends it with the answer's `previous_run_id`. A trail above the answer lists the conversation, says whether each follow-up refined the previous answer or was treated as a new question, and reopens any earlier answer. "Ask a new question" starts over.
+- **Follow-ups:** below the latest answer, "Ask a follow-up about the latest answer" takes a short change ("only phase 3", "show it by start year instead"; one-click examples are offered) and sends it with that answer's `previous_run_id`. Each follow-up's answer is added below as its own section, labelled as a refinement of the previous answer or a new question, so the whole conversation stays on the page with every chart and citation. "Ask a new question" starts over.
 - Failures show their error code, with a Retry button when retrying may help; if the chart library cannot load, the chart's data is shown as a clickable table instead.
 - Every submit carries an `Idempotency-Key`, so a double-click never runs twice.
 - Registry text is always inserted as text, never as markup.
