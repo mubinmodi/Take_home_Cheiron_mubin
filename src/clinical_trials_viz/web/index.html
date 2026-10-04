@@ -120,6 +120,7 @@
     </details>
     <div class="row">
       <button class="primary" id="submit" type="submit">Ask a new question</button>
+      <button id="new-question" type="button" hidden>New question</button>
       <span id="loading" class="muted">Planning, retrieving every matching trial, counting and verifying…</span>
     </div>
   </form>
@@ -271,7 +272,18 @@ function setBusy(busy) {
   for (const b of [$("submit"), $("refine-submit"), ...$("followup-examples").children]) b.disabled = busy;
   $("loading").classList.toggle("on", busy);
   $("refine").hidden = !latestAnswer();
+  $("new-question").hidden = busy || !thread.length;  // only once something is on the page
 }
+
+/** Start over: clear the question, the optional filters and every answer on the page. */
+$("new-question").addEventListener("click", () => {
+  thread.length = 0;
+  $("thread").replaceChildren();
+  $("ask").reset();
+  $("refine-text").value = "";
+  setBusy(false);
+  $("query").focus();
+});
 
 /** The newest turn with an answer: follow-ups continue from it. */
 function latestAnswer() {
