@@ -6,3 +6,7 @@ data/
 .DS_Store
 .pytest_cache/
 .ruff_cache/
+
+# Agent tooling: local issue tracker and skill configuration
+.scratch/
+docs/agents/

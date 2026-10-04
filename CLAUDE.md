@@ -70,3 +70,17 @@ Python 3.13 with `uv`, FastAPI, pydantic v2, async `httpx`, pydantic-ai, `vl-con
 - ClinicalTrials.gov is the only authoritative source for analytical values.
 - Follow the work order in `harness-design.md` section 7 and run the eval suite after each step.
 - Ask the user before committing to scope expansions; they prefer recommendations with reasons.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs are local markdown files under `.scratch/<feature-slug>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, recorded as a `Status:` line in each issue file. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
