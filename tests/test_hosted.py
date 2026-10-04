@@ -15,6 +15,7 @@ from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from clinical_trials_viz import runs as runs_module
 from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
 from clinical_trials_viz.catalog import Dimension
 from clinical_trials_viz.config import HOSTED_QUERIES_PER_HOUR, HOSTED_RUN_DEADLINE_SECONDS, Settings
@@ -23,7 +24,7 @@ from clinical_trials_viz.idempotency import KeyInProgress, KeyReused
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.planner import LLMPlanner
-from clinical_trials_viz.runs import async_database_url, runs_table
+from clinical_trials_viz.runs import SqlRunStore, async_database_url, runs_table
 from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisRateLimiter, RedisUserLimiter
 from tests.conftest import ScriptedPlanner, ask
 
@@ -400,3 +401,24 @@ async def test_parts_answered_before_the_deadline_stand(make_client, settings, c
     second = body["additional_answers"][0]
     assert second["outcome"] == "upstream_error" and second["error"]["code"] == "run_timeout"
     assert "stopped during retrieval from ClinicalTrials.gov" in second["message"]
+
+
+async def test_an_unreachable_database_does_not_hold_up_startup(tmp_path, monkeypatch):
+    # On AWS the database's firewall was still closed: each task waited a minute to start, failed its
+    # health checks and was replaced, so the first deployment never finished.
+    store = SqlRunStore(f"sqlite+aiosqlite:///{tmp_path}/runs.db")
+
+    async def unreachable():
+        await asyncio.sleep(3600)
+
+    monkeypatch.setattr(store, "_create", unreachable)
+    async with asyncio.timeout(1):  # fails fast, rather than hanging, if startup waits for the database again
+        await store.open()
+    await store.close()  # cancels the background attempt
+
+
+def test_postgres_connections_give_up_in_seconds(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(runs_module, "create_async_engine", lambda url, **options: seen.update(url=url, **options))
+    SqlRunStore("postgresql://user:pw@db.example/trials?sslmode=require")
+    assert seen["url"].startswith("postgresql+asyncpg://") and seen["connect_args"]["timeout"] <= 10

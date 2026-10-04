@@ -5,6 +5,8 @@ the hosted version keeps run history in Postgres (`DATABASE_URL`), shared by eve
 run bundles with raw API responses (for replay) are deferred.
 """
 
+import asyncio
+import contextlib
 import logging
 import re
 import uuid
@@ -126,15 +128,27 @@ def async_database_url(url: str) -> str:
     return parsed.render_as_string(hide_password=False)
 
 
+# asyncpg waits 60 s for a connection by default; a request should fail fast instead (seen on AWS while
+# the database's firewall was still closed: every container then took a minute to start).
+_POSTGRES_CONNECT_ARGS = {"timeout": 5, "command_timeout": 15}
+
+
 class SqlRunStore:
     """Run history in a SQL database: Postgres when hosted (any instance can load any Run), SQLite in tests."""
 
     def __init__(self, url: str):
-        self._engine: AsyncEngine = create_async_engine(async_database_url(url), pool_pre_ping=True)
+        url = async_database_url(url)
+        connect_args = _POSTGRES_CONNECT_ARGS if url.startswith("postgresql+asyncpg") else {}
+        self._engine: AsyncEngine = create_async_engine(url, pool_pre_ping=True, connect_args=connect_args)
         self._ready = False
+        self._opening: asyncio.Task[None] | None = None
 
     async def open(self) -> None:
-        """Create the table if needed. A database that is down at startup is retried on first use."""
+        """Create the table in the background, so the service starts serving at once even while the
+        database is unreachable; reads and writes also create it on first use."""
+        self._opening = asyncio.create_task(self._create_at_startup())
+
+    async def _create_at_startup(self) -> None:
         try:
             await self._create()
         except (SQLAlchemyError, OSError) as exc:
@@ -150,6 +164,10 @@ class SqlRunStore:
         self._ready = True
 
     async def close(self) -> None:
+        if self._opening is not None:
+            self._opening.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._opening
         await self._engine.dispose()
 
     async def save(self, request: QueryRequest, response: QueryResponse, user: str | None = None) -> None:

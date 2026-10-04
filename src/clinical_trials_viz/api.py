@@ -55,7 +55,12 @@ def create_app(
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         client_http = http or httpx.AsyncClient(timeout=settings.ctgov_timeout_seconds)
         # Hosted: state every instance must share lives in Redis. Locally it stays in this process.
-        shared = redis or (Redis.from_url(settings.redis_url.get_secret_value()) if settings.redis_url else None)
+        shared = redis or (
+            # Short timeouts: an unreachable Redis must fail fast so each part falls back to working locally.
+            Redis.from_url(settings.redis_url.get_secret_value(), socket_connect_timeout=2, socket_timeout=2)
+            if settings.redis_url
+            else None
+        )
         per_minute = settings.ctgov_requests_per_minute
         client = CtGovClient(
             client_http,
