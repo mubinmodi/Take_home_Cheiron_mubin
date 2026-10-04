@@ -392,7 +392,7 @@ async def test_a_rejected_key_never_opens_a_breaker(make_client):
         for _ in range(2):
             body = (await client.post("/v1/query", json=QUESTION)).json()
             assert body["error"]["code"] == "planner_rejected"  # the real cause, every time
-    assert calls == ["primary", "primary"]
+    assert calls == ["primary"] * 4  # per question: the split call, then planning (which reports the cause)
 
 
 # --- Run deadline -----------------------------------------------------------------------------------

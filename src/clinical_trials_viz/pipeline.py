@@ -324,10 +324,21 @@ class Pipeline:
         with run.stage("analyze"):
             spec, dimension = self._build(target, plan, filters, cohort)
         if isinstance(spec.data, NetworkData) and not spec.data.edges:
-            _finish(target, Outcome.NO_DATA, "No entities share enough trials to draw a link (all pages retrieved).")
+            _finish(
+                target,
+                Outcome.NO_DATA,
+                f"The {len(cohort.trials):,} trials matching {describe_filters(filters)} were all checked, but no two "
+                "entities share enough of them to draw a link. Try a broader question (for example without a "
+                "status or phase filter).",
+            )
             return
         if missing := _nothing_to_plot(spec, dimension):
-            _finish(target, Outcome.NO_DATA, f"None of the {len(cohort.trials)} matching trials report {missing}.")
+            _finish(
+                target,
+                Outcome.NO_DATA,
+                f"None of the {len(cohort.trials):,} trials matching {describe_filters(filters)} report {missing}, "
+                "so there is nothing to plot. A table of these trials is still available (ask to list them).",
+            )
             return
         self._finish_success(run, target, plan, spec, {t.nct_id: t for t in cohort.trials}, dimension, index)
 
@@ -338,8 +349,8 @@ class Pipeline:
             if unknown := await suggest.unknown_drugs(filters, self.client):
                 names = ", ".join(f"'{d}'" for d in unknown)
                 message = (
-                    f"No trial in ClinicalTrials.gov lists {names} as an intervention. Check the spelling, or try "
-                    "the generic, brand or code name."
+                    f"Read as: {read}. No trial in ClinicalTrials.gov lists {names} as an intervention. Check the "
+                    "spelling, or try the generic, brand or code name."
                 )
             else:
                 message = f"No trials match {read}. Every matching page was checked, so this is not a sample."
@@ -425,7 +436,14 @@ class Pipeline:
         trials = {t.nct_id: t for ts in sides.values() for t in ts}
         target.source.cohort_size = len(trials)
         if not trials:
-            _finish(target, Outcome.NO_DATA, "No trials match any of the compared sides.")
+            read = describe_filters(base)
+            within = "" if read == "all trials" else f" with {read}"
+            _finish(
+                target,
+                Outcome.NO_DATA,
+                f"No trials match {' vs '.join(sides)}{within}. Every matching page was checked; check the names, "
+                "or ask about each side on its own.",
+            )
             return
         with run.stage("analyze"):
             groups = comparison_groups(sides)

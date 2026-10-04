@@ -83,7 +83,11 @@ class Suggestion(BaseModel):
         default=None, description="Send as a Follow-up (`query` with `previous_run_id`) to apply this correction."
     )
     query: str | None = Field(default=None, description="Send as a new question.")
-    trial_count: int | None = Field(default=None, description="Trials matching after the correction, counted live.")
+    trial_count: int | None = Field(
+        default=None,
+        description="Search matches after the correction, counted live (before the drug match check, so approximate "
+        "when a drug filter applies).",
+    )
 
 
 class Clarification(BaseModel):

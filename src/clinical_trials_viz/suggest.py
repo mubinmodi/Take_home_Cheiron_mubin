@@ -1,4 +1,5 @@
-"""Ways forward when a question has no answer, built by code: corrections counted live, never guessed."""
+"""Corrections for a question with no data: each filter dropped in turn and the rest counted live, by code.
+(Questions suggested for an unanswerable question are written by the planner; see models.plan.UnsupportedPlan.)"""
 
 from clinical_trials_viz.cohort import build_params
 from clinical_trials_viz.ctgov.client import CtGovClient
@@ -20,10 +21,10 @@ _DROPPABLE: list[tuple[str, tuple[str, ...]]] = [
 
 
 async def count(filters: AppliedFilters, client: CtGovClient) -> int:
-    """Search matches for these filters (drugs are searched one at a time, as in retrieval)."""
-    if filters.drugs:
-        return sum([await client.count(build_params(filters, drug)) for drug in filters.drugs])
-    return await client.count(build_params(filters))
+    """Search matches for these filters, each trial once (several drugs are searched together). Before the
+    drug match check, so the label says "about"."""
+    drugs = " OR ".join(f"({d})" for d in filters.drugs) or None
+    return await client.count(build_params(filters, drugs))
 
 
 async def corrections(filters: AppliedFilters, client: CtGovClient) -> list[Suggestion]:

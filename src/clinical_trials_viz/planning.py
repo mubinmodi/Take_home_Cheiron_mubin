@@ -72,24 +72,37 @@ async def plan_question(
         # A Follow-up on a multi-part Run answers one of its parts (e.g. a Clarification for that part),
         # sent as that part's own request: plan it as a fresh question.
         previous = previous_request = None
-    if previous is None and request.previous_run_id is None:  # Follow-ups are never split
-        requests, warnings = await _split(planner, request.query, tally)
+    requests, warnings = await _split(planner, request.query, tally)
+    if previous is None and request.previous_run_id is None:
         if len(requests) >= 2:
             planning = await _plan_parts(planner, request, requests, countries, tally)
         else:
             planning = await _plan_single(planner, request, previous, previous_request, countries, tally)
         planning.warnings[:0] = warnings
         return planning
-    return await _plan_single(planner, request, previous, previous_request, countries, tally)
+    # A Follow-up refines one earlier answer, so it is never split: its first question is applied, and
+    # any other question it asks is named in a note rather than dropped.
+    notes = []
+    if len(requests) >= 2:
+        rest = "; ".join(f'"{r}"' for r in requests[1:])
+        notes.append(
+            f"This follow-up asks {len(requests)} things; only the first was applied to the earlier answer: "
+            f'"{requests[0]}". Ask the rest as a new question: {rest}.'
+        )
+        request = request.model_copy(update={"query": requests[0]})
+    planning = await _plan_single(planner, request, previous, previous_request, countries, tally)
+    planning.warnings[:0] = warnings
+    planning.notes[:0] = notes
+    return planning
 
 
 async def _split(planner: Planner, message: str, tally: CallTally) -> tuple[list[str], list[str]]:
-    """The separate questions in a message, from the model's split step. If its reply is unusable, the
-    code splitter is used instead and a warning says so. A provider error propagates: planning would
-    fail the same way, and the caller reports it."""
+    """The separate questions in a message, from the model's split step. If that step fails (an unusable
+    reply, a provider error, a timeout), the code splitter is used instead and a warning says so; planning
+    then reports a provider that is really down."""
     try:
         result = await planner.split(message)
-    except (UnexpectedModelBehavior, UsageLimitExceeded):
+    except _PART_FAILURES:
         tally.calls += take_unreported_calls()
         fallback = separate_requests(message)
         note = "The message could not be split by the model; it was split by simple rules instead"

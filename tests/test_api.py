@@ -1,5 +1,6 @@
 """End-to-end through the HTTP API: scripted planner, mocked ClinicalTrials.gov, real everything else."""
 
+import asyncio
 import json
 
 import httpx
@@ -963,3 +964,28 @@ async def test_a_new_question_does_not_inherit_an_earlier_conflict_answer(make_c
         }
         second = (await client.post("/v1/query", json=body)).json()
         assert second["outcome"] == "clarification_required" and second["clarification"]["reason"] == "conflict"
+
+
+async def test_a_follow_up_that_asks_two_things_applies_one_and_names_the_other(make_client):
+    follow_up = "only phase 3, and also show the sponsors of melanoma trials"
+    first_part = "Only phase 3"
+    planner = ScriptedPlanner(TREND, TREND, splits={follow_up: [first_part, "Show the sponsors of melanoma trials"]})
+    async for client in make_client(planner):
+        first = (await client.post("/v1/query", json={"query": "Keytruda trials per year"})).json()
+        body = {"query": follow_up, "previous_run_id": first["run_id"]}
+        second = (await client.post("/v1/query", json=body)).json()
+        assert planner.calls[-1]["question"] == first_part  # one refinement, not a split
+        assert any("Show the sponsors of melanoma trials" in a and "new question" in a for a in second["assumptions"])
+
+
+async def test_a_split_call_that_times_out_falls_back_to_the_code_splitter(make_client):
+    async def respond(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        if any(t.name == "separate_requests" for t in info.output_tools):
+            await asyncio.sleep(5)  # the split step hangs
+        args = {"operation": "aggregate", "filters": {"drugs": ["Keytruda"]}, "group_by": "start_year"}
+        return ModelResponse(parts=[ToolCallPart("answer_plan", args)])
+
+    planner = LLMPlanner(FunctionModel(respond, model_name="slow-split"), deadline=0.2)
+    body = await ask(make_client, planner, query="Keytruda trials per year")
+    assert body["outcome"] == "success"
+    assert any("could not be split by the model" in w for w in body["warnings"])

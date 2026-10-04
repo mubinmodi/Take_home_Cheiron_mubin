@@ -535,7 +535,7 @@ function suggestionsBlock(turn, a, part, total) {
   const list = a.suggestions || [];
   if (!list.length) return "";
   const box = el("div", { class: "options" },
-    el("strong", {}, a.outcome === "unsupported_query" ? "Questions the registry can answer" : "Try instead"));
+    el("strong", {}, a.outcome === "unsupported_query" ? "Related questions you could ask" : "Try instead"));
   for (const s of list) {
     if (s.follow_up) {
       // A part of a multi-part question is asked again as its own question, with the correction.

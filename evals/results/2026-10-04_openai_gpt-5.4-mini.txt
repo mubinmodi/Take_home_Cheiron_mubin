@@ -16,8 +16,7 @@ PASS  cmp-04           Industry vs academic sponsorship: compare Parkinson's dis
 PASS  cmp-05           How many recruiting trials do atezolizumab, durvalumab and avelumab each have?
 PASS  geo-01           Which countries have the most recruiting trials for melanoma?
 PASS  geo-02           Top 10 countries running completed sickle cell disease trials
-FAIL  geo-03           How many recruiting obesity trials are there in the UK?
-        filters.countries: expected ['united kingdom'], got ['UK']
+PASS  geo-03           How many recruiting obesity trials are there in the UK?
 PASS  net-01           Show a network of sponsors and drugs for glioblastoma trials
 PASS  net-02           Which drugs are most often combined with pembrolizumab?
 PASS  single-01        How many phase 3 trials of semaglutide are currently recruiting?
@@ -33,7 +32,9 @@ PASS  unsupported-02   Which cancer treatment should I take?
 PASS  hist-01          What is the enrollment distribution of melanoma trials?
 PASS  hist-02          How many participants do completed breast cancer trials usually enroll?
 PASS  timeline-01      Show a timeline of recruiting phase 3 pembrolizumab trials in Germany
-PASS  scatter-01       Plot enrollment against duration for melanoma trials
+FAIL  scatter-01       Plot enrollment against duration for melanoma trials
+        operation: expected 'per_trial', got 'bin'
+        view: expected 'scatter', got None
 PASS  net-03           Which companies are developing which drugs for obesity?
 PASS  multi-01         How many trials does Pfizer sponsor, and what are the most common conditions in lung cancer trials?
 PASS  multi-02         Show melanoma trials by phase and also by start year
@@ -50,11 +51,11 @@ PASS  multi-08         What phases are lung cancer trials in, what countries, an
   clarification   4/4
   comparison      5/5
   distribution    7/7
-  geographic      2/3
+  geographic      3/3
   histogram       2/2
   multi_part      8/8
   network         3/3
-  per_trial       3/3
+  per_trial       2/3
   series          2/2
   single_study    1/1
   single_value    1/1

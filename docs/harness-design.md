@@ -11,7 +11,7 @@ Targets agreed 2026-10-03, except where marked.
 | Goal | Target | Measured by | Result (2026-10-04) |
 |---|---|---|---|
 | No made-up numbers | 100%, guaranteed by the design | The model never outputs values, IDs or citations; code produces all of them | Met by design: the model returns only a plan; every count, cited trial and citation comes from code and the registry |
-| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 46 questions: `gpt-5.4-mini` 46/46 and 45/46 in two runs (2026-10-04, with the split step); `claude-haiku-4-5` 95% on the earlier 42 (`evals/results/`) |
+| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 46 questions: `gpt-5.4-mini` 46/46, 45/46 and 45/46 in three runs (2026-10-04, with the split step); `claude-haiku-4-5` 95% on the earlier 42 (`evals/results/`) |
 | Citations add up | 100% of data points | Verifier recounts every bar, bucket or edge from its cited trials | Every answer passes the verifier before it is returned; tamper tests prove it rejects wrong counts and citations |
 | Honest failure | 0 runs that report success after incomplete data | Tests that inject failures | Failure-injection tests for the model, ClinicalTrials.gov, charts and storage (`tests/test_failures.py`) |
 | Latency | No target (this is a demo); measured and reported. Hard cap: undecided locally; ~30 s when hosted ([hosted-deployment.md](hosted-deployment.md)) | Timing spans per stage | 1.7–4.9 s for the five live examples (planning 1.1–2.3 s, retrieval 0.6–2.7 s) |
@@ -80,14 +80,14 @@ The **capability catalog** is one versioned file. It feeds the planner prompt, t
 The model has one job: turn the question into a typed plan. The plan is either an executable plan, a request for clarification, or "unsupported".
 
 ```
-request → validate input → load earlier run (follow-ups) → split into parts (code)
+request → validate input → load earlier run (follow-ups) → split into parts (model; code as fallback)
    every part: PLAN (LLM) → semantic gate ─┬─ ok → field-conflict check → fetch every page (completeness gate)
                   ↑ repair once ───────────┘       → sponsor ambiguity check → analyze → build chart
                     (structured validator errors)  → verify → respond
               ambiguous / unsupported / no data → explicit outcome (clarification options built by code, or reason)
 ```
 
-*Updated 2026-10-04 to match the build:* there is no separate dry-plan compile step (filters become API parameters during retrieval, in `cohort.build_params`); code splits multi-part messages before planning (all parts are planned and gated, then each is answered in turn); and code asks two clarifications of its own, when a structured field contradicts the question and when a sponsor name matches several lead sponsors.
+*Updated 2026-10-04 to match the build:* there is no separate dry-plan compile step (filters become API parameters during retrieval, in `cohort.build_params`); a split step (one model call; the code splitter is its fallback) separates multi-part messages before planning (all parts are planned and gated, then each is answered in turn); and code asks two clarifications of its own, when a structured field contradicts the question and when a sponsor name matches several lead sponsors.
 
 - The model never sees trial records, only the question and the catalog, so trial text can't inject instructions.
 - The model never calls tools. The pipeline calls typed functions with structured errors (`{code, message, retryable}`).

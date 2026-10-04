@@ -26,6 +26,13 @@ _Avoid_: Analysis type, query type
 A question with choices taken from the data, returned instead of an answer when no sensible default exists; it may allow one choice or several.
 _Avoid_: Follow-up question, prompt
 
+**Conflict**:
+A structured field that names a different value from the question for the same Filter ("nivolumab" in the question, `drug_name: pembrolizumab`). Code finds it and asks a Clarification offering both values; the answer is final for that question.
+
+**Correction**:
+A suggested change to a Question that found no trials: one Filter removed, with the trials that would then match counted live. Sent back as a Follow-up.
+_Avoid_: Suggestion (the response field that carries Corrections, or related questions for an unanswerable Question)
+
 **Assumption**:
 A default the service applied without asking, reported back with the answer.
 _Avoid_: Note, caveat
@@ -39,7 +46,7 @@ The Trials that belong to more than one compared side, shown as their own group.
 _Avoid_: Intersection, both
 
 **Part**:
-One separate request inside a Question that asks several things ("how many X, and which countries for Y?"). Each Part has its own Filters, Query Plan and answer.
+One separate request inside a Question that asks several things ("how many X, and which countries for Y?"). A model call (the split step) finds the Parts and rewrites each to stand alone. Each Part has its own Filters, Query Plan and answer.
 _Avoid_: Sub-question, sub-query
 
 **Series**:
