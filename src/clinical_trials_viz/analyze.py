@@ -173,3 +173,44 @@ def enrollment_histogram(trials: list[Trial]) -> Histogram:
     if missing:
         assumptions.append(f"{missing} trials do not report enrollment; they are shown as '{NOT_REPORTED}'.")
     return Histogram(cells, series, missing, assumptions)
+
+
+SERIES_TOP_N = 6  # colours stay distinguishable
+
+
+def in_bucket(trial: Trial, dimension: Dimension, label: str, kept: set[str]) -> bool:
+    """Whether a trial counts in a bucket; 'Other' holds trials with a value outside the kept buckets."""
+    values = dimension_values(trial, dimension)
+    if label == OTHER_BUCKET:
+        return any(v not in kept for v in values)
+    return label in values
+
+
+@dataclass
+class CrossBreakdown:
+    """A Cohort counted by two Dimensions: the axis (`dimension`) and a coloured split (`series`)."""
+
+    dimension: Dimension
+    series: Dimension
+    axis_labels: list[str]
+    series_labels: list[str]
+    cells: list[tuple[str, str, list[str]]]  # (axis label, series label, trial IDs), series-major
+    axis_top_n: int | None
+    assumptions: list[str] = field(default_factory=list)
+
+
+def cross_breakdown(trials: list[Trial], dimension: Dimension, series: Dimension, top_n: int | None) -> CrossBreakdown:
+    axis = breakdown(trials, dimension, top_n)
+    split = breakdown(trials, series, SERIES_TOP_N)
+    axis_labels = [b.label for b in axis.buckets]
+    series_labels = [b.label for b in split.buckets]
+    axis_kept = {label for label in axis_labels if label != OTHER_BUCKET}
+    series_kept = {label for label in series_labels if label != OTHER_BUCKET}
+    cells = []
+    for s in series_labels:
+        members = [t for t in trials if in_bucket(t, series, s, series_kept)]
+        for x in axis_labels:
+            ids = sorted(t.nct_id for t in members if in_bucket(t, dimension, x, axis_kept))
+            cells.append((x, s, ids))
+    notes = list(dict.fromkeys([*axis.assumptions, *split.assumptions]))
+    return CrossBreakdown(dimension, series, axis_labels, series_labels, cells, axis.top_n, notes)

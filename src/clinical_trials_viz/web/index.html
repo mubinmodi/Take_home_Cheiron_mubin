@@ -48,7 +48,7 @@
   .layout.stacked { grid-template-columns: 1fr; }
   .layout.stacked aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--border); padding-top: 12px; }
   @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
-  #chart { overflow-x: auto; min-height: 120px; width: 100%; }
+  #chart, .chart { overflow-x: auto; min-height: 120px; width: 100%; }
   aside { border-left: 1px solid var(--border); padding-left: 16px; max-height: 760px; overflow-y: auto; }
   @media (max-width: 900px) { aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--border); padding-top: 12px; } }
   .big { font-size: 56px; font-weight: 700; cursor: pointer; }
@@ -125,6 +125,7 @@
     <details><summary>Verification</summary><ul class="plain" id="checks"></ul></details>
     <details><summary>Source</summary><ul class="plain" id="source"></ul></details>
   </section>
+  <div id="more-answers"></div>
 </main>
 
 <script>
@@ -236,6 +237,7 @@ function showError(text) {
     $(id).replaceChildren();
   }
   $("layout").hidden = true;
+  $("more-answers").replaceChildren();
 }
 
 function datums(spec) {
@@ -255,15 +257,17 @@ async function render(r) {
     ...links.flatMap((a) => [el("span", { class: "muted" }, "·"), a]),
   );
   $("message").textContent = r.outcome === "clarification_required" ? "" : r.message || "";
-  renderClarification(r);
+  renderClarification($("clarification"), r, r, 0);
   const spec = r.visualization;
   $("title").textContent = spec ? spec.title : "";
   $("subtitle").textContent = spec ? spec.subtitle || "" : "";
   $("layout").hidden = !spec;
   $("chart").replaceChildren();
-  $("citations").replaceChildren(el("p", { class: "muted" },
-    "Click any bar, point, node, link or row to see the trials behind it."));
-  if (spec) await renderChart(r, spec);
+  $("citations").replaceChildren(el("p", { class: "muted" }, CITE_HINT));
+  if (spec) await renderChart(view(r, 0, $("chart"), $("citations"), $("layout")));
+  if ((r.additional_answers || []).length) {
+    $("title").textContent = `Part 1 of ${r.additional_answers.length + 1}: ${spec ? spec.title : r.outcome.replaceAll("_", " ")}`;
+  }
   fillList("assumptions", r.assumptions || []);
   const f = r.applied_filters || {};
   const hidden = new Set(["sponsor_role", "sponsor_exact", "exact_sponsors", "from_request"]);
@@ -277,42 +281,49 @@ async function render(r) {
     `${s.search_matches} search matches → ${s.cohort_size} trials after match checks`,
     `Run ${r.run_id}`,
   ] : [`Run ${r.run_id}`]);
+  await renderMoreAnswers(r);
 }
 
 function fillList(id, items) {
   $(id).replaceChildren(...(items.length ? items : ["—"]).map((x) => (x instanceof Node ? x : el("li", {}, x))));
 }
 
-async function renderChart(r, spec) {
+/** A place to draw one answer: its chart, its citations panel and the layout around them. */
+function view(answer, part, chartEl, citeEl, layoutEl) {
+  return { answer, part, chartEl, citeEl, layoutEl };
+}
+
+async function renderChart(v) {
+  const spec = v.answer.visualization;
   if (spec.type === "single_value") {
-    const value = el("div", { class: "big", title: "Click to see the trials", onclick: () => showCitation(0) },
+    const value = el("div", { class: "big", title: "Click to see the trials", onclick: () => showCitation(v, 0) },
                      spec.data[0].trial_count.toLocaleString());
-    $("chart").append(value, el("p", { class: "muted" }, "trials"));
+    v.chartEl.append(value, el("p", { class: "muted" }, "trials"));
     return;
   }
   if (spec.type === "table") {
     const columns = spec.encoding.columns;
-    const rows = spec.data.map((d, i) => el("tr", { onclick: (e) => { markRow(e.currentTarget); showCitation(i); } },
+    const rows = spec.data.map((d, i) => el("tr", { onclick: (e) => { markRow(e.currentTarget); showCitation(v, i); } },
       columns.map((c) => el("td", {}, d[c.field] == null ? "—" : String(d[c.field])))));
-    $("chart").append(el("table", {}, el("thead", {}, el("tr", {}, columns.map((c) => el("th", {}, c.title)))),
-                          el("tbody", {}, rows)));
+    v.chartEl.append(el("table", {}, el("thead", {}, el("tr", {}, columns.map((c) => el("th", {}, c.title)))),
+                     el("tbody", {}, rows)));
     if (spec.metadata.total_rows > spec.data.length) {
-      $("chart").append(el("p", { class: "muted" }, `Showing ${spec.data.length} of ${spec.metadata.total_rows} trials.`));
+      v.chartEl.append(el("p", { class: "muted" }, `Showing ${spec.data.length} of ${spec.metadata.total_rows} trials.`));
     }
     return;
   }
-  const vl = await (await fetch(`/v1/runs/${r.run_id}/vega-lite.json`)).json();
+  const vl = await (await fetch(`/v1/runs/${current.run_id}/vega-lite.json?part=${v.part}`)).json();
   delete vl.title;  // the page already shows the title and subtitle
   vl.width = "container";  // fill the column; positions are in data units, so networks scale too
   vl.autosize = { type: "fit-x", contains: "padding" };
   const network = spec.type === "network_graph";
-  $("layout").classList.toggle("stacked", network);  // networks need the full width; citations go below
+  v.layoutEl.classList.toggle("stacked", network);  // networks need the full width; citations go below
   if (network) vl.config = { ...(vl.config || {}), legend: { orient: "bottom", direction: "horizontal" } };
   const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const result = await vegaEmbed("#chart", vl, { actions: false, theme: dark ? "dark" : undefined, renderer: "svg" });
+  const result = await vegaEmbed(v.chartEl, vl, { actions: false, theme: dark ? "dark" : undefined, renderer: "svg" });
   result.view.addEventListener("click", (_event, item) => {
     const index = item && item.datum && item.datum._datum;
-    if (Number.isInteger(index)) showCitation(index);
+    if (Number.isInteger(index)) showCitation(v, index);
   });
 }
 
@@ -331,20 +342,20 @@ function describe(spec, d) {
   return parts.length ? parts.join(" · ") : d.nct_id || d.label || "";
 }
 
-function showCitation(index) {
-  const spec = current.visualization;
+function showCitation(v, index) {
+  const spec = v.answer.visualization;
   const d = datums(spec)[index];
   if (!d) return;
   const ids = d.trial_ids || [];
   const shown = ids.slice(0, MAX_TRIALS_SHOWN).map((id) => {
-    const e = current.evidence[id] || { title: "", url: `https://clinicaltrials.gov/study/${id}`, fields: {} };
-    const fields = Object.entries(e.fields).filter(([k]) => !k.endsWith("nctId")).map(([k, v]) =>
-      el("li", { title: k }, `${fieldName(k)}: ${typeof v === "string" ? v : JSON.stringify(v)}`));
+    const e = v.answer.evidence[id] || { title: "", url: `https://clinicaltrials.gov/study/${id}`, fields: {} };
+    const fields = Object.entries(e.fields).filter(([k]) => !k.endsWith("nctId")).map(([k, val]) =>
+      el("li", { title: k }, `${fieldName(k)}: ${typeof val === "string" ? val : JSON.stringify(val)}`));
     return el("div", { class: "trial" },
       el("a", { href: e.url, target: "_blank", rel: "noopener" }, id), " ", e.title,
       fields.length ? el("ul", { class: "fields" }, fields) : null);
   });
-  $("citations").replaceChildren(
+  v.citeEl.replaceChildren(
     el("p", {}, el("strong", {}, describe(spec, d))),
     el("p", { class: "muted" }, `${ids.length.toLocaleString()} cited trial(s)` +
        (ids.length > MAX_TRIALS_SHOWN ? `; showing the first ${MAX_TRIALS_SHOWN} (all are in the full JSON)` : "")),
@@ -352,15 +363,57 @@ function showCitation(index) {
   );
 }
 
-function renderClarification(r) {
-  const box = $("clarification");
+const CITE_HINT = "Click any bar, point, node, link or row to see the trials behind it.";
+
+/** Parts 2 and 3 of a multi-part question, each in its own panel. */
+async function renderMoreAnswers(r) {
+  const box = $("more-answers");
   box.replaceChildren();
-  const c = r.clarification;
+  const more = r.additional_answers || [];
+  const total = more.length + 1;
+  for (const [i, a] of more.entries()) {
+    const part = i + 1;
+    const spec = a.visualization;
+    const chartEl = el("div", { class: "chart" });
+    const citeEl = el("div", {}, el("p", { class: "muted" }, CITE_HINT));
+    const layoutEl = el("div", { class: "layout" }, chartEl, el("aside", {}, el("h3", {}, "Citations"), citeEl));
+    const links = spec && a.chart_url ? [el("span", { class: "muted" }, "·"),
+      el("a", { href: `/v1/runs/${r.run_id}/chart.png?part=${part}`, target: "_blank" }, "PNG")] : [];
+    const checks = (a.verification && a.verification.checks) || [];
+    const clarifyEl = el("div", {});
+    renderClarification(clarifyEl, a, r, part);
+    box.append(el("section", { class: "panel" },
+      el("div", { class: "row" }, el("span", { class: "muted" }, `Part ${part + 1} of ${total}`),
+         el("span", { class: `badge ${OUTCOME_STYLE[a.outcome] || "warn"}` }, a.outcome.replaceAll("_", " ")), ...links),
+      a.message && !["success", "clarification_required"].includes(a.outcome) ? el("p", {}, a.message) : null,
+      clarifyEl,
+      spec ? el("h2", {}, spec.title) : null,
+      spec ? el("p", { class: "muted" }, spec.subtitle || "") : null,
+      spec ? layoutEl : null,
+      el("details", { open: "" }, el("summary", {}, "Assumptions"),
+         el("ul", { class: "plain" }, (a.assumptions || []).map((x) => el("li", {}, x)))),
+      checks.length ? el("p", { class: "muted" },
+        `Verification: ${a.verification.passed ? "passed" : "failed"} (${checks.length} checks)`) : null,
+    ));
+    if (spec) await renderChart(view(a, part, chartEl, citeEl, layoutEl));
+  }
+}
+
+/** The request text of one part: a multi-part message's Clarification re-asks only that part. */
+function partQuery(r, part) {
+  const requests = (r.plan && r.plan.requests) || [];
+  return requests.length > part ? requests[part] : lastBody.query;
+}
+
+function renderClarification(box, answer, r, part) {
+  box.replaceChildren();
+  const c = answer.clarification;
   if (!c) return;
   box.append(el("p", {}, el("strong", {}, c.question)));
-  const answer = (value) => {
-    const body = { ...lastBody, previous_run_id: r.run_id };
-    if (c.field === "query") body.query = `${lastBody.query} (${value})`;
+  const answerWith = (value) => {
+    const query = partQuery(r, part);
+    const body = { ...lastBody, query, previous_run_id: r.run_id };
+    if (c.field === "query") body.query = `${query} (${value})`;
     else body[c.field] = value;
     ask(body);
   };
@@ -371,16 +424,16 @@ function renderClarification(r) {
     }
     options.append(el("div", { class: "row" }, el("button", { type: "button", class: "primary", onclick: () => {
       const picked = [...options.querySelectorAll("input:checked")].flatMap((i) => [].concat(JSON.parse(i.value)));
-      if (picked.length) answer(picked);
+      if (picked.length) answerWith(picked);
     } }, "Use selected")));
   } else {
-    for (const o of c.options) options.append(el("button", { type: "button", onclick: () => answer(o.value) }, o.label));
+    for (const o of c.options) options.append(el("button", { type: "button", onclick: () => answerWith(o.value) }, o.label));
   }
   if (c.allow_free_text) {
     const input = el("input", { placeholder: "Or type your answer" });
     options.append(el("div", { class: "row" }, input, el("button", { type: "button", onclick: () => {
       const v = input.value.trim();
-      if (v) answer(c.multi_select ? v.split(",").map((s) => s.trim()).filter(Boolean) : v);
+      if (v) answerWith(c.multi_select ? v.split(",").map((s) => s.trim()).filter(Boolean) : v);
     } }, "Send")));
   }
   box.append(options);

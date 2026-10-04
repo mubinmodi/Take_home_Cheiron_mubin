@@ -14,9 +14,10 @@ from pathlib import Path
 from typing import Any
 
 from clinical_trials_viz.config import get_settings
-from clinical_trials_viz.models.plan import QueryPlan
+from clinical_trials_viz.models.plan import AnswerPlan, MultiAnswerPlan, QueryPlan
 from clinical_trials_viz.models.request import QueryRequest
-from clinical_trials_viz.planner import UnconfiguredPlanner, build_planner
+from clinical_trials_viz.planner import Planner, UnconfiguredPlanner, build_planner
+from clinical_trials_viz.planning import plan_question
 
 QUESTIONS = Path(__file__).with_name("questions.json")
 
@@ -35,8 +36,16 @@ def _norm(value: Any) -> Any:
     return value
 
 
-def mismatches(plan: QueryPlan, expect: dict[str, Any]) -> list[str]:
-    """Compare only the expected keys. Lists of names compare as sets."""
+def mismatches(plan: QueryPlan | AnswerPlan, expect: dict[str, Any]) -> list[str]:
+    """Compare only the expected keys. Lists of names compare as sets. A multi-part expectation
+    ({"kind": "multi", "parts": [...]}) compares each part in order."""
+    if expect.get("kind") == "multi":
+        if not isinstance(plan, MultiAnswerPlan):
+            return [f"kind: expected 'multi', got {plan.kind!r}"]
+        if len(plan.parts) != len(expect["parts"]):
+            return [f"parts: expected {len(expect['parts'])}, got {len(plan.parts)}"]
+        return [f"part {i + 1} {p}" for i, (part, want) in enumerate(zip(plan.parts, expect["parts"], strict=True))
+                for p in mismatches(part, {"kind": "answer", **want})]  # fmt: skip
     actual = plan.model_dump(mode="json")
     problems = []
     for key, want in expect.items():
@@ -59,6 +68,11 @@ def _as_set(value: Any) -> Any:
     return frozenset(value) if isinstance(value, list) else value
 
 
+async def plan_like_the_service(planner: Planner, request: QueryRequest) -> QueryPlan:
+    """The service's own planning stage (split, plan, gate, repair), without retrieving any trials."""
+    return (await plan_question(planner, request, None, None, set())).plan
+
+
 async def main(selected: list[str]) -> int:
     settings = get_settings()
     planner = build_planner(settings.planner_primary, settings.planner_fallback)
@@ -70,8 +84,8 @@ async def main(selected: list[str]) -> int:
     for case in cases:
         request = QueryRequest(query=case["question"], **case.get("fields", {}))
         try:
-            result = await planner.plan(request.query, request.structured_fields(), None)
-            problems = mismatches(result.plan, case["expect"])
+            plan = await plan_like_the_service(planner, request)
+            problems = mismatches(plan, case["expect"])
         except Exception as exc:  # a failed call is a failed case, not a crashed eval
             problems = [f"error: {exc}"]
         by_family[case["family"]].append(not problems)

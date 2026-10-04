@@ -16,6 +16,7 @@ def verify(
     dimension: Dimension | None,
     expected_type: VisualizationType,
     filters: AppliedFilters,
+    series: Dimension | None = None,
 ) -> Verification:
     checks: list[VerificationCheck] = []
 
@@ -51,16 +52,17 @@ def verify(
     cited = {i for d in datums for i in d["trial_ids"]}
     check("citations_resolve", [f"{i} missing" for i in sorted(cited) if i not in evidence or i not in trials])
 
-    # Each cited trial really has the value of the bucket it is counted in.
+    # Each cited trial really has the value of the bucket it is counted in (both, for a crossed chart).
     if dimension is not None and spec.type not in (VisualizationType.TABLE, VisualizationType.NETWORK_GRAPH):
         wrong = []
-        for d in spec.rows():
-            label = d.get(dimension.value)
-            if label in (OTHER_BUCKET, None):
-                continue
-            for nct_id in d["trial_ids"]:
-                if nct_id in trials and label not in dimension_values(trials[nct_id], dimension):
-                    wrong.append(f"{nct_id} counted under '{label}'")
+        for dim in [dimension, *([series] if series else [])]:
+            for d in spec.rows():
+                label = d.get(dim.value)
+                if label in (OTHER_BUCKET, None):
+                    continue
+                for nct_id in d["trial_ids"]:
+                    if nct_id in trials and label not in dimension_values(trials[nct_id], dim):
+                        wrong.append(f"{nct_id} counted under '{label}'")
         check("cited_values_match_source", wrong)
 
     if isinstance(spec.data, NetworkData):
@@ -123,7 +125,7 @@ def verify(
 
     # Readability: no silent gaps in a time series.
     if spec.type is VisualizationType.TIME_SERIES and dimension is Dimension.START_YEAR:
-        years = [int(d[dimension.value]) for d in spec.rows() if d[dimension.value] != NOT_REPORTED]
+        years = sorted({int(d[dimension.value]) for d in spec.rows() if d[dimension.value] != NOT_REPORTED})
         check("no_time_gaps", [] if years == list(range(min(years), max(years) + 1)) else ["missing years"])
 
     return Verification(passed=all(c.passed for c in checks), checks=checks)

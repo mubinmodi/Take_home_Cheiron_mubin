@@ -14,6 +14,7 @@ from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.idempotency import MAX_KEY_LENGTH, IdempotencyStore, KeyInProgress, KeyReused
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import QueryResponse
+from clinical_trials_viz.models.spec import VisualizationSpec
 from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
 from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
@@ -108,26 +109,31 @@ def create_app(
             raise HTTPException(404, "run not found")
         return record
 
-    @app.get("/v1/runs/{run_id}/chart.{fmt}")
-    async def get_chart(run_id: str, fmt: Literal["png", "svg"]) -> Response:
+    def visualization(run_id: str, part: int) -> VisualizationSpec:
+        """The chart of one part of a run: 0 is the top-level answer, 1+ the additional answers."""
         record = pipeline().runs.load(run_id)
-        if record is None or record.response.visualization is None:
-            raise HTTPException(404, "no visualization for this run")
+        answers = [record.response, *record.response.additional_answers] if record else []
+        spec = answers[part].visualization if 0 <= part < len(answers) else None
+        if spec is None:
+            raise HTTPException(404, "no visualization for this run and part")
+        return spec
+
+    @app.get("/v1/runs/{run_id}/chart.{fmt}")
+    async def get_chart(run_id: str, fmt: Literal["png", "svg"], part: int = 0) -> Response:
+        spec = visualization(run_id, part)
         try:
-            image = render(record.response.visualization, fmt)
+            image = render(spec, fmt)
         except NotRenderable as exc:
             raise HTTPException(404, str(exc)) from exc
         return Response(image, media_type="image/png" if fmt == "png" else "image/svg+xml")
 
     @app.get("/v1/runs/{run_id}/vega-lite.json")
-    async def get_vega_lite(run_id: str) -> dict[str, Any]:
+    async def get_vega_lite(run_id: str, part: int = 0) -> dict[str, Any]:
         """The chart as a Vega-Lite spec (finished values only); each mark carries `_datum`, its index
         in the visualization's Datums, so a client can show that Datum's Citation on click."""
-        record = pipeline().runs.load(run_id)
-        if record is None or record.response.visualization is None:
-            raise HTTPException(404, "no visualization for this run")
+        spec = visualization(run_id, part)
         try:
-            return to_vega_lite(record.response.visualization)
+            return to_vega_lite(spec)
         except NotRenderable as exc:
             raise HTTPException(404, str(exc)) from exc
 

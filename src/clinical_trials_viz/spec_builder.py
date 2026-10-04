@@ -6,7 +6,7 @@ The chart type follows deterministically from the Query Plan; the model does not
 from datetime import date
 from typing import Any
 
-from clinical_trials_viz.analyze import Breakdown, ComparisonGroups, Histogram, breakdown
+from clinical_trials_viz.analyze import Breakdown, ComparisonGroups, CrossBreakdown, Histogram, breakdown
 from clinical_trials_viz.catalog import (
     DIMENSIONS,
     ENROLLMENT_BINS,
@@ -50,6 +50,12 @@ def chart_type_for(plan: AnswerPlan) -> VisualizationType:
         return VisualizationType.GROUPED_BAR_CHART if plan.group_by else VisualizationType.BAR_CHART
     if plan.group_by is None:
         return VisualizationType.SINGLE_VALUE
+    if plan.series_by is not None:
+        return (
+            VisualizationType.TIME_SERIES
+            if plan.group_by is Dimension.START_YEAR
+            else VisualizationType.GROUPED_BAR_CHART
+        )
     if plan.group_by is Dimension.START_YEAR:
         return VisualizationType.TIME_SERIES
     return VisualizationType.BAR_CHART
@@ -126,6 +132,34 @@ def breakdown_spec(result: Breakdown, filters: AppliedFilters, cohort_size: int)
             cohort_size=cohort_size,
         ),
     )
+
+
+def cross_spec(cross: CrossBreakdown, filters: AppliedFilters, cohort_size: int) -> VisualizationSpec:
+    """One chart of two Dimensions: the axis and a coloured series ('phases per year')."""
+    dim, series = cross.dimension, cross.series
+    time_series = dim is Dimension.START_YEAR
+    data = [{dim.value: x, series.value: s, "trial_count": len(ids), "trial_ids": ids} for x, s, ids in cross.cells]
+    # Colours must be distinct categories even for an ordered dimension (a sequential ramp is unreadable);
+    # the order is kept by metadata.series_order.
+    series_channel = Channel(field=series.value, type=FieldType.NOMINAL, title=DIMENSIONS[series].label)
+    info, series_info = DIMENSIONS[dim], DIMENSIONS[series]
+    return VisualizationSpec(
+        type=VisualizationType.TIME_SERIES if time_series else VisualizationType.GROUPED_BAR_CHART,
+        title=f"Trials by {info.label.lower()} and {series_info.label.lower()}: {describe_filters(filters)}",
+        subtitle=f"{cohort_size} trials",
+        encoding=Encoding(x=_dimension_channel(dim), y=COUNT, color=series_channel,
+                          tooltip=[_dimension_channel(dim), series_channel, COUNT]),
+        data=data,
+        metadata=RenderMetadata(
+            time_granularity="year" if time_series else None,
+            category_order=cross.axis_labels,
+            series_order=cross.series_labels,
+            top_n=cross.axis_top_n,
+            other_bucket=OTHER_BUCKET in cross.axis_labels or OTHER_BUCKET in cross.series_labels,
+            multi_valued=info.multi_valued or series_info.multi_valued,
+            cohort_size=cohort_size,
+        ),
+    )  # fmt: skip
 
 
 def comparison_spec(

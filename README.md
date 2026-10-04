@@ -78,7 +78,8 @@ question ─► PLAN (the only model step) ─► GATE ─► RETRIEVE ─► CO
               (or clarify/refuse)     repair once  match check  only   by code        every answer
 ```
 
-- **One model step.** A pydantic-ai agent turns the question (plus any structured fields, plus the previous plan for follow-ups) into a typed **Query Plan**: filters, operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`), what to group by, and a view or network kind. It may instead return a clarification request or a refusal. The model **never sees trial records** and **never outputs numbers, trial IDs or citations**.
+- **One model step.** A pydantic-ai agent turns the question (plus any structured fields, plus the previous plan for follow-ups) into a typed **Query Plan**: filters, operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`), what to group by (optionally with a second **series** dimension, "phases per year"), and a view or network kind. It may instead return a clarification request or a refusal. The model **never sees trial records** and **never outputs numbers, trial IDs or citations**.
+- **Questions that ask several things are split by code, not by the model.** A plain-code detector splits the message where a new request starts ("…, and what…", "…; show…", "… and also by …"). Each **part** is planned on its own as an ordinary single question, with the full message as context only for references. The model never sees a multi-part shape, so its job doesn't change. Each part gets its own filters, chart, citations and verification, and fails or asks independently. Parts are planned one after another and share the 3-call budget (at most 3 parts).
 - **Code does everything else:**
   - compiles filters into API requests
   - retrieves **every** page, or refuses with `scope_required` and never samples
@@ -153,8 +154,8 @@ Request equality is judged on the validated request, so whitespace and field ord
 
 Other endpoints:
 - `GET /v1/runs/{run_id}`: the saved run record (request, plan, response)
-- `GET /v1/runs/{run_id}/chart.png` and `.svg`: the rendered chart
-- `GET /v1/runs/{run_id}/vega-lite.json`: the chart as Vega-Lite with finished values; each mark carries `_datum`, its index in the spec's Datums (rows, or nodes then edges), so a client can show the Citation for whatever is clicked
+- `GET /v1/runs/{run_id}/chart.png` and `.svg` (`?part=N` for part N+1 of a multi-part question): the rendered chart
+- `GET /v1/runs/{run_id}/vega-lite.json` (`?part=N`): the chart as Vega-Lite with finished values; each mark carries `_datum`, its index in the spec's Datums (rows, or nodes then edges), so a client can show the Citation for whatever is clicked
 - `GET /`: the web page
 - `GET /health`
 
@@ -167,6 +168,7 @@ All outcomes return HTTP 200 with the outcome in the body.
 | Field | Meaning |
 |---|---|
 | `run_id`, `outcome`, `message` | Identity and result; `message` explains non-success outcomes |
+| `additional_answers` | When the Question asks several things: the answers to parts 2 and 3, each with the same fields as the top level (outcome, plan, filters, visualization, `chart_url` with `?part=N`, evidence, assumptions, clarification, verification). The top level is part 1; `plan.kind == "multi"` lists every part's request in `plan.requests`. |
 | `visualization` | The **Visualization Specification** (below); present on success |
 | `chart_url` | Link to the rendered image (absent for tables) |
 | `evidence` | `{nct_id: {nct_id, title, url, fields}}`: each cited trial once, with the **source field values** (API field path → value) that placed it in the data and satisfied each filter |
@@ -207,8 +209,8 @@ Each type, its data and its channels:
 |---|---|---|
 | `single_value` | `[{label, trial_count, trial_ids}]` | `value` |
 | `bar_chart` | one row per category | `x` category, `y` count; `metadata.top_n`, `other_bucket`, `multi_valued` (a trial can fall in several categories) |
-| `time_series` | one row per start year, no gaps, plus `estimated_count` | `x` year (`time_granularity: "year"`), `y` count. A `Not reported` row holds undated trials and is not plotted on the axis. |
-| `grouped_bar_chart` | one row per category × comparison group (`"A only"`, `"B only"`, `"Both"`/`"More than one"`) | `x`, `y`, `color` = group |
+| `time_series` | one row per start year, no gaps, plus `estimated_count`; for a crossed chart one row per year × series value | `x` year (`time_granularity: "year"`), `y` count, optional `color` = series (one line each). A `Not reported` row holds undated trials and is not plotted on the axis. |
+| `grouped_bar_chart` | one row per category × comparison group (`"A only"`, `"B only"`, `"Both"`/`"More than one"`), or × series value for a crossed chart | `x`, `y`, `color` = group or series (`metadata.series_order`) |
 | `histogram` | one row per enrollment bin × enrollment type (Actual / Estimated / Type not reported) | `x` bin (ordinal), `y` count, `color` type; `metadata.bins = [{label, min, max}]` |
 | `table` | one row per trial (≤ 100; `metadata.total_rows` = all) | `columns` |
 | `timeline` | one row per trial: `start`, `end` (ISO dates), `dates` (actual vs estimated) | `x` start, `x2` end, `y` trial, `color` |
@@ -260,7 +262,7 @@ Regenerate with `uv run python -m examples.generate`.
 - **Drug classes** ("PD-1 inhibitors") are handled by a clarification listing the drugs most often found in matching trials. There is no verified class membership; the registry has none.
 - **Data quality is passed through, not corrected.** Enrollment outliers (one melanoma record lists 2,953,748 participants, another 999,999) are shown as recorded. Alternatives listed in an arm are detected from its description; when the description does not name both drugs, they still count as given together.
 - **Run records** keep the plan and response only. Full run bundles with the raw API pages, for exact offline replay, are designed but not built.
-- **The planner eval** has 36 questions: `gpt-5.4-mini` scores 97%, `claude-haiku-4-5` 92% (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. The one shared miss ("industry vs academic … Parkinson's and ALS") shows that questions naming two comparison axes need a clearer rule.
+- **The planner eval** has 36 questions: `gpt-5.4-mini` scores 98%, `claude-haiku-4-5` 95% on 42 questions including multi-part and crossed questions (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. The one shared miss ("industry vs academic … Parkinson's and ALS") shows that questions naming two comparison axes need a clearer rule.
 - **Not built:**
   - hosting
   - investigator and site networks
@@ -285,6 +287,7 @@ Regenerate with `uv run python -m examples.generate`.
   - alternatives in one arm ("cisplatin OR carboplatin") counted as combinations → detected from the arm description; checked on the real KEYNOTE-189 record and on real "either / investigator's choice" arm texts, including a false positive the tests caught (a dose unit "mg/m²" read as "or")
   - incomplete current-year counts → assumption
   - shallow citations → per-filter source values with a verifier check
+  - multi-part questions: one unrelated question silently merged with another into a wrong single number, and second requests were dropped. Asking the model to produce a multi-part plan was unreliable (about 50% across repeated runs, and its repair turn confused it), so code now splits the message and the model plans each part as a normal question: 20/20 across repeated runs, with the eval otherwise unchanged
   - a refinement in the web page silently dropped the user's Clarification answer (the exact Merck companies) → refining Follow-ups now inherit the earlier structured fields
 
 ---

@@ -38,6 +38,14 @@ _Avoid_: Arm (reserved for trial arms), series, cohort
 The Trials that belong to more than one compared side, shown as their own group.
 _Avoid_: Intersection, both
 
+**Part**:
+One separate request inside a Question that asks several things ("how many X, and which countries for Y?"). Each Part has its own Filters, Query Plan and answer.
+_Avoid_: Sub-question, sub-query
+
+**Series**:
+A second Dimension split inside one chart, shown as colours ("phases per year": years on the axis, one series per phase).
+_Avoid_: Breakdown (a breakdown is one Dimension), facet
+
 **Follow-up**:
 A Question that refines or corrects an earlier Run by referring to it.
 _Avoid_: Conversation, session, chat turn

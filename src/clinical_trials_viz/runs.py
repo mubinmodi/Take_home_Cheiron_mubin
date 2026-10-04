@@ -11,7 +11,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, UnsupportedPlan
+from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, MultiAnswerPlan, UnsupportedPlan
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import QueryResponse
 
@@ -22,7 +22,7 @@ class RunRecord(BaseModel):
     run_id: str
     created_at: datetime
     request: QueryRequest
-    plan: AnswerPlan | ClarifyPlan | UnsupportedPlan | None
+    plan: AnswerPlan | MultiAnswerPlan | ClarifyPlan | UnsupportedPlan | None
     response: QueryResponse
 
 

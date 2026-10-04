@@ -47,8 +47,18 @@ class ScriptedPlanner:
         self.plans = list(plans)
         self.calls: list[dict[str, Any]] = []
 
-    async def plan(self, question, structured, previous_plan, *, repair=None, max_calls=3) -> PlannerResult:
-        self.calls.append({"question": question, "structured": structured, "previous": previous_plan, "repair": repair})
+    async def plan(
+        self, question, structured, previous_plan, *, repair=None, max_calls=3, context=None
+    ) -> PlannerResult:
+        self.calls.append(
+            {
+                "question": question,
+                "structured": structured,
+                "previous": previous_plan,
+                "repair": repair,
+                "context": context,
+            }
+        )
         return PlannerResult(self.plans.pop(0), 1, "scripted", [])
 
 

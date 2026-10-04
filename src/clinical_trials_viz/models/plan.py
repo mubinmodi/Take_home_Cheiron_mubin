@@ -70,7 +70,7 @@ class ComparisonSide(BaseModel):
 
 
 class AnswerPlan(BaseModel):
-    """Use when the question can be answered with trial counts or trial lists."""
+    """Use when the message asks one thing that trial counts, charts or trial lists can answer."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -85,6 +85,11 @@ class AnswerPlan(BaseModel):
     )
     group_by: Dimension | None = Field(
         default=None, description="aggregate/compare: what to count by. None for a single total ('how many…')."
+    )
+    series_by: Dimension | None = Field(
+        default=None,
+        description="aggregate only, rarely: a second dimension split inside one chart, for 'X per Y' "
+        "('phases per year': group_by start_year, series_by phase). Leave null otherwise.",
     )
     compare_sides: list[ComparisonSide] = Field(
         default_factory=list, description="compare only: 2-5 sides, e.g. Drug A vs Drug B."
@@ -125,4 +130,16 @@ class UnsupportedPlan(BaseModel):
     reason: str = Field(description="One sentence explaining why, addressed to the user.")
 
 
-QueryPlan = AnswerPlan | ClarifyPlan | UnsupportedPlan
+class MultiAnswerPlan(BaseModel):
+    """The plans of a message that asks several separate things. Built by code, which splits the message
+    and plans each request on its own; the model never produces this shape."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["multi"] = "multi"
+    relation: Literal["new", "refine"] = "new"
+    requests: list[str] = Field(description="The separate requests, as split from the message.")
+    parts: list[AnswerPlan | ClarifyPlan | UnsupportedPlan] = Field(min_length=2, max_length=3)
+
+
+QueryPlan = AnswerPlan | MultiAnswerPlan | ClarifyPlan | UnsupportedPlan

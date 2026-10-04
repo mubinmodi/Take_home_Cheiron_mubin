@@ -1,5 +1,6 @@
 """Semantic gate: merge the plan with structured fields and check it against the catalog."""
 
+import re
 from dataclasses import dataclass, field
 
 from clinical_trials_viz.catalog import COUNTRY_ALIASES, DIMENSIONS, MAX_COMPARE_SIDES, Dimension
@@ -81,6 +82,11 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
 
     if plan.view is not None and plan.operation is not Operation.PER_TRIAL:
         errors.append("view is only allowed with operation 'per_trial'")
+    if plan.series_by is not None:
+        if plan.operation is not Operation.AGGREGATE or plan.group_by is None:
+            errors.append("series_by needs operation 'aggregate' with a group_by")
+        elif plan.series_by == plan.group_by:
+            errors.append("series_by must differ from group_by")
     if plan.operation is Operation.PER_TRIAL and plan.group_by is not None:
         errors.append("per_trial lists trials; set group_by to null")
     if plan.group_by is not None and plan.group_by not in DIMENSIONS:
@@ -109,3 +115,19 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
     if filters.sponsor and not filters.sponsor_exact and filters.sponsor_role == "lead":
         result.assumptions.append(f"'{filters.sponsor}' is matched as the lead sponsor (collaborators not included).")
     return result
+
+
+# A second request inside one message: a joiner ("and", "also", ";", "?") followed closely by a request word.
+_SECOND_REQUEST = re.compile(
+    r"(?:\?|;|,?\s+and\s+(?:also\s+|then\s+)?|,?\s+as well as\s+|\balso\s+)"
+    r"(?=(?:please\s+)?(?:show|list|plot|draw|map|chart|display|give|compare|what|which|how many|how|who|where)\b)"
+    r"|,?\s+and\s+also\s+(?=by\b)|\s+and\s+(?=by\b)",  # a second breakdown: "by phase and (also) by year"
+    re.IGNORECASE,
+)
+
+
+def separate_requests(question: str) -> list[str]:
+    """Split a message where it appears to start a new request. A hint for the planner's repair turn,
+    never a decision: "how many X, and which countries?" splits here but is one question."""
+    parts = [p.strip(" ,.?;") for p in _SECOND_REQUEST.split(question)]
+    return [p for p in parts if len(p.split()) >= 2]

@@ -1,6 +1,6 @@
 {
   "description": "Planner eval set modelled on the assignment appendix (docs/assignment-images/IMG_5213.png). Each case lists the question, optional structured fields, and the expected plan. Only the keys listed under `expect` are checked; drug, condition, sponsor and country names compare case-insensitively.",
-  "version": "2026-10-03.2",
+  "version": "2026-10-04.1",
   "cases": [
     {
       "id": "trend-01",
@@ -607,6 +607,169 @@
         "filters": {
           "conditions": [
             "obesity"
+          ]
+        }
+      }
+    },
+    {
+      "id": "multi-01",
+      "family": "multi_part",
+      "appendix": "(two unrelated questions)",
+      "question": "How many trials does Pfizer sponsor, and what are the most common conditions in lung cancer trials?",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": null,
+            "filters": {
+              "sponsor": "pfizer",
+              "conditions": []
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "condition",
+            "filters": {
+              "conditions": [
+                "lung cancer"
+              ],
+              "sponsor": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-02",
+      "family": "multi_part",
+      "appendix": "(two breakdowns of the same trials)",
+      "question": "Show melanoma trials by phase and also by start year",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": "phase",
+            "filters": {
+              "conditions": [
+                "melanoma"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "start_year",
+            "filters": {
+              "conditions": [
+                "melanoma"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-03",
+      "family": "multi_part",
+      "appendix": "(total plus breakdown: split by code into two answers)",
+      "question": "How many recruiting pembrolizumab trials are there, and which countries have the most?",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": null,
+            "filters": {
+              "drugs": [
+                "pembrolizumab"
+              ],
+              "statuses": [
+                "RECRUITING"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "country",
+            "filters": {
+              "drugs": [
+                "pembrolizumab"
+              ],
+              "statuses": [
+                "RECRUITING"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-04",
+      "family": "multi_part",
+      "appendix": "(different chart types)",
+      "question": "List recruiting nivolumab trials in Japan, and show a network of sponsors and drugs for mesothelioma trials",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "per_trial",
+            "filters": {
+              "drugs": [
+                "nivolumab"
+              ],
+              "statuses": [
+                "RECRUITING"
+              ],
+              "countries": [
+                "japan"
+              ]
+            }
+          },
+          {
+            "operation": "relate",
+            "network": "sponsor_drug",
+            "filters": {
+              "conditions": [
+                "mesothelioma"
+              ],
+              "drugs": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "series-01",
+      "family": "series",
+      "appendix": "(X per Y)",
+      "question": "How have phases of breast cancer trials changed per year since 2015?",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "start_year",
+        "series_by": "phase",
+        "filters": {
+          "conditions": [
+            "breast cancer"
+          ],
+          "start_year_from": 2015
+        }
+      }
+    },
+    {
+      "id": "series-02",
+      "family": "series",
+      "appendix": "(X by Y together)",
+      "question": "Show recruitment status by country for melanoma trials",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "country",
+        "series_by": "status",
+        "filters": {
+          "conditions": [
+            "melanoma"
           ]
         }
       }

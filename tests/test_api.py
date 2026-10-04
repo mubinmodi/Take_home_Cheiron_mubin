@@ -180,6 +180,7 @@ async def test_llm_planner_wiring_with_tool_output(make_client):
     """The real pydantic-ai planner, with a function standing in for the provider."""
 
     def model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        # The model sees three tools; multi-part messages are split by code before they reach it.
         assert {t.name for t in info.output_tools} == {"answer_plan", "clarify_plan", "unsupported_plan"}
         args = {"operation": "aggregate", "filters": {"drugs": ["Keytruda"]}, "group_by": "start_year"}
         return ModelResponse(parts=[ToolCallPart("answer_plan", args)])
@@ -566,3 +567,114 @@ async def test_vega_lite_endpoint_maps_marks_to_datums_and_page_is_served(make_c
         page = await client.get("/")
         assert page.status_code == 200 and "Clinical Trials Explorer" in page.text
         assert ".innerHTML" not in page.text  # registry text is always inserted as text, never as markup
+
+
+async def test_multi_part_question_is_split_by_code_and_each_part_planned_alone(make_client):
+    parts = [
+        AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(sponsor="Pfizer")),
+        AnswerPlan(
+            operation=Operation.AGGREGATE, filters=Filters(conditions=["lung cancer"]), group_by=Dimension.PHASE
+        ),
+    ]
+    planner = ScriptedPlanner(*parts)
+    question = "How many trials does Pfizer sponsor, and what phases are lung cancer trials in?"
+    async for client in make_client(planner):
+        body = (await client.post("/v1/query", json={"query": question})).json()
+        # Each request reached the model on its own, with the full message only as context.
+        assert [c["question"] for c in planner.calls] == [
+            "How many trials does Pfizer sponsor",
+            "what phases are lung cancer trials in",
+        ]
+        assert all(c["context"] == question for c in planner.calls)
+        assert body["model_calls"] == 2
+        assert body["plan"]["kind"] == "multi" and len(body["plan"]["parts"]) == 2
+        assert body["assumptions"][0].startswith("The question asks 2 separate things")
+        second = body["additional_answers"][0]
+        assert second["visualization"]["type"] == "bar_chart"
+        assert second["applied_filters"]["conditions"] == ["lung cancer"] and not second["applied_filters"].get(
+            "sponsor"
+        )
+        assert second["verification"]["passed"]
+        assert second["chart_url"].endswith("chart.png?part=1")
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png", params={"part": 1})
+        assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")
+        assert (await client.get(f"/v1/runs/{body['run_id']}/vega-lite.json", params={"part": 1})).status_code == 200
+        assert (await client.get(f"/v1/runs/{body['run_id']}/chart.png", params={"part": 2})).status_code == 404
+
+
+async def test_parts_fail_independently(make_client, ctgov, page):
+    parts = [TREND, AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(conditions=["cancer"]))]
+
+    def studies(request):
+        if "query.cond" in request.url.params:  # the second part matches too many trials
+            return httpx.Response(200, json={"totalCount": 99_000, "studies": [], "nextPageToken": "t"})
+        return httpx.Response(200, json=page)
+
+    ctgov.get("/studies").mock(side_effect=studies)
+    body = await ask(
+        make_client, ScriptedPlanner(*parts), query="Keytruda trials per year; and show cancer trials by phase"
+    )
+    assert body["outcome"] == "success"
+    assert body["additional_answers"][0]["outcome"] == "scope_required"
+
+
+async def test_follow_ups_are_not_split(make_client):
+    planner = ScriptedPlanner(TREND, TREND)
+    async for client in make_client(planner):
+        first = (await client.post("/v1/query", json={"query": "Keytruda per year"})).json()
+        await client.post(
+            "/v1/query", json={"query": "only phase 3, and show it by country", "previous_run_id": first["run_id"]}
+        )
+        assert len(planner.calls) == 2 and planner.calls[1]["context"] is None
+
+
+async def test_series_by_crosses_two_dimensions_in_one_verified_chart(make_client, trials):
+    from clinical_trials_viz.ctgov.trial import dimension_values
+
+    plan = AnswerPlan(operation=Operation.AGGREGATE, group_by=Dimension.START_YEAR, series_by=Dimension.PHASE)
+    async for client in make_client(ScriptedPlanner(plan)):
+        body = (await client.post("/v1/query", json={"query": "phases per year"})).json()
+        assert body["outcome"] == "success", body.get("message")
+        spec = body["visualization"]
+        assert spec["type"] == "time_series" and spec["encoding"]["color"]["field"] == "phase"
+        assert (
+            spec["metadata"]["series_order"][0] == "Early Phase 1" or spec["metadata"]["series_order"][0] == "Phase 1"
+        )
+        by_id = {t.nct_id: t for t in trials}
+        for d in spec["data"]:
+            for nct_id in d["trial_ids"]:
+                assert d["phase"] in dimension_values(by_id[nct_id], Dimension.PHASE)
+        assert body["verification"]["passed"]
+        assert "protocolSection.designModule.phases" in next(iter(body["evidence"].values()))["fields"]
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert chart.status_code == 200
+
+
+async def test_series_by_rules_are_gated(make_client):
+    bad = AnswerPlan(operation=Operation.AGGREGATE, group_by=Dimension.PHASE, series_by=Dimension.PHASE)
+    planner = ScriptedPlanner(bad, TREND)
+    await ask(make_client, planner, query="x")
+    assert "series_by must differ from group_by" in planner.calls[1]["repair"][1][0]
+
+
+async def test_clarification_for_one_part_is_answered_as_that_part_alone(make_client):
+    from clinical_trials_viz.models.plan import ClarificationReason, ClarifyPlan
+
+    clarify = ClarifyPlan(reason=ClarificationReason.MISSING_REFERENCE, field="drug", question="Which drug?")
+    phases = AnswerPlan(
+        operation=Operation.AGGREGATE, filters=Filters(conditions=["lung cancer"]), group_by=Dimension.PHASE
+    )
+    planner = ScriptedPlanner(clarify, phases, TREND)
+    async for client in make_client(planner):
+        first = (
+            await client.post(
+                "/v1/query", json={"query": "Show trials of this drug per year, and show lung cancer trials by phase"}
+            )
+        ).json()
+        assert first["outcome"] == "clarification_required"
+        assert first["additional_answers"][0]["outcome"] == "success"
+        part = first["plan"]["requests"][0]
+        answer = {"query": part, "drug_name": "Keytruda", "previous_run_id": first["run_id"]}
+        second = (await client.post("/v1/query", json=answer)).json()
+        assert second["outcome"] == "success" and not second.get("additional_answers")
+        assert planner.calls[2]["question"] == part and planner.calls[2]["previous"] is None  # planned fresh

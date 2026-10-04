@@ -7,7 +7,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from clinical_trials_viz.catalog import OverallStatus, Phase, StudyType
-from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, UnsupportedPlan
+from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, MultiAnswerPlan, UnsupportedPlan
 from clinical_trials_viz.models.spec import VisualizationSpec
 
 
@@ -89,12 +89,12 @@ class Verification(BaseModel):
     checks: list[VerificationCheck]
 
 
-class QueryResponse(BaseModel):
-    run_id: str
+class Answer(BaseModel):
+    """The result for one part of a Question. A single Question has one part: the response itself."""
+
     outcome: Outcome
     message: str | None = Field(default=None, description="Human-readable explanation for non-success outcomes.")
-    relation: Literal["new", "refine"] | None = None
-    plan: AnswerPlan | ClarifyPlan | UnsupportedPlan | None = None
+    plan: AnswerPlan | MultiAnswerPlan | ClarifyPlan | UnsupportedPlan | None = None
     applied_filters: AppliedFilters | None = None
     visualization: VisualizationSpec | None = None
     chart_url: str | None = None
@@ -103,5 +103,16 @@ class QueryResponse(BaseModel):
     clarification: Clarification | None = None
     source: SourceInfo | None = None
     verification: Verification | None = None
+
+
+class QueryResponse(Answer):
+    """The first (or only) part's answer at the top level; further parts in `additional_answers`."""
+
+    run_id: str
+    relation: Literal["new", "refine"] | None = None
+    additional_answers: list[Answer] = Field(
+        default_factory=list,
+        description="When the Question asks several separate things: the answers to the second and third part.",
+    )
     model_calls: int = 0
     timings_ms: dict[str, float] = Field(default_factory=dict)

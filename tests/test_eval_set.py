@@ -22,17 +22,26 @@ CASES = load_cases()
 def test_case_is_well_formed(case):
     QueryRequest(query=case["question"], **case.get("fields", {}))
     expect = case["expect"]
-    if expect["kind"] == "answer":
-        Operation(expect["operation"])
-        if expect.get("group_by"):
-            Dimension(expect["group_by"])
-        Filters.model_validate(expect.get("filters", {}))
-        for side in expect.get("compare_sides", []):
-            ComparisonSide.model_validate(side)
+    if expect["kind"] == "multi":
+        assert 2 <= len(expect["parts"]) <= 3
+        for part in expect["parts"]:
+            _check_answer(part)
+    elif expect["kind"] == "answer":
+        _check_answer(expect)
     elif expect["kind"] == "clarify":
         ClarificationReason(expect["reason"])
     else:
         assert expect["kind"] == "unsupported"
+
+
+def _check_answer(expect):
+    Operation(expect["operation"])
+    for key in ("group_by", "series_by"):
+        if expect.get(key):
+            Dimension(expect[key])
+    Filters.model_validate({k: v for k, v in expect.get("filters", {}).items() if v is not None})
+    for side in expect.get("compare_sides", []):
+        ComparisonSide.model_validate(side)
 
 
 def test_ids_are_unique():

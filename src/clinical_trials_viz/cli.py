@@ -55,53 +55,68 @@ async def _ask(body: dict[str, Any], *, full_json: bool, save_chart: bool) -> No
             print(f"HTTP {response.status_code}: {response.text}")
             return
         result = response.json()
-        chart_path = None
-        if save_chart and result.get("chart_url"):
-            image = await client.get(f"/v1/runs/{result['run_id']}/chart.png")
+        chart_paths: dict[int, Path] = {}
+        answers = [result, *result.get("additional_answers", [])]
+        for part, answer in enumerate(answers):
+            if not (save_chart and answer.get("chart_url")):
+                continue
+            image = await client.get(f"/v1/runs/{result['run_id']}/chart.png", params={"part": part})
             if image.status_code == 200:
-                chart_path = get_settings().runs_dir.parent / "charts" / f"{result['run_id']}.png"
-                chart_path.parent.mkdir(parents=True, exist_ok=True)
-                chart_path.write_bytes(image.content)
-    print(json.dumps(result, indent=2) if full_json else summarize(result, chart_path))
+                suffix = f"-part{part + 1}" if len(answers) > 1 else ""
+                path = get_settings().runs_dir.parent / "charts" / f"{result['run_id']}{suffix}.png"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(image.content)
+                chart_paths[part] = path
+    print(json.dumps(result, indent=2) if full_json else summarize(result, chart_paths))
 
 
-def summarize(r: dict[str, Any], chart_path: Path | None = None) -> str:
-    """A short, readable view of a QueryResponse."""
-    lines: list[str] = []
+def summarize(r: dict[str, Any], chart_paths: dict[int, Path] | None = None) -> str:
+    """A short, readable view of a QueryResponse (every part, when the Question asked several things)."""
+    chart_paths = chart_paths or {}
+    answers = [r, *r.get("additional_answers", [])]
     seconds = sum(r.get("timings_ms", {}).values()) / 1000
     api_requests = (r.get("source") or {}).get("api_requests", 0)
-    spec = r.get("visualization")
-    kind = f" · {spec['type']}" if spec else ""
-    lines.append(f"{r['outcome']}{kind} · {r.get('model_calls', 0)} model call(s) · "
-                 f"{api_requests} API request(s) · {seconds:.1f} s")  # fmt: skip
-    if r.get("message") and r["outcome"] != "clarification_required":
-        lines.append(r["message"])
+    kinds = " + ".join(a["visualization"]["type"] for a in answers if a.get("visualization"))
+    lines = [f"{r['outcome']}{f' · {kinds}' if kinds else ''} · {r.get('model_calls', 0)} model call(s) · "
+             f"{api_requests} API request(s) · {seconds:.1f} s"]  # fmt: skip
+    requests = (r.get("plan") or {}).get("requests") or [r.get("question", "")]
+    for part, answer in enumerate(answers):
+        if len(answers) > 1:
+            lines += ["", f"── Part {part + 1} of {len(answers)}: {answer['outcome']}"]
+        query = requests[part] if part < len(requests) and len(answers) > 1 else None
+        lines += _answer_lines(answer, r["run_id"], chart_paths.get(part), query)
+    lines.append(f"Run: {r['run_id']} (full response: --json)")
+    return "\n".join(lines)
 
-    if spec:
+
+def _answer_lines(a: dict[str, Any], run_id: str, chart_path: Path | None, query: str | None = None) -> list[str]:
+    lines: list[str] = []
+    if a.get("message") and a["outcome"] != "clarification_required":
+        lines.append(a["message"])
+    if spec := a.get("visualization"):
         lines += ["", spec["title"], *_data_lines(spec)]
-    if clarification := r.get("clarification"):
+    if clarification := a.get("clarification"):
         lines += ["", clarification["question"]]
         for i, option in enumerate(clarification.get("options", []), 1):
             lines.append(f"  {i}. {option['label']}")
         hint = "several values as a JSON list" if clarification.get("multi_select") else "one value"
-        lines.append(f"Answer with --previous {r['run_id']} --fields '{{\"{clarification['field']}\": ...}}' ({hint})")
-
-    if filters := r.get("applied_filters"):
+        ask = f'ask "{query}" ' if query else ""  # a part's Clarification re-asks only that part
+        lines.append(f"Answer with {ask}--previous {run_id} --fields '{{\"{clarification['field']}\": ...}}' ({hint})")
+    if filters := a.get("applied_filters"):
         hidden = ("sponsor_role", "sponsor_exact", "exact_sponsors", "from_request")
         shown = {k: v for k, v in filters.items() if v and k not in hidden}
         if shown:
             lines += ["", "Filters: " + "; ".join(f"{k}={_fmt(v)}" for k, v in shown.items())]
-    if assumptions := r.get("assumptions"):
-        lines += ["Assumptions:", *(f"  - {a}" for a in assumptions)]
-    if verification := r.get("verification"):
+    if assumptions := a.get("assumptions"):
+        lines += ["Assumptions:", *(f"  - {x}" for x in assumptions)]
+    if verification := a.get("verification"):
         failed = [c["name"] for c in verification["checks"] if not c["passed"]]
         status = "passed" if verification["passed"] else f"FAILED ({', '.join(failed)})"
         lines.append(f"Verification: {status} ({len(verification['checks'])} checks) · "
-                     f"{len(r.get('evidence', {}))} trials cited")  # fmt: skip
+                     f"{len(a.get('evidence', {}))} trials cited")  # fmt: skip
     if chart_path:
         lines.append(f"Chart: {chart_path}")
-    lines.append(f"Run: {r['run_id']} (full response: --json)")
-    return "\n".join(lines)
+    return lines
 
 
 def _fmt(value: Any) -> str:

@@ -29,6 +29,7 @@ citations, and you never answer from your own knowledge. Catalog version {CATALO
 
 Call exactly one output tool:
 - `answer_plan` when the question can be answered with counts or lists of registered trials.
+  This is the normal case, even for long questions.
 - `clarify_plan` only when no sensible default exists (see below).
 - `unsupported_plan` when the registry cannot answer it: efficacy or safety conclusions,
   treatment advice, prices, or anything not about registered trials.
@@ -47,8 +48,15 @@ Operations (answer_plan.operation):
 - `bin`: an enrollment histogram ("distribution of trial sizes", "how many participants do trials
   enroll"). group_by stays null.
 
-Dimensions for group_by:
+Dimensions for group_by (and series_by):
 {dimensions}
+
+One chart with two dimensions: set `series_by` only for "X per Y" or "X by Y and Z together"
+("phases per year" -> group_by start_year, series_by phase; "status by country" -> group_by country,
+series_by status). Leave series_by null in every other case.
+
+If a message contains several separate requests, plan only the first one and never mix filters from
+different requests. (Code splits multi-part messages before they reach you, so this is rare.)
 
 Filters: fill only what the question (or the structured fields) states.
 - Phases: {phases}. "Phase 2/3" means both PHASE2 and PHASE3.
@@ -91,11 +99,19 @@ class Planner(Protocol):
         *,
         repair: tuple[list[ModelMessage], list[str]] | None = None,
         max_calls: int = 3,
+        context: str | None = None,
     ) -> PlannerResult: ...
 
 
-def build_prompt(question: str, structured: dict[str, Any], previous_plan: QueryPlan | None) -> str:
+def build_prompt(
+    question: str, structured: dict[str, Any], previous_plan: QueryPlan | None, context: str | None = None
+) -> str:
     parts = [f"Question: {question}"]
+    if context:
+        parts.append(
+            "This question is one part of a longer message. Plan only this part; use the full message only to "
+            f"resolve references (e.g. 'these trials'). Full message: {context}"
+        )
     if structured:
         parts.append("Structured fields: " + json.dumps(structured))
     if previous_plan is not None:
@@ -160,6 +176,7 @@ class LLMPlanner:
         *,
         repair: tuple[list[ModelMessage], list[str]] | None = None,
         max_calls: int = 3,
+        context: str | None = None,
     ) -> PlannerResult:
         limits = UsageLimits(request_limit=max_calls)
         if repair:
@@ -167,6 +184,7 @@ class LLMPlanner:
             prompt = "Your plan failed validation. Return a corrected plan.\nProblems:\n- " + "\n- ".join(errors)
             result = await self._agent.run(prompt, message_history=history, usage_limits=limits)
         else:
-            result = await self._agent.run(build_prompt(question, structured, previous_plan), usage_limits=limits)
+            prompt = build_prompt(question, structured, previous_plan, context)
+            result = await self._agent.run(prompt, usage_limits=limits)
         response_model = result.response.model_name if result.response else None
         return PlannerResult(result.output, result.usage.requests, response_model, result.all_messages())

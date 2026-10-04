@@ -77,6 +77,8 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
                     "x": _channel(enc.x, sort=meta.category_order),
                     "y": _channel(enc.y),
                     "tooltip": _tooltip(spec),
+                    # One line per series when the chart crosses two dimensions ("phases per year").
+                    **({"color": _channel(enc.color, sort=meta.series_order)} if enc.color else {}),
                 },
             }
 
