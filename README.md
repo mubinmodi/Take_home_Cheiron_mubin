@@ -189,6 +189,7 @@ Other endpoints:
 - `GET /v1/runs/{run_id}`: the saved run record (request, plan, response)
 - `GET /v1/runs/{run_id}/chart.png` and `.svg` (`?part=N` for part N+1 of a multi-part question): the rendered chart
 - `GET /v1/runs/{run_id}/vega-lite.json` (`?part=N`): the chart as Vega-Lite with finished values; each mark carries `_datum`, its index in the spec's Datums (rows, or nodes then edges), so a client can show the Citation for whatever is clicked
+- `GET /v1/schema`: the JSON Schemas of the request and the response
 - `GET /`: the web page
 - `GET /health`
 
@@ -196,7 +197,7 @@ Other endpoints:
 
 ## 4. Response schema
 
-All outcomes return HTTP 200 with the outcome in the body.
+Every Outcome returns HTTP 200 with the outcome in the body; HTTP error codes are only for requests that cannot run (listed in §3 and §7).
 
 | Field | Meaning |
 |---|---|
@@ -259,14 +260,14 @@ The images are produced by translating this spec, and only this spec, into Vega-
 
 ## 5. Example runs
 
-[`examples/`](examples/) holds five real runs from the live service, unedited: request, full JSON response and chart.
+[`examples/`](examples/) holds five real runs of the service against the live ClinicalTrials.gov API, unedited: request, full JSON response and chart.
 
 | Example | Outcome |
 |---|---|
 | The assignment's own request ("this drug" + `drug_name: Pembrolizumab`) | `time_series`, 2,620 cited trials |
 | "Which countries have the most recruiting trials for melanoma?" | `bar_chart`, 480 |
 | "Compare phases for trials involving semaglutide vs tirzepatide" | `grouped_bar_chart`, 824 |
-| "Show a network of sponsors and drugs for glioblastoma trials" | `network_graph`, 975 |
+| "Show a network of sponsors and drugs for glioblastoma trials" | `network_graph`: 975 trials cited by the 52 links shown (of 2,269 matching trials, 1,736 with a drug and a lead sponsor) |
 | "What phases are Merck's trials in?" | `clarification_required`: Merck Sharp & Dohme (2,151) / Merck KGaA (275) / All of these (2,426) |
 
 Regenerate with `uv run python -m examples.generate`.
@@ -277,7 +278,7 @@ All nine are supported. The eval (`evals/questions.json`) checks the planner on 
 
 | # | Example | Answer | What defines it | Eval cases |
 |---|---|---|---|---|
-| Q-01 | Trials for a drug per year since 2015 | `time_series` | trial start year (estimated dates flagged); years without trials shown as zero; the current year marked incomplete; the drug must be an intervention, not just mentioned | trend-01, trend-02, trend-05 |
+| Q-01 | Trials for a drug per year since 2015 | `time_series` | trial start year (estimated start dates counted in each row's `estimated_count`); years without trials shown as zero; the current year noted as incomplete in the assumptions; the drug must be an intervention, not just mentioned | trend-01, trend-02, trend-05 |
 | Q-02 | Trials started each year for a condition | `time_series` | start date; the API's condition search is trusted (it includes basket trials) | trend-03, trend-04 |
 | Q-03 | A condition's trials across phases | `bar_chart` | a multi-phase trial counts under each of its phases (disclosed); "Not applicable" and missing phases keep their own bars | dist-01, dist-02 |
 | Q-04 | Most common intervention types | `bar_chart` | distinct trials per type: a trial with two drugs counts once for "Drug" | dist-03, dist-04 |
@@ -367,7 +368,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 ## 9. How correctness was validated
 
 - **API spike before design.** Every filter was checked against the live API, and local counts reproduce the API's own totals exactly: start year 2020 = 263, Phase 3 = 367, Germany = 326, recruiting = 712. Findings and data-quality measurements are in [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md).
-- **189 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
+- **197 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
   - every chart type, clarifications, follow-ups, repair
   - `scope_required`, `no_data`, upstream errors, rate-limit retries
   - every failure point in §7 (23 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
@@ -405,7 +406,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 - **Filters and clarifications:** filters come from the question; structured fields are optional overrides; ask a multiple-choice question only when the request is unclear.
 - **Data:** the live API only, with no local copy, and citations as trial IDs on every data point.
 - **Charts:** our own spec is the contract. Counting stays in our code and Vega-Lite only draws, so no library does the analysis. Images by default, plus an interactive page.
-- **Networks:** modelled on the gene-network image; drugs, sponsors and conditions, because the source has no gene data.
+- **Networks:** modelled on a gene-network viewer I used as a reference; drugs, sponsors and conditions, because the source has no gene data.
 - **Models:** OpenAI first, Anthropic as fallback, Gemini optional, all changed by configuration; the allowed OpenAI model list.
 - **Left out:** MCP, Neo4j, CI and full run bundles.
 - **Hosting:** OpenTelemetry without a vendor; a working local version before any hosting; AWS for the hosted version.

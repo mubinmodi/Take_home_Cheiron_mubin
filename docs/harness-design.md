@@ -1,7 +1,7 @@
 # Harness Design Approach
 
 **Status:** Agreed direction (2026-10-03; updated the same day with the API spike results and the request/clarification design). Supersedes the overlapping parts of the earlier proposal (`take-home-system-design.md`, kept in the repo, not in the zip) where they conflict (no checkpointer, no Postgres for the local build, no model routing).
-**Method:** The user's own notes (`~/Downloads/AI Engineering Notes/`: agent system design, harness and loops, memory, worked walkthrough): goals → scope → rules → data → architecture.
+**Method:** The author's own design notes (agent system design, harness and loops, memory, a worked walkthrough): goals → scope → rules → data → architecture.
 **Evidence:** [research/harness-system-design-research.md](research/harness-system-design-research.md), [research/query-to-visualization-workflow-design.md](research/query-to-visualization-workflow-design.md), [research/api-data-guide.md](research/api-data-guide.md) (API spike).
 
 ## 1. Measurable goals ("numbers before boxes")
@@ -33,7 +33,7 @@ The example questions in the assignment are examples, not the full list. Any que
 - **Questions about one study:** the cohort is one NCT ID (or a few). This is a filter, not a new operation; e.g. "countries for NCT…" is `aggregate` over that study's sites.
 - **Follow-ups and corrections:** "now only Phase 3", "I meant lead sponsors". See section 5, *Input and clarification*.
 
-**Networks** use entities that ClinicalTrials.gov contains: drugs, sponsors, conditions (later: investigators, sites). Gene networks are not possible; the source has no gene data. The visual model follows the user's reference (an interactive gene-network viewer): node colour by entity type, edge colour by edge type with a legend, a minimum-weight threshold (minimum shared trials), and clicking a node or edge shows the trials behind it (the citations).
+**Networks** use entities that ClinicalTrials.gov contains: drugs, sponsors, conditions (later: investigators, sites). Gene networks are not possible; the source has no gene data. The visual model follows the author's reference (an interactive gene-network viewer, not shipped): node colour by entity type, edge colour by edge type with a legend, a minimum-weight threshold (minimum shared trials), and clicking a node or edge shows the trials behind it (the citations).
 
 Out of scope: medical conclusions, free-form API queries, generated SQL or Python, other data sources, gene or molecular data.
 
@@ -159,7 +159,7 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 
 ## 7. Order to work in
 
-1. Goals, scope and counting rules doc (sections 1–3, decided with the user 2026-10-03). Results against the section 1 goals measured 2026-10-04. Steps 1–7 are done.
+1. Goals, scope and counting rules doc (sections 1–3, decided by the author 2026-10-03). Results against the section 1 goals measured 2026-10-04. Steps 1–7 are done.
 2. API spike; save fixtures. **Done 2026-10-03** ([api-data-guide.md](research/api-data-guide.md)).
 3. Typed models: `QueryRequest`, `QueryPlan`, `AnalysisResult` (each datum carries its contributing trials), `Visualization`, `QueryResponse`.
 4. One end-to-end slice: trial count by start year, with citations, verification and replay.
