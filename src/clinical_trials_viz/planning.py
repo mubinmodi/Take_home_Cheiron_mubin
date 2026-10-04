@@ -11,7 +11,7 @@ from pydantic_ai import FallbackExceptionGroup, ModelAPIError, UnexpectedModelBe
 
 from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, MultiAnswerPlan, QueryPlan, UnsupportedPlan
 from clinical_trials_viz.models.request import QueryRequest
-from clinical_trials_viz.planner import Planner, PlannerResult, PlannerTimeout, run_scope
+from clinical_trials_viz.planner import Planner, PlannerResult, PlannerTimeout, take_unreported_calls
 from clinical_trials_viz.validate import GateResult, check_plan, separate_requests
 
 MAX_MODEL_CALLS = 3
@@ -52,17 +52,6 @@ async def plan_question(
 ) -> Planning:
     """Plan a Question. Planner failures on a single question propagate (the caller classifies them);
     on a multi-part message they are kept per part in `part_errors`."""
-    with run_scope():
-        return await _plan(planner, request, previous, previous_request, countries)
-
-
-async def _plan(
-    planner: Planner,
-    request: QueryRequest,
-    previous: QueryPlan | None,
-    previous_request: QueryRequest | None,
-    countries: set[str],
-) -> Planning:
     if isinstance(previous, MultiAnswerPlan):
         # A Follow-up on a multi-part Run answers one of its parts (e.g. a Clarification for that part),
         # sent as that part's own request: plan it as a fresh question.
@@ -110,16 +99,16 @@ async def _plan_parts(planner: Planner, request: QueryRequest, requests: list[st
         # at least one call, and an earlier part may use a spare call for the model's output retry.
         reserve = len(requests) - index - 1
         budget = MAX_MODEL_CALLS - planning.model_calls - reserve
-        try:
+        try:  # planning and repairing a part: a failure in either ends this part only
             result = await planner.plan(text, structured, None, max_calls=budget, context=request.query)
+            planning.record(result)
+            plan, gate = await _gate_and_repair(planner, planning, result.plan, result, countries, reserve)
         except _PART_FAILURES as exc:
-            planning.model_calls += budget  # count the whole share: the calls made before failing are unknown
+            planning.model_calls += take_unreported_calls()
             parts.append(UnsupportedPlan(reason=f"This part could not be planned: {text}"))
             planning.gates.append(None)
             planning.part_errors.append(exc)
             continue
-        planning.record(result)
-        plan, gate = await _gate_and_repair(planner, planning, result.plan, result, countries, reserve)
         parts.append(plan)  # type: ignore[arg-type]  # parts are planned without a previous plan: never multi
         planning.gates.append(gate)
         planning.part_errors.append(None)

@@ -107,6 +107,13 @@ async def test_every_model_failing_is_a_retryable_upstream_error(make_client):
     assert "secret upstream details" not in body["message"]  # provider response bodies are never shown
 
 
+async def test_failed_model_calls_are_still_reported(make_client):
+    planner = LLMPlanner(failing("primary-model", 503), failing("fallback-model", None))
+    body = await ask(make_client, planner, query="Keytruda trials per year")
+    assert body["outcome"] == "upstream_error"
+    assert body["model_calls"] == 2  # both attempts cost a call, though neither produced a plan
+
+
 async def test_rejected_credentials_are_not_retryable(make_client):
     planner = LLMPlanner(failing("primary-model", 401), failing("fallback-model", 404))
     body = await ask(make_client, planner, query="Keytruda trials per year")
@@ -159,6 +166,22 @@ async def test_a_part_the_model_cannot_plan_does_not_stop_the_others(make_client
     assert body["outcome"] == "success" and body["visualization"]["type"] == "time_series"
     second = body["additional_answers"][0]
     assert second["outcome"] == "upstream_error" and second["error"]["code"] == "planner_unavailable"
+
+
+async def test_a_failed_repair_in_one_part_does_not_stop_the_next(make_client):
+    bad = AnswerPlan(operation=Operation.BIN, filters=Filters(drugs=["Keytruda"]), group_by=Dimension.START_YEAR)
+
+    class RepairFails(ScriptedPlanner):
+        async def plan(self, *args, **kwargs):
+            if kwargs.get("repair"):
+                self.calls.append({})
+                raise ModelHTTPError(503, "primary-model")
+            return await super().plan(*args, **kwargs)
+
+    body = await ask(make_client, RepairFails(bad, HISTOGRAM), query=TWO_PARTS)
+    assert body["outcome"] == "upstream_error" and body["error"]["code"] == "planner_unavailable"
+    second = body["additional_answers"][0]
+    assert second["outcome"] == "success" and second["visualization"]["type"] == "histogram"
 
 
 # --- Bugs and verification ------------------------------------------------------------------------

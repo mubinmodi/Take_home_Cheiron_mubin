@@ -41,7 +41,7 @@ from clinical_trials_viz.models.response import (
 )
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import drug_drug_network, sponsor_drug_network
-from clinical_trials_viz.planner import Planner
+from clinical_trials_viz.planner import Planner, run_scope, take_unreported_calls
 from clinical_trials_viz.planning import plan_question
 from clinical_trials_viz.render import chart_problem
 from clinical_trials_viz.runs import RunStore, StoreUnavailable, new_run_id
@@ -171,17 +171,19 @@ class Pipeline:
         with tracer.start_as_current_span("run") as span, count_requests() as requests:
             span.set_attribute("run.id", run.response.run_id)
             deadline = asyncio.timeout(self.run_deadline)
-            try:
-                async with deadline:
-                    previous = await self._load_previous(run)
-                    await self._execute(run, previous)
-            except (RunNotFound, StoreUnavailable):  # the request cannot start: HTTP 404 / 503
-                raise
-            except Exception as exc:  # planner failures, source failures and bugs alike end in one Outcome
-                if isinstance(exc, TimeoutError) and deadline.expired():
-                    self._stop_at_deadline(run)
-                else:
-                    _fail(run.response, classify(exc, run.response.run_id))
+            with run_scope():
+                try:
+                    async with deadline:
+                        previous = await self._load_previous(run)
+                        await self._execute(run, previous)
+                except (RunNotFound, StoreUnavailable):  # the request cannot start: HTTP 404 / 503
+                    raise
+                except Exception as exc:  # planner failures, source failures and bugs alike end in one Outcome
+                    if isinstance(exc, TimeoutError) and deadline.expired():
+                        self._stop_at_deadline(run)
+                    else:
+                        _fail(run.response, classify(exc, run.response.run_id))
+                run.model_calls += take_unreported_calls()  # attempts of a planning step that failed
             span.set_attribute("run.outcome", run.response.outcome.value)
 
         response = run.response

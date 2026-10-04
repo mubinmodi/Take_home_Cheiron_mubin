@@ -206,19 +206,36 @@ class _CallBudget:
 
 _call_budget: ContextVar[_CallBudget | None] = ContextVar("planner_call_budget", default=None)
 
-# Models that failed with an outage earlier in this Run: later plan() calls (the other parts of a
-# multi-part Question) skip them without spending a call, as an open circuit breaker would.
-_failed_in_run: ContextVar[set[str] | None] = ContextVar("planner_failed_in_run", default=None)
+
+@dataclass
+class _RunCalls:
+    """Model calls across the plan() calls of one Run."""
+
+    failed: set[str] = field(default_factory=set)  # models that failed with an outage: later parts skip them
+    attempts: int = 0  # every provider attempt in the Run
+    reported: int = 0  # attempts already counted in a returned PlannerResult
+
+
+_run_calls: ContextVar[_RunCalls | None] = ContextVar("planner_run_calls", default=None)
 
 
 @contextmanager
 def run_scope() -> Iterator[None]:
-    """Share provider failures between the plan() calls of one Run."""
-    token = _failed_in_run.set(set())
+    """Share provider failures and the call count between the plan() calls of one Run."""
+    token = _run_calls.set(_RunCalls())
     try:
         yield
     finally:
-        _failed_in_run.reset(token)
+        _run_calls.reset(token)
+
+
+def take_unreported_calls() -> int:
+    """Attempts made in this Run that no PlannerResult reported, because plan() raised. Each is counted once."""
+    calls = _run_calls.get()
+    if calls is None:
+        return 0
+    unreported, calls.reported = calls.attempts - calls.reported, calls.attempts
+    return unreported
 
 
 class _ReportingModel(WrapperModel):
@@ -238,8 +255,8 @@ class _ReportingModel(WrapperModel):
     ) -> ModelResponse:
         if (budget := _call_budget.get()) is not None and budget.used >= budget.limit:
             raise CallBudgetExhausted(f"The {budget.limit} model call(s) allowed for this question are used up.")
-        failed_in_run = _failed_in_run.get()
-        if failed_in_run is not None and self.model_name in failed_in_run:
+        run_calls = _run_calls.get()
+        if run_calls is not None and self.model_name in run_calls.failed:
             skipped = ModelAPIError(self.model_name, "not called again, it failed earlier in this run")
             self._note(skipped)
             raise skipped
@@ -253,13 +270,15 @@ class _ReportingModel(WrapperModel):
             raise skipped from exc
         if budget is not None:
             budget.used += 1
+        if run_calls is not None:
+            run_calls.attempts += 1
         try:
             response = await super().request(messages, model_settings, model_request_parameters)
         except ModelAPIError as exc:
             if is_outage(exc):
                 self._breaker.failure()
-                if failed_in_run is not None:
-                    failed_in_run.add(self.model_name)
+                if run_calls is not None:
+                    run_calls.failed.add(self.model_name)
             else:
                 self._breaker.success()  # it answered; the configuration is at fault
             self._note(exc)
@@ -391,4 +410,6 @@ class LLMPlanner:
             _model_failures.reset(token)
             _call_budget.reset(budget_token)
         response_model = result.response.model_name if result.response else None
+        if (run_calls := _run_calls.get()) is not None:
+            run_calls.reported += budget.used
         return PlannerResult(result.output, budget.used, response_model, result.all_messages(), failures)
