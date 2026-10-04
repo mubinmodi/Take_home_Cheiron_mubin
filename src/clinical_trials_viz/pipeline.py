@@ -64,8 +64,10 @@ class RunNotFound(Exception):
 class _Run:
     """Mutable state of one Run."""
 
-    def __init__(self, request: QueryRequest, api_requests_before: int):
+    def __init__(self, request: QueryRequest, api_requests_before: int, previous_request: QueryRequest | None):
         self.request = request
+        self.previous_request = previous_request  # for Follow-ups: carried over when the plan refines
+        self.request_fields_set = list(request.structured_fields())
         self.response = QueryResponse(run_id=new_run_id(), outcome=Outcome.INTERNAL_ERROR)
         self.model_calls = 0
         self.api_requests_before = api_requests_before
@@ -104,13 +106,14 @@ class Pipeline:
 
     async def run(self, request: QueryRequest) -> QueryResponse:
         previous: QueryPlan | None = None
+        previous_request: QueryRequest | None = None
         if request.previous_run_id:
             record = self.runs.load(request.previous_run_id)
             if record is None:
                 raise RunNotFound(request.previous_run_id)
-            previous = record.plan
+            previous, previous_request = record.plan, record.request
 
-        run = _Run(request, self.client.requests_made)
+        run = _Run(request, self.client.requests_made, previous_request)
         with tracer.start_as_current_span("run") as span:
             span.set_attribute("run.id", run.response.run_id)
             try:
@@ -139,7 +142,7 @@ class Pipeline:
         response.timings_ms = run.timings
         if response.source:
             response.source.api_requests = self.client.requests_made - run.api_requests_before
-        self.runs.save(request, response)
+        self.runs.save(run.request, response)  # the effective request, so later Follow-ups inherit it too
         return response
 
     async def _plan(self, run: _Run, previous: QueryPlan | None) -> QueryPlan:
@@ -153,6 +156,12 @@ class Pipeline:
         plan = result.plan
         if not isinstance(plan, AnswerPlan):
             return plan
+        if plan.relation == "refine" and run.previous_request is not None:
+            request = run.request = _inherit_fields(request, run.previous_request)
+            if kept := sorted(set(request.structured_fields()) - set(run.request_fields_set)):
+                run.response.assumptions.append(
+                    "Kept from the earlier question: " + ", ".join(f"{k} = {_show(request, k)}" for k in kept) + "."
+                )
 
         gate = check_plan(plan, request, await self.known_countries())
         if gate.errors and run.model_calls < MAX_MODEL_CALLS:
@@ -343,3 +352,15 @@ def _cited_dimensions(plan: AnswerPlan) -> list[Dimension]:
         elif side.sponsor:
             found.append(Dimension.LEAD_SPONSOR)
     return list(dict.fromkeys(found))
+
+
+def _inherit_fields(request: QueryRequest, previous: QueryRequest) -> QueryRequest:
+    """A refining Follow-up keeps the earlier request's structured fields (e.g. a Clarification answer)
+    unless the new request sets them."""
+    merged = {**previous.structured_fields(), **request.structured_fields()}
+    return QueryRequest.model_validate({**merged, "query": request.query, "previous_run_id": request.previous_run_id})
+
+
+def _show(request: QueryRequest, field: str) -> str:
+    value = getattr(request, field)
+    return ", ".join(map(str, value)) if isinstance(value, list) else str(value)

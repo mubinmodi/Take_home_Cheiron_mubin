@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clinical Trials Explorer</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --text: #1d1d1b; --muted: #5f5e5a; --border: #dedcd5;
+    --accent: #185fa5; --accent-bg: #e6f1fb; --ok: #2f6b14; --ok-bg: #eaf3de;
+    --warn: #854f0b; --warn-bg: #faeeda; --bad: #a32d2d; --bad-bg: #fcebeb; --radius: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b1b1a; --panel: #242423; --text: #ecebe6; --muted: #aaa9a2; --border: #3a3a37;
+      --accent: #85b7eb; --accent-bg: #10263a; --ok: #97c459; --ok-bg: #1f2e12;
+      --warn: #fac775; --warn-bg: #3a2a10; --bad: #f09595; --bad-bg: #3a1717;
+    }
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header, main { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+  header { padding-top: 24px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  h2 { font-size: 18px; font-weight: 600; margin: 0; }
+  h3 { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+  .muted { color: var(--muted); }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0; }
+  textarea, input, select { width: 100%; font: inherit; color: var(--text); background: var(--bg);
+                            border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; }
+  textarea { min-height: 64px; resize: vertical; }
+  button { font: inherit; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel);
+           color: var(--text); padding: 7px 14px; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+  button:disabled { opacity: .6; cursor: wait; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
+  label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 3px; }
+  details > summary { cursor: pointer; color: var(--muted); margin-top: 10px; }
+  .badge { display: inline-block; font-size: 13px; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+  .badge.ok { background: var(--ok-bg); color: var(--ok); }
+  .badge.warn { background: var(--warn-bg); color: var(--warn); }
+  .badge.bad { background: var(--bad-bg); color: var(--bad); }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; margin-top: 12px; }
+  .layout.stacked { grid-template-columns: 1fr; }
+  .layout.stacked aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--border); padding-top: 12px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+  #chart { overflow-x: auto; min-height: 120px; width: 100%; }
+  aside { border-left: 1px solid var(--border); padding-left: 16px; max-height: 760px; overflow-y: auto; }
+  @media (max-width: 900px) { aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--border); padding-top: 12px; } }
+  .big { font-size: 56px; font-weight: 700; cursor: pointer; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover, tbody tr.selected { background: var(--accent-bg); }
+  .trial { padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .trial a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .fields { font-size: 12px; color: var(--muted); margin: 4px 0 0; padding-left: 16px; }
+  ul.plain { margin: 6px 0; padding-left: 18px; }
+  .options { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .options label { color: var(--text); font-size: 14px; display: flex; gap: 8px; align-items: center; }
+  .options input { width: auto; }
+  .check.fail { color: var(--bad); }
+  a { color: var(--accent); }
+  #loading { display: none; }
+  #loading.on { display: inline; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+<header>
+  <h1>Clinical Trials Explorer</h1>
+  <p class="muted">Ask a question about trials registered on ClinicalTrials.gov. Every number is computed from the
+    registry and cited: click a bar, point, node or link to see the trials behind it.</p>
+</header>
+<main>
+  <form id="ask" class="panel">
+    <label for="query">Question</label>
+    <textarea id="query" required maxlength="1000" placeholder="e.g. Which countries have the most recruiting trials for melanoma?"></textarea>
+    <div class="row" id="examples"></div>
+    <details>
+      <summary>Optional filters (pin values instead of relying on the question)</summary>
+      <div class="grid">
+        <div><label for="drug_name">Drug(s), comma-separated</label><input id="drug_name"></div>
+        <div><label for="condition">Condition(s)</label><input id="condition"></div>
+        <div><label for="sponsor">Lead sponsor (exact name)</label><input id="sponsor"></div>
+        <div><label for="country">Country / countries</label><input id="country"></div>
+        <div><label for="trial_phase">Phase(s)</label><select id="trial_phase" multiple size="3"></select></div>
+        <div><label for="status">Status(es)</label><select id="status" multiple size="3"></select></div>
+        <div><label for="start_year">Start year from</label><input id="start_year" type="number" min="1990"></div>
+        <div><label for="end_year">Start year to</label><input id="end_year" type="number" min="1990"></div>
+        <div><label for="nct_id">NCT ID(s)</label><input id="nct_id" placeholder="NCT02578680"></div>
+      </div>
+    </details>
+    <div class="row">
+      <button class="primary" id="submit" type="submit">Ask</button>
+      <span id="loading" class="muted">Planning, retrieving every matching trial, counting and verifying…</span>
+    </div>
+  </form>
+
+  <section id="result" class="panel" hidden>
+    <div class="row" id="status-line"></div>
+    <p id="message"></p>
+    <div id="clarification"></div>
+    <h2 id="title"></h2>
+    <p id="subtitle" class="muted"></p>
+    <div class="layout" id="layout">
+      <div id="chart"></div>
+      <aside>
+        <h3>Citations</h3>
+        <div id="citations"><p class="muted">Click any bar, point, node, link or row to see the trials behind it.</p></div>
+      </aside>
+    </div>
+    <form id="refine" class="row">
+      <input id="refine-text" placeholder="Refine this answer, e.g. “only phase 3” or “show it by country instead”" style="flex:1; min-width:240px">
+      <button type="submit">Refine</button>
+    </form>
+    <details open><summary>Assumptions</summary><ul class="plain" id="assumptions"></ul></details>
+    <details><summary>Filters applied</summary><ul class="plain" id="filters"></ul></details>
+    <details><summary>Verification</summary><ul class="plain" id="checks"></ul></details>
+    <details><summary>Source</summary><ul class="plain" id="source"></ul></details>
+  </section>
+</main>
+
+<script>
+"use strict";
+const EXAMPLES = [
+  "How has the number of trials for pembrolizumab changed per year since 2015?",
+  "Which countries have the most recruiting trials for melanoma?",
+  "Compare phases for trials involving semaglutide vs tirzepatide",
+  "Show a network of sponsors and drugs for glioblastoma trials",
+  "Which drugs are most often combined with pembrolizumab?",
+  "What is the enrollment distribution of breast cancer trials?",
+];
+const OUTCOME_STYLE = { success: "ok", clarification_required: "warn", no_data: "warn", scope_required: "warn",
+                        unsupported_query: "warn", upstream_error: "bad", internal_error: "bad" };
+const MAX_TRIALS_SHOWN = 200;
+// Readable names for cited source fields; the exact API path stays available on hover.
+const FIELD_NAMES = [
+  ["conditionBrowseModule.meshes.term", "condition terms (MeSH)"],
+  ["interventionBrowseModule.meshes.term", "drug terms (MeSH)"],
+  ["leadSponsor.name", "lead sponsor"], ["leadSponsor.class", "sponsor category"],
+  ["collaborators.name", "collaborators"], ["designModule.phases", "phases"],
+  ["overallStatus", "status"], ["studyType", "study type"], ["locations.country", "countries"],
+  ["startDateStruct", "start date"], ["primaryCompletionDateStruct", "primary completion"],
+  ["completionDateStruct", "completion"], ["enrollmentInfo", "enrollment"],
+  ["interventions.type", "intervention types"], ["armGroups", "arms giving each drug pair"],
+];
+function fieldName(path) {
+  const hit = FIELD_NAMES.find(([suffix]) => path.includes(suffix));
+  return hit ? hit[1] : path.split(".").slice(-2).join(".");
+}
+const $ = (id) => document.getElementById(id);
+let current = null;      // last response
+let lastBody = null;     // last request body
+
+/** Build DOM safely: text always via textContent, never innerHTML. */
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") node.className = v;
+    else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v);
+  }
+  for (const child of children.flat()) {
+    if (child == null) continue;
+    node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  }
+  return node;
+}
+
+async function loadEnums() {
+  try {
+    const schema = await (await fetch("/v1/schema")).json();
+    const defs = schema.request.$defs || {};
+    for (const [field, def] of [["trial_phase", "Phase"], ["status", "OverallStatus"]]) {
+      for (const value of (defs[def] && defs[def].enum) || []) $(field).append(el("option", { value }, value));
+    }
+  } catch (e) { /* filters still work as free text in the question */ }
+}
+
+function list(id) {
+  return $(id).value.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+function requestBody() {
+  const body = { query: $("query").value.trim() };
+  for (const field of ["drug_name", "condition", "sponsor", "country", "nct_id"]) {
+    const values = list(field);
+    if (values.length) body[field] = values;
+  }
+  for (const field of ["trial_phase", "status"]) {
+    const values = [...$(field).selectedOptions].map((o) => o.value);
+    if (values.length) body[field] = values;
+  }
+  for (const field of ["start_year", "end_year"]) {
+    if ($(field).value) body[field] = Number($(field).value);
+  }
+  return body;
+}
+
+async function ask(body) {
+  lastBody = body;
+  $("submit").disabled = true;
+  $("loading").classList.add("on");
+  try {
+    const response = await fetch("/v1/query", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() },
+      body: JSON.stringify(body),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      showError(typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail));
+      return;
+    }
+    await render(data);
+  } catch (e) {
+    showError(`Request failed: ${e}`);
+  } finally {
+    $("submit").disabled = false;
+    $("loading").classList.remove("on");
+  }
+}
+
+function showError(text) {
+  $("result").hidden = false;
+  $("status-line").replaceChildren(el("span", { class: "badge bad" }, "request rejected"));
+  $("message").textContent = text;
+  for (const id of ["clarification", "title", "subtitle", "chart", "assumptions", "filters", "checks", "source"]) {
+    $(id).replaceChildren();
+  }
+  $("layout").hidden = true;
+}
+
+function datums(spec) {
+  return Array.isArray(spec.data) ? spec.data : [...spec.data.nodes, ...spec.data.edges];
+}
+
+async function render(r) {
+  current = r;
+  $("result").hidden = false;
+  const seconds = Object.values(r.timings_ms || {}).reduce((a, b) => a + b, 0) / 1000;
+  const links = [el("a", { href: `/v1/runs/${r.run_id}`, target: "_blank" }, "full JSON")];
+  if (r.chart_url) links.push(el("a", { href: `/v1/runs/${r.run_id}/chart.png`, target: "_blank" }, "PNG"));
+  $("status-line").replaceChildren(
+    el("span", { class: `badge ${OUTCOME_STYLE[r.outcome] || "warn"}` }, r.outcome.replaceAll("_", " ")),
+    el("span", { class: "muted" },
+       `${r.model_calls} model call(s) · ${(r.source && r.source.api_requests) || 0} API request(s) · ${seconds.toFixed(1)} s`),
+    ...links.flatMap((a) => [el("span", { class: "muted" }, "·"), a]),
+  );
+  $("message").textContent = r.outcome === "clarification_required" ? "" : r.message || "";
+  renderClarification(r);
+  const spec = r.visualization;
+  $("title").textContent = spec ? spec.title : "";
+  $("subtitle").textContent = spec ? spec.subtitle || "" : "";
+  $("layout").hidden = !spec;
+  $("chart").replaceChildren();
+  $("citations").replaceChildren(el("p", { class: "muted" },
+    "Click any bar, point, node, link or row to see the trials behind it."));
+  if (spec) await renderChart(r, spec);
+  fillList("assumptions", r.assumptions || []);
+  const f = r.applied_filters || {};
+  const hidden = new Set(["sponsor_role", "sponsor_exact", "exact_sponsors", "from_request"]);
+  fillList("filters", Object.entries(f).filter(([k, v]) => !hidden.has(k) && v && (!Array.isArray(v) || v.length))
+    .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}${(f.from_request || []).includes(k) ? " (from your filters)" : ""}`));
+  fillList("checks", ((r.verification && r.verification.checks) || []).map((c) =>
+    el("li", { class: c.passed ? "check" : "check fail" }, `${c.passed ? "✓" : "✗"} ${c.name}${c.detail ? ` — ${c.detail}` : ""}`)));
+  const s = r.source || {};
+  fillList("source", s.data_timestamp ? [
+    `ClinicalTrials.gov API ${s.api_version}, data as of ${s.data_timestamp}`,
+    `${s.search_matches} search matches → ${s.cohort_size} trials after match checks`,
+    `Run ${r.run_id}`,
+  ] : [`Run ${r.run_id}`]);
+}
+
+function fillList(id, items) {
+  $(id).replaceChildren(...(items.length ? items : ["—"]).map((x) => (x instanceof Node ? x : el("li", {}, x))));
+}
+
+async function renderChart(r, spec) {
+  if (spec.type === "single_value") {
+    const value = el("div", { class: "big", title: "Click to see the trials", onclick: () => showCitation(0) },
+                     spec.data[0].trial_count.toLocaleString());
+    $("chart").append(value, el("p", { class: "muted" }, "trials"));
+    return;
+  }
+  if (spec.type === "table") {
+    const columns = spec.encoding.columns;
+    const rows = spec.data.map((d, i) => el("tr", { onclick: (e) => { markRow(e.currentTarget); showCitation(i); } },
+      columns.map((c) => el("td", {}, d[c.field] == null ? "—" : String(d[c.field])))));
+    $("chart").append(el("table", {}, el("thead", {}, el("tr", {}, columns.map((c) => el("th", {}, c.title)))),
+                          el("tbody", {}, rows)));
+    if (spec.metadata.total_rows > spec.data.length) {
+      $("chart").append(el("p", { class: "muted" }, `Showing ${spec.data.length} of ${spec.metadata.total_rows} trials.`));
+    }
+    return;
+  }
+  const vl = await (await fetch(`/v1/runs/${r.run_id}/vega-lite.json`)).json();
+  delete vl.title;  // the page already shows the title and subtitle
+  vl.width = "container";  // fill the column; positions are in data units, so networks scale too
+  vl.autosize = { type: "fit-x", contains: "padding" };
+  const network = spec.type === "network_graph";
+  $("layout").classList.toggle("stacked", network);  // networks need the full width; citations go below
+  if (network) vl.config = { ...(vl.config || {}), legend: { orient: "bottom", direction: "horizontal" } };
+  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const result = await vegaEmbed("#chart", vl, { actions: false, theme: dark ? "dark" : undefined, renderer: "svg" });
+  result.view.addEventListener("click", (_event, item) => {
+    const index = item && item.datum && item.datum._datum;
+    if (Number.isInteger(index)) showCitation(index);
+  });
+}
+
+function markRow(row) {
+  for (const r of row.parentElement.children) r.classList.remove("selected");
+  row.classList.add("selected");
+}
+
+function describe(spec, d) {
+  if (!Array.isArray(spec.data)) {
+    const labels = Object.fromEntries(spec.data.nodes.map((n) => [n.id, n.label]));
+    return d.source ? `${labels[d.source]} — ${labels[d.target]}` : `${d.label} (${d.kind})`;
+  }
+  const enc = spec.encoding;
+  const parts = [enc.x, enc.color].filter(Boolean).map((c) => d[c.field]).filter((v) => v != null);
+  return parts.length ? parts.join(" · ") : d.nct_id || d.label || "";
+}
+
+function showCitation(index) {
+  const spec = current.visualization;
+  const d = datums(spec)[index];
+  if (!d) return;
+  const ids = d.trial_ids || [];
+  const shown = ids.slice(0, MAX_TRIALS_SHOWN).map((id) => {
+    const e = current.evidence[id] || { title: "", url: `https://clinicaltrials.gov/study/${id}`, fields: {} };
+    const fields = Object.entries(e.fields).filter(([k]) => !k.endsWith("nctId")).map(([k, v]) =>
+      el("li", { title: k }, `${fieldName(k)}: ${typeof v === "string" ? v : JSON.stringify(v)}`));
+    return el("div", { class: "trial" },
+      el("a", { href: e.url, target: "_blank", rel: "noopener" }, id), " ", e.title,
+      fields.length ? el("ul", { class: "fields" }, fields) : null);
+  });
+  $("citations").replaceChildren(
+    el("p", {}, el("strong", {}, describe(spec, d))),
+    el("p", { class: "muted" }, `${ids.length.toLocaleString()} cited trial(s)` +
+       (ids.length > MAX_TRIALS_SHOWN ? `; showing the first ${MAX_TRIALS_SHOWN} (all are in the full JSON)` : "")),
+    ...shown,
+  );
+}
+
+function renderClarification(r) {
+  const box = $("clarification");
+  box.replaceChildren();
+  const c = r.clarification;
+  if (!c) return;
+  box.append(el("p", {}, el("strong", {}, c.question)));
+  const answer = (value) => {
+    const body = { ...lastBody, previous_run_id: r.run_id };
+    if (c.field === "query") body.query = `${lastBody.query} (${value})`;
+    else body[c.field] = value;
+    ask(body);
+  };
+  const options = el("div", { class: "options" });
+  if (c.multi_select) {
+    for (const o of c.options) {
+      options.append(el("label", {}, el("input", { type: "checkbox", value: JSON.stringify(o.value) }), o.label));
+    }
+    options.append(el("div", { class: "row" }, el("button", { type: "button", class: "primary", onclick: () => {
+      const picked = [...options.querySelectorAll("input:checked")].flatMap((i) => [].concat(JSON.parse(i.value)));
+      if (picked.length) answer(picked);
+    } }, "Use selected")));
+  } else {
+    for (const o of c.options) options.append(el("button", { type: "button", onclick: () => answer(o.value) }, o.label));
+  }
+  if (c.allow_free_text) {
+    const input = el("input", { placeholder: "Or type your answer" });
+    options.append(el("div", { class: "row" }, input, el("button", { type: "button", onclick: () => {
+      const v = input.value.trim();
+      if (v) answer(c.multi_select ? v.split(",").map((s) => s.trim()).filter(Boolean) : v);
+    } }, "Send")));
+  }
+  box.append(options);
+}
+
+$("ask").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if ($("query").value.trim()) ask(requestBody());
+});
+$("refine").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = $("refine-text").value.trim();
+  if (text && current) {
+    $("refine-text").value = "";
+    ask({ query: text, previous_run_id: current.run_id });
+  }
+});
+for (const q of EXAMPLES) {
+  $("examples").append(el("button", { type: "button", class: "chip", onclick: () => { $("query").value = q; ask(requestBody()); } }, q));
+}
+loadEnums();
+</script>
+</body>
+</html>

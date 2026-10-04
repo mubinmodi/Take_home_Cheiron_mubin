@@ -29,8 +29,16 @@ Requirements: Python 3.13 and [uv](https://docs.astral.sh/uv/).
 ```bash
 uv sync                      # install
 cp .env.example .env         # then set OPENAI_API_KEY and/or ANTHROPIC_API_KEY (GOOGLE_API_KEY for Gemini)
-uv run clinical-trials-viz serve          # API on http://127.0.0.1:8000, interactive docs at /docs
+uv run clinical-trials-viz serve          # web page at http://127.0.0.1:8000, API docs at /docs
 ```
+
+**Web page.** Open http://127.0.0.1:8000 after `serve`. Served by the API itself; nothing extra to install.
+- Ask a question, optionally pinning filters (phase and status lists come from `/v1/schema`).
+- See the chart interactively (Vega-Lite in the browser, from the same translation as the PNG).
+- **Click any bar, point, node, link or table row to see its cited trials**, with links and the source values that placed each one there.
+- Clarifications appear as clickable options (multi-select where allowed), and "Refine" sends a Follow-up.
+- Every submit carries an `Idempotency-Key`, so a double-click never runs twice.
+- Registry text is always inserted as text, never as markup.
 
 Ask from the command line (in-process; prints a summary and saves the chart under `data/charts/`):
 
@@ -146,6 +154,8 @@ Request equality is judged on the validated request, so whitespace and field ord
 Other endpoints:
 - `GET /v1/runs/{run_id}`: the saved run record (request, plan, response)
 - `GET /v1/runs/{run_id}/chart.png` and `.svg`: the rendered chart
+- `GET /v1/runs/{run_id}/vega-lite.json`: the chart as Vega-Lite with finished values; each mark carries `_datum`, its index in the spec's Datums (rows, or nodes then edges), so a client can show the Citation for whatever is clicked
+- `GET /`: the web page
 - `GET /health`
 
 ---
@@ -238,7 +248,7 @@ Regenerate with `uv run python -m examples.generate`.
 | **Combination = same arm, not same trial; alternatives read from arm text** | 34% of same-trial drug pairs sit in different arms (drug vs comparator). Within an arm, the description separates options ("cisplatin … OR carboplatin", "EITHER … OR …", "investigator's choice of …") from combinations ("… PLUS …"). | Text rules, not understanding: arms whose description never names both drugs are taken as given together. On "drugs combined with pembrolizumab", carboplatin + cisplatin fell from 113 to 49 trials while real combinations stayed. Fetching arm descriptions makes these questions slower (~8 s vs ~4 s). |
 | **Multi-phase trials count under each phase**; countries count trials, not sites | Matches the API's own phase filter, so counts reconcile (verified: local counts equal API totals). | Categories can sum to more than the total; flagged in metadata. |
 | **Clarify only without a sensible default** | "Year" = start year and "sponsor" = lead sponsor are reported as assumptions instead of asked. | Users must read assumptions to see defaults. |
-| **Follow-ups via `previous_run_id`** | No conversation memory: the earlier plan is loaded from the run record, and the response says whether it was refined or replaced. | One step back only; the client holds the conversation. |
+| **Follow-ups via `previous_run_id`** | No conversation memory: the earlier plan is loaded from the run record, and the response says whether it was refined or replaced. A refinement also keeps the earlier request's structured fields (such as a Clarification answer), reported as an assumption; a new topic starts clean. | One step back only; the client holds the conversation. |
 | **pydantic-ai `FallbackModel`, tool-based output** | Swap OpenAI, Anthropic or Gemini by configuration. Tool output avoids a known issue with native structured output inside fallbacks. | Fallback only on provider errors, so a weak plan from the primary is repaired, not re-asked elsewhere. |
 
 ---
@@ -252,7 +262,6 @@ Regenerate with `uv run python -m examples.generate`.
 - **Run records** keep the plan and response only. Full run bundles with the raw API pages, for exact offline replay, are designed but not built.
 - **The planner eval** has 36 questions: `gpt-5.4-mini` scores 97%, `claude-haiku-4-5` 92% (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. The one shared miss ("industry vs academic … Parkinson's and ALS") shows that questions naming two comparison axes need a clearer rule.
 - **Not built:**
-  - an interactive frontend (click a bar or edge to see its trials; the spec and evidence already support it)
   - hosting
   - investigator and site networks
   - a hard per-run time cap
@@ -276,6 +285,7 @@ Regenerate with `uv run python -m examples.generate`.
   - alternatives in one arm ("cisplatin OR carboplatin") counted as combinations → detected from the arm description; checked on the real KEYNOTE-189 record and on real "either / investigator's choice" arm texts, including a false positive the tests caught (a dose unit "mg/m²" read as "or")
   - incomplete current-year counts → assumption
   - shallow citations → per-filter source values with a verifier check
+  - a refinement in the web page silently dropped the user's Clarification answer (the exact Merck companies) → refining Follow-ups now inherit the earlier structured fields
 
 ---
 

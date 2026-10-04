@@ -2,10 +2,12 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated, Any, Literal
 
 import httpx
 from fastapi import FastAPI, Header, HTTPException, Response
+from fastapi.responses import FileResponse
 
 from clinical_trials_viz.config import Settings, get_settings
 from clinical_trials_viz.ctgov.client import CtGovClient
@@ -14,9 +16,11 @@ from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import QueryResponse
 from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
-from clinical_trials_viz.render import NotRenderable, render
+from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
 from clinical_trials_viz.runs import RunRecord, RunStore
 from clinical_trials_viz.telemetry import setup_tracing
+
+WEB_PAGE = Path(__file__).parent / "web" / "index.html"
 
 
 def create_app(
@@ -114,6 +118,22 @@ def create_app(
         except NotRenderable as exc:
             raise HTTPException(404, str(exc)) from exc
         return Response(image, media_type="image/png" if fmt == "png" else "image/svg+xml")
+
+    @app.get("/v1/runs/{run_id}/vega-lite.json")
+    async def get_vega_lite(run_id: str) -> dict[str, Any]:
+        """The chart as a Vega-Lite spec (finished values only); each mark carries `_datum`, its index
+        in the visualization's Datums, so a client can show that Datum's Citation on click."""
+        record = pipeline().runs.load(run_id)
+        if record is None or record.response.visualization is None:
+            raise HTTPException(404, "no visualization for this run")
+        try:
+            return to_vega_lite(record.response.visualization)
+        except NotRenderable as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.get("/", include_in_schema=False)
+    async def page() -> FileResponse:
+        return FileResponse(WEB_PAGE, media_type="text/html")
 
     @app.get("/v1/schema")
     async def schema() -> dict[str, Any]:

@@ -22,12 +22,15 @@ class NotRenderable(Exception):
     """The visualization type has no image form (e.g. a table)."""
 
 
+DATUM_INDEX = "_datum"  # position in spec.datums(), so an interactive page can map a click to its Citation
+
+
 def _values(spec: VisualizationSpec) -> list[dict[str, Any]]:
-    data = spec.rows()
+    rows = [{**{k: v for k, v in d.items() if k != "trial_ids"}, DATUM_INDEX: i} for i, d in enumerate(spec.rows())]
     if spec.type is VisualizationType.TIME_SERIES and spec.encoding.x:
         # Undated trials stay in the data (and citations) but have no place on a time axis.
-        data = [d for d in data if d[spec.encoding.x.field] != NOT_REPORTED]
-    return [{k: v for k, v in d.items() if k != "trial_ids"} for d in data]
+        rows = [d for d in rows if d[spec.encoding.x.field] != NOT_REPORTED]
+    return rows
 
 
 def _channel(c: Channel, **extra: Any) -> dict[str, Any]:
@@ -195,7 +198,7 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
             offset = (rows - len(members)) / 2  # centre the shorter column
             for i, node in enumerate(members):
                 position[node["id"]] = (x, i + offset)
-        x_scale = {"domain": [-0.9, 1.9], "nice": False}
+        x_scale = {"domain": [-1.5, 2.0], "nice": False}  # room for long sponsor names on the left
         y_scale = {"domain": [-0.5, rows - 0.5], "reverse": True, "nice": False}
         width, height = 760, max(200, 24 * rows)
     else:
@@ -207,15 +210,17 @@ def _network(spec: VisualizationSpec) -> dict[str, Any]:
         x_scale = {"domain": [-1.9, 1.9], "nice": False}
         y_scale = {"domain": [-1.25, 1.25], "nice": False}
         width, height = 760, 520
-    for node in data.nodes:
+    for i, node in enumerate(data.nodes):
         x, y = position[node["id"]]
         left = x < 0 or (spec.metadata.bipartite and x == 0)
         nodes.append({"x": x, "y": y, "label": _short(node["label"]), "kind": node["kind"],
-                      "trial_count": node["trial_count"], "align": "right" if left else "left"})  # fmt: skip
+                      "trial_count": node["trial_count"], "align": "right" if left else "left",
+                      DATUM_INDEX: i})  # fmt: skip
     edges = [
         {"x": position[e["source"]][0], "y": position[e["source"]][1],
-         "x2": position[e["target"]][0], "y2": position[e["target"]][1], "trial_count": e["trial_count"]}
-        for e in data.edges
+         "x2": position[e["target"]][0], "y2": position[e["target"]][1], "trial_count": e["trial_count"],
+         DATUM_INDEX: len(data.nodes) + j}
+        for j, e in enumerate(data.edges)
     ]  # fmt: skip
     axis_off = {"axis": None}
     title: dict[str, Any] = {"text": spec.title, "anchor": "start"}

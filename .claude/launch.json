@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "clinical-trials-viz",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "clinical-trials-viz", "serve", "--port", "8000"],
+      "port": 8000
+    }
+  ]
+}

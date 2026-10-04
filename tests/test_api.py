@@ -523,3 +523,46 @@ async def test_idempotency_key_in_progress_is_409_and_failures_can_retry(make_cl
         # A request that failed before producing a run does not consume its key: a corrected retry runs.
         retry = await client.post("/v1/query", json={"query": "q"}, headers={"Idempotency-Key": "k2"})
         assert retry.status_code == 200 and retry.json()["outcome"] == "success"
+
+
+async def test_refining_follow_up_keeps_earlier_structured_fields_new_topic_does_not(make_client, trials):
+    sponsor = next(t.lead_sponsor for t in trials if t.lead_sponsor)
+    first_plan = AnswerPlan(operation=Operation.AGGREGATE, group_by=Dimension.PHASE)
+    refine = AnswerPlan(relation="refine", operation=Operation.AGGREGATE, group_by=Dimension.START_YEAR)
+    new_topic = AnswerPlan(relation="new", operation=Operation.AGGREGATE, group_by=Dimension.PHASE)
+    async for client in make_client(ScriptedPlanner(first_plan, refine, new_topic)):
+        first = (await client.post("/v1/query", json={"query": "phases", "sponsor": [sponsor]})).json()
+        assert first["applied_filters"]["exact_sponsors"] == [sponsor]
+
+        refined = (
+            await client.post("/v1/query", json={"query": "by year instead", "previous_run_id": first["run_id"]})
+        ).json()
+        assert refined["applied_filters"]["exact_sponsors"] == [sponsor]  # the Clarification-style answer survives
+        assert any(a.startswith("Kept from the earlier question: sponsor") for a in refined["assumptions"])
+        record = (await client.get(f"/v1/runs/{refined['run_id']}")).json()
+        assert record["request"]["sponsor"] == [sponsor]  # saved, so a further Follow-up inherits it too
+
+        fresh = (
+            await client.post("/v1/query", json={"query": "something else", "previous_run_id": first["run_id"]})
+        ).json()
+        assert not fresh["applied_filters"]["exact_sponsors"]
+
+
+async def test_vega_lite_endpoint_maps_marks_to_datums_and_page_is_served(make_client):
+    async for client in make_client(ScriptedPlanner(TREND, SPONSOR_DRUG)):
+        trend = (await client.post("/v1/query", json={"query": "per year"})).json()
+        vl = (await client.get(f"/v1/runs/{trend['run_id']}/vega-lite.json")).json()
+        rows = trend["visualization"]["data"]
+        for value in vl["data"]["values"]:
+            assert rows[value["_datum"]]["start_year"] == value["start_year"]
+
+        network = (await client.post("/v1/query", json={"query": "network"})).json()
+        vl = (await client.get(f"/v1/runs/{network['run_id']}/vega-lite.json")).json()
+        datums = network["visualization"]["data"]["nodes"] + network["visualization"]["data"]["edges"]
+        edge_layer, node_layer = vl["layer"][0]["data"]["values"], vl["layer"][1]["data"]["values"]
+        assert all("source" in datums[e["_datum"]] for e in edge_layer)
+        assert all(datums[n["_datum"]]["trial_count"] == n["trial_count"] for n in node_layer)
+
+        page = await client.get("/")
+        assert page.status_code == 200 and "Clinical Trials Explorer" in page.text
+        assert ".innerHTML" not in page.text  # registry text is always inserted as text, never as markup
