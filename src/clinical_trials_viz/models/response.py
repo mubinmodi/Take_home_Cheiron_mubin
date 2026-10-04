@@ -71,7 +71,7 @@ class AppliedFilters(BaseModel):
 
 class ClarificationOption(BaseModel):
     label: str
-    value: str | list[str] = Field(description="Send back as-is in the Clarification's field.")
+    value: str | int | list[str] = Field(description="Send back as-is in the Clarification's field.")
     trial_count: int | None = None
 
 

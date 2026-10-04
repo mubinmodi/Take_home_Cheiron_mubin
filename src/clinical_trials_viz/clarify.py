@@ -2,13 +2,13 @@
 
 from collections import Counter
 
-from clinical_trials_viz.catalog import DRUG_CLASS_OPTIONS, PHASE_LABELS, SPONSOR_AMBIGUITY_MIN_SHARE
+from clinical_trials_viz.catalog import DRUG_CLASS_OPTIONS, PHASE_LABELS, PINNED_FIELDS, SPONSOR_AMBIGUITY_MIN_SHARE
 from clinical_trials_viz.cohort import resolve_drug_identity
 from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.ctgov.trial import Trial, drug_identities, parse_trial
 from clinical_trials_viz.models.plan import ClarificationReason, ClarifyPlan
 from clinical_trials_viz.models.response import Clarification, ClarificationOption
-from clinical_trials_viz.validate import Conflict
+from clinical_trials_viz.validate import Conflict, FieldValue
 
 # Plan field -> request field the answer goes back in.
 _REQUEST_FIELD = {
@@ -27,20 +27,7 @@ async def from_plan(plan: ClarifyPlan, client: CtGovClient, structured: dict[str
     return Clarification(field=field, question=plan.question, allow_free_text=True)
 
 
-# Request field -> how the user would call it.
-_FIELD_NAMES = {
-    "drug_name": "drug",
-    "condition": "condition",
-    "trial_phase": "phase",
-    "country": "country",
-    "status": "status",
-    "start_year": "start year",
-    "end_year": "end year",
-    "nct_id": "trial",
-}
-
-
-def show_value(value: object) -> str:
+def show_value(value: FieldValue) -> str:
     """A request field value as the user reads it: 'Phase 3', 'Germany, France', '2020'."""
     values = value if isinstance(value, list) else [value]
     return ", ".join(PHASE_LABELS.get(str(v), str(v)) for v in values)
@@ -49,7 +36,7 @@ def show_value(value: object) -> str:
 def conflict_question(conflict: Conflict) -> Clarification:
     """Ask which value is meant. Both options are valid values of the request field, built by code."""
     name, asked, given = (
-        _FIELD_NAMES[conflict.request_field],
+        PINNED_FIELDS[conflict.request_field][1],
         show_value(conflict.question_value),
         show_value(conflict.field_value),
     )
@@ -58,8 +45,8 @@ def conflict_question(conflict: Conflict) -> Clarification:
         reason="conflict",
         question=f"Your question says {asked}, but your filters say {given}. Which {name} do you mean?",
         options=[
-            ClarificationOption(label=f"{asked} (your question)", value=conflict.question_value),  # type: ignore[arg-type]
-            ClarificationOption(label=f"{given} (your filters)", value=conflict.field_value),  # type: ignore[arg-type]
+            ClarificationOption(label=f"{asked} (your question)", value=conflict.question_value),
+            ClarificationOption(label=f"{given} (your filters)", value=conflict.field_value),
         ],
     )
 

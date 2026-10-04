@@ -100,7 +100,7 @@ class _Run:
         self.stage_name = "plan"  # the stage under way, reported if the run deadline passes
         self.parts: Sequence[AnswerPlan | ClarifyPlan | UnsupportedPlan] = ()  # the Question's parts, once planned
         self.part = 0  # the part being answered
-        self.settled_conflicts: set[str] = set()  # request fields the user already chose between (final)
+        self.answered: dict[str, str | None] = {}  # request field -> reason, for each Clarification just answered
 
     @contextmanager
     def stage(self, name: str) -> Iterator[None]:
@@ -216,9 +216,7 @@ class Pipeline:
             raise RunNotFound(run.request.previous_run_id)
         run.previous_request = record.request
         earlier = (record.response, *record.response.additional_answers)
-        run.settled_conflicts = {
-            a.clarification.field for a in earlier if a.clarification and a.clarification.reason == "conflict"
-        }
+        run.answered = {a.clarification.field: a.clarification.reason for a in earlier if a.clarification}
         return record.plan
 
     async def _execute(self, run: _Run, previous: QueryPlan | None) -> None:
@@ -356,20 +354,18 @@ class Pipeline:
         return breakdown_spec(result, filters, len(cohort.trials)), plan.group_by
 
     async def _ask_about_conflict(self, run: _Run, target: Answer, gate: GateResult) -> bool:
-        """When a structured field contradicts the question, ask which value is meant, unless the user
-        already chose (the answer is final) or both names are the same drug. The field applies meanwhile."""
+        """When a structured field contradicts the question, ask which value is meant, unless the field
+        answers the previous run's Clarification (an answer is final) or both names are the same drug."""
         for conflict in gate.conflicts:
             asked, given = clarify.show_value(conflict.question_value), clarify.show_value(conflict.field_value)
-            if conflict.request_field in run.settled_conflicts:
-                target.assumptions.append(f"Used {given}, as you chose; the question says {asked}.")
+            if conflict.request_field in run.answered:  # e.g. which Merck, or which of two conflicting values
+                if run.answered[conflict.request_field] == "conflict":
+                    target.assumptions.append(f"Used {given}, as you chose; the question says {asked}.")
                 continue
-            if conflict.request_field == "drug_name":
+            names, others = conflict.question_value, conflict.field_value
+            if conflict.request_field == "drug_name" and isinstance(names, list) and isinstance(others, list):
                 with run.stage("clarify"):
-                    same = await clarify.same_drug(
-                        conflict.question_value,  # type: ignore[arg-type]
-                        conflict.field_value,  # type: ignore[arg-type]
-                        self.client,
-                    )
+                    same = await clarify.same_drug(names, others, self.client)
                 if same:
                     target.assumptions.append(
                         f"'{asked}' in the question and '{given}' in your filters are the same drug ({same})."

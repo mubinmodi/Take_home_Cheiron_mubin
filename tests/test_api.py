@@ -797,3 +797,50 @@ async def test_a_brand_name_and_its_generic_name_are_not_a_conflict(make_client)
     assert body["outcome"] == "success"
     assert body["applied_filters"]["drugs"] == ["Pembrolizumab"]
     assert any("same drug" in a for a in body["assumptions"])
+
+
+async def test_a_year_conflict_is_asked_with_year_options(make_client):
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"], start_year_from=2020))
+    question = {"query": "Keytruda trials since 2020", "start_year": 2021}
+    async for client in make_client(ScriptedPlanner(plan, plan, plan)):
+        first = (await client.post("/v1/query", json=question)).json()
+        assert first["outcome"] == "clarification_required"
+        c = first["clarification"]
+        assert c["field"] == "start_year"
+        assert [o["value"] for o in c["options"]] == [2020, 2021]
+        for option in c["options"]:
+            body = {**question, "start_year": option["value"], "previous_run_id": first["run_id"]}
+            response = await client.post("/v1/query", json=body)
+            assert response.status_code == 200, response.text
+            assert response.json()["outcome"] != "clarification_required"
+            assert response.json()["applied_filters"]["start_year_from"] == option["value"]
+
+
+async def test_a_sponsor_conflict_is_asked(make_client):
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(sponsor="Merck"), group_by=Dimension.PHASE)
+    question = {"query": "What phases are Merck's trials in?", "sponsor": "Pfizer Inc"}
+    async for client in make_client(ScriptedPlanner(plan, plan, plan)):
+        first = (await client.post("/v1/query", json=question)).json()
+        assert first["outcome"] == "clarification_required"
+        c = first["clarification"]
+        assert c["field"] == "sponsor" and c["reason"] == "conflict"
+        assert [o["value"] for o in c["options"]] == [["Merck"], ["Pfizer Inc"]]
+        pfizer = {**question, "sponsor": ["Pfizer Inc"], "previous_run_id": first["run_id"]}
+        answer = (await client.post("/v1/query", json=pfizer)).json()
+        assert answer["applied_filters"]["exact_sponsors"] == ["Pfizer Inc"]
+        assert (answer.get("clarification") or {}).get("reason") != "conflict"
+        merck = {**question, "sponsor": ["Merck"], "previous_run_id": first["run_id"]}
+        answer = (await client.post("/v1/query", json=merck)).json()
+        # The question's own term: searched as a lead sponsor name, so "which Merck?" can still be asked.
+        assert answer["applied_filters"]["sponsor"] == "Merck" and not answer["applied_filters"]["sponsor_exact"]
+        assert (answer.get("clarification") or {}).get("reason") != "conflict"
+
+
+async def test_a_sponsor_clarification_answer_is_not_a_conflict(make_client):
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(sponsor="Merck"), group_by=Dimension.PHASE)
+    body = await ask(
+        make_client, ScriptedPlanner(plan), query="What phases are Merck's trials in?",
+        sponsor=["Merck Sharp & Dohme LLC"],
+    )  # fmt: skip
+    assert (body.get("clarification") or {}).get("reason") != "conflict"
+    assert body["applied_filters"]["exact_sponsors"] == ["Merck Sharp & Dohme LLC"]

@@ -248,6 +248,22 @@ PAGE_SIZE = 1000
 TABLE_MAX_ROWS = 100
 TIMELINE_MAX_ROWS = 50
 
+# Structured request fields that pin a filter: request field -> (applied filter, what the user calls it).
+# Ambiguity rule (harness-design: conflict): when the question names a different value for one of these,
+# code asks which one is meant, offering both as valid values of the field; the answer is final.
+# Sponsor is pinned as exact lead sponsor names (see validate.merge_filters).
+PINNED_FIELDS: dict[str, tuple[str, str]] = {
+    "drug_name": ("drugs", "drug"),
+    "condition": ("conditions", "condition"),
+    "trial_phase": ("phases", "phase"),
+    "country": ("countries", "country"),
+    "status": ("statuses", "status"),
+    "start_year": ("start_year_from", "start year"),
+    "end_year": ("start_year_to", "end year"),
+    "nct_id": ("nct_ids", "trial"),
+    "sponsor": ("sponsor", "sponsor"),
+}
+
 # Drug identity: the MeSH term shared by at least this share of search matches.
 DRUG_IDENTITY_MIN_SHARE = 0.5
 # Sponsor ambiguity: a second distinct lead sponsor with at least this share triggers a Clarification.
