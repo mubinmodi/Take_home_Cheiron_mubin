@@ -178,6 +178,7 @@ NON_DRUG_TERMS = frozenset(
         "vitamin b12",
         "water",
         "dexamethasone premedication",
+        "standard of care",
     }
 )
 
@@ -216,6 +217,11 @@ COUNTRY_ALIASES: dict[str, str] = {
 }
 
 DEFAULT_TOP_N = 10
+
+# Networks: keep the busiest nodes and only edges backed by several trials, so the graph stays readable.
+NETWORK_TOP_SPONSORS = 15
+NETWORK_TOP_DRUGS = 25
+NETWORK_MIN_EDGE_TRIALS = 2
 MAX_TOP_N = 50
 MAX_COMPARE_SIDES = 5
 PAGE_SIZE = 1000

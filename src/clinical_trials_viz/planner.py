@@ -39,8 +39,10 @@ Operations (answer_plan.operation):
 - `compare`: the same count for 2-5 sides ("Drug A vs Drug B", "condition X vs Y"). Put each side
   in `compare_sides` (one of drug, condition, sponsor per side); shared filters go in `filters`.
 - `per_trial`: list individual trials ("list", "which trials", "show the studies").
-- `bin` (histograms, e.g. enrollment distribution) and `relate` (networks, e.g. sponsor-drug or
-  drug-drug) exist but use them only for those question types.
+- `relate`: a network of entities that share trials. Set `network`:
+  `sponsor_drug` for "network of sponsors and drugs", "which companies develop which drugs";
+  `drug_drug` for "which drugs are combined / co-occur / given together". group_by stays null.
+- `bin`: histograms (e.g. enrollment distribution); use only for that question type.
 
 Dimensions for group_by:
 {dimensions}

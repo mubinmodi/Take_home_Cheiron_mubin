@@ -20,6 +20,11 @@ class Operation(StrEnum):
     RELATE = "relate"  # network of related entities
 
 
+class NetworkKind(StrEnum):
+    SPONSOR_DRUG = "sponsor_drug"  # lead sponsors linked to the drugs their trials give
+    DRUG_DRUG = "drug_drug"  # drugs given together in the same trial arm
+
+
 class Filters(BaseModel):
     """Constraints that select the Cohort. Leave a field empty when the question does not mention it."""
 
@@ -81,6 +86,7 @@ class AnswerPlan(BaseModel):
     top_n: int | None = Field(
         default=None, ge=1, le=50, description="Only when the user asks for a number, e.g. 'top 5 countries'."
     )
+    network: NetworkKind | None = Field(default=None, description="relate only: which entities the network links.")
 
 
 class ClarificationReason(StrEnum):

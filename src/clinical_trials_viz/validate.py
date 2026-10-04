@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 
 from clinical_trials_viz.catalog import COUNTRY_ALIASES, DIMENSIONS, MAX_COMPARE_SIDES, Dimension
-from clinical_trials_viz.models.plan import AnswerPlan, Operation
+from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation
 from clinical_trials_viz.models.request import NCT_ID_PATTERN, QueryRequest
 from clinical_trials_viz.models.response import AppliedFilters
 
@@ -58,12 +58,22 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
     result = GateResult(filters)
     errors = result.errors
 
-    if plan.operation in (Operation.BIN, Operation.RELATE):
+    if plan.operation is Operation.BIN:
         result.unsupported = (
-            "Histograms and network graphs are not available in this version yet. "
-            "Try counts by year, phase, status, country or sponsor, a comparison, or a list of trials."
+            "Histograms are not available in this version yet. "
+            "Try counts by year, phase, status, country or sponsor, a comparison, a network or a list of trials."
         )
         return result
+    if plan.operation is Operation.RELATE:
+        if plan.network is None:
+            errors.append("relate needs network: sponsor_drug or drug_drug")
+        elif plan.network is NetworkKind.DRUG_DRUG:
+            result.unsupported = "Drug-to-drug combination networks are not available yet; try a sponsor-drug network."
+            return result
+        if plan.group_by is not None:
+            errors.append("relate does not use group_by; set it to null")
+    elif plan.network is not None:
+        errors.append("network is only allowed with operation 'relate'")
 
     if plan.operation is Operation.COMPARE:
         sides = plan.compare_sides

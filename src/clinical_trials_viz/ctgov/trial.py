@@ -108,12 +108,36 @@ def clean_drug_name(name: str) -> str:
     return " ".join(name.lower().split()).strip(" -,;:")
 
 
+def _names(intervention: Intervention) -> list[str]:
+    return [n for n in (clean_drug_name(x) for x in (intervention.name, *intervention.other_names)) if n]
+
+
+def _mesh_for(intervention: Intervention, mesh_terms: list[str]) -> str | None:
+    """The trial's MeSH term that names this intervention, if any."""
+    names = _names(intervention)
+    for term in mesh_terms:
+        if any(term in name or name in term for name in names):
+            return term
+    return None
+
+
 def drug_identities(trial: Trial) -> tuple[str, ...]:
-    """The Drugs in a trial: MeSH terms when present, otherwise cleaned names of drug-type interventions."""
-    if trial.intervention_mesh_terms:
-        names = [t.lower() for t in trial.intervention_mesh_terms]
-    else:
-        names = [clean_drug_name(i.name) for i in trial.interventions if i.type in DRUG_INTERVENTION_TYPES]
+    """The Drugs in a trial, one per drug-type intervention.
+
+    MeSH terms are listed per trial and also cover procedures and diagnostics, so each term is
+    matched to an intervention by name and kept only for drug-type interventions. A drug listed
+    under another name (e.g. "MK-3475") is paired with the one unmatched MeSH term when exactly
+    one of each remains; otherwise its cleaned raw name is used.
+    """
+    mesh = [t.lower() for t in trial.intervention_mesh_terms]
+    drugs = [i for i in trial.interventions if i.type in DRUG_INTERVENTION_TYPES]
+    matched = {id(i): _mesh_for(i, mesh) for i in trial.interventions}
+    used = {m for m in matched.values() if m}
+    unmatched_drugs = [i for i in drugs if matched[id(i)] is None]
+    unmatched_mesh = [m for m in mesh if m not in used]
+    if len(unmatched_drugs) == 1 and len(unmatched_mesh) == 1:
+        matched[id(unmatched_drugs[0])] = unmatched_mesh[0]
+    names = [matched[id(i)] or clean_drug_name(i.name) for i in drugs]
     return _unique([n for n in names if n and n not in NON_DRUG_TERMS])
 
 

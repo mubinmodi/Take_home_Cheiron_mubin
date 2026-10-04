@@ -17,6 +17,7 @@ from clinical_trials_viz.models.plan import (
     ClarifyPlan,
     ComparisonSide,
     Filters,
+    NetworkKind,
     Operation,
     UnsupportedPlan,
 )
@@ -238,3 +239,77 @@ def test_cli_summary_is_short_and_points_to_the_full_response():
     text = summarize(response)
     assert "117 trials" in text and "Filters: drugs=Keytruda" in text and "--json" in text
     assert "NCT1" not in text  # evidence is not dumped
+
+
+SPONSOR_DRUG = AnswerPlan(
+    operation=Operation.RELATE, network=NetworkKind.SPONSOR_DRUG, filters=Filters(drugs=["pembrolizumab"])
+)
+
+
+async def test_sponsor_drug_network_end_to_end(make_client):
+    async for client in make_client(ScriptedPlanner(SPONSOR_DRUG)):
+        body = (await client.post("/v1/query", json={"query": "Network of sponsors and drugs"})).json()
+        assert body["outcome"] == "success", body.get("message")
+        spec = body["visualization"]
+        assert spec["type"] == "network_graph"
+        nodes, edges = spec["data"]["nodes"], spec["data"]["edges"]
+        ids = {n["id"] for n in nodes}
+        assert edges and all(e["source"] in ids and e["target"] in ids for e in edges)
+        assert all(e["trial_count"] >= 2 for e in edges)
+        assert sum(n["kind"] == "sponsor" for n in nodes) <= 15
+        assert sum(n["kind"] == "drug" for n in nodes) <= 25
+        assert not {"placebo", "standard of care"} & {n["label"] for n in nodes}
+        assert body["verification"]["passed"]
+        assert {c["name"] for c in body["verification"]["checks"]} >= {
+            "network_matches_source",
+            "counts_match_citations",
+        }
+        assert any("top 15 lead sponsors" in a for a in body["assumptions"])
+        cited = next(iter(body["evidence"].values()))["fields"]
+        assert "protocolSection.sponsorCollaboratorsModule.leadSponsor.name" in cited
+        assert "derivedSection.interventionBrowseModule.meshes.term" in cited
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")
+
+
+def test_verifier_rejects_a_trial_cited_for_an_edge_it_does_not_have(trials):
+    from clinical_trials_viz.models.response import AppliedFilters
+    from clinical_trials_viz.network import sponsor_drug_network
+    from clinical_trials_viz.spec_builder import network_spec
+    from clinical_trials_viz.verify import network_problems
+
+    spec = network_spec(sponsor_drug_network(trials), AppliedFilters(), len(trials))
+    edge = spec.data.edges[0]  # type: ignore[union-attr]
+    sponsor = edge["source"].split(":", 1)[1]
+    stranger = next(t for t in trials if t.lead_sponsor != sponsor)
+    edge["trial_ids"].append(stranger.nct_id)
+    problems = network_problems(spec.data, {t.nct_id: t for t in trials})  # type: ignore[arg-type]
+    assert any(stranger.nct_id in p for p in problems)
+
+
+async def test_network_needs_a_kind_and_drug_drug_is_not_ready(make_client):
+    no_kind = AnswerPlan(operation=Operation.RELATE)
+    planner = ScriptedPlanner(no_kind, SPONSOR_DRUG)
+    body = await ask(make_client, planner, query="network")
+    assert planner.calls[1]["repair"] and "relate needs network" in planner.calls[1]["repair"][1][0]
+    assert body["outcome"] == "success"
+
+    drug_drug = AnswerPlan(operation=Operation.RELATE, network=NetworkKind.DRUG_DRUG)
+    body = await ask(make_client, ScriptedPlanner(drug_drug), query="drugs combined with pembrolizumab")
+    assert body["outcome"] == "unsupported_query"
+
+
+async def test_rate_limited_requests_are_retried(make_client, ctgov, page, monkeypatch):
+    import httpx as _httpx
+
+    from clinical_trials_viz.ctgov import client as ctgov_client
+
+    async def no_sleep(_):
+        return None
+
+    monkeypatch.setattr(ctgov_client.asyncio, "sleep", no_sleep)
+    ctgov.get("/studies").mock(
+        side_effect=[_httpx.Response(429, headers={"Retry-After": "1"}), _httpx.Response(200, json=page)]
+    )
+    body = await ask(make_client, ScriptedPlanner(TREND), query="Keytruda per year")
+    assert body["outcome"] == "success"

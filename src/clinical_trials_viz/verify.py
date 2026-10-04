@@ -3,7 +3,8 @@
 from clinical_trials_viz.catalog import NOT_REPORTED, OTHER_BUCKET, Dimension
 from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
-from clinical_trials_viz.models.spec import VisualizationSpec, VisualizationType
+from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
+from clinical_trials_viz.network import trial_drugs
 
 
 def verify(
@@ -60,6 +61,17 @@ def verify(
                     wrong.append(f"{nct_id} counted under '{label}'")
         check("cited_values_match_source", wrong)
 
+    if isinstance(spec.data, NetworkData):
+        enc = spec.encoding
+        node_fields = [c.field for c in (enc.label, enc.size, enc.color) if c]
+        edge_fields = [c.field for c in (enc.source, enc.target, enc.weight) if c]
+        check(
+            "encoded_fields_exist",
+            [f"node {n.get('id')} lacks '{f}'" for n in spec.data.nodes for f in node_fields if f not in n]
+            + [f"edge {i} lacks '{f}'" for i, e in enumerate(spec.data.edges) for f in edge_fields if f not in e],
+        )
+        check("network_matches_source", network_problems(spec.data, trials))
+
     # Every cited trial meets the filters, checked against its own source values (not the API's word).
     check("cited_trials_meet_filters", [
         f"{nct_id}: {problem}" for nct_id in sorted(cited) if nct_id in trials
@@ -94,4 +106,32 @@ def filter_violations(trial: Trial, filters: AppliedFilters) -> list[str]:
         low, high = filters.start_year_from or 0, filters.start_year_to or 9999
         if year is None or not low <= year <= high:
             problems.append(f"start year {year} outside {low}-{high}")
+    return problems
+
+
+def _node_values(trial: Trial, kind: str) -> tuple[str, ...]:
+    if kind == "sponsor":
+        return (trial.lead_sponsor,) if trial.lead_sponsor else ()
+    if kind == "drug":
+        return trial_drugs(trial)
+    return ()
+
+
+def network_problems(data: NetworkData, trials: dict[str, Trial]) -> list[str]:
+    """Edges join existing nodes, and every cited trial really has each entity it is cited for."""
+    nodes = {n["id"]: n for n in data.nodes}
+    problems = []
+    for node in data.nodes:
+        for nct_id in node["trial_ids"]:
+            if nct_id in trials and node.get("label") not in _node_values(trials[nct_id], node.get("kind", "")):
+                problems.append(f"{nct_id} cited for {node['id']} but its record lacks it")
+    for edge in data.edges:
+        ends = [nodes.get(edge["source"]), nodes.get(edge["target"])]
+        if None in ends:
+            problems.append(f"edge {edge['source']} -> {edge['target']} points at a missing node")
+            continue
+        for nct_id in edge["trial_ids"]:
+            trial = trials.get(nct_id)
+            if trial and any(n.get("label") not in _node_values(trial, n.get("kind", "")) for n in ends if n):
+                problems.append(f"{nct_id} cited for {edge['source']} -> {edge['target']} but lacks one end")
     return problems

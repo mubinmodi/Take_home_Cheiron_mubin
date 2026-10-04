@@ -9,7 +9,7 @@ from typing import Any, Literal
 import vl_convert
 
 from clinical_trials_viz.catalog import NOT_REPORTED
-from clinical_trials_viz.models.spec import Channel, VisualizationSpec, VisualizationType
+from clinical_trials_viz.models.spec import Channel, NetworkData, VisualizationSpec, VisualizationType
 
 ImageFormat = Literal["png", "svg"]
 
@@ -39,7 +39,7 @@ def _tooltip(spec: VisualizationSpec) -> list[dict[str, Any]]:
 
 def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
     if spec.type is VisualizationType.NETWORK_GRAPH:
-        raise NotRenderable("network graphs have no image form yet")
+        return _network(spec)
     enc, meta = spec.encoding, spec.metadata
     title: dict[str, Any] = {"text": spec.title, "anchor": "start"}
     if spec.subtitle:
@@ -111,6 +111,94 @@ def to_vega_lite(spec: VisualizationSpec) -> dict[str, Any]:
             }
 
     raise NotRenderable(f"{spec.type} has no image form")
+
+
+def _short(label: str, limit: int = 40) -> str:
+    return label if len(label) <= limit else label[: limit - 1] + "…"
+
+
+def _network(spec: VisualizationSpec) -> dict[str, Any]:
+    """Two-column layout for bipartite networks: first node kind on the left, second on the right,
+    each sorted by trial count (the data order). Positions come from the spec alone."""
+    data = spec.data
+    if not isinstance(data, NetworkData) or not spec.metadata.bipartite:
+        raise NotRenderable("only two-sided networks have an image form yet")
+    kinds = spec.metadata.node_kinds or []
+    columns: dict[str, list[dict[str, Any]]] = {k: [] for k in kinds}
+    for node in data.nodes:
+        columns.setdefault(node["kind"], []).append(node)
+    rows = max((len(c) for c in columns.values()), default=1)
+    position: dict[str, tuple[float, float]] = {}
+    nodes = []
+    for x, (kind, members) in enumerate(columns.items()):
+        offset = (rows - len(members)) / 2  # centre the shorter column
+        for i, node in enumerate(members):
+            position[node["id"]] = (x, i + offset)
+            nodes.append({"x": x, "y": i + offset, "label": _short(node["label"]), "kind": kind,
+                          "trial_count": node["trial_count"], "align": "right" if x == 0 else "left"})  # fmt: skip
+    edges = [
+        {"x": position[e["source"]][0], "y": position[e["source"]][1],
+         "x2": position[e["target"]][0], "y2": position[e["target"]][1], "trial_count": e["trial_count"]}
+        for e in data.edges
+    ]  # fmt: skip
+    x_scale = {"domain": [-0.9, 1.9], "nice": False}
+    y_scale = {"domain": [-0.5, rows - 0.5], "reverse": True, "nice": False}
+    axis_off = {"axis": None}
+    title: dict[str, Any] = {"text": spec.title, "anchor": "start"}
+    if spec.subtitle:
+        title["subtitle"] = spec.subtitle
+    return {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "title": title,
+        "width": 760,
+        "height": max(200, 24 * rows),
+        "config": {"view": {"stroke": None}},
+        "layer": [
+            {
+                "data": {"values": edges},
+                "mark": {"type": "rule", "opacity": 0.35, "color": "#7a7a7a"},
+                "encoding": {
+                    "x": {"field": "x", "type": "quantitative", "scale": x_scale, **axis_off},
+                    "y": {"field": "y", "type": "quantitative", "scale": y_scale, **axis_off},
+                    "x2": {"field": "x2"},
+                    "y2": {"field": "y2"},
+                    "strokeWidth": {"field": "trial_count", "type": "quantitative", "title": "Shared trials",
+                                    "scale": {"range": [0.5, 6]}},
+                },
+            },
+            {
+                "data": {"values": nodes},
+                "mark": {"type": "circle", "opacity": 1},
+                "encoding": {
+                    "x": {"field": "x", "type": "quantitative", "scale": x_scale, **axis_off},
+                    "y": {"field": "y", "type": "quantitative", "scale": y_scale, **axis_off},
+                    "size": {"field": "trial_count", "type": "quantitative", "title": "Trials",
+                             "scale": {"range": [40, 600]}},
+                    "color": {"field": "kind", "type": "nominal", "title": "Entity", "sort": kinds},
+                },
+            },
+            {
+                "data": {"values": nodes},
+                "transform": [{"filter": "datum.align == 'right'"}],
+                "mark": {"type": "text", "align": "right", "dx": -12, "fontSize": 11},
+                "encoding": {
+                    "x": {"field": "x", "type": "quantitative", "scale": x_scale, **axis_off},
+                    "y": {"field": "y", "type": "quantitative", "scale": y_scale, **axis_off},
+                    "text": {"field": "label"},
+                },
+            },
+            {
+                "data": {"values": nodes},
+                "transform": [{"filter": "datum.align == 'left'"}],
+                "mark": {"type": "text", "align": "left", "dx": 12, "fontSize": 11},
+                "encoding": {
+                    "x": {"field": "x", "type": "quantitative", "scale": x_scale, **axis_off},
+                    "y": {"field": "y", "type": "quantitative", "scale": y_scale, **axis_off},
+                    "text": {"field": "label"},
+                },
+            },
+        ],
+    }  # fmt: skip
 
 
 def render(spec: VisualizationSpec, fmt: ImageFormat) -> bytes:

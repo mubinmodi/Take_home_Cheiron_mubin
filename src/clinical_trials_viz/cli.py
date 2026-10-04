@@ -111,6 +111,14 @@ def _data_lines(spec: dict[str, Any]) -> list[str]:
     enc, data = spec["encoding"], spec["data"]
     if spec["type"] == "single_value":
         return [f"  {data[0]['trial_count']:,} trials"]
+    if spec["type"] == "network_graph":
+        labels = {n["id"]: n["label"] for n in data["nodes"]}
+        rows = [f"  {labels[e['source']][:40]} — {labels[e['target']][:40]}  {e['trial_count']:>5,}"
+                for e in data["edges"][:MAX_ROWS]]  # fmt: skip
+        more = len(data["edges"]) - MAX_ROWS
+        return [f"  {len(data['nodes'])} nodes, {len(data['edges'])} links (heaviest first):", *rows] + (
+            [f"  … {more} more links"] if more > 0 else []
+        )
     if spec["type"] == "table":
         rows = [f"  {d['nct_id']}  {d.get('start_date') or '':<10}  {d['title'][:80]}" for d in data[:MAX_ROWS]]
         total = spec["metadata"].get("total_rows") or len(data)

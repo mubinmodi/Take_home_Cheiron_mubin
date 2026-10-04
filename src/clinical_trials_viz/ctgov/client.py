@@ -10,6 +10,17 @@ import httpx
 
 from clinical_trials_viz.catalog import PAGE_SIZE, TRIAL_FIELDS
 
+MAX_ATTEMPTS = 4
+RETRYABLE = frozenset({429, 500, 502, 503, 504})
+
+
+def _retry_delay(response: httpx.Response, attempt: int) -> float:
+    """Seconds to wait: the server's Retry-After when given (capped at 30 s), else 2, 4, 8 s."""
+    retry_after = response.headers.get("Retry-After", "")
+    if retry_after.isdigit():
+        return min(float(retry_after), 30.0)
+    return 2.0 ** (attempt + 1)
+
 
 class UpstreamError(Exception):
     """ClinicalTrials.gov failed or returned something unusable."""
@@ -73,22 +84,25 @@ class CtGovClient:
         self.requests_made = 0  # network requests, excluding cache hits
 
     async def _get(self, path: str, params: dict[str, str] | None = None) -> Any:
-        for attempt in range(3):
+        for attempt in range(MAX_ATTEMPTS):
+            last = attempt == MAX_ATTEMPTS - 1
             await self._limiter.acquire()
             self.requests_made += 1
             try:
                 response = await self._http.get(f"{self._base}{path}", params=params)
             except httpx.TransportError as exc:
-                if attempt == 2:
+                if last:
                     raise UpstreamError(f"ClinicalTrials.gov unreachable: {exc}") from exc
-            else:
-                if response.status_code == 200:
-                    return response.json()
-                if response.status_code not in (429, 500, 502, 503, 504) or attempt == 2:
-                    raise UpstreamError(
-                        f"ClinicalTrials.gov returned HTTP {response.status_code}: {response.text[:200]}"
-                    )
-            await asyncio.sleep(2**attempt)
+                await asyncio.sleep(2**attempt)
+                continue
+            if response.status_code == 200:
+                return response.json()
+            if response.status_code not in RETRYABLE or last:
+                detail = (
+                    "rate limit reached; try again in a minute" if response.status_code == 429 else response.text[:200]
+                )
+                raise UpstreamError(f"ClinicalTrials.gov returned HTTP {response.status_code}: {detail}")
+            await asyncio.sleep(_retry_delay(response, attempt))
         raise UpstreamError("unreachable")  # pragma: no cover
 
     async def version(self) -> SourceVersion:

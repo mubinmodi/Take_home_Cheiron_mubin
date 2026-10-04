@@ -38,6 +38,11 @@ class Encoding(BaseModel):
     color: Channel | None = Field(default=None, description="Series / comparison group.")
     value: Channel | None = Field(default=None, description="single_value: the number shown.")
     columns: list[Channel] | None = Field(default=None, description="table: columns in display order.")
+    label: Channel | None = Field(default=None, description="network_graph: node label.")
+    size: Channel | None = Field(default=None, description="network_graph: node size.")
+    source: Channel | None = Field(default=None, description="network_graph: edge start node ID.")
+    target: Channel | None = Field(default=None, description="network_graph: edge end node ID.")
+    weight: Channel | None = Field(default=None, description="network_graph: edge thickness.")
     tooltip: list[Channel] = Field(default_factory=list)
 
 
@@ -59,6 +64,11 @@ class RenderMetadata(BaseModel):
     )
     cohort_size: int = Field(description="Distinct trials in the answer's cohort.")
     total_rows: int | None = Field(default=None, description="table: rows available; data may show fewer.")
+    node_kinds: list[str] | None = Field(
+        default=None, description="network_graph: node kinds in display order (e.g. sponsor, drug)."
+    )
+    bipartite: bool = Field(default=False, description="network_graph: edges only join different node kinds.")
+    min_edge_trials: int | None = Field(default=None, description="network_graph: edges need this many trials.")
 
 
 class NetworkData(BaseModel):

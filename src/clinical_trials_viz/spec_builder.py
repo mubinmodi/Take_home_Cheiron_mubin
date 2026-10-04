@@ -6,7 +6,15 @@ The chart type follows deterministically from the Query Plan; the model does not
 from typing import Any
 
 from clinical_trials_viz.analyze import Breakdown, ComparisonGroups, breakdown
-from clinical_trials_viz.catalog import DIMENSIONS, OTHER_BUCKET, PHASE_LABELS, TABLE_MAX_ROWS, Dimension, study_url
+from clinical_trials_viz.catalog import (
+    DIMENSIONS,
+    NETWORK_MIN_EDGE_TRIALS,
+    OTHER_BUCKET,
+    PHASE_LABELS,
+    TABLE_MAX_ROWS,
+    Dimension,
+    study_url,
+)
 from clinical_trials_viz.ctgov.trial import Trial, dimension_evidence
 from clinical_trials_viz.models.plan import AnswerPlan, Operation
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry
@@ -14,10 +22,12 @@ from clinical_trials_viz.models.spec import (
     Channel,
     Encoding,
     FieldType,
+    NetworkData,
     RenderMetadata,
     VisualizationSpec,
     VisualizationType,
 )
+from clinical_trials_viz.network import Network
 
 COUNT = Channel(field="trial_count", type=FieldType.QUANTITATIVE, title="Trials")
 
@@ -26,6 +36,8 @@ def chart_type_for(plan: AnswerPlan) -> VisualizationType:
     """Which visualization answers a plan. Decided by code, so the same plan always gets the same chart."""
     if plan.operation is Operation.PER_TRIAL:
         return VisualizationType.TABLE
+    if plan.operation is Operation.RELATE:
+        return VisualizationType.NETWORK_GRAPH
     if plan.operation is Operation.COMPARE:
         return VisualizationType.GROUPED_BAR_CHART if plan.group_by else VisualizationType.BAR_CHART
     if plan.group_by is None:
@@ -177,6 +189,41 @@ def comparison_spec(
         ),
     )
     return spec, assumptions
+
+
+NODE_KIND = Channel(field="kind", type=FieldType.NOMINAL, title="Entity")
+
+
+def network_spec(network: Network, filters: AppliedFilters, cohort_size: int) -> VisualizationSpec:
+    nodes = [
+        {"id": n.id, "label": n.label, "kind": n.kind, "trial_count": len(n.trial_ids), "trial_ids": n.trial_ids}
+        for n in network.nodes
+    ]
+    edges = [
+        {"source": e.source.id, "target": e.target.id, "kind": e.kind, "trial_count": len(e.trial_ids),
+         "trial_ids": e.trial_ids}
+        for e in network.edges
+    ]  # fmt: skip
+    kinds = list(dict.fromkeys(n.kind for n in network.nodes)) or ["sponsor", "drug"]
+    return VisualizationSpec(
+        type=VisualizationType.NETWORK_GRAPH,
+        title=f"Lead sponsors and drugs: {describe_filters(filters)}",
+        subtitle=f"{cohort_size:,} trials with a drug and a lead sponsor · showing {len(nodes)} nodes, {len(edges)} links",
+        encoding=Encoding(
+            label=Channel(field="label", type=FieldType.NOMINAL, title="Name"),
+            size=COUNT,
+            color=NODE_KIND,
+            source=Channel(field="source", type=FieldType.NOMINAL, title="From"),
+            target=Channel(field="target", type=FieldType.NOMINAL, title="To"),
+            weight=Channel(field="trial_count", type=FieldType.QUANTITATIVE, title="Shared trials"),
+            tooltip=[Channel(field="label", type=FieldType.NOMINAL, title="Name"), NODE_KIND, COUNT],
+        ),
+        data=NetworkData(nodes=nodes, edges=edges),
+        metadata=RenderMetadata(
+            units="trials", node_kinds=kinds, bipartite=True, min_edge_trials=NETWORK_MIN_EDGE_TRIALS,
+            cohort_size=cohort_size,
+        ),
+    )  # fmt: skip
 
 
 TABLE_COLUMNS = [

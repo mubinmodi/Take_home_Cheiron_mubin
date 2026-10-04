@@ -35,7 +35,7 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 
 ## Current state
 
-- Working local version (2026-10-03): FastAPI service with the full pipeline for `aggregate` (single value, bar, time series), `compare` (grouped bar with overlap group) and `per_trial` (table), data-built clarifications, verifier, Vega-Lite PNG/SVG rendering and run records. `bin` (histogram) and `relate` (networks) return `unsupported_query` until built. Git repository initialised, nothing committed yet.
+- Working local version (2026-10-03): FastAPI service with the full pipeline for `aggregate` (single value, bar, time series), `compare` (grouped bar with overlap group) and `per_trial` (table), data-built clarifications, verifier, Vega-Lite PNG/SVG rendering and run records. `relate` with `sponsor_drug` returns a `network_graph` (two-column image). `bin` (histogram) and `drug_drug` networks return `unsupported_query` until built. Remaining work is ticketed under `.scratch/clinical-trials-viz-service/`. Git repository initialised, nothing committed yet.
 - The six assignment screenshots are in `docs/assignment-images/`.
 - API spike done: findings in `docs/research/api-data-guide.md`, saved responses in `docs/research/api-spike/`. Scope and counting rules are decided (`harness-design.md` sections 2–3); the numeric goals in section 1 are still proposals.
 - Not yet run with a real model (no API keys were available); all model paths are tested with a scripted planner and pydantic-ai `FunctionModel`.
@@ -58,7 +58,7 @@ uv run ruff check src tests && uv run ruff format src tests && uv run pyright
 
 ## Code map (`src/clinical_trials_viz/`)
 
-`pipeline.py` runs the fixed workflow and owns Outcomes: `planner.py` (the only model step) → `validate.py` (merge structured fields, semantic gate, one repair) → `cohort.py` (compile Filters to API params, retrieve all pages, drug match check) → `analyze.py` (all counting) → `spec_builder.py` (chart type chosen by code from the plan, spec + evidence) → `verify.py` (gate) → `runs.py` (run record). `clarify.py` builds clarification options from data. `cli.py` holds `serve` and `ask`. `catalog.py` is the capability catalog. `ctgov/` is the API client and the typed `Trial` record. `render.py` turns a spec into Vega-Lite and PNG/SVG. Tests use real records saved in `tests/fixtures/` and mock the API with `respx`.
+`pipeline.py` runs the fixed workflow and owns Outcomes: `planner.py` (the only model step) → `validate.py` (merge structured fields, semantic gate, one repair) → `cohort.py` (compile Filters to API params, retrieve all pages, drug match check) → `analyze.py` (all counting) → `spec_builder.py` (chart type chosen by code from the plan, spec + evidence) → `verify.py` (gate) → `runs.py` (run record). `network.py` counts networks. `clarify.py` builds clarification options from data. `cli.py` holds `serve` and `ask`. `catalog.py` is the capability catalog. `ctgov/` is the API client and the typed `Trial` record. `render.py` turns a spec into Vega-Lite and PNG/SVG. Tests use real records saved in `tests/fixtures/` and mock the API with `respx`.
 
 ## Stack
 
