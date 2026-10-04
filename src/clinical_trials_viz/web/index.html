@@ -229,13 +229,17 @@ function requestBody() {
   return body;
 }
 
-// The hosted service needs an API key (X-API-Key); it is kept in this browser only.
+// The hosted service needs an API key (X-API-Key). It is kept in this page, and in this browser when it
+// allows storage (private windows may not, then it is asked for again after a reload).
 const KEY_STORAGE = "clinical-trials-api-key";
+let pageKey = "";
 function savedKey() {
+  if (pageKey) return pageKey;
   try { return localStorage.getItem(KEY_STORAGE) || ""; } catch (e) { return ""; }
 }
 function saveKey(key) {
-  try { localStorage.setItem(KEY_STORAGE, key); } catch (e) { /* private window: asked again next time */ }
+  pageKey = key;
+  try { localStorage.setItem(KEY_STORAGE, key); } catch (e) { /* kept in this page only */ }
 }
 
 async function ask(body, kind = "new") {
@@ -282,12 +286,14 @@ function showError(detail) {
 
 function keyForm() {
   const input = el("input", { type: "password", placeholder: "API key", "aria-label": "API key", autocomplete: "off" });
-  return el("form", { class: "row", onsubmit: (e) => {
+  const hint = savedKey() ? "That key was not accepted. Paste it again (with or without the \"name:\" part)."
+                          : "This service needs an API key.";
+  return el("div", {}, el("p", { class: "muted" }, hint), el("form", { class: "row", onsubmit: (e) => {
     e.preventDefault();
     if (!input.value.trim()) return;
     saveKey(input.value.trim());
     ask(lastBody, lastKind);
-  } }, input, el("button", { type: "submit", class: "primary" }, "Save key and ask"));
+  } }, input, el("button", { type: "submit", class: "primary" }, "Save key and ask")));
 }
 
 function retryButton() {

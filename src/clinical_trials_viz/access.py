@@ -33,9 +33,13 @@ class MemoryUserLimiter:
 
 
 def identify(api_key: str | None, users: dict[str, str]) -> str | None:
-    """The user this key belongs to, or None. Compares against every key in constant time."""
+    """The user this key belongs to, or None. Accepts the key alone or as stored in API_KEYS
+    ("name:key", which people paste from the secret). Compares against every key in constant time."""
+    if api_key is None:
+        return None
+    sent = api_key.strip().encode()
     match = None
     for key, name in users.items():
-        if api_key is not None and hmac.compare_digest(api_key.encode(), key.encode()):
+        if hmac.compare_digest(sent, key.encode()) or hmac.compare_digest(sent, f"{name}:{key}".encode()):
             match = name
     return match

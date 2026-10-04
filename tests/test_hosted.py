@@ -16,6 +16,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from clinical_trials_viz import runs as runs_module
+from clinical_trials_viz.access import identify
 from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
 from clinical_trials_viz.catalog import Dimension
 from clinical_trials_viz.config import HOSTED_QUERIES_PER_HOUR, HOSTED_RUN_DEADLINE_SECONDS, Settings
@@ -422,3 +423,10 @@ def test_postgres_connections_give_up_in_seconds(monkeypatch):
     monkeypatch.setattr(runs_module, "create_async_engine", lambda url, **options: seen.update(url=url, **options))
     SqlRunStore("postgresql://user:pw@db.example/trials?sslmode=require")
     assert seen["url"].startswith("postgresql+asyncpg://") and seen["connect_args"]["timeout"] <= 10
+
+
+def test_a_key_is_accepted_alone_or_as_stored_with_its_name():
+    users = {KEY: "alice"}
+    assert identify(KEY, users) == identify(f"alice:{KEY}", users) == identify(f" {KEY}\n", users) == "alice"
+    assert identify(f"bob:{KEY}", users) is None  # the name must be the key's own
+    assert identify("alice:not-the-key", users) is None and identify(None, users) is None
