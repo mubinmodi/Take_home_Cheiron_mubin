@@ -36,7 +36,9 @@ uv run clinical-trials-viz serve          # web page at http://127.0.0.1:8000, A
 - Ask a question, optionally pinning filters (phase and status lists come from `/v1/schema`).
 - See the chart interactively (Vega-Lite in the browser, from the same translation as the PNG).
 - **Click any bar, point, node, link or table row to see its cited trials**, with links and the source values that placed each one there.
-- Clarifications appear as clickable options (multi-select where allowed), and "Refine" sends a Follow-up.
+- Clarifications appear as clickable options (multi-select where allowed).
+- **Follow-ups:** under each answer, "Ask a follow-up about this answer" takes a short change ("only phase 3", "show it by start year instead"; one-click examples are offered) and sends it with the answer's `previous_run_id`. A trail above the answer lists the conversation, says whether each follow-up refined the previous answer or was treated as a new question, and reopens any earlier answer. "Ask a new question" starts over.
+- Failures show their error code, with a Retry button when retrying may help; if the chart library cannot load, the chart's data is shown as a clickable table instead.
 - Every submit carries an `Idempotency-Key`, so a double-click never runs twice.
 - Registry text is always inserted as text, never as markup.
 
@@ -51,20 +53,20 @@ uv run clinical-trials-viz ask "..." --json                                   # 
 ```
 
 **Configuration.** All settings are environment variables, documented in [`.env.example`](.env.example):
-- planner models: primary and fallback, as `provider:model` strings
+- planner models: primary and fallback, as `provider:model` strings, with a per-attempt timeout and a deadline for planning
 - ClinicalTrials.gov base URL, rate limit, timeout and page cap
 - run-record directory
 - public base URL used in `chart_url`
-- OpenTelemetry exporter (`none`, `console` or `otlp`)
+- chart image time limit, log level, and OpenTelemetry exporter (`none`, `console` or `otlp`)
 
 Models change by configuration only. Default: `openai:gpt-5.4-mini`, with `anthropic:claude-haiku-4-5` as fallback.
 
 **Checks.**
 
 ```bash
-uv run pytest                    # 95 offline tests (ClinicalTrials.gov mocked with saved real records)
+uv run pytest                    # offline tests (ClinicalTrials.gov mocked with saved real records)
 uv run pytest -m live            # tests against the live ClinicalTrials.gov API
-uv run python -m evals.run       # score the configured planner on 36 questions (needs an API key)
+uv run python -m evals.run       # score the configured planner on 42 questions (needs an API key)
 uv run ruff check src tests && uv run pyright
 ```
 
@@ -168,6 +170,9 @@ All outcomes return HTTP 200 with the outcome in the body.
 | Field | Meaning |
 |---|---|
 | `run_id`, `outcome`, `message` | Identity and result; `message` explains non-success outcomes |
+| `error` | On a failure: `{code, message, retryable}` (see §7); `retryable` says whether sending the same request later may work |
+| `warnings` | Problems that did not change the answer, e.g. the primary model failed and the fallback answered, or the chart image could not be prepared |
+| `planner_model` | The model that produced the plan (the fallback, if the primary failed) |
 | `additional_answers` | When the Question asks several things: the answers to parts 2 and 3, each with the same fields as the top level (outcome, plan, filters, visualization, `chart_url` with `?part=N`, evidence, assumptions, clarification, verification). The top level is part 1; `plan.kind == "multi"` lists every part's request in `plan.requests`. |
 | `visualization` | The **Visualization Specification** (below); present on success |
 | `chart_url` | Link to the rendered image (absent for tables) |
@@ -255,14 +260,36 @@ Regenerate with `uv run python -m examples.generate`.
 
 ---
 
-## 7. Limitations and what I would improve with more time
+## 7. Failure handling
+
+Every failure ends in one Outcome with a structured `error` (`code`, `message`, `retryable`), is logged with the run ID, and never shows provider response bodies. A Question that asks several things fails part by part: one part's error leaves the others answered.
+
+| Failure point | What happens | Outcome · `error.code` |
+|---|---|---|
+| **Primary planning model fails** (5xx, 429, timeout, network, bad key) | The fallback model plans instead; the answer carries a warning naming the failure ("gpt-5.4-mini: HTTP 401") and `planner_model` names the model that answered | `success` + warning |
+| **Every model fails**, retryably | Stopped; nothing is fetched from ClinicalTrials.gov | `upstream_error` · `planner_unavailable` (retryable) |
+| **Every model rejects the request** (401/403/404: bad key or model name) | Stopped with a configuration hint | `upstream_error` · `planner_rejected` (not retryable) |
+| **A model hangs** | Each attempt is limited to `PLANNER_TIMEOUT_SECONDS` (20 s, one quick retry, instead of the SDKs' 600 s with two retries); the whole step to `PLANNER_DEADLINE_SECONDS` (60 s) | `upstream_error` · `planner_timeout` (retryable) |
+| **The model returns no usable plan** (text instead of a plan, after one retry) | Stopped; not sent to the fallback, which is for provider failures only | `internal_error` · `planner_invalid_output` (retryable) |
+| **No model configured** | The service still starts; every question explains which key is missing | `internal_error` · `planner_not_configured` |
+| **ClinicalTrials.gov** fails | Retries with backoff (honouring `Retry-After`), then stops with the reason | `upstream_error` · `source_unavailable` / `source_rate_limited` / `source_rejected` / `source_invalid_response` |
+| **The chart cannot be built** (Vega-Lite fails to compile) | Checked at query time by compiling the chart (milliseconds, no drawing): the answer, specification and citations stand; `chart_url` is withheld with a warning | `success` + warning |
+| **Drawing the image fails or hangs** | Drawing runs off the event loop with a time limit; the image request fails in JSON, the run is unaffected | HTTP `500 render_failed` / `504 render_timeout` |
+| **The interactive chart cannot load** (offline, CDN blocked) | The web page shows the same data as a table, still clickable for citations | — |
+| **The answer fails verification** | Withheld, with the failed checks | `internal_error` · `verification_failed` |
+| **A bug** | Isolated to its part; logged with a stack trace and the run ID, which the message quotes | `internal_error` · `internal` |
+| **The run record cannot be saved** (e.g. full disk) | The answer is still returned; image links and follow-ups are withdrawn with a warning | `success` + warning |
+
+HTTP-level errors (unknown run, idempotency conflicts, image failures, anything unexpected) share one JSON shape: `{"detail": {"code", "message", "retryable"}}`. Request validation errors keep FastAPI's standard 422 format.
+
+## 8. Limitations and what I would improve with more time
 
 - **Scope cap:** questions matching more than 20,000 trials return `scope_required`. A background job (`POST /runs` → `GET /runs/{id}`) or the API's own count endpoint for simple totals would lift it.
 - **Rate limit:** ClinicalTrials.gov returned HTTP 429 during development. The client honours `Retry-After` and backs off, and the limiter allows 40 requests per minute per process. Several processes, or a hosted service, would need a shared limiter (e.g. Redis).
 - **Drug classes** ("PD-1 inhibitors") are handled by a clarification listing the drugs most often found in matching trials. There is no verified class membership; the registry has none.
 - **Data quality is passed through, not corrected.** Enrollment outliers (one melanoma record lists 2,953,748 participants, another 999,999) are shown as recorded. Alternatives listed in an arm are detected from its description; when the description does not name both drugs, they still count as given together.
 - **Run records** keep the plan and response only. Full run bundles with the raw API pages, for exact offline replay, are designed but not built.
-- **The planner eval** has 36 questions: `gpt-5.4-mini` scores 100%, `claude-haiku-4-5` 95% on 42 questions including multi-part and crossed questions (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. Repeated runs show residual variance: the "industry vs academic … Parkinson's and ALS" comparison sometimes omits the sponsor-category breakdown (4 of 5 runs correct).
+- **The planner eval** has 42 questions, including multi-part and crossed ones: `gpt-5.4-mini` scores 100% (42/42), `claude-haiku-4-5` 95% (40/42) (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. Repeated runs show residual variance: the "industry vs academic … Parkinson's and ALS" comparison sometimes omits the sponsor-category breakdown (4 of 5 runs correct).
 - **Not built:**
   - hosting
   - investigator and site networks
@@ -270,16 +297,17 @@ Regenerate with `uv run python -m examples.generate`.
 
 ---
 
-## 8. How correctness was validated
+## 9. How correctness was validated
 
 - **API spike before design.** Every filter was checked against the live API, and local counts reproduce the API's own totals exactly: start year 2020 = 263, Phase 3 = 367, Germany = 326, recruiting = 712. Findings and data-quality measurements are in [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md).
-- **95 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
+- **135 offline tests** run through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
   - every chart type, clarifications, follow-ups, repair
   - `scope_required`, `no_data`, upstream errors, rate-limit retries
+  - every failure point in §7 (21 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
   - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other, missing values as their own state), with property tests showing input order and duplicates do not change counts
   - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
 - **Live tests** against ClinicalTrials.gov (`pytest -m live`), and every answer type run end to end with the real models, with the images inspected (tables have none).
-- **Planner eval** (`evals/`): 36 questions modelled on the assignment's appendix, scored per question family per model.
+- **Planner eval** (`evals/`): 42 questions modelled on the assignment's appendix, scored per question family per model.
 - **Iteration driven by real data.** Each of these was found by running the real service, then fixed and covered by a test:
   - procedures counted as drugs (MeSH terms span all interventions) → drug identity matched to drug-type interventions
   - HTTP 429 → `Retry-After` handling
@@ -292,7 +320,7 @@ Regenerate with `uv run python -m examples.generate`.
 
 ---
 
-## 9. Tools used, and what was designed vs generated
+## 10. Tools used, and what was designed vs generated
 
 - **Tools:**
   - [Claude Code](https://claude.com/claude-code) (Anthropic) as the coding assistant: research, API exploration, implementation, tests and documentation
@@ -310,5 +338,5 @@ Regenerate with `uv run python -m examples.generate`.
   - the order of work
 - **Generated with the assistant, then reviewed and adapted:**
   - most of the code, tests and documentation, written by Claude Code against those decisions
-  - outputs and charts were inspected after each feature, and several defects found that way were fixed (section 8)
+  - outputs and charts were inspected after each feature, and several defects found that way were fixed (section 9)
   - the eval set's expected plans were drafted by the assistant for the author's review
