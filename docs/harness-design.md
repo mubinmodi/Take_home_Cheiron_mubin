@@ -11,7 +11,7 @@ Targets agreed 2026-10-03, except where marked.
 | Goal | Target | Measured by | Result (2026-10-04) |
 |---|---|---|---|
 | No made-up numbers | 100%, guaranteed by the design | The model never outputs values, IDs or citations; code produces all of them | Met by design: the model returns only a plan; every count, cited trial and citation comes from code and the registry |
-| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 46 questions: `gpt-5.4-mini` 46/46, 45/46 and 45/46 in three runs (2026-10-04, with the split step); `claude-haiku-4-5` 95% on the earlier 42 (`evals/results/`) |
+| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 46 questions: `gpt-5.4-mini` 46/46, 45/46, 45/46 and, with the final prompt, 46/46 in four runs (2026-10-04, with the split step); `claude-haiku-4-5` 95% on the earlier 42 (`evals/results/`) |
 | Citations add up | 100% of data points | Verifier recounts every bar, bucket or edge from its cited trials | Every answer passes the verifier before it is returned; tamper tests prove it rejects wrong counts and citations |
 | Honest failure | 0 runs that report success after incomplete data | Tests that inject failures | Failure-injection tests for the model, ClinicalTrials.gov, charts and storage (`tests/test_failures.py`) |
 | Latency | No target (this is a demo); measured and reported. Hard cap: undecided locally; ~30 s when hosted ([hosted-deployment.md](hosted-deployment.md)) | Timing spans per stage | 3.3–6.2 s for the five submitted examples on 2026-10-04 (planning, split included, 2.0–3.0 s; retrieval 0.6–3.1 s) |
