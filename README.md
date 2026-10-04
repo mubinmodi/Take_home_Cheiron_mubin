@@ -414,4 +414,4 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 - I ran the outputs and charts; problems I found (unreadable charts, follow-ups replacing answers, pasted keys rejected) went back as fixes.
 - Data problems found on live data (procedures counted as drugs, rate limits) are handled in code, at my request.
 - I ran the AWS deployment myself, step by step. The assistant wrote the scripts and diagnosed the first deployment's failures.
-- A second model reviewed the finished code. Each finding was checked against the code and logged; the confirmed bugs are being fixed with regression tests.
+- A second model reviewed the finished code. Each finding was checked against the code and logged; the confirmed bugs were fixed, each with a regression test that failed first.
