@@ -12,8 +12,7 @@ PASS  dist-06          Who are the top 5 lead sponsors of melanoma trials?
 PASS  cmp-01           Compare phases for trials involving pembrolizumab vs nivolumab
 PASS  cmp-02           Semaglutide versus tirzepatide: how do their trials split by phase?
 PASS  cmp-03           Compare sponsor categories across lung cancer and breast cancer trials
-FAIL  cmp-04           Industry vs academic sponsorship: compare Parkinson's disease and ALS trials
-        group_by: expected 'sponsor_class', got None
+PASS  cmp-04           Industry vs academic sponsorship: compare Parkinson's disease and ALS trials
 PASS  cmp-05           How many recruiting trials do atezolizumab, durvalumab and avelumab each have?
 PASS  geo-01           Which countries have the most recruiting trials for melanoma?
 PASS  geo-02           Top 10 countries running completed sickle cell disease trials
@@ -42,9 +41,9 @@ PASS  multi-04         List recruiting nivolumab trials in Japan, and show a net
 PASS  series-01        How have phases of breast cancer trials changed per year since 2015?
 PASS  series-02        Show recruitment status by country for melanoma trials
 
-41/42 plans correct (98%) using openai:gpt-5.4-mini
+42/42 plans correct (100%) using openai:gpt-5.4-mini
   clarification   4/4
-  comparison      4/5
+  comparison      5/5
   distribution    7/7
   geographic      3/3
   histogram       2/2

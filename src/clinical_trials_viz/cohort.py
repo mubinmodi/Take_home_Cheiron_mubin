@@ -31,6 +31,8 @@ def build_params(filters: AppliedFilters, drug: str | None = None) -> dict[str, 
         params["query.intr"] = drug
     if filters.conditions:
         params["query.cond"] = " OR ".join(f"({c})" for c in filters.conditions)
+    if filters.keywords:  # every keyword must appear somewhere in the trial record
+        params["query.term"] = " AND ".join(f"({k})" for k in filters.keywords)
     if filters.sponsor:
         if filters.sponsor_role == "any":
             params["query.spons"] = filters.sponsor

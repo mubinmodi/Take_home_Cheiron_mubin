@@ -1,6 +1,6 @@
 {
   "description": "Planner eval set modelled on the assignment appendix (docs/assignment-images/IMG_5213.png). Each case lists the question, optional structured fields, and the expected plan. Only the keys listed under `expect` are checked; drug, condition, sponsor and country names compare case-insensitively.",
-  "version": "2026-10-04.1",
+  "version": "2026-10-04.2",
   "cases": [
     {
       "id": "trend-01",
@@ -163,6 +163,9 @@
         "filters": {
           "conditions": [
             "covid-19"
+          ],
+          "keywords": [
+            "vaccine"
           ]
         }
       }

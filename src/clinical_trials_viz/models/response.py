@@ -26,6 +26,7 @@ class AppliedFilters(BaseModel):
 
     drugs: list[str] = Field(default_factory=list)
     conditions: list[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list, description="Free-text terms searched anywhere in the record.")
     phases: list[Phase] = Field(default_factory=list)
     statuses: list[OverallStatus] = Field(default_factory=list)
     study_types: list[StudyType] = Field(default_factory=list)

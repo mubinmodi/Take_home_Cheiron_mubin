@@ -64,6 +64,12 @@ Filters: fill only what the question (or the structured fields) states.
 - Years: "since 2020" -> start_year_from 2020; "in 2021" -> from 2021 to 2021.
 - Drugs: copy the user's drug names as written (brand, generic or code names all work).
   A drug class ("PD-1 inhibitors", "checkpoint inhibitors", "chemotherapy") is not a drug name.
+- Sponsors: "industry", "academic", "NIH", "government" are sponsor categories (the `sponsor_class`
+  dimension), never sponsor names: "industry vs academic ... compare X and Y" -> compare the
+  conditions X and Y with group_by sponsor_class.
+- Keywords: topic words that are neither a drug nor a condition ("vaccine", "gene therapy", "CAR-T")
+  go in `keywords`, never in conditions or drugs: "COVID-19 vaccine trials" -> condition COVID-19,
+  keyword vaccine.
 
 Defaults: never ask about these; just use them:
 - "year" means start year; "sponsor" means lead sponsor; brand names resolve automatically;

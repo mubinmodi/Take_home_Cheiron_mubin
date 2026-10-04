@@ -67,6 +67,8 @@ def describe_filters(filters: AppliedFilters) -> str:
         parts.append(" or ".join(filters.drugs))
     if filters.conditions:
         parts.append(" or ".join(filters.conditions))
+    if filters.keywords:
+        parts.append(" and ".join(f"'{k}'" for k in filters.keywords))
     if filters.sponsor:
         parts.append(f"{'lead sponsor' if filters.sponsor_role == 'lead' else 'sponsor'} {filters.sponsor}")
     if filters.phases:

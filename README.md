@@ -262,7 +262,7 @@ Regenerate with `uv run python -m examples.generate`.
 - **Drug classes** ("PD-1 inhibitors") are handled by a clarification listing the drugs most often found in matching trials. There is no verified class membership; the registry has none.
 - **Data quality is passed through, not corrected.** Enrollment outliers (one melanoma record lists 2,953,748 participants, another 999,999) are shown as recorded. Alternatives listed in an arm are detected from its description; when the description does not name both drugs, they still count as given together.
 - **Run records** keep the plan and response only. Full run bundles with the raw API pages, for exact offline replay, are designed but not built.
-- **The planner eval** has 36 questions: `gpt-5.4-mini` scores 98%, `claude-haiku-4-5` 95% on 42 questions including multi-part and crossed questions (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. The one shared miss ("industry vs academic … Parkinson's and ALS") shows that questions naming two comparison axes need a clearer rule.
+- **The planner eval** has 36 questions: `gpt-5.4-mini` scores 100%, `claude-haiku-4-5` 95% on 42 questions including multi-part and crossed questions (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. Repeated runs show residual variance: the "industry vs academic … Parkinson's and ALS" comparison sometimes omits the sponsor-category breakdown (4 of 5 runs correct).
 - **Not built:**
   - hosting
   - investigator and site networks

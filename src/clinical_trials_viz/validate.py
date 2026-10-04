@@ -17,6 +17,23 @@ class GateResult:
     assumptions: list[str] = field(default_factory=list)
 
 
+# Sponsor categories are values of the sponsor_class dimension, never sponsor names.
+_SPONSOR_CATEGORIES = frozenset({
+    "industry", "industrial", "pharma", "pharmaceutical", "pharmaceutical companies", "companies", "company",
+    "academic", "academia", "university", "universities", "academic centers", "nih", "government", "federal",
+    "other government", "network", "networks", "individual", "individuals", "other",
+})  # fmt: skip
+_CATEGORY_HINT = (
+    "sponsor category, not a sponsor name: use group_by (or compare by) 'sponsor_class' instead, "
+    "with the conditions or drugs as the compared sides"
+)
+
+
+def _is_sponsor_category(name: str) -> bool:
+    words = name.strip().lower().removesuffix(" sponsors").removesuffix(" sponsored").removesuffix("-sponsored")
+    return words in _SPONSOR_CATEGORIES
+
+
 def normalize_country(name: str, known: set[str]) -> str | None:
     if name in known:
         return name
@@ -77,6 +94,8 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
         for i, side in enumerate(sides):
             if sum(v is not None for v in (side.drug, side.condition, side.sponsor)) != 1:
                 errors.append(f"compare_sides[{i}] must set exactly one of drug, condition, sponsor")
+            if side.sponsor and _is_sponsor_category(side.sponsor):
+                errors.append(f"compare_sides[{i}]: '{side.sponsor}' is a {_CATEGORY_HINT}")
     elif plan.compare_sides:
         errors.append("compare_sides is only allowed with operation 'compare'")
 
@@ -87,6 +106,8 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
             errors.append("series_by needs operation 'aggregate' with a group_by")
         elif plan.series_by == plan.group_by:
             errors.append("series_by must differ from group_by")
+    if plan.filters.sponsor and _is_sponsor_category(plan.filters.sponsor):
+        errors.append(f"sponsor '{plan.filters.sponsor}' is a {_CATEGORY_HINT}")
     if plan.operation is Operation.PER_TRIAL and plan.group_by is not None:
         errors.append("per_trial lists trials; set group_by to null")
     if plan.group_by is not None and plan.group_by not in DIMENSIONS:
@@ -110,6 +131,12 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
                 result.assumptions.append(f"Country '{name}' was read as '{match}'.")
     filters.countries = countries
 
+    if filters.keywords:
+        result.assumptions.append(
+            "Matched as free text anywhere in the trial record (not a specific field): "
+            + ", ".join(f"'{k}'" for k in filters.keywords)
+            + "."
+        )
     if plan.group_by is Dimension.COUNTRY:
         result.assumptions.append("Countries count trials with a current site there; a trial counts once per country.")
     if filters.sponsor and not filters.sponsor_exact and filters.sponsor_role == "lead":

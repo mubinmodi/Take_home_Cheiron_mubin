@@ -41,6 +41,11 @@ class Filters(BaseModel):
         description="Specific drug names as written by the user (brand or generic). Never a drug class.",
     )
     conditions: list[str] = Field(default_factory=list, description="Conditions or diseases, as written by the user.")
+    keywords: list[str] = Field(
+        default_factory=list,
+        description="Topic words that are neither a drug nor a condition, e.g. 'vaccine', 'gene therapy', 'CAR-T'. "
+        "Never put them into conditions or drugs.",
+    )
     phases: list[Phase] = Field(default_factory=list)
     statuses: list[OverallStatus] = Field(
         default_factory=list, description="e.g. RECRUITING for 'recruiting trials', COMPLETED for 'completed'."

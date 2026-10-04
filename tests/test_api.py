@@ -678,3 +678,36 @@ async def test_clarification_for_one_part_is_answered_as_that_part_alone(make_cl
         second = (await client.post("/v1/query", json=answer)).json()
         assert second["outcome"] == "success" and not second.get("additional_answers")
         assert planner.calls[2]["question"] == part and planner.calls[2]["previous"] is None  # planned fresh
+
+
+async def test_keywords_are_free_text_and_reported(make_client, ctgov):
+    plan = AnswerPlan(
+        operation=Operation.AGGREGATE,
+        filters=Filters(conditions=["COVID-19"], keywords=["vaccine"]),
+        group_by=Dimension.STATUS,
+    )
+    body = await ask(make_client, ScriptedPlanner(plan), query="Status breakdown of COVID-19 vaccine trials")
+    assert body["outcome"] == "success"
+    sent = ctgov.calls[-1].request.url.params
+    assert sent["query.cond"] == "(COVID-19)" and sent["query.term"] == "(vaccine)"
+    assert any("free text" in a and "'vaccine'" in a for a in body["assumptions"])
+    assert "'vaccine'" in body["visualization"]["title"]
+
+
+async def test_sponsor_categories_are_not_sponsor_names(make_client):
+    bad = AnswerPlan(
+        operation=Operation.COMPARE,
+        compare_sides=[ComparisonSide(sponsor="Industry"), ComparisonSide(sponsor="Academic")],
+    )
+    good = AnswerPlan(
+        operation=Operation.COMPARE,
+        group_by=Dimension.SPONSOR_CLASS,
+        compare_sides=[ComparisonSide(condition="Parkinson's disease"), ComparisonSide(condition="ALS")],
+    )
+    planner = ScriptedPlanner(bad, good)
+    body = await ask(
+        make_client, planner, query="Industry vs academic sponsorship: compare Parkinson's disease and ALS"
+    )
+    errors = planner.calls[1]["repair"][1]
+    assert any("'Industry' is a sponsor category" in e and "sponsor_class" in e for e in errors)
+    assert body["outcome"] == "success" and body["visualization"]["type"] == "grouped_bar_chart"

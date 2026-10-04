@@ -36,11 +36,11 @@ This folder is a clean start. It replaces earlier work in `/Users/mubinmodi/Data
 
 ## Current state
 
-- Working local version (2026-10-03): FastAPI service with the full pipeline for `aggregate` (single value, bar, time series), `compare` (grouped bar with overlap group) and `per_trial` (table), data-built clarifications, verifier, Vega-Lite PNG/SVG rendering and run records. `relate` returns a `network_graph`: `sponsor_drug` (two-column image) or `drug_drug` same-arm combinations (circular image). `bin` returns an enrollment `histogram` (actual vs estimated). `per_trial` returns a `table`, a `timeline` or a `scatter_plot` (enrollment vs duration), by `view`. Remaining work is ticketed under `.scratch/clinical-trials-viz-service/`. Git repository initialised, nothing committed yet.
+- Working version (2026-10-04): FastAPI service with the full pipeline for `aggregate` (single value, bar, time series), `compare` (grouped bar with overlap group) and `per_trial` (table), data-built clarifications, verifier, Vega-Lite PNG/SVG rendering and run records. `relate` returns a `network_graph`: `sponsor_drug` (two-column image) or `drug_drug` same-arm combinations (circular image). `bin` returns an enrollment `histogram` (actual vs estimated). `per_trial` returns a `table`, a `timeline` or a `scatter_plot` (enrollment vs duration), by `view`. Optional `keywords` filter (free text) for topics that are neither drug nor condition; sponsor categories are never sponsor names (gate check). All tickets under `.scratch/clinical-trials-viz-service/` are done.
 - The six assignment screenshots are in `docs/assignment-images/`.
 - API spike done: findings in `docs/research/api-data-guide.md`, saved responses in `docs/research/api-spike/`. Scope and counting rules are decided (`harness-design.md` sections 2–3); the numeric goals in section 1 are still proposals.
-- Run with real models (OpenAI primary, Anthropic fallback); planner eval: gpt-5.4-mini 98%, claude-haiku-4-5 95% on 42 questions (`evals/results/`).
-- README, five live example outputs (`examples/`) and all agent tickets are done. Open: the user's review of the eval set's expected plans (ticket 08); packaging as a zip.
+- Run with real models (OpenAI primary, Anthropic fallback); planner eval: gpt-5.4-mini 100%, claude-haiku-4-5 95% on 42 questions (`evals/results/`). Expected plans reviewed by the user (ticket 08 done).
+- README and five live example outputs (`examples/`) exist; examples predate multi-part questions and `series_by` and should be regenerated. Open: packaging as a zip.
 
 ## Commands
 

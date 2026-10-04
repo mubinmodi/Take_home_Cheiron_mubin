@@ -12,9 +12,7 @@ PASS  dist-06          Who are the top 5 lead sponsors of melanoma trials?
 PASS  cmp-01           Compare phases for trials involving pembrolizumab vs nivolumab
 PASS  cmp-02           Semaglutide versus tirzepatide: how do their trials split by phase?
 PASS  cmp-03           Compare sponsor categories across lung cancer and breast cancer trials
-FAIL  cmp-04           Industry vs academic sponsorship: compare Parkinson's disease and ALS trials
-        group_by: expected 'sponsor_class', got 'condition'
-        compare_sides: expected [{'condition': "parkinson's disease"}, {'condition': 'als'}], got [{'drug': None, 'condition': None, 'sponsor': 'industry'}, {'drug': None, 'condition': None, 'sponsor': 'academic'}]
+PASS  cmp-04           Industry vs academic sponsorship: compare Parkinson's disease and ALS trials
 PASS  cmp-05           How many recruiting trials do atezolizumab, durvalumab and avelumab each have?
 PASS  geo-01           Which countries have the most recruiting trials for melanoma?
 PASS  geo-02           Top 10 countries running completed sickle cell disease trials
@@ -40,18 +38,19 @@ PASS  scatter-01       Plot enrollment against duration for melanoma trials
 PASS  net-03           Which companies are developing which drugs for obesity?
 PASS  multi-01         How many trials does Pfizer sponsor, and what are the most common conditions in lung cancer trials?
 PASS  multi-02         Show melanoma trials by phase and also by start year
-PASS  multi-03         How many recruiting pembrolizumab trials are there, and which countries have the most?
+FAIL  multi-03         How many recruiting pembrolizumab trials are there, and which countries have the most?
+        part 1 group_by: expected None, got 'country'
 PASS  multi-04         List recruiting nivolumab trials in Japan, and show a network of sponsors and drugs for mesothelioma trials
 PASS  series-01        How have phases of breast cancer trials changed per year since 2015?
 PASS  series-02        Show recruitment status by country for melanoma trials
 
 40/42 plans correct (95%) using anthropic:claude-haiku-4-5
   clarification   4/4
-  comparison      4/5
+  comparison      5/5
   distribution    7/7
   geographic      3/3
   histogram       2/2
-  multi_part      4/4
+  multi_part      3/4
   network         3/3
   per_trial       3/3
   series          2/2
