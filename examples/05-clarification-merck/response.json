@@ -1,0 +1,81 @@
+{
+  "run_id": "run_23f2d2c8eff740b8a5163d929c73e8e8",
+  "outcome": "clarification_required",
+  "message": "'Merck' matches more than one lead sponsor. Which one do you mean?",
+  "relation": "new",
+  "plan": {
+    "kind": "answer",
+    "relation": "new",
+    "operation": "aggregate",
+    "filters": {
+      "drugs": [],
+      "conditions": [],
+      "phases": [],
+      "statuses": [],
+      "study_types": [],
+      "sponsor": "Merck",
+      "sponsor_role": "lead",
+      "countries": [],
+      "nct_ids": []
+    },
+    "group_by": "phase",
+    "compare_sides": []
+  },
+  "applied_filters": {
+    "drugs": [],
+    "conditions": [],
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor": "Merck",
+    "sponsor_role": "lead",
+    "exact_sponsors": [],
+    "sponsor_exact": false,
+    "countries": [],
+    "nct_ids": [],
+    "from_request": []
+  },
+  "evidence": {},
+  "assumptions": [
+    "'Merck' is matched as the lead sponsor (collaborators not included)."
+  ],
+  "clarification": {
+    "field": "sponsor",
+    "question": "'Merck' matches more than one lead sponsor. Which one do you mean?",
+    "options": [
+      {
+        "label": "Merck Sharp & Dohme LLC (2151 trials)",
+        "value": "Merck Sharp & Dohme LLC",
+        "trial_count": 2151
+      },
+      {
+        "label": "Merck KGaA, Darmstadt, Germany (275 trials)",
+        "value": "Merck KGaA, Darmstadt, Germany",
+        "trial_count": 275
+      },
+      {
+        "label": "All of these (2426 trials)",
+        "value": [
+          "Merck Sharp & Dohme LLC",
+          "Merck KGaA, Darmstadt, Germany"
+        ],
+        "trial_count": 2426
+      }
+    ],
+    "multi_select": false,
+    "allow_free_text": false
+  },
+  "source": {
+    "api_version": "2.0.5",
+    "data_timestamp": "2026-10-02T09:00:04",
+    "retrieved_at": "2026-10-04T05:08:19.562410Z",
+    "search_matches": 2750,
+    "cohort_size": 2750,
+    "api_requests": 3
+  },
+  "model_calls": 1,
+  "timings_ms": {
+    "plan": 986.0,
+    "retrieve": 2540.8
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "example": "01-trend-this-drug",
+    "question": "How has the number of trials for this drug changed over time?",
+    "outcome": "success",
+    "type": "time_series",
+    "title": "Trials by start year: Pembrolizumab",
+    "cited_trials": 2629,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
+  },
+  {
+    "example": "02-countries-recruiting-melanoma",
+    "question": "Which countries have the most recruiting trials for melanoma?",
+    "outcome": "success",
+    "type": "bar_chart",
+    "title": "Trials by country: melanoma; recruiting",
+    "cited_trials": 480,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
+  },
+  {
+    "example": "03-compare-phases-semaglutide-tirzepatide",
+    "question": "Compare phases for trials involving semaglutide vs tirzepatide",
+    "outcome": "success",
+    "type": "grouped_bar_chart",
+    "title": "Trials by phase: semaglutide vs tirzepatide",
+    "cited_trials": 832,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
+  },
+  {
+    "example": "04-network-sponsors-drugs-glioblastoma",
+    "question": "Show a network of sponsors and drugs for glioblastoma trials",
+    "outcome": "success",
+    "type": "network_graph",
+    "title": "Lead sponsors and drugs: glioblastoma",
+    "cited_trials": 975,
+    "verification": true,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": "chart.png"
+  },
+  {
+    "example": "05-clarification-merck",
+    "question": "What phases are Merck's trials in?",
+    "outcome": "clarification_required",
+    "type": null,
+    "title": null,
+    "cited_trials": 0,
+    "verification": null,
+    "data_timestamp": "2026-10-02T09:00:04",
+    "model_calls": 1,
+    "chart": null
+  }
+]
