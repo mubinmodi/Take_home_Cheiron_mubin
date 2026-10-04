@@ -21,7 +21,7 @@ from clinical_trials_viz.models.spec import VisualizationSpec
 from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
 from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
-from clinical_trials_viz.runs import RunRecord, RunStore
+from clinical_trials_viz.runs import RunRecord, StoreUnavailable, run_store
 from clinical_trials_viz.telemetry import configure_logging, setup_tracing
 
 WEB_PAGE = Path(__file__).parent / "web" / "index.html"
@@ -47,6 +47,9 @@ def create_app(
         client = CtGovClient(
             client_http, settings.ctgov_base_url, settings.ctgov_requests_per_minute, settings.max_pages
         )
+        database_url = settings.database_url.get_secret_value() if settings.database_url else None
+        runs = run_store(database_url, settings.runs_dir)
+        await runs.open()
         app.state.pipeline = Pipeline(
             client,
             planner
@@ -56,11 +59,12 @@ def create_app(
                 timeout=settings.planner_timeout_seconds,
                 deadline=settings.planner_deadline_seconds,
             ),
-            RunStore(settings.runs_dir),
+            runs,
             settings.public_base_url,
         )
         app.state.idempotency = IdempotencyStore(settings.runs_dir / "idempotency")
         yield
+        await runs.close()
         if http is None:
             await client_http.aclose()
 
@@ -78,6 +82,13 @@ def create_app(
 
     def pipeline() -> Pipeline:
         return app.state.pipeline
+
+    @app.exception_handler(StoreUnavailable)
+    async def store_unavailable(request: Request, exc: StoreUnavailable) -> JSONResponse:
+        log.error("run history unavailable on %s %s: %s", request.method, request.url.path, exc)
+        detail = {"code": "store_unavailable", "message": "The run history is unavailable; try again shortly.",
+                  "retryable": True}  # fmt: skip
+        return JSONResponse(status_code=503, content={"detail": detail})
 
     @app.exception_handler(Exception)
     async def unexpected_error(request: Request, exc: Exception) -> JSONResponse:
@@ -116,7 +127,7 @@ def create_app(
                     "A request with this Idempotency-Key is still running; retry shortly",
                     True,
                 ) from exc
-            if replay is not None and (record := pipeline().runs.load(replay)) is not None:
+            if replay is not None and (record := await pipeline().runs.load(replay)) is not None:
                 response.headers["Idempotent-Replayed"] = "true"
                 return record.response
         try:
@@ -135,14 +146,14 @@ def create_app(
 
     @app.get("/v1/runs/{run_id}", response_model=RunRecord, response_model_exclude_none=True)
     async def get_run(run_id: str) -> RunRecord:
-        record = pipeline().runs.load(run_id)
+        record = await pipeline().runs.load(run_id)
         if record is None:
             raise http_error(404, "run_not_found", "run not found")
         return record
 
-    def visualization(run_id: str, part: int) -> VisualizationSpec:
+    async def visualization(run_id: str, part: int) -> VisualizationSpec:
         """The chart of one part of a run: 0 is the top-level answer, 1+ the additional answers."""
-        record = pipeline().runs.load(run_id)
+        record = await pipeline().runs.load(run_id)
         answers = [record.response, *record.response.additional_answers] if record else []
         spec = answers[part].visualization if 0 <= part < len(answers) else None
         if spec is None:
@@ -151,7 +162,7 @@ def create_app(
 
     @app.get("/v1/runs/{run_id}/chart.{fmt}")
     async def get_chart(run_id: str, fmt: Literal["png", "svg"], part: int = 0) -> Response:
-        spec = visualization(run_id, part)
+        spec = await visualization(run_id, part)
         limit = settings.render_timeout_seconds
         try:
             # Drawing is CPU work: run it off the event loop, with a time limit.
@@ -175,7 +186,7 @@ def create_app(
     async def get_vega_lite(run_id: str, part: int = 0) -> dict[str, Any]:
         """The chart as a Vega-Lite spec (finished values only); each mark carries `_datum`, its index
         in the visualization's Datums, so a client can show that Datum's Citation on click."""
-        spec = visualization(run_id, part)
+        spec = await visualization(run_id, part)
         try:
             return to_vega_lite(spec)
         except NotRenderable as exc:

@@ -43,7 +43,7 @@ from clinical_trials_viz.network import drug_drug_network, same_arm_pairs, spons
 from clinical_trials_viz.planner import Planner
 from clinical_trials_viz.planning import plan_question
 from clinical_trials_viz.render import chart_problem
-from clinical_trials_viz.runs import RunStore, new_run_id
+from clinical_trials_viz.runs import RunStore, StoreUnavailable, new_run_id
 from clinical_trials_viz.spec_builder import (
     breakdown_spec,
     build_evidence,
@@ -125,13 +125,15 @@ class Pipeline:
                 return set()  # validate country names later instead of failing the Run
         return self._countries
 
-    async def run(self, request: QueryRequest, *, base_url: str | None = None) -> QueryResponse:
+    async def run(
+        self, request: QueryRequest, *, base_url: str | None = None, user: str | None = None
+    ) -> QueryResponse:
         """Answer one request. `base_url` is the address it arrived on, for chart links when the
-        settings give no public address."""
+        settings give no public address; `user` is recorded in the run history."""
         previous: QueryPlan | None = None
         previous_request: QueryRequest | None = None
         if request.previous_run_id:
-            record = self.runs.load(request.previous_run_id)
+            record = await self.runs.load(request.previous_run_id)
             if record is None:
                 raise RunNotFound(request.previous_run_id)
             previous, previous_request = record.plan, record.request
@@ -154,8 +156,8 @@ class Pipeline:
             if answer.source:
                 answer.source.api_requests = api_requests  # shared by all parts of the Run
         try:
-            self.runs.save(run.request, response)  # the effective request, so later Follow-ups inherit it too
-        except OSError as exc:  # e.g. a full disk: still answer, but nothing can be fetched by run ID later
+            await self.runs.save(run.request, response, user)  # the effective request, so Follow-ups inherit it
+        except StoreUnavailable as exc:  # full disk, database down: still answer, but nothing can be fetched later
             log.error("run %s could not be saved: %s", response.run_id, exc)
             response.warnings.append(
                 "This answer could not be saved, so its chart image and follow-ups are unavailable."

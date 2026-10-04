@@ -4,6 +4,7 @@ takes the answer down with it."""
 
 import asyncio
 import time
+from pathlib import Path
 
 import httpx
 import pytest
@@ -182,7 +183,7 @@ async def test_an_unsaved_run_still_answers_without_dead_links(make_client, monk
         raise OSError("No space left on device")
 
     async for client in make_client(ScriptedPlanner(TREND)):
-        monkeypatch.setattr(client._transport.app.state.pipeline.runs, "save", full_disk)  # type: ignore[attr-defined]
+        monkeypatch.setattr(Path, "write_text", full_disk)  # the run record's file cannot be written
         body = (await client.post("/v1/query", json={"query": "q"})).json()
         assert body["outcome"] == "success" and "chart_url" not in body
         assert any("could not be saved" in w for w in body["warnings"])
