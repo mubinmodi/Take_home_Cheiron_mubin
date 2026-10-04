@@ -11,10 +11,11 @@ import httpx
 from fastapi import FastAPI, Header, HTTPException, Request, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
+from redis.asyncio import Redis
 
 from clinical_trials_viz.config import Settings, get_settings
-from clinical_trials_viz.ctgov.client import CtGovClient
-from clinical_trials_viz.idempotency import MAX_KEY_LENGTH, IdempotencyStore, KeyInProgress, KeyReused
+from clinical_trials_viz.ctgov.client import CtGovClient, MemoryPageCache, RateLimiter
+from clinical_trials_viz.idempotency import MAX_KEY_LENGTH, FileIdempotencyStore, KeyInProgress, KeyReused, KeyStore
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import QueryResponse
 from clinical_trials_viz.models.spec import VisualizationSpec
@@ -22,6 +23,7 @@ from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
 from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
 from clinical_trials_viz.runs import RunRecord, StoreUnavailable, run_store
+from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisPageCache, RedisRateLimiter
 from clinical_trials_viz.telemetry import configure_logging, setup_tracing
 
 WEB_PAGE = Path(__file__).parent / "web" / "index.html"
@@ -34,9 +36,12 @@ def http_error(status: int, code: str, message: str, retryable: bool = False) ->
 
 
 def create_app(
-    settings: Settings | None = None, planner: Planner | None = None, http: httpx.AsyncClient | None = None
+    settings: Settings | None = None,
+    planner: Planner | None = None,
+    http: httpx.AsyncClient | None = None,
+    redis: Redis | None = None,
 ) -> FastAPI:
-    """Build the app. Tests pass a fake planner and a mocked HTTP client."""
+    """Build the app. Tests pass a fake planner, a mocked HTTP client and an in-memory Redis."""
     settings = settings or get_settings()
     configure_logging(settings.log_level)
     setup_tracing(settings.otel_exporter)
@@ -44,8 +49,15 @@ def create_app(
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         client_http = http or httpx.AsyncClient(timeout=settings.ctgov_timeout_seconds)
+        # Hosted: state every instance must share lives in Redis. Locally it stays in this process.
+        shared = redis or (Redis.from_url(settings.redis_url.get_secret_value()) if settings.redis_url else None)
+        per_minute = settings.ctgov_requests_per_minute
         client = CtGovClient(
-            client_http, settings.ctgov_base_url, settings.ctgov_requests_per_minute, settings.max_pages
+            client_http,
+            settings.ctgov_base_url,
+            RedisRateLimiter(shared, per_minute) if shared else RateLimiter(per_minute),
+            settings.max_pages,
+            RedisPageCache(shared) if shared else MemoryPageCache(),
         )
         database_url = settings.database_url.get_secret_value() if settings.database_url else None
         runs = run_store(database_url, settings.runs_dir)
@@ -62,9 +74,13 @@ def create_app(
             runs,
             settings.public_base_url,
         )
-        app.state.idempotency = IdempotencyStore(settings.runs_dir / "idempotency")
+        app.state.idempotency = (
+            RedisIdempotencyStore(shared) if shared else FileIdempotencyStore(settings.runs_dir / "idempotency")
+        )
         yield
         await runs.close()
+        if shared is not None and redis is None:
+            await shared.aclose()
         if http is None:
             await client_http.aclose()
 
@@ -112,7 +128,7 @@ def create_app(
             ),
         ] = None,
     ) -> QueryResponse:
-        keys: IdempotencyStore = app.state.idempotency
+        keys: KeyStore = app.state.idempotency
         if idempotency_key:
             try:
                 replay = await keys.begin(idempotency_key, request)
@@ -134,14 +150,14 @@ def create_app(
             result = await pipeline().run(request, base_url=str(http_request.base_url))
         except RunNotFound as exc:
             if idempotency_key:
-                keys.abandon(idempotency_key)
+                await keys.abandon(idempotency_key)
             raise http_error(404, "run_not_found", f"previous_run_id {exc} not found") from exc
         except BaseException:
             if idempotency_key:
-                keys.abandon(idempotency_key)
+                await keys.abandon(idempotency_key)
             raise
         if idempotency_key:
-            keys.finish(idempotency_key, request, result.run_id)
+            await keys.finish(idempotency_key, request, result.run_id)
         return result
 
     @app.get("/v1/runs/{run_id}", response_model=RunRecord, response_model_exclude_none=True)

@@ -15,7 +15,7 @@ from clinical_trials_viz import clarify
 from clinical_trials_viz.analyze import breakdown, comparison_groups, cross_breakdown, enrollment_histogram
 from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS, DEFAULT_TOP_N, ENROLLMENT_FIELD, Dimension
 from clinical_trials_viz.cohort import Cohort, fetch_cohort
-from clinical_trials_viz.ctgov.client import CtGovClient, UpstreamError
+from clinical_trials_viz.ctgov.client import CtGovClient, UpstreamError, count_requests
 from clinical_trials_viz.ctgov.trial import Trial
 from clinical_trials_viz.failures import Failure, classify
 from clinical_trials_viz.models.plan import (
@@ -78,15 +78,12 @@ class RunNotFound(Exception):
 class _Run:
     """Mutable state of one Run."""
 
-    def __init__(
-        self, request: QueryRequest, api_requests_before: int, previous_request: QueryRequest | None, base_url: str
-    ):
+    def __init__(self, request: QueryRequest, previous_request: QueryRequest | None, base_url: str):
         self.request = request
         self.base_url = base_url  # of chart_url links
         self.previous_request = previous_request  # for Follow-ups: carried over when the plan refines
         self.response = QueryResponse(run_id=new_run_id(), outcome=Outcome.INTERNAL_ERROR)
         self.model_calls = 0
-        self.api_requests_before = api_requests_before
         self.timings: dict[str, float] = {}
 
     @contextmanager
@@ -139,8 +136,8 @@ class Pipeline:
             previous, previous_request = record.plan, record.request
 
         links = (self.public_base_url or base_url or DEFAULT_BASE_URL).rstrip("/")
-        run = _Run(request, self.client.requests_made, previous_request, links)
-        with tracer.start_as_current_span("run") as span:
+        run = _Run(request, previous_request, links)
+        with tracer.start_as_current_span("run") as span, count_requests() as requests:
             span.set_attribute("run.id", run.response.run_id)
             try:
                 await self._execute(run, previous)
@@ -151,7 +148,7 @@ class Pipeline:
         response = run.response
         response.model_calls = run.model_calls
         response.timings_ms = run.timings
-        api_requests = self.client.requests_made - run.api_requests_before
+        api_requests = requests[0]
         for answer in (response, *response.additional_answers):
             if answer.source:
                 answer.source.api_requests = api_requests  # shared by all parts of the Run

@@ -1,15 +1,22 @@
 """Hosted mode (docs/hosted-deployment.md): settings, shared state, access control, circuit breakers
 and the run deadline. The local mode must keep working with none of it configured."""
 
+import asyncio
+
+import fakeredis
 import pytest
 from pydantic import SecretStr, ValidationError
+from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from clinical_trials_viz.catalog import Dimension
 from clinical_trials_viz.config import HOSTED_QUERIES_PER_HOUR, HOSTED_RUN_DEADLINE_SECONDS, Settings
+from clinical_trials_viz.idempotency import KeyInProgress, KeyReused
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
+from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.runs import async_database_url, runs_table
+from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisRateLimiter
 from tests.conftest import ScriptedPlanner, ask
 
 TREND = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"]), group_by=Dimension.START_YEAR)
@@ -109,3 +116,74 @@ async def test_an_unreachable_run_history_still_answers_and_reports_503(make_cli
             "message": "The run history is unavailable; try again shortly.",
             "retryable": True,
         }
+
+
+# --- Shared state in Redis --------------------------------------------------------------------------
+
+NOW_MS = 1_759_500_000_000.0  # a real epoch in milliseconds, so the Lua script's number handling is exercised
+
+
+async def test_two_instances_share_one_clinicaltrials_budget():
+    redis = fakeredis.FakeAsyncRedis()
+    first, second = RedisRateLimiter(redis, per_minute=6), RedisRateLimiter(redis, per_minute=6)
+    waits = [await limiter.reserve(NOW_MS) for limiter in (first, second) * 3]
+    assert waits == [0] * 6  # a burst of up to 6, whichever instance asks
+    assert await first.reserve(NOW_MS) == pytest.approx(10_000)  # the 7th waits one interval (60 s / 6)
+    assert await second.reserve(NOW_MS + 10_000) == 0
+
+
+async def test_a_page_fetched_by_one_instance_serves_the_others(make_client, ctgov):
+    redis = fakeredis.FakeAsyncRedis()
+    pages_fetched = []
+    for _ in range(2):  # two instances, one Redis
+        async for client in make_client(ScriptedPlanner(TREND), redis=redis):
+            body = (await client.post("/v1/query", json={"query": "Keytruda trials per year"})).json()
+            assert body["outcome"] == "success"
+        pages_fetched.append(sum(call.request.url.path.endswith("/studies") for call in ctgov.calls))
+    assert pages_fetched[0] >= 1 and pages_fetched[1] == pages_fetched[0]  # the second instance fetched none
+
+
+async def test_idempotency_keys_hold_across_instances():
+    redis = fakeredis.FakeAsyncRedis()
+    one, other = RedisIdempotencyStore(redis), RedisIdempotencyStore(redis)
+    request = QueryRequest(query="Keytruda trials per year")
+    assert await one.begin("key-1", request) is None  # first use: run it
+    with pytest.raises(KeyInProgress):
+        await other.begin("key-1", request)
+    await one.finish("key-1", request, "run_" + "a" * 32)
+    assert await other.begin("key-1", request) == "run_" + "a" * 32  # replayed on another instance
+    with pytest.raises(KeyReused):
+        await other.begin("key-1", QueryRequest(query="something else"))
+    assert await one.begin("key-2", request) is None
+    await one.abandon("key-2")  # failed before producing a run: the key is free again
+    assert await other.begin("key-2", request) is None
+
+
+async def test_a_replay_through_another_instance_returns_the_original_answer(make_client):
+    redis = fakeredis.FakeAsyncRedis()
+    body, headers = {"query": "Keytruda trials per year"}, {"Idempotency-Key": "retry-7"}
+    answers = []
+    for _ in range(2):
+        async for client in make_client(ScriptedPlanner(TREND), redis=redis):
+            answers.append(await client.post("/v1/query", json=body, headers=headers))
+    assert answers[1].json() == answers[0].json() and answers[1].headers["Idempotent-Replayed"] == "true"
+
+
+async def test_a_redis_outage_degrades_instead_of_failing_questions(make_client, caplog):
+    unreachable = Redis.from_url("redis://127.0.0.1:1/0", socket_connect_timeout=0.2)
+    async for client in make_client(ScriptedPlanner(TREND, TREND), redis=unreachable):
+        headers = {"Idempotency-Key": "during-outage"}
+        first = await client.post("/v1/query", json={"query": "Keytruda trials per year"}, headers=headers)
+        again = await client.post("/v1/query", json={"query": "Keytruda trials per year"}, headers=headers)
+    assert first.json()["outcome"] == again.json()["outcome"] == "success"
+    assert "Redis unavailable for the ClinicalTrials.gov rate limit" in caplog.text
+    assert "Redis unavailable for Idempotency-Keys" in caplog.text
+
+
+async def test_api_requests_are_counted_once_by_the_run_that_made_them(make_client, ctgov):
+    plans = (TREND, TREND.model_copy(update={"filters": Filters(drugs=["pembrolizumab"])}))
+    async for client in make_client(ScriptedPlanner(*plans)):
+        replies = await asyncio.gather(*(client.post("/v1/query", json={"query": f"question {i}"}) for i in range(2)))
+    counts = [reply.json()["source"]["api_requests"] for reply in replies]
+    # A shared counter would credit each run with the other's requests too, so the sum would exceed the calls.
+    assert all(counts) and sum(counts) == len(ctgov.calls)

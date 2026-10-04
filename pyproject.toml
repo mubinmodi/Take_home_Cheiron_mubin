@@ -18,6 +18,7 @@ dependencies = [
     "pydantic>=2.13.5",
     "pydantic-ai-slim[anthropic,google,openai]>=2.54.0",
     "pydantic-settings>=2.15.0",
+    "redis>=5.2",
     "sqlalchemy[asyncio]>=2.0.40",
     "uvicorn[standard]>=0.54.0",
     "vl-convert-python>=1.9.0.post1",
@@ -33,6 +34,7 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "aiosqlite>=0.21",
+    "fakeredis[lua]>=2.26",
     "hypothesis>=6.168.3",
     "pyright>=1.1.414",
     "pytest>=9.1.1",

@@ -83,8 +83,8 @@ def make_client(settings, ctgov):
 
     Unhandled errors come back as HTTP 500 responses (as for a real client) instead of being raised."""
 
-    async def make(planner) -> AsyncIterator[httpx.AsyncClient]:
-        app = create_app(settings, planner=planner, http=httpx.AsyncClient())
+    async def make(planner, redis=None) -> AsyncIterator[httpx.AsyncClient]:
+        app = create_app(settings, planner=planner, http=httpx.AsyncClient(), redis=redis)
         transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
         async with (
             app.router.lifespan_context(app),

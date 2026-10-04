@@ -3,8 +3,12 @@
 import asyncio
 import time
 from collections import OrderedDict
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Protocol
+from urllib.parse import urlencode
 
 import httpx
 
@@ -69,6 +73,57 @@ class SearchResult:
     complete: bool  # every page was fetched
 
 
+class Limiter(Protocol):
+    async def acquire(self) -> None:
+        """Wait until one more request fits the budget."""
+        ...
+
+
+class PageCache(Protocol):
+    async def get(self, key: str) -> dict[str, Any] | None: ...
+
+    async def put(self, key: str, page: dict[str, Any]) -> None: ...
+
+
+def page_key(params: dict[str, str], data_timestamp: str) -> str:
+    """Cache key of one result page: the compiled request and the registry's data timestamp, so the
+    cache turns over when ClinicalTrials.gov publishes new data."""
+    return f"{data_timestamp}?{urlencode(sorted(params.items()))}"
+
+
+class MemoryPageCache:
+    """The most recently used pages, in this process."""
+
+    def __init__(self, max_pages: int = 256):
+        self._pages: OrderedDict[str, dict[str, Any]] = OrderedDict()
+        self._max_pages = max_pages
+
+    async def get(self, key: str) -> dict[str, Any] | None:
+        page = self._pages.get(key)
+        if page is not None:
+            self._pages.move_to_end(key)
+        return page
+
+    async def put(self, key: str, page: dict[str, Any]) -> None:
+        self._pages[key] = page
+        if len(self._pages) > self._max_pages:
+            self._pages.popitem(last=False)
+
+
+_requests_in_run: ContextVar[list[int] | None] = ContextVar("ctgov_requests_in_run", default=None)
+
+
+@contextmanager
+def count_requests() -> Iterator[list[int]]:
+    """Count the network requests made inside this block (one Run), however many Runs are in flight."""
+    counter = [0]
+    token = _requests_in_run.set(counter)
+    try:
+        yield counter
+    finally:
+        _requests_in_run.reset(token)
+
+
 class RateLimiter:
     """Token bucket shared by all requests from this process."""
 
@@ -93,22 +148,26 @@ class RateLimiter:
 
 class CtGovClient:
     def __init__(
-        self, http: httpx.AsyncClient, base_url: str, requests_per_minute: int, max_pages: int, cache_pages: int = 256
+        self,
+        http: httpx.AsyncClient,
+        base_url: str,
+        limiter: Limiter,
+        max_pages: int,
+        cache: PageCache | None = None,
     ):
         self._http = http
         self._base = base_url.rstrip("/")
-        self._limiter = RateLimiter(requests_per_minute)
+        self._limiter = limiter
         self.max_pages = max_pages
-        self._cache: OrderedDict[tuple, dict[str, Any]] = OrderedDict()
-        self._cache_pages = cache_pages
+        self._cache = cache or MemoryPageCache()
         self._version: tuple[float, SourceVersion] | None = None
-        self.requests_made = 0  # network requests, excluding cache hits
 
     async def _get(self, path: str, params: dict[str, str] | None = None) -> Any:
         for attempt in range(MAX_ATTEMPTS):
             last = attempt == MAX_ATTEMPTS - 1
             await self._limiter.acquire()
-            self.requests_made += 1
+            if (counter := _requests_in_run.get()) is not None:
+                counter[0] += 1
             try:
                 response = await self._http.get(f"{self._base}{path}", params=params)
             except httpx.TransportError as exc:
@@ -142,14 +201,11 @@ class CtGovClient:
         return version
 
     async def _page(self, params: dict[str, str], data_timestamp: str) -> dict[str, Any]:
-        key = (data_timestamp, tuple(sorted(params.items())))
-        if key in self._cache:
-            self._cache.move_to_end(key)
-            return self._cache[key]
+        key = page_key(params, data_timestamp)
+        if (page := await self._cache.get(key)) is not None:
+            return page
         page = await self._get("/studies", params)
-        self._cache[key] = page
-        if len(self._cache) > self._cache_pages:
-            self._cache.popitem(last=False)
+        await self._cache.put(key, page)
         return page
 
     async def search(
