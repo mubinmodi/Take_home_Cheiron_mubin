@@ -20,7 +20,7 @@ from clinical_trials_viz.ctgov import client as ctgov_client
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
 from clinical_trials_viz.models.response import Verification, VerificationCheck
 from clinical_trials_viz.planner import LLMPlanner, UnconfiguredPlanner
-from tests.conftest import ScriptedPlanner, ask
+from tests.conftest import ScriptedPlanner, ask, split_reply
 
 TREND = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"]), group_by=Dimension.START_YEAR)
 HISTOGRAM = AnswerPlan(operation=Operation.BIN, filters=Filters(drugs=["pembrolizumab"]))
@@ -29,6 +29,8 @@ TWO_PARTS = "Show Keytruda trials per year, and show the enrollment distribution
 
 def answering(model_name: str) -> FunctionModel:
     def plan(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        if reply := split_reply(messages, info):
+            return reply
         args = {"operation": "aggregate", "filters": {"drugs": ["Keytruda"]}, "group_by": "start_year"}
         return ModelResponse(parts=[ToolCallPart("answer_plan", args)], model_name=model_name)
 
@@ -64,17 +66,19 @@ async def test_primary_model_failure_falls_back_and_says_so(make_client):
     body = await ask(make_client, planner, query="Keytruda trials per year")
     assert body["outcome"] == "success"
     assert body["planner_model"] == "fallback-model"
-    assert any("primary planning model failed (primary-model: HTTP 503)" in w for w in body["warnings"])
+    assert any("primary model failed (primary-model: HTTP 503)" in w for w in body["warnings"])
 
 
 async def test_a_fallback_attempt_counts_as_a_model_call(make_client):
     planner = LLMPlanner(failing("primary-model", 503), answering("fallback-model"))
     body = await ask(make_client, planner, query="Keytruda trials per year")
     assert body["outcome"] == "success"
-    assert body["model_calls"] == 2  # the failed primary attempt and the fallback's answer
+    # Splitting: the failed primary attempt and the fallback's answer. Planning: the fallback only, since a
+    # model that failed is not called again in the same run.
+    assert body["model_calls"] == 3
 
 
-async def test_a_failing_primary_cannot_push_a_run_past_three_model_calls(make_client):
+async def test_a_failing_primary_cannot_push_planning_past_three_model_calls(make_client):
     calls: list[str] = []
 
     def counted(model: FunctionModel) -> FunctionModel:
@@ -90,7 +94,7 @@ async def test_a_failing_primary_cannot_push_a_run_past_three_model_calls(make_c
     planner = LLMPlanner(counted(failing("primary-model", 503)), counted(answering("fallback-model")))
     three_parts = TWO_PARTS + ", and list pembrolizumab trials in Germany"
     body = await ask(make_client, planner, query=three_parts)
-    assert len(calls) <= 3, calls
+    assert len(calls) <= 2 + 3, calls  # the split step (primary + fallback), then at most 3 planning calls
     assert body["model_calls"] == len(calls)
     # Once the primary has failed, later parts of the run go straight to the fallback.
     assert calls.count("primary-model") == 1, calls

@@ -19,7 +19,7 @@ What makes it hard:
 
 ## My approach
 
-**The model plans; code does everything else.** One model call turns the question into a typed **Query Plan**: the filters, an operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`) and what to group by. From there plain, tested code takes over:
+**The model reads the question; code does everything else.** A first model call lists the separate questions a message asks, each rewritten to stand alone. A second turns each question into a typed **Query Plan**: the filters, an operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`) and what to group by. From there plain, tested code takes over:
 - it fetches **every** matching trial from the live API, and never samples;
 - it counts distinct trials under documented rules;
 - it chooses the chart type from the plan;
@@ -45,7 +45,7 @@ A **verifier** then re-derives every count and cited value from the trial record
 - a hosted version on AWS: a [live demo](https://cl-f44fdf3287b047ef971affaa8d767246.ecs.us-east-2.on.aws), no key needed.
 
 **What I chose not to build:**
-- **No agent loop:** a fixed workflow keeps cost bounded (at most 3 model calls) and every step testable.
+- **No agent loop:** a fixed workflow keeps cost bounded (usually 2 model calls, at most 5) and every step testable.
 - **No RAG or vector database:** the data is structured and queried live.
 - **No local copy of the registry:** answers reflect today's data.
 - **Not needed for this task:** conversation memory beyond the previous answer, an MCP server, a graph database.
@@ -109,7 +109,7 @@ Models change by configuration only. Default: `openai:gpt-5.4-mini`, with `anthr
 ```bash
 uv run pytest                    # offline tests (ClinicalTrials.gov mocked with saved real records)
 uv run pytest -m live            # tests against the live ClinicalTrials.gov API
-uv run python -m evals.run       # score the configured planner on 42 questions (needs an API key)
+uv run python -m evals.run       # score the configured planner on 46 questions (needs an API key)
 uv run ruff check src tests && uv run pyright
 ```
 
@@ -142,7 +142,7 @@ request ─► LOAD ─► SPLIT ─► PLAN ─► GATE ─► RETRIEVE ─► 
                             (at most 3 parts: all are planned and gated first, then answered one by one)
 
 LOAD      follow-ups only: the earlier run's plan and request, by previous_run_id          code
-SPLIT     a message that asks several things becomes parts                                 code
+SPLIT     list the separate questions, each rewritten to stand alone                        the model
 PLAN      the question → a typed Query Plan, or a clarification request, or a refusal       the model
 GATE      merge structured fields, check the plan against the catalog, repair once          code (+1 model call)
 RETRIEVE  every page from ClinicalTrials.gov; drug match check                             code
@@ -159,8 +159,8 @@ Exits (each part ends in exactly one outcome):
   any step  upstream_error / internal_error with a structured error; hosted: run_timeout after 30 s
 ```
 
-- **One model step.** A pydantic-ai agent turns the question (plus any structured fields, plus the previous plan for follow-ups) into a typed **Query Plan**: filters, operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`), what to group by (optionally with a second **series** dimension, "phases per year"), and a view or network kind. It may instead return a clarification request or a refusal. The model **never sees trial records** and **never outputs numbers, trial IDs or citations**.
-- **Questions that ask several things are split by code, not by the model.** A plain-code detector splits the message where a new request starts ("…, and what…", "…; show…", "… and also by …"). Each **part** is planned on its own as an ordinary single question, with the full message as context only for references. The model never sees a multi-part shape, so its job doesn't change. Each part gets its own filters, chart, citations and verification, and fails or asks independently. Parts are planned one after another and share the 3-call budget (at most 3 parts).
+- **Two model steps, both reading only the question.** The **split step** lists the separate questions a message asks (below). The **planning step**, a pydantic-ai agent, turns each question (plus any structured fields, plus the previous plan for follow-ups) into a typed **Query Plan**: filters, operation (`aggregate`, `compare`, `per_trial`, `bin`, `relate`), what to group by (optionally with a second **series** dimension, "phases per year"), and a view or network kind. It may instead return a clarification request or a refusal. The model **never sees trial records** and **never outputs numbers, trial IDs or citations**.
+- **Questions that ask several things are split before planning.** One model call lists the separate questions in the message and rewrites each to stand alone: "List recruiting Keytruda trials in Germany and show their phases" becomes "List recruiting Keytruda trials in Germany" and "Show the phases of recruiting Keytruda trials in Germany". A comparison ("A vs B") stays one question. Each **part** is then planned on its own as an ordinary single question, with the full message as context only, so the planning step never sees a multi-part shape. Each part gets its own filters, chart, citations and verification, and fails or asks independently. At most 3 parts are answered; a note names any that are not. If the split reply is unusable, simple code rules split the message instead, with a warning. Follow-ups are never split.
 - **Code does everything else:**
   - compiles filters into API requests
   - retrieves **every** page, or refuses with `scope_required` and never samples
@@ -170,7 +170,7 @@ Exits (each part ends in exactly one outcome):
   - builds the spec and evidence
   - verifies
 - **When the answer is a chart** (the assignment asks both to judge whether a visualization fits and for a visualization as the answer). Every successful analytical answer is a visualization specification; a single number is a `single_value` and a list of trials a `table`, so a renderer handles every answer the same way. Code picks the type from the plan: counts over start years → `time_series`; a breakdown → `bar_chart`; a comparison or a crossed breakdown → `grouped_bar_chart`; enrollment distribution → `histogram`; trial by trial → `table`, `timeline` or `scatter_plot`; relationships → `network_graph`. Outcomes that are not answers (clarification, unsupported, no data, scope required, errors) carry no visualization; they say why and what to do next.
-- **Bounded:** at most 3 model calls per run (plan, one repair with the validator's errors, one provider fallback on transport errors only). Every attempt counts, a failed one included, and a model that failed is not tried again in the same run. The SDK's own single retry of a request is not counted. Every run ends in exactly one **outcome**: `success`, `no_data`, `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error`, `internal_error`.
+- **Bounded:** one split call (two if the primary model fails), then at most 3 planning calls per run, shared by the parts (plan, one repair with the validator's errors, one provider fallback on transport errors only). A single question usually takes 2 calls. Every attempt counts, a failed one included, and a model that failed is not tried again in the same run. The SDK's own single retry of a request is not counted. Every run ends in exactly one **outcome**: `success`, `no_data`, `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error`, `internal_error`.
 - **Verifier**, a gate before every successful response. It checks that:
   - the chart answers the plan: its type, grouped by the plan's dimensions
   - every encoded field exists
@@ -422,7 +422,7 @@ Example 02, "Which countries have the most recruiting trials for melanoma?":
 
 | Decision | Why | Tradeoff |
 |---|---|---|
-| **Fixed workflow with one model step**, not an agent loop | Planning is the only judgement call; everything else is deterministic. Bounded cost (≤ 3 calls), testable stages, no hallucinated numbers. | Less open-ended than a tool-using agent; new question types need a new operation in the catalog. |
+| **Fixed workflow with two small model steps**, not an agent loop | Reading the question (splitting it, then planning each part) is the only judgement; everything else is deterministic. Bounded cost (usually 2 calls, at most 5), testable stages, no hallucinated numbers. | Less open-ended than a tool-using agent; new question types need a new operation in the catalog. |
 | **The model never sees trial data** | Numbers, IDs and citations cannot be invented, and trial text cannot inject instructions. | The model cannot list real names in clarifications, so code builds the options from data. |
 | **Live API with a page cache**; no local database copy | Answers reflect the registry's current data; the cache key includes the data timestamp. | A broad question costs many requests (~1.1 s per 1,000 trials); above 20 pages the service returns `scope_required`. |
 | **Own visualization spec, Vega-Lite only as renderer** | A documented, renderer-independent contract; Vega-Lite never aggregates, so every displayed number stays tied to its citations. | We maintain the spec and its renderer, including network layout. |
@@ -471,7 +471,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 - **Drug classes** ("PD-1 inhibitors") are handled by a clarification listing the drugs most often found in matching trials. There is no verified class membership; the registry has none.
 - **Data quality is passed through, not corrected.** Enrollment outliers (one melanoma record lists 2,953,748 participants, another 999,999) are shown as recorded. Alternatives listed in an arm are detected from its description; when the description does not name both drugs, they still count as given together.
 - **Run records** keep the plan and response only. Full run bundles with the raw API pages, for exact offline replay, are designed but not built.
-- **The planner eval** has 42 questions, including multi-part and crossed ones: `gpt-5.4-mini` scores 100% (42/42), `claude-haiku-4-5` 95% (40/42) (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. Repeated runs show residual variance: the "industry vs academic … Parkinson's and ALS" comparison sometimes omits the sponsor-category breakdown (4 of 5 runs correct).
+- **The planner eval** has 46 questions, including multi-part and crossed ones: `gpt-5.4-mini` scores 100% (46/46, with the split step); `claude-haiku-4-5` scored 95% (40/42) on the earlier 42-question set, before the split step (results in [`evals/results/`](evals/results/)). A larger held-out set and adversarial phrasings would make it stronger. Repeated runs show residual variance: the "industry vs academic … Parkinson's and ALS" comparison sometimes omits the sponsor-category breakdown (4 of 5 runs correct).
 - **Hosting:** deployed on AWS (us-east-2) and checked live with the smoke test: health, a question, a follow-up from the Postgres run history, and a chart. The first deployment exposed a startup that waited a minute on an unreachable database; it now connects in the background. Circuit breakers are per instance. The table is created on startup; a migration tool such as Alembic would come with the first schema change. Traces are not yet sent anywhere on AWS: X-Ray needs an OpenTelemetry collector next to the app.
 - **Time cap:** the 30 s run deadline applies when hosted; locally there is none. Questions near the page cap can exceed 30 s; a background job (`POST /runs`) would be the next step if traces show deadline hits.
 - **Not built:** investigator and site networks.
@@ -489,7 +489,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other with "Not reported" kept separate, missing values as their own state, the drug filter keeping only drug-type interventions), with property tests showing input order and duplicates do not change counts
   - **tamper tests** proving the verifier rejects a changed count, a trial moved to the wrong bar or bin, a chart grouped by the wrong field, a count that leaves out part of the cohort, a trial wrongly counted in "Other", an altered citation value or link, a trial cited for a network edge it lacks, an edge without a shared arm, and a trial outside the filters
 - **Live tests** against ClinicalTrials.gov (`pytest -m live`), and every answer type run end to end with the real models, with the images inspected (tables have none).
-- **Planner eval** (`evals/`): 42 questions modelled on the assignment's appendix, scored per question family per model.
+- **Planner eval** (`evals/`): 46 questions modelled on the assignment's appendix, scored per question family per model.
 - **An external code review** by a second model, every finding checked against the code. Ten were real and are fixed, each with a regression test that failed first. Among them: the drug filter kept trials that gave the drug only as a device or tracer; fallback attempts escaped the 3-call limit; the verifier missed a wrong grouping and altered citations; "Not reported" was folded into "Other"; and picking your own filter's value in a conflict clarification asked again forever.
 - **Iteration driven by real data.** Each of these was found by running the real service, then fixed and covered by a test:
   - procedures counted as drugs (MeSH terms span all interventions) → drug identity matched to drug-type interventions
@@ -498,7 +498,7 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
   - alternatives in one arm ("cisplatin OR carboplatin") counted as combinations → detected from the arm description; checked on the real KEYNOTE-189 record and on real "either / investigator's choice" arm texts, including a false positive the tests caught (a dose unit "mg/m²" read as "or")
   - incomplete current-year counts → assumption
   - shallow citations → per-filter source values with a verifier check
-  - multi-part questions: one unrelated question silently merged with another into a wrong single number, and second requests were dropped. Asking the model to produce a multi-part plan was unreliable (about 50% across repeated runs, and its repair turn confused it), so code now splits the message and the model plans each part as a normal question: 20/20 across repeated runs, with the eval otherwise unchanged
+  - multi-part questions: one unrelated question silently merged with another into a wrong single number, and second requests were dropped. Asking the model to produce a multi-part plan was unreliable (about 50% across repeated runs, and its repair turn confused it), so code split the message and the model planned each part as a normal question. A later probe of nine phrasings found the code splitter still missing some (". Also, …", "… plus …", "1) … 2) …", "show their phases"), three of them dropping a part silently. A dedicated split call, which only lists the questions and rewrites each to stand alone, now handles all nine, and 35 of 35 repeated runs, with comparisons kept whole. The eval gained four multi-part cases
   - a refinement in the web page silently dropped the user's Clarification answer (the exact Merck companies) → refining Follow-ups now inherit the earlier structured fields
   - the first AWS deployment ([details](docs/hosted-deployment.md#first-deployment-what-went-wrong-and-the-fixes)):
     - it was rolled back because new service roles were used in the same second they were created; the fix was to create them in setup

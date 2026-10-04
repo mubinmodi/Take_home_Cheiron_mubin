@@ -1,8 +1,9 @@
-"""The planning stage: the service's only model step, plus the code around it.
+"""The planning stage: the service's model steps, plus the code around them.
 
-A message that asks several separate things is split by code and each request is planned on its own,
-exactly like a single question; the model never has to decide how to structure a multi-part answer.
-Every plan is then gated, with one repair when the gate finds errors. At most three model calls.
+A split step (one model call) lists the separate questions a message asks, each rewritten to stand
+alone; each is then planned on its own, exactly like a single question, so planning never has to
+decide how to structure a multi-part answer. Every plan is gated, with one repair when the gate finds
+errors. At most three planning calls, after the split call.
 """
 
 from dataclasses import dataclass, field
@@ -14,8 +15,15 @@ from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.planner import Planner, PlannerResult, PlannerTimeout, take_unreported_calls
 from clinical_trials_viz.validate import GateResult, check_plan, separate_requests
 
-MAX_MODEL_CALLS = 3
+MAX_MODEL_CALLS = 3  # planning calls per Run; the split step has its own (planner.SPLIT_MAX_CALLS)
 MAX_PARTS = 3
+
+
+@dataclass
+class CallTally:
+    """Model calls made while planning a Run. The caller holds it, so the count survives a failure."""
+
+    calls: int = 0
 
 
 @dataclass
@@ -28,13 +36,18 @@ class Planning:
     model_name: str | None = None  # the model that produced the (last) plan
     notes: list[str] = field(default_factory=list)  # Assumptions about how the message was read
     warnings: list[str] = field(default_factory=list)  # e.g. the primary model failed and the fallback answered
+    tally: CallTally = field(default_factory=CallTally)  # every model call of the Run, the split step's included
+
+    def count(self, calls: int) -> None:
+        self.model_calls += calls
+        self.tally.calls += calls
 
     def record(self, result: PlannerResult) -> None:
-        self.model_calls += result.model_calls
+        self.count(result.model_calls)
         self.model_name = result.model_name or self.model_name
         if result.model_failures:
             self.warnings.append(
-                f"The primary planning model failed ({'; '.join(result.model_failures)}); "
+                f"The primary model failed ({'; '.join(result.model_failures)}); "
                 f"the fallback model ({result.model_name}) planned this question."
             )
 
@@ -49,18 +62,46 @@ async def plan_question(
     previous: QueryPlan | None,
     previous_request: QueryRequest | None,
     countries: set[str],
+    tally: CallTally | None = None,
 ) -> Planning:
     """Plan a Question. Planner failures on a single question propagate (the caller classifies them);
-    on a multi-part message they are kept per part in `part_errors`."""
+    on a multi-part message they are kept per part in `part_errors`. `tally` counts every model call,
+    including those of a step that then failed."""
+    tally = tally if tally is not None else CallTally()
     if isinstance(previous, MultiAnswerPlan):
         # A Follow-up on a multi-part Run answers one of its parts (e.g. a Clarification for that part),
         # sent as that part's own request: plan it as a fresh question.
         previous = previous_request = None
     if previous is None and request.previous_run_id is None:  # Follow-ups are never split
-        requests = separate_requests(request.query)
+        requests, warnings = await _split(planner, request.query, tally)
         if len(requests) >= 2:
-            return await _plan_parts(planner, request, requests, countries)
-    return await _plan_single(planner, request, previous, previous_request, countries)
+            planning = await _plan_parts(planner, request, requests, countries, tally)
+        else:
+            planning = await _plan_single(planner, request, previous, previous_request, countries, tally)
+        planning.warnings[:0] = warnings
+        return planning
+    return await _plan_single(planner, request, previous, previous_request, countries, tally)
+
+
+async def _split(planner: Planner, message: str, tally: CallTally) -> tuple[list[str], list[str]]:
+    """The separate questions in a message, from the model's split step. If its reply is unusable, the
+    code splitter is used instead and a warning says so. A provider error propagates: planning would
+    fail the same way, and the caller reports it."""
+    try:
+        result = await planner.split(message)
+    except (UnexpectedModelBehavior, UsageLimitExceeded):
+        tally.calls += take_unreported_calls()
+        fallback = separate_requests(message)
+        note = "The message could not be split by the model; it was split by simple rules instead"
+        return fallback, [f"{note} ({len(fallback)} part(s))."]
+    tally.calls += result.model_calls
+    warnings = []
+    if result.model_failures:
+        warnings.append(
+            f"The primary model failed ({'; '.join(result.model_failures)}); "
+            f"the fallback model ({result.model_name}) split the message."
+        )
+    return result.requests, warnings
 
 
 async def _plan_single(
@@ -69,9 +110,10 @@ async def _plan_single(
     previous: QueryPlan | None,
     previous_request: QueryRequest | None,
     countries: set[str],
+    tally: CallTally,
 ) -> Planning:
     result = await planner.plan(request.query, request.structured_fields(), previous, max_calls=MAX_MODEL_CALLS)
-    planning = Planning(result.plan, request)
+    planning = Planning(result.plan, request, tally=tally)
     planning.record(result)
     plan = result.plan
     if isinstance(plan, AnswerPlan) and plan.relation == "refine" and previous_request is not None:
@@ -86,13 +128,15 @@ async def _plan_single(
     return planning
 
 
-async def _plan_parts(planner: Planner, request: QueryRequest, requests: list[str], countries: set[str]) -> Planning:
+async def _plan_parts(
+    planner: Planner, request: QueryRequest, requests: list[str], countries: set[str], tally: CallTally
+) -> Planning:
     notes = []
     if len(requests) > MAX_PARTS:
         notes.append(f"The message asks {len(requests)} things; only the first {MAX_PARTS} are answered.")
         requests = requests[:MAX_PARTS]
     structured = request.structured_fields()
-    planning = Planning(UnsupportedPlan(reason="not planned yet"), request, notes=notes)
+    planning = Planning(UnsupportedPlan(reason="not planned yet"), request, notes=notes, tally=tally)
     parts: list[AnswerPlan | ClarifyPlan | UnsupportedPlan] = []
     for index, text in enumerate(requests):
         # Parts are planned one after another so they share the call budget: each later part keeps
@@ -104,7 +148,7 @@ async def _plan_parts(planner: Planner, request: QueryRequest, requests: list[st
             planning.record(result)
             plan, gate = await _gate_and_repair(planner, planning, result.plan, result, countries, reserve)
         except _PART_FAILURES as exc:
-            planning.model_calls += take_unreported_calls()
+            planning.count(take_unreported_calls())
             parts.append(UnsupportedPlan(reason=f"This part could not be planned: {text}"))
             planning.gates.append(None)
             planning.part_errors.append(exc)

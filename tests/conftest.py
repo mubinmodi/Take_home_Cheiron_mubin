@@ -13,7 +13,8 @@ from clinical_trials_viz.api import create_app
 from clinical_trials_viz.config import Settings
 from clinical_trials_viz.ctgov.trial import Trial, parse_trial
 from clinical_trials_viz.models.plan import QueryPlan
-from clinical_trials_viz.planner import PlannerResult
+from clinical_trials_viz.planner import PlannerResult, SplitResult
+from clinical_trials_viz.validate import separate_requests
 
 FIXTURES = Path(__file__).parent / "fixtures"
 BASE = "https://clinicaltrials.gov/api/v2"
@@ -45,9 +46,14 @@ def ctgov(page: dict[str, Any]) -> Iterator[respx.MockRouter]:
 class ScriptedPlanner:
     """Returns pre-written plans in order; stands in for the model in tests."""
 
-    def __init__(self, *plans: QueryPlan):
+    def __init__(self, *plans: QueryPlan, splits: dict[str, list[str]] | None = None):
         self.plans = list(plans)
         self.calls: list[dict[str, Any]] = []
+        self.splits = splits or {}  # message -> the separate questions the split step returns
+
+    async def split(self, message: str) -> SplitResult:
+        """Stands in for the model's split step: the given split, else the code splitter."""
+        return SplitResult(self.splits.get(message) or separate_requests(message), 0, "scripted")
 
     async def plan(
         self, question, structured, previous_plan, *, repair=None, max_calls=3, context=None
@@ -101,3 +107,15 @@ async def ask(make_client, planner, **body: Any) -> dict[str, Any]:
         assert response.status_code == 200, response.text
         return response.json()
     raise AssertionError
+
+
+def split_reply(messages, info) -> Any:
+    """For test models: answer the split step as a model would, using the code splitter; None when the
+    call is not the split step (then the test model plans as usual)."""
+    from pydantic_ai.messages import ModelResponse, ToolCallPart, UserPromptPart
+
+    if not any(t.name == "separate_requests" for t in info.output_tools):
+        return None
+    prompt = next(p.content for m in messages for p in getattr(m, "parts", []) if isinstance(p, UserPromptPart))
+    message = str(prompt).removeprefix("Message: ")
+    return ModelResponse(parts=[ToolCallPart("separate_requests", {"requests": separate_requests(message)})])

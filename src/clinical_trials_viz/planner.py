@@ -16,6 +16,7 @@ from typing import Any, Protocol
 
 from anthropic import AsyncAnthropic
 from openai import AsyncOpenAI
+from pydantic import BaseModel, Field
 from pydantic_ai import (
     Agent,
     ModelAPIError,
@@ -117,7 +118,50 @@ class PlannerResult:
     model_failures: list[str] = field(default_factory=list)  # e.g. ["gpt-5.4-mini: HTTP 503"], before a fallback
 
 
+@dataclass
+class SplitResult:
+    requests: list[str]  # the separate questions in a message, each standalone (one item: a single question)
+    model_calls: int
+    model_name: str | None
+    model_failures: list[str] = field(default_factory=list)
+
+
+class MessageParts(BaseModel):
+    """The separate questions a message asks."""
+
+    requests: list[str] = Field(
+        min_length=1,
+        max_length=8,
+        description="Each separate question, rewritten to stand alone with no 'their', 'them' or 'it'; one item if one.",
+    )
+
+
+SPLIT_INSTRUCTIONS = """You read a message sent to a clinical-trials analytics service and list the separate
+questions it asks. You never answer them.
+- One request is one answer or chart. "Phases of melanoma trials per year" and "trials by phase and
+  status" are each ONE request.
+- A comparison is always ONE request: never split its sides. "Compare phases for semaglutide vs
+  tirzepatide trials", "A versus B", "compare A and B" and "how does A compare with B" stay whole.
+- A message asks several things when it joins requests that each need their own answer: "and", "also",
+  "plus", ";", a new sentence or a second "?", or numbering ("1) ... 2) ..."). "How many X, and which
+  countries have the most?" is TWO requests. "What phases, what countries and what intervention types
+  are lung cancer trials?" is THREE.
+- Each item is read alone, without the others, so it must make sense on its own. Replace every word
+  that points to another request ("their", "them", "those", "these", "it", "the same", "ones") with
+  what it refers to: the drug, condition, status, phase, country and years.
+  "List recruiting Keytruda trials in Germany and show their phases" becomes
+  ["List recruiting Keytruda trials in Germany", "Show the phases of recruiting Keytruda trials in Germany"].
+  "Which sponsors run the most Alzheimer's trials? Which countries host them?" becomes
+  ["Which sponsors run the most Alzheimer's trials?", "Which countries host Alzheimer's trials?"].
+- Otherwise keep the user's words. Never add a question the user did not ask; never drop one.
+- A message that asks one thing: return it unchanged as the only item."""
+
+SPLIT_MAX_CALLS = 2  # the split call and, if the primary model fails, the fallback's attempt
+
+
 class Planner(Protocol):
+    async def split(self, message: str) -> SplitResult: ...
+
     async def plan(
         self,
         question: str,
@@ -162,6 +206,9 @@ class PlannerTimeout(Exception):
 class UnconfiguredPlanner:
     def __init__(self, reason: str):
         self.reason = reason
+
+    async def split(self, message: str) -> SplitResult:
+        raise PlannerNotConfigured(self.reason)
 
     async def plan(self, *args: Any, **kwargs: Any) -> PlannerResult:
         raise PlannerNotConfigured(self.reason)
@@ -211,7 +258,7 @@ _call_budget: ContextVar[_CallBudget | None] = ContextVar("planner_call_budget",
 class _RunCalls:
     """Model calls across the plan() calls of one Run."""
 
-    failed: set[str] = field(default_factory=set)  # models that failed with an outage: later parts skip them
+    failed: dict[str, str] = field(default_factory=dict)  # model -> its outage; later calls in the Run skip it
     attempts: int = 0  # every provider attempt in the Run
     reported: int = 0  # attempts already counted in a returned PlannerResult
 
@@ -257,9 +304,8 @@ class _ReportingModel(WrapperModel):
             raise CallBudgetExhausted(f"The {budget.limit} model call(s) allowed for this question are used up.")
         run_calls = _run_calls.get()
         if run_calls is not None and self.model_name in run_calls.failed:
-            skipped = ModelAPIError(self.model_name, "not called again, it failed earlier in this run")
-            self._note(skipped)
-            raise skipped
+            earlier = run_calls.failed[self.model_name]
+            raise ModelAPIError(self.model_name, f"{earlier} earlier in this run; not called again")
         try:
             self._breaker.check()
         except CircuitOpen as exc:
@@ -278,7 +324,7 @@ class _ReportingModel(WrapperModel):
             if is_outage(exc):
                 self._breaker.failure()
                 if run_calls is not None:
-                    run_calls.failed.add(self.model_name)
+                    run_calls.failed[self.model_name] = describe_model_error(exc).removeprefix(f"{self.model_name}: ")
             else:
                 self._breaker.success()  # it answered; the configuration is at fault
             self._note(exc)
@@ -381,6 +427,35 @@ class LLMPlanner:
             retries={"output": 1},
             name="planner",
         )
+        self._splitter = Agent(
+            model,
+            output_type=ToolOutput(MessageParts, name="separate_requests"),
+            instructions=SPLIT_INSTRUCTIONS,
+            model_settings=ModelSettings(timeout=timeout) if timeout else None,
+            name="splitter",
+        )
+
+    async def split(self, message: str) -> SplitResult:
+        """The separate questions in a message, each rewritten to stand alone. One model call (two if
+        the primary fails); its calls are counted like planning calls, outside planning's budget."""
+        failures: list[str] = []
+        budget = _CallBudget(SPLIT_MAX_CALLS)
+        token, budget_token = _model_failures.set(failures), _call_budget.set(budget)
+        try:
+            async with asyncio.timeout(self._deadline):
+                result = await self._splitter.run(
+                    f"Message: {message}", usage_limits=UsageLimits(request_limit=SPLIT_MAX_CALLS)
+                )
+        except TimeoutError as exc:
+            raise PlannerTimeout(f"Splitting the message took longer than {self._deadline:g} s") from exc
+        finally:
+            _model_failures.reset(token)
+            _call_budget.reset(budget_token)
+        if (run_calls := _run_calls.get()) is not None:
+            run_calls.reported += budget.used
+        requests = [r.strip() for r in result.output.requests if r.strip()] or [message]
+        model_name = result.response.model_name if result.response else None
+        return SplitResult(requests, budget.used, model_name, failures)
 
     async def plan(
         self,

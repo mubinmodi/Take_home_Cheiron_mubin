@@ -354,7 +354,7 @@
     {
       "id": "net-01",
       "family": "network",
-      "appendix": "Show a network of sponsors ↔ drugs for [condition] trials.",
+      "appendix": "Show a network of sponsors \u2194 drugs for [condition] trials.",
       "question": "Show a network of sponsors and drugs for glioblastoma trials",
       "expect": {
         "kind": "answer",
@@ -370,7 +370,7 @@
     {
       "id": "net-02",
       "family": "network",
-      "appendix": "Which drugs frequently co-occur in combination studies (drug ↔ drug network)?",
+      "appendix": "Which drugs frequently co-occur in combination studies (drug \u2194 drug network)?",
       "question": "Which drugs are most often combined with pembrolizumab?",
       "expect": {
         "kind": "answer",
@@ -606,7 +606,7 @@
     {
       "id": "net-03",
       "family": "network",
-      "appendix": "Show a network of sponsors ↔ drugs for [condition] trials.",
+      "appendix": "Show a network of sponsors \u2194 drugs for [condition] trials.",
       "question": "Which companies are developing which drugs for obesity?",
       "expect": {
         "kind": "answer",
@@ -780,6 +780,136 @@
             "melanoma"
           ]
         }
+      }
+    },
+    {
+      "id": "multi-05",
+      "family": "multi_part",
+      "appendix": "(new sentence with 'Also')",
+      "question": "Show the phases of melanoma trials. Also, who are the top sponsors?",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": "phase",
+            "filters": {
+              "conditions": [
+                "melanoma"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "lead_sponsor",
+            "filters": {
+              "conditions": [
+                "melanoma"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-06",
+      "family": "multi_part",
+      "appendix": "(second question refers back: 'their phases')",
+      "question": "List recruiting Keytruda trials in Germany and show their phases",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "per_trial",
+            "filters": {
+              "drugs": [
+                "keytruda"
+              ],
+              "countries": [
+                "germany"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "phase",
+            "filters": {
+              "drugs": [
+                "keytruda"
+              ],
+              "countries": [
+                "germany"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-07",
+      "family": "multi_part",
+      "appendix": "(numbered requests)",
+      "question": "1) trials per year for semaglutide 2) phases for tirzepatide",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": "start_year",
+            "filters": {
+              "drugs": [
+                "semaglutide"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "phase",
+            "filters": {
+              "drugs": [
+                "tirzepatide"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-08",
+      "family": "multi_part",
+      "appendix": "(three questions in one sentence)",
+      "question": "What phases are lung cancer trials in, what countries, and what intervention types?",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": "phase",
+            "filters": {
+              "conditions": [
+                "lung cancer"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "country",
+            "filters": {
+              "conditions": [
+                "lung cancer"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": "intervention_type",
+            "filters": {
+              "conditions": [
+                "lung cancer"
+              ]
+            }
+          }
+        ]
       }
     }
   ]

@@ -11,11 +11,11 @@ Targets agreed 2026-10-03, except where marked.
 | Goal | Target | Measured by | Result (2026-10-04) |
 |---|---|---|---|
 | No made-up numbers | 100%, guaranteed by the design | The model never outputs values, IDs or citations; code produces all of them | Met by design: the model returns only a plan; every count, cited trial and citation comes from code and the registry |
-| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 42 questions: `gpt-5.4-mini` 100%, `claude-haiku-4-5` 95% (`evals/results/`) |
+| Interpretation accuracy | ≥ 90% correct plans on a fixed set of ~30–40 test questions | Plan-level evals | 46 questions: `gpt-5.4-mini` 100% (2026-10-04, with the split step); `claude-haiku-4-5` 95% on the earlier 42 (`evals/results/`) |
 | Citations add up | 100% of data points | Verifier recounts every bar, bucket or edge from its cited trials | Every answer passes the verifier before it is returned; tamper tests prove it rejects wrong counts and citations |
 | Honest failure | 0 runs that report success after incomplete data | Tests that inject failures | Failure-injection tests for the model, ClinicalTrials.gov, charts and storage (`tests/test_failures.py`) |
 | Latency | No target (this is a demo); measured and reported. Hard cap: undecided locally; ~30 s when hosted ([hosted-deployment.md](hosted-deployment.md)) | Timing spans per stage | 1.7–4.9 s for the five live examples (planning 1.1–2.3 s, retrieval 0.6–2.7 s) |
-| Cost | ≤ 3 model calls per query | Counted on every run | Enforced; each live example used 1 call |
+| Cost | ≤ 3 model calls per query (planning); plus one split call, added 2026-10-04 | Counted on every run | Enforced; a single question usually takes 2 calls |
 
 Paging (≤ 1000 trials per page) limits how much can be fetched before the deadline. Past the cap, return `scope_required`; never sample silently.
 
@@ -126,7 +126,7 @@ Local build (decided 2026-10-03): each Run is saved as a small **run record** (r
 There is no open-ended agent loop; every loop is bounded:
 - Plan repair: at most once.
 - Provider fallback: at most once, only on provider or transport errors, never on semantic failure. Implemented with pydantic-ai's `FallbackModel`: OpenAI primary, Anthropic fallback by default, and Gemini (`google:…`) available for either slot (added 2026-10-03), all chosen by configuration strings (e.g. `openai:…`, `anthropic:…`, `google:…`) so a model can be changed without code changes. Use tool-based output mode (native structured output inside a fallback chain has an open issue, [pydantic/pydantic-ai#3104](https://github.com/pydantic/pydantic-ai/issues/3104)), set `fallback_on` to provider/transport errors only, and cap pydantic-ai's own retries so every attempt counts toward the 3-call limit.
-- Total model calls: at most 3.
+- Total model calls: at most 3 for planning. *Changed 2026-10-04 (author):* one split call comes first (two if the primary fails): it lists the separate questions in a message and rewrites each to stand alone, because the code splitter dropped parts of messages it did not recognise. Planning keeps its 3.
 - Paging stops at the source's end, the page or record cap, or the deadline.
 
 Each run ends in exactly one outcome: `success`, `no_data` (only after complete retrieval), `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error`, `internal_error`.
@@ -154,7 +154,7 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 | Semantic and episodic memory | Skip | A run builds on at most one earlier run, loaded from its bundle via `previous_run_id`; no conversation store. Procedural memory = catalog + prompts as files |
 | Saving and resuming runs | Skip | Runs take seconds; nothing waits on a human |
 | Approval gates | Becomes the verifier | All tools are read-only |
-| Model routing | Skip | There is only one model step |
+| Model routing | Skip | The split step and the planning step use the same configured models |
 | Multi-agent, MCP, semantic caching | Skip | No benefit within 24 hours; list under future work (MCP was considered and dropped: the need was model swapping, met by pydantic-ai configuration) |
 | Graph database (Neo4j / Cypher) | Skip | Networks are small and built per question in Python from the live API; a graph store would add a second data copy and generated queries |
 | LangGraph | Optional (not used) | Plain Python is enough; each step stays an ordinary testable function |

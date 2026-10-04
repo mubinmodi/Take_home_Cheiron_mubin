@@ -3,7 +3,7 @@
 import json
 
 import httpx
-from pydantic_ai.messages import ModelMessage, ModelResponse, ToolCallPart
+from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCallPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
 from clinical_trials_viz.catalog import Dimension, Phase
@@ -20,7 +20,7 @@ from clinical_trials_viz.models.plan import (
     UnsupportedPlan,
 )
 from clinical_trials_viz.planner import LLMPlanner
-from tests.conftest import ScriptedPlanner, ask
+from tests.conftest import ScriptedPlanner, ask, split_reply
 
 TREND = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"]), group_by=Dimension.START_YEAR)
 
@@ -153,14 +153,16 @@ async def test_llm_planner_wiring_with_tool_output(make_client):
     """The real pydantic-ai planner, with a function standing in for the provider."""
 
     def model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
-        # The model sees three tools; multi-part messages are split by code before they reach it.
+        if reply := split_reply(messages, info):  # the split step: one question
+            return reply
+        # Planning sees three tools; the message was split into questions before it reached planning.
         assert {t.name for t in info.output_tools} == {"answer_plan", "clarify_plan", "unsupported_plan"}
         args = {"operation": "aggregate", "filters": {"drugs": ["Keytruda"]}, "group_by": "start_year"}
         return ModelResponse(parts=[ToolCallPart("answer_plan", args)])
 
     body = await ask(make_client, LLMPlanner(FunctionModel(model)), query="Keytruda trials per year")
     assert body["outcome"] == "success"
-    assert body["model_calls"] == 1
+    assert body["model_calls"] == 2  # the split step and the plan
 
 
 def test_build_planner_uses_only_models_with_keys(monkeypatch):
@@ -573,6 +575,50 @@ async def test_multi_part_question_is_split_by_code_and_each_part_planned_alone(
         assert chart.status_code == 200 and chart.content.startswith(b"\x89PNG")
         assert (await client.get(f"/v1/runs/{body['run_id']}/vega-lite.json", params={"part": 1})).status_code == 200
         assert (await client.get(f"/v1/runs/{body['run_id']}/chart.png", params={"part": 2})).status_code == 404
+
+
+async def test_the_split_step_separates_what_the_code_splitter_misses(make_client):
+    message = "Show the phases of melanoma trials. Also, who are the top sponsors?"
+    parts = ["Show the phases of melanoma trials", "Who are the top lead sponsors of melanoma trials?"]
+    by_phase = AnswerPlan(
+        operation=Operation.AGGREGATE, filters=Filters(conditions=["melanoma"]), group_by=Dimension.PHASE
+    )
+    by_sponsor = by_phase.model_copy(update={"group_by": Dimension.LEAD_SPONSOR})
+    planner = ScriptedPlanner(by_phase, by_sponsor, splits={message: parts})
+    body = await ask(make_client, planner, query=message)
+    assert [c["question"] for c in planner.calls] == parts  # standalone questions, planned one by one
+    assert len(body["additional_answers"]) == 1
+    assert body["additional_answers"][0]["applied_filters"]["conditions"] == ["melanoma"]
+
+
+def _split_then_plan(split: list[str] | None):
+    """A model that answers the split step with `split` (None: an unusable reply) and every plan with TREND."""
+
+    def respond(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        if any(t.name == "separate_requests" for t in info.output_tools):
+            if split is None:  # an unusable reply: text instead of the list
+                return ModelResponse(parts=[TextPart("These look like two questions.")])
+            return ModelResponse(parts=[ToolCallPart("separate_requests", {"requests": split})])
+        args = {"operation": "aggregate", "filters": {"drugs": ["Keytruda"]}, "group_by": "start_year"}
+        return ModelResponse(parts=[ToolCallPart("answer_plan", args)])
+
+    return FunctionModel(respond, model_name="split-model")
+
+
+async def test_the_model_splits_a_message_and_the_call_is_counted(make_client):
+    message = "1) Keytruda trials per year 2) Keytruda trials per year since 2015"
+    planner = LLMPlanner(_split_then_plan(["Keytruda trials per year", "Keytruda trials per year since 2015"]))
+    body = await ask(make_client, planner, query=message)
+    assert len(body["additional_answers"]) == 1
+    assert body["model_calls"] == 3  # one split call, one plan per part
+
+
+async def test_a_failed_split_call_falls_back_to_the_code_splitter(make_client):
+    planner = LLMPlanner(_split_then_plan(None))
+    body = await ask(make_client, planner, query="Show Keytruda trials per year, and show Keytruda trials by phase")
+    assert len(body["additional_answers"]) == 1  # the code splitter still found both parts
+    assert any("could not be split by the model" in w for w in body["warnings"])
+    assert body["model_calls"] == 4  # two unusable split replies (one retry), then one plan per part
 
 
 async def test_parts_fail_independently(make_client, ctgov, page):
