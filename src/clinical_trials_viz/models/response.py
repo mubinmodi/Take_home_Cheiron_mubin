@@ -80,6 +80,9 @@ class Clarification(BaseModel):
 
     field: str = Field(description="Request field to fill with the answer, e.g. 'sponsor' or 'drug_name'.")
     question: str
+    reason: str | None = Field(
+        default=None, description="'conflict' when a structured field contradicts the question; the answer is final."
+    )
     options: list[ClarificationOption] = Field(default_factory=list)
     multi_select: bool = False
     allow_free_text: bool = False

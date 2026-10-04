@@ -99,12 +99,11 @@ Defaults: never ask about these; just use them:
 Clarify only for:
 - `missing_reference`: "this drug" / "that condition" with no structured field to resolve it.
 - `drug_class`: the user names a drug class instead of drugs. Set `term` to the class name.
-- `conflict`: a structured field and the question name different values for the same filter.
-  Put both values in `mentioned_values`.
 - `missing_comparison`: "compare these" without naming the sides.
 
-Structured fields, when present, are authoritative values for the matching filters and resolve
-references like "this drug". Follow-ups: when a previous plan is shown, decide whether the new
+Structured fields resolve references like "this drug". When the question itself names a value,
+put the question's value in the filter even if a structured field differs; never ask about that,
+code compares them. Follow-ups: when a previous plan is shown, decide whether the new
 message refines it (relation "refine": keep its filters and change only what the user asks) or
 starts a new question (relation "new")."""
 

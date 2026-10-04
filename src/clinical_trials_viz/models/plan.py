@@ -109,7 +109,6 @@ class AnswerPlan(BaseModel):
 class ClarificationReason(StrEnum):
     MISSING_REFERENCE = "missing_reference"  # "this drug" with nothing to resolve it
     DRUG_CLASS = "drug_class"  # a class such as "PD-1 inhibitors" instead of named drugs
-    CONFLICT = "conflict"  # a structured field and the question name different values
     MISSING_COMPARISON = "missing_comparison"  # "compare these" with sides not named
 
 
@@ -122,7 +121,6 @@ class ClarifyPlan(BaseModel):
     reason: ClarificationReason
     field: Literal["drug", "condition", "sponsor", "country", "compare_sides"]
     term: str | None = Field(default=None, description="The unclear term from the question, e.g. 'PD-1 inhibitors'.")
-    mentioned_values: list[str] = Field(default_factory=list, description="Conflicting values the user wrote.")
     question: str = Field(description="Short question to show the user.")
 
 

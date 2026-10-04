@@ -6,7 +6,7 @@ import httpx
 from pydantic_ai.messages import ModelMessage, ModelResponse, ToolCallPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
-from clinical_trials_viz.catalog import Dimension
+from clinical_trials_viz.catalog import Dimension, Phase
 from clinical_trials_viz.config import Settings
 from clinical_trials_viz.models.plan import (
     AnswerPlan,
@@ -723,3 +723,77 @@ async def test_scatter_with_no_enrollment_is_no_data(make_client, ctgov, page):
     body = await ask(make_client, ScriptedPlanner(plan), query="Enrollment vs duration for Keytruda trials")
     assert body["outcome"] == "no_data"
     assert "report" in body["message"] and "enrollment" in body["message"]
+
+
+# --- A structured field that contradicts the question (code asks; harness-design: never pick one) ---
+
+
+def _no_nivolumab(page):
+    """Mock search: nivolumab finds nothing, everything else the pembrolizumab page."""
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if "nivolumab" in str(request.url).lower():
+            return httpx.Response(200, json={"studies": [], "totalCount": 0})
+        return httpx.Response(200, json=page)
+
+    return respond
+
+
+async def test_a_drug_conflict_is_asked_and_each_option_is_final(make_client, ctgov, page):
+    ctgov.get("/studies").mock(side_effect=_no_nivolumab(page))
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["nivolumab"]))
+    question = {"query": "How many nivolumab trials are there?", "drug_name": "Pembrolizumab"}
+    async for client in make_client(ScriptedPlanner(plan, plan, plan)):
+        first = (await client.post("/v1/query", json=question)).json()
+        assert first["outcome"] == "clarification_required"
+        c = first["clarification"]
+        assert c["field"] == "drug_name" and c["reason"] == "conflict"
+        assert [(o["label"], o["value"]) for o in c["options"]] == [
+            ("nivolumab (your question)", ["nivolumab"]),
+            ("Pembrolizumab (your filters)", ["Pembrolizumab"]),
+        ]
+        outcomes = {}
+        for option in c["options"]:
+            body = {**question, "drug_name": option["value"], "previous_run_id": first["run_id"]}
+            response = await client.post("/v1/query", json=body)
+            assert response.status_code == 200, response.text
+            answer = response.json()
+            assert answer["applied_filters"]["drugs"] == option["value"]
+            outcomes[option["value"][0]] = answer["outcome"]
+        assert outcomes == {"nivolumab": "no_data", "Pembrolizumab": "success"}  # never asked again
+
+
+async def test_a_phase_conflict_offers_valid_phase_values(make_client):
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"], phases=[Phase.PHASE3]))
+    question = {"query": "How many phase 3 Keytruda trials?", "trial_phase": "PHASE2"}
+    async for client in make_client(ScriptedPlanner(plan, plan, plan)):
+        first = (await client.post("/v1/query", json=question)).json()
+        assert first["outcome"] == "clarification_required"
+        c = first["clarification"]
+        assert c["field"] == "trial_phase"
+        assert [(o["label"], o["value"]) for o in c["options"]] == [
+            ("Phase 3 (your question)", ["PHASE3"]),
+            ("Phase 2 (your filters)", ["PHASE2"]),
+        ]
+        for option in c["options"]:
+            body = {**question, "trial_phase": option["value"], "previous_run_id": first["run_id"]}
+            response = await client.post("/v1/query", json=body)
+            assert response.status_code == 200, response.text  # option values pass request validation
+            answer = response.json()
+            assert answer["outcome"] != "clarification_required"
+            assert answer["applied_filters"]["phases"] == option["value"]
+
+
+async def test_a_country_conflict_is_asked(make_client):
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"], countries=["Germany"]))
+    body = await ask(make_client, ScriptedPlanner(plan), query="Keytruda trials in Germany", country="South Korea")
+    assert body["outcome"] == "clarification_required"
+    assert [o["value"] for o in body["clarification"]["options"]] == [["Germany"], ["South Korea"]]
+
+
+async def test_a_brand_name_and_its_generic_name_are_not_a_conflict(make_client):
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["Keytruda"]))
+    body = await ask(make_client, ScriptedPlanner(plan), query="How many Keytruda trials?", drug_name="Pembrolizumab")
+    assert body["outcome"] == "success"
+    assert body["applied_filters"]["drugs"] == ["Pembrolizumab"]
+    assert any("same drug" in a for a in body["assumptions"])

@@ -16,7 +16,7 @@
 | SRC-01 | verified | Live API at request time; examples carry data timestamp 2026-10-02T09:00:04; test fixtures are saved real records (`tests/fixtures/`) | — |
 | IN-01 | verified | `query` required; missing, empty, whitespace-only, non-string, over-long and unknown-field requests each return 422 with a message (checked 2026-10-04) | — |
 | IN-03 | verified | README §3 field table; `GET /v1/schema` | — |
-| IN-04 | verified | Example 01 (`drug_name: Pembrolizumab` resolves "this drug"); `tests/test_api.py`; conflicts: eval `clarify-03` and `tests/test_contracts.py` | Spotting a conflict is the planner's job; an unflagged one is reported as an assumption |
+| IN-04 | verified | Example 01 (`drug_name: Pembrolizumab` resolves "this drug"); `tests/test_api.py`; conflicts: code compares the question with the fields and asks (`tests/test_api.py`, checked live 2026-10-04) | — |
 | OUT-01 – OUT-06 | verified | `models/spec.py`; README §4; the verifier's `encoded_fields_exist` check | — |
 | OUT-08 | verified | README §4, "Visualization Specification" (our own spec; Vega-Lite only renders it) | — |
 | VIS-01 | verified | Every successful answer carries a visualization (single numbers as `single_value`, lists as `table`) | — |

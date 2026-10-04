@@ -485,15 +485,20 @@
     {
       "id": "clarify-03",
       "family": "clarification",
-      "appendix": "(conflict with a structured field)",
+      "appendix": "(conflict with a structured field: the planner reads the question; code compares and asks)",
       "question": "Show nivolumab trials by phase",
       "fields": {
         "drug_name": "Pembrolizumab"
       },
       "expect": {
-        "kind": "clarify",
-        "reason": "conflict",
-        "field": "drug"
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "phase",
+        "filters": {
+          "drugs": [
+            "nivolumab"
+          ]
+        }
       }
     },
     {

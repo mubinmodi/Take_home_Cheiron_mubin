@@ -2,11 +2,13 @@
 
 from collections import Counter
 
-from clinical_trials_viz.catalog import DRUG_CLASS_OPTIONS, SPONSOR_AMBIGUITY_MIN_SHARE
+from clinical_trials_viz.catalog import DRUG_CLASS_OPTIONS, PHASE_LABELS, SPONSOR_AMBIGUITY_MIN_SHARE
+from clinical_trials_viz.cohort import resolve_drug_identity
 from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.ctgov.trial import Trial, drug_identities, parse_trial
 from clinical_trials_viz.models.plan import ClarificationReason, ClarifyPlan
 from clinical_trials_viz.models.response import Clarification, ClarificationOption
+from clinical_trials_viz.validate import Conflict
 
 # Plan field -> request field the answer goes back in.
 _REQUEST_FIELD = {
@@ -22,18 +24,60 @@ async def from_plan(plan: ClarifyPlan, client: CtGovClient, structured: dict[str
     field = _REQUEST_FIELD[plan.field]
     if plan.reason is ClarificationReason.DRUG_CLASS and plan.term:
         return await drug_class_options(plan.term, client)
-    if plan.reason is ClarificationReason.CONFLICT:
-        values = list(dict.fromkeys([*plan.mentioned_values, *_as_strings(structured.get(field))]))
-        return Clarification(
-            field=field, question=plan.question, options=[ClarificationOption(label=v, value=v) for v in values]
-        )
     return Clarification(field=field, question=plan.question, allow_free_text=True)
 
 
-def _as_strings(value: object) -> list[str]:
-    if value is None:
-        return []
-    return [str(v) for v in value] if isinstance(value, list) else [str(value)]
+# Request field -> how the user would call it.
+_FIELD_NAMES = {
+    "drug_name": "drug",
+    "condition": "condition",
+    "trial_phase": "phase",
+    "country": "country",
+    "status": "status",
+    "start_year": "start year",
+    "end_year": "end year",
+    "nct_id": "trial",
+}
+
+
+def show_value(value: object) -> str:
+    """A request field value as the user reads it: 'Phase 3', 'Germany, France', '2020'."""
+    values = value if isinstance(value, list) else [value]
+    return ", ".join(PHASE_LABELS.get(str(v), str(v)) for v in values)
+
+
+def conflict_question(conflict: Conflict) -> Clarification:
+    """Ask which value is meant. Both options are valid values of the request field, built by code."""
+    name, asked, given = (
+        _FIELD_NAMES[conflict.request_field],
+        show_value(conflict.question_value),
+        show_value(conflict.field_value),
+    )
+    return Clarification(
+        field=conflict.request_field,
+        reason="conflict",
+        question=f"Your question says {asked}, but your filters say {given}. Which {name} do you mean?",
+        options=[
+            ClarificationOption(label=f"{asked} (your question)", value=conflict.question_value),  # type: ignore[arg-type]
+            ClarificationOption(label=f"{given} (your filters)", value=conflict.field_value),  # type: ignore[arg-type]
+        ],
+    )
+
+
+async def same_drug(names: list[str], others: list[str], client: CtGovClient) -> str | None:
+    """The standard drug name when two sets of drug names are the same drug (e.g. Keytruda and
+    pembrolizumab both resolve to the MeSH term 'pembrolizumab'); None when they differ or are unknown."""
+    identities = []
+    for group in (names, others):
+        found = set()
+        for name in group:
+            result = await client.search({"query.intr": name}, max_pages=1, allow_partial=True)
+            identity = resolve_drug_identity([parse_trial(s) for s in result.studies])
+            if identity is None:
+                return None
+            found.add(identity)
+        identities.append(found)
+    return ", ".join(sorted(identities[0])) if identities[0] == identities[1] else None
 
 
 async def drug_class_options(term: str, client: CtGovClient) -> Clarification:

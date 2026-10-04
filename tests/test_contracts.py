@@ -7,7 +7,7 @@ from clinical_trials_viz import clarify
 from clinical_trials_viz.analyze import breakdown
 from clinical_trials_viz.catalog import Dimension, OverallStatus, Phase
 from clinical_trials_viz.cohort import build_params
-from clinical_trials_viz.models.plan import AnswerPlan, ClarificationReason, ClarifyPlan, Filters, Operation
+from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import AppliedFilters
 from clinical_trials_viz.models.spec import VisualizationType
@@ -249,26 +249,25 @@ def test_network_datums_get_citations_and_checks(trials):
 # --- Structured fields against the question ---------------------------------------------------------
 
 
-def test_a_structured_field_that_overrides_the_question_is_reported():
+def test_the_gate_finds_a_structured_field_that_contradicts_the_question():
     plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["nivolumab"]), group_by=Dimension.PHASE)
     result = check_plan(plan, QueryRequest(query="Nivolumab trials by phase", drug_name="Pembrolizumab"), set())
-    assert result.filters.drugs == ["Pembrolizumab"]  # the field wins...
-    assert "Used your drug_name field (pembrolizumab); the question says nivolumab." in result.assumptions  # ...openly
+    assert [(c.request_field, c.question_value, c.field_value) for c in result.conflicts] == [
+        ("drug_name", ["nivolumab"], ["Pembrolizumab"])
+    ]
     same = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(countries=["USA"]), group_by=Dimension.PHASE)
     quiet = check_plan(same, QueryRequest(query="US trials", country="United States"), {"United States"})
-    assert not any(a.startswith("Used your") for a in quiet.assumptions)  # an alias is not a conflict
+    assert not quiet.conflicts  # an alias is not a conflict
 
 
-async def test_a_conflict_clarification_offers_both_values():
-    plan = ClarifyPlan(
-        reason=ClarificationReason.CONFLICT,
-        field="drug",
-        mentioned_values=["nivolumab"],
-        question="Your drug field says Pembrolizumab but the question says nivolumab. Which one?",
-    )
-    clarification = await clarify.from_plan(plan, client=None, structured={"drug_name": ["Pembrolizumab"]})  # type: ignore[arg-type]
-    assert clarification.field == "drug_name"
-    assert [o.value for o in clarification.options] == ["nivolumab", "Pembrolizumab"]
+def test_a_conflict_clarification_offers_both_values_as_valid_field_values():
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(phases=[Phase.PHASE3]))
+    (conflict,) = check_plan(plan, QueryRequest(query="Phase 3 trials", trial_phase="PHASE2"), set()).conflicts
+    clarification = clarify.conflict_question(conflict)
+    assert clarification.field == "trial_phase" and clarification.reason == "conflict"
+    assert [o.label for o in clarification.options] == ["Phase 3 (your question)", "Phase 2 (your filters)"]
+    for option in clarification.options:
+        QueryRequest(query="Phase 3 trials", trial_phase=option.value)  # type: ignore[arg-type]  # validates
 
 
 def test_recruiting_by_country_says_which_status_is_meant():

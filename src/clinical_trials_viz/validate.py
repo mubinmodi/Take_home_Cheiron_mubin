@@ -10,11 +10,21 @@ from clinical_trials_viz.models.response import AppliedFilters
 
 
 @dataclass
+class Conflict:
+    """A structured field that contradicts the question, with both values as the field takes them."""
+
+    request_field: str  # e.g. "trial_phase"
+    question_value: object  # e.g. ["PHASE3"]
+    field_value: object  # e.g. ["PHASE2"]
+
+
+@dataclass
 class GateResult:
     filters: AppliedFilters
     errors: list[str] = field(default_factory=list)  # fixable by the model (repair once)
     unsupported: str | None = None  # valid plan the service cannot run yet
     assumptions: list[str] = field(default_factory=list)
+    conflicts: list[Conflict] = field(default_factory=list)  # the structured field is applied until answered
 
 
 # Sponsor categories are values of the sponsor_class dimension, never sponsor names.
@@ -78,18 +88,24 @@ def _as_set(value: object) -> set[str]:
     return {COUNTRY_ALIASES.get(w, w).lower() for w in words}  # "USA" and "United States" agree
 
 
-def _overridden_by_fields(plan: AnswerPlan, request: QueryRequest) -> list[str]:
-    """Structured fields win over the question. When the planner read a different value from the question
-    and did not ask (a conflict it should flag), say which value was used rather than override silently."""
-    notes = []
+def _request_value(filter_field: str, value: object) -> object:
+    """A plan filter value in the form its structured request field takes (phases as 'PHASE3')."""
+    if isinstance(value, list):
+        return [str(getattr(v, "value", v)) for v in value]
+    return value
+
+
+def find_conflicts(plan: AnswerPlan, request: QueryRequest) -> list[Conflict]:
+    """Filters where the question names a different value from the structured field. Code asks which
+    one is meant (harness-design: never pick one); aliases such as "USA" and "United States" agree."""
+    conflicts = []
     for request_field, filter_field in _PINNED_FIELDS.items():
         asked, given = getattr(plan.filters, filter_field), getattr(request, request_field)
         if asked and given and _as_set(asked) != _as_set(given):
-            shown = ", ".join(sorted(_as_set(asked)))
-            notes.append(
-                f"Used your {request_field} field ({', '.join(sorted(_as_set(given)))}); the question says {shown}."
+            conflicts.append(
+                Conflict(request_field, _request_value(filter_field, asked), _request_value(filter_field, given))
             )
-    return notes
+    return conflicts
 
 
 def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str]) -> GateResult:
@@ -163,7 +179,7 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
             result.assumptions.append(
                 "Status filters use the trial's overall status; its sites are counted whatever their own status."
             )
-    result.assumptions.extend(_overridden_by_fields(plan, request))
+    result.conflicts = find_conflicts(plan, request)
     if filters.sponsor and not filters.sponsor_exact and filters.sponsor_role == "lead":
         result.assumptions.append(f"'{filters.sponsor}' is matched as the lead sponsor (collaborators not included).")
     return result
