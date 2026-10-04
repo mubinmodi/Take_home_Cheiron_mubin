@@ -171,7 +171,7 @@ Only `query` is required. Every other field pins a filter, so the model does not
 
 If a structured field and the question name different values for the same filter, the planner asks which one you mean (a multiple-choice clarification listing both; eval case `clarify-03`). If it does not flag the conflict, the structured field is used and the answer says so in its assumptions ("Used your drug_name field (pembrolizumab); the question says nivolumab.").
 
-**Idempotent retries.** Send an optional `Idempotency-Key` header (up to 255 characters) to make retries safe:
+**Idempotent retries.** Send an optional `Idempotency-Key` header (up to 255 characters) to make retries safe. Keys belong to the user who sent them: the same key from another API key is a new request.
 
 | Case | Response |
 |---|---|

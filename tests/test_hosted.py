@@ -249,6 +249,20 @@ async def test_a_replay_does_not_count_against_the_limit(make_client, settings):
         assert (await client.post("/v1/query", json=QUESTION)).status_code == 429  # a new question is over
 
 
+async def test_idempotency_keys_are_scoped_per_user(make_client, settings):
+    settings.api_keys = SecretStr(f"alice:{ALICE},bob:{BOB}")
+    settings.user_queries_per_hour = 1
+    async for client in make_client(ScriptedPlanner(TREND, TREND)):
+        same_key = {"Idempotency-Key": "shared-7"}
+        alice = await client.post("/v1/query", json=QUESTION, headers={**same_key, "X-API-Key": ALICE})
+        bob = await client.post("/v1/query", json=QUESTION, headers={**same_key, "X-API-Key": BOB})
+        assert alice.status_code == bob.status_code == 200
+        assert "Idempotent-Replayed" not in bob.headers  # Bob's request runs, and counts against Bob
+        assert alice.json()["run_id"] != bob.json()["run_id"]
+        again = await client.post("/v1/query", json=QUESTION, headers={"X-API-Key": BOB})
+        assert again.status_code == 429
+
+
 async def test_user_limits_hold_across_instances():
     redis = fakeredis.FakeAsyncRedis()
     one, other = RedisUserLimiter(redis, per_hour=2), RedisUserLimiter(redis, per_hour=2)

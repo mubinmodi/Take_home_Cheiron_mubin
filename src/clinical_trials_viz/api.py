@@ -154,7 +154,8 @@ def create_app(
         if users and user is None:
             raise http_error(401, "unauthorized", "Send a valid API key in the X-API-Key header.")
         keys: KeyStore = app.state.idempotency
-        if idempotency_key:
+        if idempotency_key:  # scoped per user, so one user's key never replays another user's run
+            idempotency_key = f"{user or 'anonymous'}:{idempotency_key}"
             try:
                 replay = await keys.begin(idempotency_key, request)
             except KeyReused as exc:
