@@ -6,6 +6,17 @@ ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 REGISTRY="$ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
 SERVICE_ARN="arn:aws:ecs:$AWS_REGION:$ACCOUNT:service/default/$NAME"
 
+with_settings() {  # with_settings JSON: the container JSON with the image $IMAGE and the SET_ENV settings applied
+  printf '%s' "$1" | python3 -c '
+import json, sys
+c = json.load(sys.stdin)
+c["image"] = sys.argv[1]
+env = {e["name"]: e["value"] for e in c.get("environment", [])}
+env.update(pair.split("=", 1) for pair in sys.argv[2].split())  # SET_ENV="NAME=value NAME=value"
+c["environment"] = [{"name": k, "value": v} for k, v in env.items()]
+print(json.dumps(c))' "$IMAGE" "${SET_ENV:-}"
+}
+
 container_json() {  # container_json IMAGE: the app container with its settings and secrets
   local secrets="" var arn
   for var in OPENAI_API_KEY ANTHROPIC_API_KEY API_KEYS DATABASE_URL REDIS_URL; do

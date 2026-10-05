@@ -24,7 +24,7 @@ aws ecs create-express-gateway-service \
   --service-name "$NAME" \
   --execution-role-arn "arn:aws:iam::$ACCOUNT:role/ecsTaskExecutionRole" \
   --infrastructure-role-arn "arn:aws:iam::$ACCOUNT:role/ecsInfrastructureRoleForExpressServices" \
-  --primary-container "$(container_json "$IMAGE")" \
+  --primary-container "$(with_settings "$(container_json "$IMAGE")")" \
   --cpu 512 --memory 1024 --cpu-architecture ARM64 \
   --health-check-path /health \
   --scaling-target '{"minTaskCount": 1, "maxTaskCount": 2}' \

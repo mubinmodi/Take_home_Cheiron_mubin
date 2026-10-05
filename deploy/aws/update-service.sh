@@ -17,14 +17,7 @@ docker push "$IMAGE"
 
 CURRENT=$(aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" \
   --query 'service.activeConfigurations[0].primaryContainer' --output json)
-UPDATED=$(printf '%s' "$CURRENT" | python3 -c '
-import json, sys
-c = json.load(sys.stdin)
-c["image"] = sys.argv[1]
-env = {e["name"]: e["value"] for e in c.get("environment", [])}
-env.update(pair.split("=", 1) for pair in sys.argv[2].split())  # SET_ENV="NAME=value NAME=value"
-c["environment"] = [{"name": k, "value": v} for k, v in env.items()]
-print(json.dumps(c))' "$IMAGE" "${SET_ENV:-}")
+UPDATED=$(with_settings "$CURRENT")
 echo "Switching $NAME to $IMAGE"
 aws ecs update-express-gateway-service --service-arn "$SERVICE_ARN" --primary-container "$UPDATED" \
   --query 'service.status.statusCode' --output text

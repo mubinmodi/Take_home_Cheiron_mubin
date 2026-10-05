@@ -125,13 +125,15 @@ On AWS it runs on **ECS Express Mode** (App Runner closed to new customers in Ap
 
 ```bash
 API_KEYS=you:a-long-random-key docker compose up --build   # the hosted mode on this machine, with Redis and Postgres
+deploy/aws/deploy.sh                                        # everything in one command: sets up what is missing, ships, smoke-tests
+DRY_RUN=1 deploy/aws/deploy.sh                              # the same, read-only: lists what it would create or change
 deploy/aws/create-service.sh                                # create the ECS Express Mode service (after the one-time setup)
 TAG=v6 deploy/aws/update-service.sh                         # roll out new code: build, push, rolling update with rollback
 TAG=v6 SET_ENV="OPEN_ACCESS=true" deploy/aws/update-service.sh   # the same, also changing settings
 deploy/smoke-test.sh https://YOUR-SERVICE-URL               # health, a question, a follow-up and a chart
 ```
 
-The hosted mode refuses to start without Redis, Postgres and API keys (API keys may be left out only with `OPEN_ACCESS=true`). The one-time AWS setup (registry, roles, database, cache, secrets) is listed command by command in [`docs/hosted-deployment.md`](docs/hosted-deployment.md#aws-deployment-2026-10-04), with costs (roughly $50–60 a month while running) and teardown. Every question costs 2–5 model calls (one split call, two if the primary model fails, then up to three planning calls); the per-user limit caps that (with open access, nothing does: tear the service down after the review).
+The hosted mode refuses to start without Redis, Postgres and API keys (API keys may be left out only with `OPEN_ACCESS=true`). `deploy/aws/deploy.sh` runs the whole deployment and is safe to run again: each step checks what exists and skips it, and secret values are never printed. The same one-time setup (registry, roles, database, cache, secrets) is also listed command by command in [`docs/hosted-deployment.md`](docs/hosted-deployment.md#aws-deployment-2026-10-04), with costs (roughly $50–60 a month while running) and teardown. Every question costs 2–5 model calls (one split call, two if the primary model fails, then up to three planning calls); the per-user limit caps that (with open access, nothing does: tear the service down after the review).
 
 ---
 

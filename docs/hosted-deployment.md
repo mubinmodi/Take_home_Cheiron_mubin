@@ -77,6 +77,8 @@ Done step by step with the user, who ran each command. Account: "Idea Incubator"
 
 ### One-time setup
 
+`deploy/aws/deploy.sh` does all of this, and the deployment after it, in one command (`DRY_RUN=1` first to see what it would change). It is safe to run again: each step checks what exists and skips it. The commands below are what it runs.
+
 All commands run with `--profile incubator` and region us-east-2 (`aws configure set region us-east-2 --profile incubator`).
 
 ```bash

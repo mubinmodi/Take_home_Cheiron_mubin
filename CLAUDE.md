@@ -59,6 +59,7 @@ uv run python -m evals.run [case-id ...]       # score the planner on evals/ques
 uv run pytest tests/test_api.py::test_compare_has_overlap_group   # one test
 uv run ruff check src tests && uv run ruff format src tests && uv run pyright
 API_KEYS=you:a-long-random-key docker compose up --build   # hosted mode locally (service + Redis + Postgres)
+deploy/aws/deploy.sh                                        # whole AWS deployment in one command (DRY_RUN=1 to preview; safe to re-run)
 TAG=v2 deploy/aws/update-service.sh                         # roll out new code on AWS; deploy/smoke-test.sh URL checks it
 ```
 
