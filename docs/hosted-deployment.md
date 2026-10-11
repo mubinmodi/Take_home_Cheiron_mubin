@@ -131,7 +131,7 @@ Verified live: `/health`, a question (melanoma trials by country), a follow-up r
 
 Running costs are roughly $50–60 a month, paid from the free plan's credits: the load balancer (~$16 + usage), one Fargate task with 0.5 vCPU and 1 GB on ARM (~$15), RDS db.t4g.micro with 20 GB (~$14), ElastiCache Serverless at its minimum (~$6), and Secrets Manager (6 secrets, ~$2.40). Every question also costs 2–5 model calls (one split call, two if the primary model fails, then up to three planning calls), which the per-user limit caps.
 
-To delete everything, in this order:
+To delete everything, run `deploy/aws/teardown.sh` (`DRY_RUN=1` first to see what it would delete). It asks you to type the service name, deletes in the order below, waits for each step and skips what is already gone. The commands it runs, in this order:
 
 ```bash
 aws ecs delete-express-gateway-service --service-arn arn:aws:ecs:us-east-2:ACCOUNT:service/default/clinical-trials-viz

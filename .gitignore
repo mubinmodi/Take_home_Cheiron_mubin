@@ -17,3 +17,6 @@ dist/
 # The assignment (screenshots and transcription) stays on the author's machine only (not published)
 docs/assignment-images/
 docs/take-home-assignment.md
+
+# Local agent notes (e.g. for Codex): never committed or shipped
+AGENTS.md

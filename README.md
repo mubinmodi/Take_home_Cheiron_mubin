@@ -127,6 +127,7 @@ On AWS it runs on **ECS Express Mode** (App Runner closed to new customers in Ap
 API_KEYS=you:a-long-random-key docker compose up --build   # the hosted mode on this machine, with Redis and Postgres
 deploy/aws/deploy.sh                                        # everything in one command: sets up what is missing, ships, smoke-tests
 DRY_RUN=1 deploy/aws/deploy.sh                              # the same, read-only: lists what it would create or change
+deploy/aws/teardown.sh                                      # delete the whole deployment (DRY_RUN=1 to preview; asks to confirm)
 deploy/aws/create-service.sh                                # create the ECS Express Mode service (after the one-time setup)
 TAG=v6 deploy/aws/update-service.sh                         # roll out new code: build, push, rolling update with rollback
 TAG=v6 SET_ENV="OPEN_ACCESS=true" deploy/aws/update-service.sh   # the same, also changing settings
