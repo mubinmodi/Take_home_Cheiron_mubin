@@ -252,7 +252,7 @@ TIMELINE_MAX_ROWS = 50
 # Structured request fields that pin a filter: request field -> (applied filter, what the user calls it).
 # Ambiguity rule (harness-design: conflict): when the question names a different value for one of these,
 # code asks which one is meant, offering both as valid values of the field; the answer is final.
-# Sponsor is pinned as exact lead sponsor names (see validate.merge_filters), with two exceptions:
+# Sponsor is pinned as exact lead sponsor names (see filters.AppliedFilters.merge), with two exceptions:
 # - a question's sponsor term ("Merck") agrees with field names that contain it ("Merck Sharp & Dohme
 #   LLC"), so a sponsor conflict needs a field name that does not; every name must agree;
 # - a field that repeats the question's own term is searched as a lead sponsor name, not matched exactly,

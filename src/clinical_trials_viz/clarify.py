@@ -2,13 +2,12 @@
 
 from collections import Counter
 
-from clinical_trials_viz.catalog import DRUG_CLASS_OPTIONS, PHASE_LABELS, PINNED_FIELDS, SPONSOR_AMBIGUITY_MIN_SHARE
+from clinical_trials_viz.catalog import DRUG_CLASS_OPTIONS, SPONSOR_AMBIGUITY_MIN_SHARE
 from clinical_trials_viz.cohort import resolve_drug_identity
 from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.ctgov.trial import Trial, drug_identities, parse_trial
 from clinical_trials_viz.models.plan import ClarificationReason, ClarifyPlan
 from clinical_trials_viz.models.response import Clarification, ClarificationOption
-from clinical_trials_viz.validate import Conflict, FieldValue
 
 # Plan field -> request field the answer goes back in.
 _REQUEST_FIELD = {
@@ -25,30 +24,6 @@ async def from_plan(plan: ClarifyPlan, client: CtGovClient, structured: dict[str
     if plan.reason is ClarificationReason.DRUG_CLASS and plan.term:
         return await drug_class_options(plan.term, client)
     return Clarification(field=field, question=plan.question, allow_free_text=True)
-
-
-def show_value(value: FieldValue) -> str:
-    """A request field value as the user reads it: 'Phase 3', 'Germany, France', '2020'."""
-    values = value if isinstance(value, list) else [value]
-    return ", ".join(PHASE_LABELS.get(str(v), str(v)) for v in values)
-
-
-def conflict_question(conflict: Conflict) -> Clarification:
-    """Ask which value is meant. Both options are valid values of the request field, built by code."""
-    name, asked, given = (
-        PINNED_FIELDS[conflict.request_field][1],
-        show_value(conflict.question_value),
-        show_value(conflict.field_value),
-    )
-    return Clarification(
-        field=conflict.request_field,
-        reason="conflict",
-        question=f"Your question says {asked}, but your filters say {given}. Which {name} do you mean?",
-        options=[
-            ClarificationOption(label=f"{asked} (your question)", value=conflict.question_value),
-            ClarificationOption(label=f"{given} (your filters)", value=conflict.field_value),
-        ],
-    )
 
 
 async def same_drug(names: list[str], others: list[str], client: CtGovClient) -> str | None:

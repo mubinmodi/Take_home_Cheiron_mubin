@@ -3,10 +3,9 @@
 import pytest
 from pydantic import ValidationError
 
-from clinical_trials_viz import clarify
+from clinical_trials_viz import conflicts
 from clinical_trials_viz.analyze import breakdown
 from clinical_trials_viz.catalog import Dimension, OverallStatus, Phase
-from clinical_trials_viz.cohort import build_params
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import AppliedFilters
@@ -42,7 +41,7 @@ class TestRequest:
             QueryRequest(**fields)
 
 
-def test_build_params_compiles_every_filter():
+def test_api_params_compile_every_filter():
     f = AppliedFilters(
         conditions=["lung cancer"],
         phases=[Phase.PHASE2, Phase.PHASE3],
@@ -52,7 +51,7 @@ def test_build_params_compiles_every_filter():
         start_year_from=2020,
         nct_ids=["NCT02578680"],
     )
-    params = build_params(f, drug="Keytruda")
+    params = f.api_params(drug="Keytruda")
     assert params["query.intr"] == "Keytruda"
     assert params["query.cond"] == "(lung cancer)"
     assert params["filter.overallStatus"] == "RECRUITING"
@@ -64,11 +63,11 @@ def test_build_params_compiles_every_filter():
 
 
 def test_exact_and_any_sponsor_roles():
-    exact = build_params(AppliedFilters(sponsor="Merck Sharp & Dohme LLC", sponsor_exact=True))
+    exact = AppliedFilters(sponsor="Merck Sharp & Dohme LLC", sponsor_exact=True).api_params()
     assert exact["filter.advanced"] == 'AREA[LeadSponsorName]("Merck Sharp & Dohme LLC")'
-    both = build_params(AppliedFilters(sponsor="x", sponsor_exact=True, exact_sponsors=["A Inc", "B AG"]))
+    both = AppliedFilters(sponsor="x", sponsor_exact=True, exact_sponsors=["A Inc", "B AG"]).api_params()
     assert both["filter.advanced"] == 'AREA[LeadSponsorName]("A Inc" OR "B AG")'
-    assert build_params(AppliedFilters(sponsor="Merck", sponsor_role="any")) == {"query.spons": "Merck"}
+    assert AppliedFilters(sponsor="Merck", sponsor_role="any").api_params() == {"query.spons": "Merck"}
 
 
 def _time_series(trials):
@@ -296,7 +295,7 @@ def test_the_gate_finds_a_structured_field_that_contradicts_the_question():
 def test_a_conflict_clarification_offers_both_values_as_valid_field_values():
     plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(phases=[Phase.PHASE3]))
     (conflict,) = check_plan(plan, QueryRequest(query="Phase 3 trials", trial_phase="PHASE2"), set()).conflicts
-    clarification = clarify.conflict_question(conflict)
+    clarification = conflicts.conflict_question(conflict)
     assert clarification.field == "trial_phase" and clarification.reason == "conflict"
     assert [o.label for o in clarification.options] == ["Phase 3 (your question)", "Phase 2 (your filters)"]
     for option in clarification.options:

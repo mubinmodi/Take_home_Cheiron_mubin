@@ -3,21 +3,11 @@
 import re
 from dataclasses import dataclass, field
 
-from clinical_trials_viz.catalog import COUNTRY_ALIASES, DIMENSIONS, MAX_COMPARE_SIDES, PINNED_FIELDS, Dimension
+from clinical_trials_viz.catalog import COUNTRY_ALIASES, DIMENSIONS, MAX_COMPARE_SIDES, Dimension
+from clinical_trials_viz.conflicts import Conflict, find_conflicts
+from clinical_trials_viz.filters import AppliedFilters
 from clinical_trials_viz.models.plan import AnswerPlan, Operation
 from clinical_trials_viz.models.request import NCT_ID_PATTERN, QueryRequest
-from clinical_trials_viz.models.response import AppliedFilters
-
-FieldValue = list[str] | int  # a structured field's value: names or enum values, or a year
-
-
-@dataclass
-class Conflict:
-    """A structured field that contradicts the question, with both values as the field takes them."""
-
-    request_field: str  # e.g. "trial_phase"
-    question_value: FieldValue  # e.g. ["PHASE3"]
-    field_value: FieldValue  # e.g. ["PHASE2"]
 
 
 @dataclass
@@ -56,64 +46,8 @@ def normalize_country(name: str, known: set[str]) -> str | None:
     return by_lower.get(name.strip().lower())
 
 
-def _confirms_question_sponsor(plan: AnswerPlan, request: QueryRequest) -> bool:
-    """The structured sponsor repeats the question's own sponsor term (e.g. the "your question" answer
-    to a conflict): search it as a lead sponsor name, so an ambiguous name is still asked about."""
-    asked = (plan.filters.sponsor or "").strip().lower()
-    return bool(asked) and [s.strip().lower() for s in request.sponsor or []] == [asked]
-
-
-def merge_filters(plan: AnswerPlan, request: QueryRequest) -> AppliedFilters:
-    """Structured request fields are authoritative; the plan fills everything else."""
-    applied = AppliedFilters(**plan.filters.model_dump())
-    for request_field, (filter_field, _) in PINNED_FIELDS.items():
-        value = getattr(request, request_field)
-        if value and request_field != "sponsor":
-            setattr(applied, filter_field, value)
-            applied.from_request.append(filter_field)
-    if request.sponsor and _confirms_question_sponsor(plan, request):
-        applied.from_request.append("sponsor")
-    elif request.sponsor:  # structured sponsors are exact lead sponsor names (e.g. a Clarification answer)
-        applied.exact_sponsors = list(request.sponsor)
-        applied.sponsor, applied.sponsor_role, applied.sponsor_exact = " or ".join(request.sponsor), "lead", True
-        applied.from_request.append("sponsor")
-    return applied
-
-
-def _as_set(value: object) -> set[str]:
-    values = value if isinstance(value, list) else [value]
-    words = (str(getattr(v, "value", v)).strip().lower() for v in values)
-    return {COUNTRY_ALIASES.get(w, w).lower() for w in words}  # "USA" and "United States" agree
-
-
-def _request_value(value: object) -> FieldValue:
-    """A plan filter value in the form its structured request field takes (phases as 'PHASE3')."""
-    if isinstance(value, int):
-        return value
-    values = value if isinstance(value, list) else [value]
-    return [str(getattr(v, "value", v)) for v in values]
-
-
-def _differs(request_field: str, asked: object, given: object) -> bool:
-    if request_field == "sponsor":  # a term vs exact names: "Merck" agrees with "Merck Sharp & Dohme LLC"
-        term = str(asked).strip().lower()  # every name must match it: ["Merck", "Pfizer"] would widen "Merck"
-        return not all(term in name or name in term for name in _as_set(given))
-    return _as_set(asked) != _as_set(given)
-
-
-def find_conflicts(plan: AnswerPlan, request: QueryRequest) -> list[Conflict]:
-    """Filters where the question names a different value from the structured field. Code asks which
-    one is meant (catalog.PINNED_FIELDS); aliases such as "USA" and "United States" agree."""
-    conflicts = []
-    for request_field, (filter_field, _) in PINNED_FIELDS.items():
-        asked, given = getattr(plan.filters, filter_field), getattr(request, request_field)
-        if asked and given and _differs(request_field, asked, given):
-            conflicts.append(Conflict(request_field, _request_value(asked), _request_value(given)))
-    return conflicts
-
-
 def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str]) -> GateResult:
-    filters = merge_filters(plan, request)
+    filters = AppliedFilters.merge(plan, request)
     result = GateResult(filters)
     errors = result.errors
 
@@ -184,7 +118,7 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
                 "Status filters use the trial's overall status; its sites are counted whatever their own status."
             )
     result.conflicts = find_conflicts(plan, request)
-    if filters.sponsor and not filters.sponsor_exact and filters.sponsor_role == "lead":
+    if filters.sponsor_is_ambiguous_term():
         result.assumptions.append(f"'{filters.sponsor}' is matched as the lead sponsor (collaborators not included).")
     return result
 

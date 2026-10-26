@@ -195,8 +195,10 @@ Code map (`src/clinical_trials_viz/`):
 | `planning.py` | Split a multi-part question; plan each part; gate and one repair |
 | `planner.py` | The model steps (split, plan) |
 | `ledger.py` | The Run's model-call ledger: every attempt recorded once, the call caps enforced |
-| `validate.py` | Merge structured fields; semantic gate |
-| `cohort.py` | Compile filters, retrieve, drug match check |
+| `filters.py` | Everything one Filter means: merging from the plan and the structured fields, API parameters, the local check on a Trial, citation, description, Corrections |
+| `conflicts.py` | The Conflict rule: detection, "an answer is final", brand vs generic, the Clarification |
+| `validate.py` | Semantic gate |
+| `cohort.py` | Retrieve every page, drug match check |
 | `answer.py` | From a Query Plan and its Cohort to a verified answer: counting, the spec, the Evidence each chart relies on, verification, and "nothing to draw" |
 | `analyze.py`, `network.py` | All counting |
 | `spec_builder.py` | Specification and evidence |

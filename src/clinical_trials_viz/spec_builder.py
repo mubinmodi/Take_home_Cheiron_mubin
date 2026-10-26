@@ -64,35 +64,6 @@ def chart_type_for(plan: AnswerPlan) -> VisualizationType:
     return VisualizationType.BAR_CHART
 
 
-def describe_filters(filters: AppliedFilters) -> str:
-    parts: list[str] = []
-    if filters.drugs:
-        parts.append(" or ".join(filters.drugs))
-    if filters.conditions:
-        parts.append(" or ".join(filters.conditions))
-    if filters.keywords:
-        parts.append(" and ".join(f"'{k}'" for k in filters.keywords))
-    if filters.sponsor:
-        parts.append(f"{'lead sponsor' if filters.sponsor_role == 'lead' else 'sponsor'} {filters.sponsor}")
-    if filters.phases:
-        parts.append(", ".join(PHASE_LABELS[p] for p in filters.phases))
-    if filters.statuses:
-        parts.append(", ".join(s.replace("_", " ").lower() for s in filters.statuses))
-    if filters.study_types:
-        parts.append(", ".join(s.replace("_", " ").lower() for s in filters.study_types))
-    if filters.countries:
-        parts.append("in " + ", ".join(filters.countries))
-    if filters.start_year_from and filters.start_year_to:
-        parts.append(f"started {filters.start_year_from}–{filters.start_year_to}")
-    elif filters.start_year_from:
-        parts.append(f"started {filters.start_year_from} or later")
-    elif filters.start_year_to:
-        parts.append(f"started {filters.start_year_to} or earlier")
-    if filters.nct_ids:
-        parts.append(", ".join(filters.nct_ids))
-    return "; ".join(parts) if parts else "all trials"
-
-
 def _dimension_channel(dimension: Dimension) -> Channel:
     kind = FieldType.ORDINAL if DIMENSIONS[dimension].ordered else FieldType.NOMINAL
     return Channel(field=dimension.value, type=kind, title=DIMENSIONS[dimension].label)
@@ -102,7 +73,7 @@ def single_value_spec(trials: list[Trial], filters: AppliedFilters) -> Visualiza
     ids = sorted(t.nct_id for t in trials)
     return VisualizationSpec(
         type=VisualizationType.SINGLE_VALUE,
-        title=f"Number of trials: {describe_filters(filters)}",
+        title=f"Number of trials: {filters.describe()}",
         encoding=Encoding(value=COUNT),
         data=[{"label": "Trials", "trial_count": len(ids), "trial_ids": ids}],
         metadata=RenderMetadata(cohort_size=len(ids)),
@@ -124,7 +95,7 @@ def breakdown_spec(result: Breakdown, filters: AppliedFilters, cohort_size: int)
         tooltip.append(Channel(field="estimated_count", type=FieldType.QUANTITATIVE, title="With estimated start date"))
     return VisualizationSpec(
         type=VisualizationType.TIME_SERIES if time_series else VisualizationType.BAR_CHART,
-        title=f"Trials by {info.label.lower()}: {describe_filters(filters)}",
+        title=f"Trials by {info.label.lower()}: {filters.describe()}",
         subtitle=f"{cohort_size} trials",
         encoding=Encoding(x=_dimension_channel(dim), y=COUNT, tooltip=tooltip),
         data=data,
@@ -150,7 +121,7 @@ def cross_spec(cross: CrossBreakdown, filters: AppliedFilters, cohort_size: int)
     info, series_info = DIMENSIONS[dim], DIMENSIONS[series]
     return VisualizationSpec(
         type=VisualizationType.TIME_SERIES if time_series else VisualizationType.GROUPED_BAR_CHART,
-        title=f"Trials by {info.label.lower()} and {series_info.label.lower()}: {describe_filters(filters)}",
+        title=f"Trials by {info.label.lower()} and {series_info.label.lower()}: {filters.describe()}",
         subtitle=f"{cohort_size} trials",
         encoding=Encoding(x=_dimension_channel(dim), y=COUNT, color=series_channel,
                           tooltip=[_dimension_channel(dim), series_channel, COUNT]),
@@ -172,7 +143,7 @@ def comparison_spec(
 ) -> tuple[VisualizationSpec, list[str]]:
     group_channel = Channel(field="group", type=FieldType.NOMINAL, title="Comparison group")
     cohort_size = sum(len(t) for t in groups.trials.values())
-    scope = describe_filters(filters)
+    scope = filters.describe()
     title = " vs ".join(sides) + ("" if scope == "all trials" else f": {scope}")
     assumptions = [f"Trials that involve more than one compared side are shown as '{groups.overlap_label}'."]
 
@@ -261,7 +232,7 @@ def network_spec(
         title, counted = "Drugs given together in the same arm", "trials with a same-arm drug combination"
     return VisualizationSpec(
         type=VisualizationType.NETWORK_GRAPH,
-        title=f"{title}: {describe_filters(filters)}",
+        title=f"{title}: {filters.describe()}",
         subtitle=f"{cohort_size:,} {counted} · showing {len(nodes)} nodes, {len(edges)} links",
         encoding=Encoding(
             label=Channel(field="label", type=FieldType.NOMINAL, title="Name"),
@@ -290,7 +261,7 @@ def histogram_spec(histogram: Histogram, filters: AppliedFilters, cohort_size: i
     order = list(dict.fromkeys(label for label, _, _ in histogram.cells))
     return VisualizationSpec(
         type=VisualizationType.HISTOGRAM,
-        title=f"Trials by enrollment: {describe_filters(filters)}",
+        title=f"Trials by enrollment: {filters.describe()}",
         subtitle=f"{cohort_size:,} trials",
         encoding=Encoding(x=bin_channel, y=COUNT, color=type_channel, tooltip=[bin_channel, type_channel, COUNT]),
         data=data,
@@ -335,7 +306,7 @@ def table_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[Visualizat
         assumptions.append(f"Showing the {TABLE_MAX_ROWS} most recently started of {len(ordered)} trials.")
     spec = VisualizationSpec(
         type=VisualizationType.TABLE,
-        title=f"Trials: {describe_filters(filters)}",
+        title=f"Trials: {filters.describe()}",
         subtitle=f"{len(ordered)} trials",
         encoding=Encoding(columns=TABLE_COLUMNS),
         data=rows,
@@ -367,21 +338,6 @@ _CITED_FIELDS: dict[str, Callable[[Trial], Any]] = {
 def cited_value(trial: Trial, field: str) -> Any:
     """The value a Citation quotes for `field`, read from the trial record. KeyError: never cited."""
     return _CITED_FIELDS[field](trial)
-
-
-def filter_dimensions(filters: AppliedFilters) -> list[Dimension]:
-    """The source fields that decide whether a trial passes each applied filter."""
-    used = {
-        Dimension.DRUG: bool(filters.drugs),
-        Dimension.CONDITION: bool(filters.conditions),
-        Dimension.PHASE: bool(filters.phases),
-        Dimension.STATUS: bool(filters.statuses),
-        Dimension.STUDY_TYPE: bool(filters.study_types),
-        Dimension.LEAD_SPONSOR: bool(filters.sponsor),
-        Dimension.COUNTRY: bool(filters.countries),
-        Dimension.START_YEAR: bool(filters.start_year_from or filters.start_year_to),
-    }
-    return [d for d, on in used.items() if on]
 
 
 def iso_date(value: str | None) -> str | None:
@@ -426,7 +382,7 @@ def timeline_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[Visuali
     end_channel = Channel(field="end", type=FieldType.TEMPORAL, title="Primary completion")
     spec = VisualizationSpec(
         type=VisualizationType.TIMELINE,
-        title=f"Trial timeline: {describe_filters(filters)}",
+        title=f"Trial timeline: {filters.describe()}",
         subtitle=f"{len(rows)} of {len(trials)} trials",
         encoding=Encoding(
             x=start, x2=end_channel, y=trial_channel, color=dates_channel,
@@ -484,7 +440,7 @@ def scatter_spec(trials: list[Trial], filters: AppliedFilters) -> tuple[Visualiz
     color = Channel(field="values", type=FieldType.NOMINAL, title="Values")
     spec = VisualizationSpec(
         type=VisualizationType.SCATTER_PLOT,
-        title=f"Enrollment vs duration: {describe_filters(filters)}",
+        title=f"Enrollment vs duration: {filters.describe()}",
         subtitle=f"{len(points):,} of {len(trials):,} trials",
         encoding=Encoding(x=x, y=y, color=color, tooltip=[
             Channel(field="nct_id", type=FieldType.NOMINAL, title="NCT ID"),
@@ -507,9 +463,9 @@ def build_evidence(
     """One entry per cited trial, with the source values that placed it in the data: the field it
     is grouped by, every field an applied filter (or comparison side, via `extra`) relies on, and
     the record fields a per-trial chart plots (`record_fields`)."""
-    wanted: list[Dimension] = [*filter_dimensions(filters), *extra, *([dimension] if dimension else [])]
+    wanted: list[Dimension] = [*filters.cited_dimensions(), *extra, *([dimension] if dimension else [])]
     fields = [NCT_ID_FIELD, *(DIMENSIONS[d].source_field for d in wanted)]
-    if filters.sponsor and filters.sponsor_role == "any":
+    if filters.cites_collaborators():
         fields.append(COLLABORATORS_FIELD)
     fields = list(dict.fromkeys([*fields, *record_fields]))
     evidence: dict[str, EvidenceEntry] = {}

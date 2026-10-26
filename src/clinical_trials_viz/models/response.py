@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from clinical_trials_viz.catalog import OverallStatus, Phase, StudyType
+from clinical_trials_viz.filters import AppliedFilters  # re-exported: part of the response
 from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, MultiAnswerPlan, UnsupportedPlan
 from clinical_trials_viz.models.spec import VisualizationSpec
 
@@ -43,30 +43,6 @@ class ErrorInfo(BaseModel):
     code: ErrorCode
     message: str
     retryable: bool = Field(description="True when sending the same request again later may succeed.")
-
-
-class AppliedFilters(BaseModel):
-    """The Filters actually applied, after merging the plan with structured request fields."""
-
-    drugs: list[str] = Field(default_factory=list)
-    conditions: list[str] = Field(default_factory=list)
-    keywords: list[str] = Field(default_factory=list, description="Free-text terms searched anywhere in the record.")
-    phases: list[Phase] = Field(default_factory=list)
-    statuses: list[OverallStatus] = Field(default_factory=list)
-    study_types: list[StudyType] = Field(default_factory=list)
-    sponsor: str | None = None
-    sponsor_role: Literal["lead", "any"] = "lead"
-    exact_sponsors: list[str] = Field(
-        default_factory=list, description="Lead sponsor names matched exactly (any of them), from a structured field."
-    )
-    sponsor_exact: bool = Field(
-        default=False, description="Sponsor came from a structured field and is matched exactly."
-    )
-    countries: list[str] = Field(default_factory=list)
-    start_year_from: int | None = None
-    start_year_to: int | None = None
-    nct_ids: list[str] = Field(default_factory=list)
-    from_request: list[str] = Field(default_factory=list, description="Filter names set by structured request fields.")
 
 
 class ClarificationOption(BaseModel):

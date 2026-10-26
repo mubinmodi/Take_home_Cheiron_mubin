@@ -27,7 +27,6 @@ from clinical_trials_viz.spec_builder import (
     chart_type_for,
     comparison_spec,
     cross_spec,
-    describe_filters,
     histogram_spec,
     network_spec,
     scatter_spec,
@@ -119,7 +118,7 @@ def _nothing_to_draw(
     spec: VisualizationSpec, dimension: Dimension | None, cohort_size: int, filters: AppliedFilters
 ) -> str | None:
     """Why a chart of a complete, non-empty cohort would show nothing, else None."""
-    read = describe_filters(filters)
+    read = filters.describe()
     if isinstance(spec.data, NetworkData) and not spec.data.edges:
         return (
             f"The {cohort_size:,} trials matching {read} were all checked, but no two entities share enough of "

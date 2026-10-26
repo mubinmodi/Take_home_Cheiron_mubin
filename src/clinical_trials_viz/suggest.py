@@ -1,47 +1,28 @@
 """Corrections for a question with no data: each filter dropped in turn and the rest counted live, by code.
 (Questions suggested for an unanswerable question are written by the planner; see models.plan.UnsupportedPlan.)"""
 
-from clinical_trials_viz.cohort import build_params
 from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.models.response import AppliedFilters, Suggestion
-from clinical_trials_viz.spec_builder import describe_filters
 
 MAX_CORRECTIONS = 4
-
-# Filters a correction may drop, one at a time: the name the user sees, and the fields it clears.
-_DROPPABLE: list[tuple[str, tuple[str, ...]]] = [
-    ("country", ("countries",)),
-    ("phase", ("phases",)),
-    ("status", ("statuses",)),
-    ("start-year", ("start_year_from", "start_year_to")),
-    ("study type", ("study_types",)),
-    ("keyword", ("keywords",)),
-    ("sponsor", ("sponsor", "exact_sponsors", "sponsor_exact")),
-]
 
 
 async def count(filters: AppliedFilters, client: CtGovClient) -> int:
     """Search matches for these filters, each trial once (several drugs are searched together). Before the
     drug match check, so the label says "about"."""
     drugs = " OR ".join(f"({d})" for d in filters.drugs) or None
-    return await client.count(build_params(filters, drugs))
+    return await client.count(filters.api_params(drugs))
 
 
 async def corrections(filters: AppliedFilters, client: CtGovClient) -> list[Suggestion]:
     """For each filter, how many trials match without it. Only corrections that find trials are offered.
     A filter pinned by a structured field is reported but cannot be dropped by a Follow-up."""
     suggestions = []
-    for name, fields in _DROPPABLE:
-        if not any(getattr(filters, f) for f in fields):
-            continue
-        only = AppliedFilters(**{f: getattr(filters, f) for f in fields if f != "sponsor_exact"})
-        relaxed = filters.model_copy(update={f: AppliedFilters.model_fields[f].get_default(call_default_factory=True)
-                                              for f in fields})  # fmt: skip
-        found = await count(relaxed, client)
+    for relaxation in filters.relaxations():
+        found = await count(relaxation.without, client)
         if not found:
             continue
-        dropped = describe_filters(only)
-        pinned = any(f in filters.from_request for f in fields)
+        name, dropped, pinned = relaxation.name, relaxation.dropped, relaxation.pinned
         suggestions.append(
             Suggestion(
                 label=f"Without the {name} filter ({dropped}): {'about ' if filters.drugs else ''}{found:,} "

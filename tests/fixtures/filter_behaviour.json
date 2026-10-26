@@ -1,0 +1,2697 @@
+{
+ "cases": [
+  {
+   "cited_dimensions": [],
+   "corrections": [],
+   "describe": "all trials",
+   "filters": {},
+   "params": {
+    "None": {}
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "drug"
+   ],
+   "corrections": [],
+   "describe": "Keytruda",
+   "filters": {
+    "drugs": [
+     "Keytruda"
+    ]
+   },
+   "params": {
+    "Keytruda": {
+     "query.intr": "Keytruda"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "drug"
+   ],
+   "corrections": [],
+   "describe": "Keytruda or nivolumab",
+   "filters": {
+    "drugs": [
+     "Keytruda",
+     "nivolumab"
+    ]
+   },
+   "params": {
+    "Keytruda": {
+     "query.intr": "Keytruda"
+    },
+    "nivolumab": {
+     "query.intr": "nivolumab"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "condition"
+   ],
+   "corrections": [],
+   "describe": "melanoma or lung cancer",
+   "filters": {
+    "conditions": [
+     "melanoma",
+     "lung cancer"
+    ]
+   },
+   "params": {
+    "None": {
+     "query.cond": "(melanoma) OR (lung cancer)"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [],
+   "corrections": [
+    {
+     "dropped": "'vaccine' and 'first-line'",
+     "name": "keyword",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "'vaccine' and 'first-line'",
+   "filters": {
+    "keywords": [
+     "vaccine",
+     "first-line"
+    ]
+   },
+   "params": {
+    "None": {
+     "query.term": "(vaccine) AND (first-line)"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "phase",
+    "status"
+   ],
+   "corrections": [
+    {
+     "dropped": "Phase 3",
+     "name": "phase",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [
+       "RECRUITING"
+      ],
+      "study_types": []
+     }
+    },
+    {
+     "dropped": "recruiting",
+     "name": "status",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [
+       "PHASE3"
+      ],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "Phase 3; recruiting",
+   "filters": {
+    "phases": [
+     "PHASE3"
+    ],
+    "statuses": [
+     "RECRUITING"
+    ]
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[Phase](PHASE3)",
+     "filter.overallStatus": "RECRUITING"
+    }
+   },
+   "violations": {
+    "NCT02122861": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02178722": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02220894": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02313272": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02331251": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status TERMINATED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02564263": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02600169": [
+     "phases [] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02704156": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02919969": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT02981303": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03066778": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03139851": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03149029": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03238638": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03257163": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03337841": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status UNKNOWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03428802": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03617224": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03654833": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03675737": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT03832569": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04045730": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04123366": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04185883": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04224480": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status UNKNOWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04231526": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04335669": [
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04357587": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04358237": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04408898": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04430738": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04699123": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04848337": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04909164": [
+     "phases [] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT04991948": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05119296": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT05267470": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status TERMINATED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT05553782": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05705466": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT05741164": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05913388": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ACTIVE_NOT_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT06086288": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status NOT_YET_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT06204614": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ENROLLING_BY_INVITATION not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT06952504": [],
+    "NCT06983743": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT07082439": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT07136545": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT07256184": [
+     "phases [] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>]"
+    ],
+    "NCT07283731": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT07404332": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ]
+   }
+  },
+  {
+   "cited_dimensions": [
+    "phase"
+   ],
+   "corrections": [
+    {
+     "dropped": "Phase 2, Phase 3",
+     "name": "phase",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "Phase 2, Phase 3",
+   "filters": {
+    "phases": [
+     "PHASE2",
+     "PHASE3"
+    ]
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[Phase](PHASE2 OR PHASE3)"
+    }
+   },
+   "violations": {
+    "NCT02122861": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [
+     "phases [] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04224480": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [
+     "phases [] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04991948": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05119296": [],
+    "NCT05267470": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05553782": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT06952504": [],
+    "NCT06983743": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [
+     "phases [] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT07283731": [],
+    "NCT07404332": [
+     "phases ['PHASE1'] not in [<Phase.PHASE2: 'PHASE2'>, <Phase.PHASE3: 'PHASE3'>]"
+    ]
+   }
+  },
+  {
+   "cited_dimensions": [
+    "study_type"
+   ],
+   "corrections": [
+    {
+     "dropped": "interventional",
+     "name": "study type",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "interventional",
+   "filters": {
+    "study_types": [
+     "INTERVENTIONAL"
+    ]
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[StudyType](INTERVENTIONAL)"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [
+     "study type OBSERVATIONAL not in [<StudyType.INTERVENTIONAL: 'INTERVENTIONAL'>]"
+    ],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [
+     "study type OBSERVATIONAL not in [<StudyType.INTERVENTIONAL: 'INTERVENTIONAL'>]"
+    ],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [
+     "study type OBSERVATIONAL not in [<StudyType.INTERVENTIONAL: 'INTERVENTIONAL'>]"
+    ],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "lead_sponsor"
+   ],
+   "corrections": [
+    {
+     "dropped": "lead sponsor Merck",
+     "name": "sponsor",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "lead sponsor Merck",
+   "filters": {
+    "sponsor": "Merck"
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[LeadSponsorName](Merck)"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "lead_sponsor"
+   ],
+   "corrections": [
+    {
+     "dropped": "lead sponsor Merck",
+     "name": "sponsor",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "any",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "sponsor Merck",
+   "filters": {
+    "sponsor": "Merck",
+    "sponsor_role": "any"
+   },
+   "params": {
+    "None": {
+     "query.spons": "Merck"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "lead_sponsor"
+   ],
+   "corrections": [
+    {
+     "dropped": "lead sponsor Merck Sharp & Dohme LLC or Merck KGaA",
+     "name": "sponsor",
+     "pinned": true,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [
+       "sponsor"
+      ],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "lead sponsor Merck Sharp & Dohme LLC or Merck KGaA",
+   "filters": {
+    "exact_sponsors": [
+     "Merck Sharp & Dohme LLC",
+     "Merck KGaA"
+    ],
+    "from_request": [
+     "sponsor"
+    ],
+    "sponsor": "Merck Sharp & Dohme LLC or Merck KGaA",
+    "sponsor_exact": true
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[LeadSponsorName](\"Merck Sharp & Dohme LLC\" OR \"Merck KGaA\")"
+    }
+   },
+   "violations": {
+    "NCT02122861": [
+     "lead sponsor 'Immune Design, a subsidiary of Merck & Co., Inc. (Rahway, New Jersey USA)' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT02178722": [
+     "lead sponsor 'Incyte Corporation' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT02220894": [],
+    "NCT02313272": [
+     "lead sponsor 'H. Lee Moffitt Cancer Center and Research Institute' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT02331251": [
+     "lead sponsor 'Western Regional Medical Center' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT02564263": [],
+    "NCT02600169": [
+     "lead sponsor 'University Medical Center Groningen' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT02704156": [
+     "lead sponsor 'Changhai Hospital' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT02919969": [
+     "lead sponsor 'Dana-Farber Cancer Institute' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT02981303": [
+     "lead sponsor 'HiberCell, Inc.' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03066778": [],
+    "NCT03139851": [
+     "lead sponsor 'Centre Leon Berard' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03149029": [
+     "lead sponsor 'Massachusetts General Hospital' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03238638": [
+     "lead sponsor 'University of Chicago' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03257163": [
+     "lead sponsor 'Rutgers, The State University of New Jersey' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03337841": [
+     "lead sponsor 'Kindai University' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03428802": [
+     "lead sponsor 'Rutgers, The State University of New Jersey' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03617224": [
+     "lead sponsor 'University of Texas Southwestern Medical Center' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03654833": [
+     "lead sponsor 'University of Leicester' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT03675737": [],
+    "NCT03832569": [
+     "lead sponsor 'Memorial Sloan Kettering Cancer Center' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04045730": [
+     "lead sponsor 'Yale University' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04123366": [],
+    "NCT04185883": [
+     "lead sponsor 'Amgen' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04224480": [
+     "lead sponsor 'National Cancer Centre, Singapore' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04231526": [
+     "lead sponsor 'University of Chicago' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04335669": [
+     "lead sponsor 'Lund University Hospital' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04357587": [
+     "lead sponsor 'Case Comprehensive Cancer Center' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04358237": [
+     "lead sponsor 'Antonio Calles Blanco' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04408898": [
+     "lead sponsor 'Adaptimmune' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04430738": [
+     "lead sponsor 'Seagen, a wholly owned subsidiary of Pfizer' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04699123": [
+     "lead sponsor 'Yale University' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04848337": [
+     "lead sponsor 'University of Michigan Rogel Cancer Center' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04909164": [
+     "lead sponsor 'Myung-Ju Ahn' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT04991948": [
+     "lead sponsor 'Celyad Oncology SA' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT05119296": [
+     "lead sponsor 'Saad A Khan' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT05267470": [
+     "lead sponsor 'Amgen' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT05553782": [
+     "lead sponsor \"Brigham and Women's Hospital\" is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT05705466": [
+     "lead sponsor 'Kartos Therapeutics, Inc.' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT05741164": [
+     "lead sponsor 'Emory University' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT05913388": [
+     "lead sponsor 'Providence Health & Services' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT06086288": [
+     "lead sponsor 'Fondazione IRCCS Istituto Nazionale dei Tumori, Milano' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT06204614": [
+     "lead sponsor \"Brigham and Women's Hospital\" is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT06952504": [],
+    "NCT06983743": [
+     "lead sponsor 'Erasca, Inc.' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT07082439": [
+     "lead sponsor 'Abramson Cancer Center at Penn Medicine' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT07136545": [
+     "lead sponsor 'Taipei Veterans General Hospital, Taiwan' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT07256184": [
+     "lead sponsor 'Ankara Etlik City Hospital' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT07283731": [
+     "lead sponsor 'M.D. Anderson Cancer Center' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ],
+    "NCT07404332": [
+     "lead sponsor 'Mohammed Milhem' is not 'Merck Sharp & Dohme LLC or Merck KGaA'"
+    ]
+   }
+  },
+  {
+   "cited_dimensions": [
+    "country"
+   ],
+   "corrections": [
+    {
+     "dropped": "in Germany, United States",
+     "name": "country",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "in Germany, United States",
+   "filters": {
+    "countries": [
+     "Germany",
+     "United States"
+    ]
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[LocationCountry](\"Germany\" OR \"United States\")"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT02600169": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT02704156": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT03675737": [],
+    "NCT03832569": [],
+    "NCT04045730": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT04231526": [],
+    "NCT04335669": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT04357587": [],
+    "NCT04358237": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT07256184": [
+     "no site in ['Germany', 'United States']"
+    ],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "start_year"
+   ],
+   "corrections": [
+    {
+     "dropped": "started 2020 or later",
+     "name": "start-year",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "started 2020 or later",
+   "filters": {
+    "start_year_from": 2020
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[StartDate]RANGE[2020-01-01,MAX]"
+    }
+   },
+   "violations": {
+    "NCT02122861": [
+     "start year 2014 outside 2020-9999"
+    ],
+    "NCT02178722": [
+     "start year 2014 outside 2020-9999"
+    ],
+    "NCT02220894": [
+     "start year 2014 outside 2020-9999"
+    ],
+    "NCT02313272": [
+     "start year 2015 outside 2020-9999"
+    ],
+    "NCT02331251": [
+     "start year 2014 outside 2020-9999"
+    ],
+    "NCT02564263": [
+     "start year 2015 outside 2020-9999"
+    ],
+    "NCT02600169": [
+     "start year 2015 outside 2020-9999"
+    ],
+    "NCT02704156": [
+     "start year 2016 outside 2020-9999"
+    ],
+    "NCT02919969": [
+     "start year 2016 outside 2020-9999"
+    ],
+    "NCT02981303": [
+     "start year 2017 outside 2020-9999"
+    ],
+    "NCT03066778": [
+     "start year 2017 outside 2020-9999"
+    ],
+    "NCT03139851": [
+     "start year 2017 outside 2020-9999"
+    ],
+    "NCT03149029": [
+     "start year 2017 outside 2020-9999"
+    ],
+    "NCT03238638": [
+     "start year 2018 outside 2020-9999"
+    ],
+    "NCT03257163": [
+     "start year 2017 outside 2020-9999"
+    ],
+    "NCT03337841": [
+     "start year 2017 outside 2020-9999"
+    ],
+    "NCT03428802": [
+     "start year 2018 outside 2020-9999"
+    ],
+    "NCT03617224": [
+     "start year 2018 outside 2020-9999"
+    ],
+    "NCT03654833": [
+     "start year 2019 outside 2020-9999"
+    ],
+    "NCT03675737": [
+     "start year 2018 outside 2020-9999"
+    ],
+    "NCT03832569": [
+     "start year 2019 outside 2020-9999"
+    ],
+    "NCT04045730": [
+     "start year 2019 outside 2020-9999"
+    ],
+    "NCT04123366": [
+     "start year 2019 outside 2020-9999"
+    ],
+    "NCT04185883": [
+     "start year 2019 outside 2020-9999"
+    ],
+    "NCT04224480": [
+     "start year 2019 outside 2020-9999"
+    ],
+    "NCT04231526": [],
+    "NCT04335669": [
+     "start year 2019 outside 2020-9999"
+    ],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [],
+    "NCT05267470": [],
+    "NCT05553782": [],
+    "NCT05705466": [],
+    "NCT05741164": [],
+    "NCT05913388": [],
+    "NCT06086288": [],
+    "NCT06204614": [],
+    "NCT06952504": [],
+    "NCT06983743": [],
+    "NCT07082439": [],
+    "NCT07136545": [],
+    "NCT07256184": [],
+    "NCT07283731": [],
+    "NCT07404332": []
+   }
+  },
+  {
+   "cited_dimensions": [
+    "start_year"
+   ],
+   "corrections": [
+    {
+     "dropped": "started 2018 or earlier",
+     "name": "start-year",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "started 2018 or earlier",
+   "filters": {
+    "start_year_to": 2018
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[StartDate]RANGE[MIN,2018-12-31]"
+    }
+   },
+   "violations": {
+    "NCT02122861": [],
+    "NCT02178722": [],
+    "NCT02220894": [],
+    "NCT02313272": [],
+    "NCT02331251": [],
+    "NCT02564263": [],
+    "NCT02600169": [],
+    "NCT02704156": [],
+    "NCT02919969": [],
+    "NCT02981303": [],
+    "NCT03066778": [],
+    "NCT03139851": [],
+    "NCT03149029": [],
+    "NCT03238638": [],
+    "NCT03257163": [],
+    "NCT03337841": [],
+    "NCT03428802": [],
+    "NCT03617224": [],
+    "NCT03654833": [
+     "start year 2019 outside 0-2018"
+    ],
+    "NCT03675737": [],
+    "NCT03832569": [
+     "start year 2019 outside 0-2018"
+    ],
+    "NCT04045730": [
+     "start year 2019 outside 0-2018"
+    ],
+    "NCT04123366": [
+     "start year 2019 outside 0-2018"
+    ],
+    "NCT04185883": [
+     "start year 2019 outside 0-2018"
+    ],
+    "NCT04224480": [
+     "start year 2019 outside 0-2018"
+    ],
+    "NCT04231526": [
+     "start year 2020 outside 0-2018"
+    ],
+    "NCT04335669": [
+     "start year 2019 outside 0-2018"
+    ],
+    "NCT04357587": [
+     "start year 2020 outside 0-2018"
+    ],
+    "NCT04358237": [
+     "start year 2020 outside 0-2018"
+    ],
+    "NCT04408898": [
+     "start year 2020 outside 0-2018"
+    ],
+    "NCT04430738": [
+     "start year 2020 outside 0-2018"
+    ],
+    "NCT04699123": [
+     "start year 2021 outside 0-2018"
+    ],
+    "NCT04848337": [
+     "start year 2021 outside 0-2018"
+    ],
+    "NCT04909164": [
+     "start year 2021 outside 0-2018"
+    ],
+    "NCT04991948": [
+     "start year 2021 outside 0-2018"
+    ],
+    "NCT05119296": [
+     "start year 2022 outside 0-2018"
+    ],
+    "NCT05267470": [
+     "start year 2022 outside 0-2018"
+    ],
+    "NCT05553782": [
+     "start year 2023 outside 0-2018"
+    ],
+    "NCT05705466": [
+     "start year 2023 outside 0-2018"
+    ],
+    "NCT05741164": [
+     "start year 2024 outside 0-2018"
+    ],
+    "NCT05913388": [
+     "start year 2024 outside 0-2018"
+    ],
+    "NCT06086288": [
+     "start year 2023 outside 0-2018"
+    ],
+    "NCT06204614": [
+     "start year 2024 outside 0-2018"
+    ],
+    "NCT06952504": [
+     "start year 2025 outside 0-2018"
+    ],
+    "NCT06983743": [
+     "start year 2025 outside 0-2018"
+    ],
+    "NCT07082439": [
+     "start year 2025 outside 0-2018"
+    ],
+    "NCT07136545": [
+     "start year 2025 outside 0-2018"
+    ],
+    "NCT07256184": [
+     "start year 2022 outside 0-2018"
+    ],
+    "NCT07283731": [
+     "start year 2026 outside 0-2018"
+    ],
+    "NCT07404332": [
+     "start year 2026 outside 0-2018"
+    ]
+   }
+  },
+  {
+   "cited_dimensions": [
+    "start_year"
+   ],
+   "corrections": [
+    {
+     "dropped": "started 2019\u20132021",
+     "name": "start-year",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [],
+      "exact_sponsors": [],
+      "from_request": [],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "started 2019\u20132021",
+   "filters": {
+    "start_year_from": 2019,
+    "start_year_to": 2021
+   },
+   "params": {
+    "None": {
+     "filter.advanced": "AREA[StartDate]RANGE[2019-01-01,2021-12-31]"
+    }
+   },
+   "violations": {
+    "NCT02122861": [
+     "start year 2014 outside 2019-2021"
+    ],
+    "NCT02178722": [
+     "start year 2014 outside 2019-2021"
+    ],
+    "NCT02220894": [
+     "start year 2014 outside 2019-2021"
+    ],
+    "NCT02313272": [
+     "start year 2015 outside 2019-2021"
+    ],
+    "NCT02331251": [
+     "start year 2014 outside 2019-2021"
+    ],
+    "NCT02564263": [
+     "start year 2015 outside 2019-2021"
+    ],
+    "NCT02600169": [
+     "start year 2015 outside 2019-2021"
+    ],
+    "NCT02704156": [
+     "start year 2016 outside 2019-2021"
+    ],
+    "NCT02919969": [
+     "start year 2016 outside 2019-2021"
+    ],
+    "NCT02981303": [
+     "start year 2017 outside 2019-2021"
+    ],
+    "NCT03066778": [
+     "start year 2017 outside 2019-2021"
+    ],
+    "NCT03139851": [
+     "start year 2017 outside 2019-2021"
+    ],
+    "NCT03149029": [
+     "start year 2017 outside 2019-2021"
+    ],
+    "NCT03238638": [
+     "start year 2018 outside 2019-2021"
+    ],
+    "NCT03257163": [
+     "start year 2017 outside 2019-2021"
+    ],
+    "NCT03337841": [
+     "start year 2017 outside 2019-2021"
+    ],
+    "NCT03428802": [
+     "start year 2018 outside 2019-2021"
+    ],
+    "NCT03617224": [
+     "start year 2018 outside 2019-2021"
+    ],
+    "NCT03654833": [],
+    "NCT03675737": [
+     "start year 2018 outside 2019-2021"
+    ],
+    "NCT03832569": [],
+    "NCT04045730": [],
+    "NCT04123366": [],
+    "NCT04185883": [],
+    "NCT04224480": [],
+    "NCT04231526": [],
+    "NCT04335669": [],
+    "NCT04357587": [],
+    "NCT04358237": [],
+    "NCT04408898": [],
+    "NCT04430738": [],
+    "NCT04699123": [],
+    "NCT04848337": [],
+    "NCT04909164": [],
+    "NCT04991948": [],
+    "NCT05119296": [
+     "start year 2022 outside 2019-2021"
+    ],
+    "NCT05267470": [
+     "start year 2022 outside 2019-2021"
+    ],
+    "NCT05553782": [
+     "start year 2023 outside 2019-2021"
+    ],
+    "NCT05705466": [
+     "start year 2023 outside 2019-2021"
+    ],
+    "NCT05741164": [
+     "start year 2024 outside 2019-2021"
+    ],
+    "NCT05913388": [
+     "start year 2024 outside 2019-2021"
+    ],
+    "NCT06086288": [
+     "start year 2023 outside 2019-2021"
+    ],
+    "NCT06204614": [
+     "start year 2024 outside 2019-2021"
+    ],
+    "NCT06952504": [
+     "start year 2025 outside 2019-2021"
+    ],
+    "NCT06983743": [
+     "start year 2025 outside 2019-2021"
+    ],
+    "NCT07082439": [
+     "start year 2025 outside 2019-2021"
+    ],
+    "NCT07136545": [
+     "start year 2025 outside 2019-2021"
+    ],
+    "NCT07256184": [
+     "start year 2022 outside 2019-2021"
+    ],
+    "NCT07283731": [
+     "start year 2026 outside 2019-2021"
+    ],
+    "NCT07404332": [
+     "start year 2026 outside 2019-2021"
+    ]
+   }
+  },
+  {
+   "cited_dimensions": [],
+   "corrections": [],
+   "describe": "NCT02178722, NCT04408898",
+   "filters": {
+    "nct_ids": [
+     "NCT02178722",
+     "NCT04408898"
+    ]
+   },
+   "params": {
+    "None": {
+     "filter.ids": "NCT02178722,NCT04408898"
+    }
+   },
+   "violations": {
+    "NCT02122861": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02178722": [],
+    "NCT02220894": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02313272": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02331251": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02564263": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02600169": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02704156": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02919969": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT02981303": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03066778": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03139851": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03149029": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03238638": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03257163": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03337841": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03428802": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03617224": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03654833": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03675737": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT03832569": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04045730": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04123366": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04185883": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04224480": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04231526": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04335669": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04357587": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04358237": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04408898": [],
+    "NCT04430738": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04699123": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04848337": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04909164": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT04991948": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT05119296": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT05267470": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT05553782": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT05705466": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT05741164": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT05913388": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT06086288": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT06204614": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT06952504": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT06983743": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT07082439": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT07136545": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT07256184": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT07283731": [
+     "not one of the requested NCT IDs"
+    ],
+    "NCT07404332": [
+     "not one of the requested NCT IDs"
+    ]
+   }
+  },
+  {
+   "cited_dimensions": [
+    "drug",
+    "phase",
+    "status",
+    "country",
+    "start_year"
+   ],
+   "corrections": [
+    {
+     "dropped": "in United States",
+     "name": "country",
+     "pinned": true,
+     "relaxed": {
+      "conditions": [],
+      "countries": [],
+      "drugs": [
+       "pembrolizumab"
+      ],
+      "exact_sponsors": [],
+      "from_request": [
+       "countries"
+      ],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [
+       "PHASE3"
+      ],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": 2016,
+      "start_year_to": 2022,
+      "statuses": [
+       "RECRUITING",
+       "ACTIVE_NOT_RECRUITING"
+      ],
+      "study_types": []
+     }
+    },
+    {
+     "dropped": "Phase 3",
+     "name": "phase",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [
+       "United States"
+      ],
+      "drugs": [
+       "pembrolizumab"
+      ],
+      "exact_sponsors": [],
+      "from_request": [
+       "countries"
+      ],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": 2016,
+      "start_year_to": 2022,
+      "statuses": [
+       "RECRUITING",
+       "ACTIVE_NOT_RECRUITING"
+      ],
+      "study_types": []
+     }
+    },
+    {
+     "dropped": "recruiting, active not recruiting",
+     "name": "status",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [
+       "United States"
+      ],
+      "drugs": [
+       "pembrolizumab"
+      ],
+      "exact_sponsors": [],
+      "from_request": [
+       "countries"
+      ],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [
+       "PHASE3"
+      ],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": 2016,
+      "start_year_to": 2022,
+      "statuses": [],
+      "study_types": []
+     }
+    },
+    {
+     "dropped": "started 2016\u20132022",
+     "name": "start-year",
+     "pinned": false,
+     "relaxed": {
+      "conditions": [],
+      "countries": [
+       "United States"
+      ],
+      "drugs": [
+       "pembrolizumab"
+      ],
+      "exact_sponsors": [],
+      "from_request": [
+       "countries"
+      ],
+      "keywords": [],
+      "nct_ids": [],
+      "phases": [
+       "PHASE3"
+      ],
+      "sponsor": null,
+      "sponsor_exact": false,
+      "sponsor_role": "lead",
+      "start_year_from": null,
+      "start_year_to": null,
+      "statuses": [
+       "RECRUITING",
+       "ACTIVE_NOT_RECRUITING"
+      ],
+      "study_types": []
+     }
+    }
+   ],
+   "describe": "pembrolizumab; Phase 3; recruiting, active not recruiting; in United States; started 2016\u20132022",
+   "filters": {
+    "countries": [
+     "United States"
+    ],
+    "drugs": [
+     "pembrolizumab"
+    ],
+    "from_request": [
+     "countries"
+    ],
+    "phases": [
+     "PHASE3"
+    ],
+    "start_year_from": 2016,
+    "start_year_to": 2022,
+    "statuses": [
+     "RECRUITING",
+     "ACTIVE_NOT_RECRUITING"
+    ]
+   },
+   "params": {
+    "pembrolizumab": {
+     "filter.advanced": "AREA[Phase](PHASE3) AND AREA[LocationCountry](\"United States\") AND AREA[StartDate]RANGE[2016-01-01,2022-12-31]",
+     "filter.overallStatus": "RECRUITING,ACTIVE_NOT_RECRUITING",
+     "query.intr": "pembrolizumab"
+    }
+   },
+   "violations": {
+    "NCT02122861": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "start year 2014 outside 2016-2022"
+    ],
+    "NCT02178722": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "start year 2014 outside 2016-2022"
+    ],
+    "NCT02220894": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']",
+     "start year 2014 outside 2016-2022"
+    ],
+    "NCT02313272": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "start year 2015 outside 2016-2022"
+    ],
+    "NCT02331251": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status TERMINATED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "start year 2014 outside 2016-2022"
+    ],
+    "NCT02564263": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']",
+     "start year 2015 outside 2016-2022"
+    ],
+    "NCT02600169": [
+     "phases [] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']",
+     "start year 2015 outside 2016-2022"
+    ],
+    "NCT02704156": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT02919969": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT02981303": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT03066778": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT03139851": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT03149029": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT03238638": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT03257163": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT03337841": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status UNKNOWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT03428802": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT03617224": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT03654833": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT03675737": [
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT03832569": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04045730": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT04123366": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT04185883": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04224480": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status UNKNOWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT04231526": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT04335669": [
+     "no site in ['United States']"
+    ],
+    "NCT04357587": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT04358237": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT04408898": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT04430738": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04699123": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04848337": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT04909164": [
+     "phases [] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT04991948": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05119296": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]"
+    ],
+    "NCT05267470": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status TERMINATED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]"
+    ],
+    "NCT05553782": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "start year 2023 outside 2016-2022"
+    ],
+    "NCT05705466": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status WITHDRAWN not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']",
+     "start year 2023 outside 2016-2022"
+    ],
+    "NCT05741164": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "start year 2024 outside 2016-2022"
+    ],
+    "NCT05913388": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "start year 2024 outside 2016-2022"
+    ],
+    "NCT06086288": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status NOT_YET_RECRUITING not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']",
+     "start year 2023 outside 2016-2022"
+    ],
+    "NCT06204614": [
+     "phases ['EARLY_PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status ENROLLING_BY_INVITATION not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "start year 2024 outside 2016-2022"
+    ],
+    "NCT06952504": [
+     "start year 2025 outside 2016-2022"
+    ],
+    "NCT06983743": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "start year 2025 outside 2016-2022"
+    ],
+    "NCT07082439": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "start year 2025 outside 2016-2022"
+    ],
+    "NCT07136545": [
+     "phases ['PHASE1', 'PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "no site in ['United States']",
+     "start year 2025 outside 2016-2022"
+    ],
+    "NCT07256184": [
+     "phases [] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "status COMPLETED not in [<OverallStatus.RECRUITING: 'RECRUITING'>, <OverallStatus.ACTIVE_NOT_RECRUITING: 'ACTIVE_NOT_RECRUITING'>]",
+     "no site in ['United States']"
+    ],
+    "NCT07283731": [
+     "phases ['PHASE2'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "start year 2026 outside 2016-2022"
+    ],
+    "NCT07404332": [
+     "phases ['PHASE1'] not in [<Phase.PHASE3: 'PHASE3'>]",
+     "start year 2026 outside 2016-2022"
+    ]
+   }
+  }
+ ],
+ "merges": [
+  {
+   "conflicts": [
+    [
+     "drug_name",
+     [
+      "nivolumab"
+     ],
+     [
+      "Pembrolizumab"
+     ]
+    ]
+   ],
+   "fields": {
+    "drug_name": "Pembrolizumab"
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [
+     "Pembrolizumab"
+    ],
+    "exact_sponsors": [],
+    "from_request": [
+     "drugs"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": null,
+    "sponsor_exact": false,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "drugs": [
+     "nivolumab"
+    ]
+   }
+  },
+  {
+   "conflicts": [
+    [
+     "trial_phase",
+     [
+      "PHASE3"
+     ],
+     [
+      "PHASE2"
+     ]
+    ]
+   ],
+   "fields": {
+    "trial_phase": "PHASE2"
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [],
+    "exact_sponsors": [],
+    "from_request": [
+     "phases"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [
+     "PHASE2"
+    ],
+    "sponsor": null,
+    "sponsor_exact": false,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "phases": [
+     "PHASE3"
+    ]
+   }
+  },
+  {
+   "conflicts": [],
+   "fields": {
+    "country": "United States"
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [
+     "United States"
+    ],
+    "drugs": [],
+    "exact_sponsors": [],
+    "from_request": [
+     "countries"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": null,
+    "sponsor_exact": false,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "countries": [
+     "USA"
+    ]
+   }
+  },
+  {
+   "conflicts": [
+    [
+     "sponsor",
+     [
+      "Merck"
+     ],
+     [
+      "Pfizer Inc"
+     ]
+    ]
+   ],
+   "fields": {
+    "sponsor": "Pfizer Inc"
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [],
+    "exact_sponsors": [
+     "Pfizer Inc"
+    ],
+    "from_request": [
+     "sponsor"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": "Pfizer Inc",
+    "sponsor_exact": true,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "sponsor": "Merck"
+   }
+  },
+  {
+   "conflicts": [],
+   "fields": {
+    "sponsor": [
+     "Merck Sharp & Dohme LLC"
+    ]
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [],
+    "exact_sponsors": [
+     "Merck Sharp & Dohme LLC"
+    ],
+    "from_request": [
+     "sponsor"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": "Merck Sharp & Dohme LLC",
+    "sponsor_exact": true,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "sponsor": "Merck"
+   }
+  },
+  {
+   "conflicts": [],
+   "fields": {
+    "sponsor": [
+     "Merck"
+    ]
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [],
+    "exact_sponsors": [],
+    "from_request": [
+     "sponsor"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": "Merck",
+    "sponsor_exact": false,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "sponsor": "Merck"
+   }
+  },
+  {
+   "conflicts": [
+    [
+     "sponsor",
+     [
+      "Merck"
+     ],
+     [
+      "Merck",
+      "Pfizer"
+     ]
+    ]
+   ],
+   "fields": {
+    "sponsor": [
+     "Merck",
+     "Pfizer"
+    ]
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [],
+    "exact_sponsors": [
+     "Merck",
+     "Pfizer"
+    ],
+    "from_request": [
+     "sponsor"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": "Merck or Pfizer",
+    "sponsor_exact": true,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "sponsor": "Merck"
+   }
+  },
+  {
+   "conflicts": [
+    [
+     "start_year",
+     2020,
+     2021
+    ]
+   ],
+   "fields": {
+    "start_year": 2021
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [],
+    "exact_sponsors": [],
+    "from_request": [
+     "start_year_from"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": null,
+    "sponsor_exact": false,
+    "sponsor_role": "lead",
+    "start_year_from": 2021,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "start_year_from": 2020
+   }
+  },
+  {
+   "conflicts": [],
+   "fields": {
+    "condition": "melanoma"
+   },
+   "merged": {
+    "conditions": [
+     "melanoma"
+    ],
+    "countries": [],
+    "drugs": [],
+    "exact_sponsors": [],
+    "from_request": [
+     "conditions"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": null,
+    "sponsor_exact": false,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [],
+    "study_types": []
+   },
+   "plan": {
+    "conditions": [
+     "melanoma"
+    ]
+   }
+  },
+  {
+   "conflicts": [],
+   "fields": {
+    "drug_name": "Keytruda",
+    "status": "RECRUITING"
+   },
+   "merged": {
+    "conditions": [],
+    "countries": [],
+    "drugs": [
+     "Keytruda"
+    ],
+    "exact_sponsors": [],
+    "from_request": [
+     "drugs",
+     "statuses"
+    ],
+    "keywords": [],
+    "nct_ids": [],
+    "phases": [],
+    "sponsor": null,
+    "sponsor_exact": false,
+    "sponsor_role": "lead",
+    "start_year_from": null,
+    "start_year_to": null,
+    "statuses": [
+     "RECRUITING"
+    ],
+    "study_types": []
+   },
+   "plan": {}
+  }
+ ]
+}

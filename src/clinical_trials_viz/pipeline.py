@@ -13,9 +13,10 @@ from datetime import UTC, datetime
 from opentelemetry import trace
 
 from clinical_trials_viz import answer as answering
-from clinical_trials_viz import clarify, suggest
+from clinical_trials_viz import clarify, conflicts, suggest
 from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS
 from clinical_trials_viz.cohort import fetch_cohort
+from clinical_trials_viz.conflicts import PreviousRun
 from clinical_trials_viz.ctgov.client import CtGovClient, UpstreamError, count_requests
 from clinical_trials_viz.ctgov.trial import Trial
 from clinical_trials_viz.failures import Failure, classify
@@ -45,9 +46,6 @@ from clinical_trials_viz.planner import Planner
 from clinical_trials_viz.planning import plan_question
 from clinical_trials_viz.render import chart_problem
 from clinical_trials_viz.runs import RunStore, StoreUnavailable, new_run_id
-from clinical_trials_viz.spec_builder import (
-    describe_filters,
-)
 from clinical_trials_viz.validate import GateResult
 
 log = logging.getLogger(__name__)
@@ -84,8 +82,7 @@ class _Run:
         self.stage_name = "plan"  # the stage under way, reported if the run deadline passes
         self.parts: Sequence[AnswerPlan | ClarifyPlan | UnsupportedPlan] = ()  # the Question's parts, once planned
         self.part = 0  # the part being answered
-        self.answered: dict[str, str | None] = {}  # request field -> reason, for each Clarification just answered
-        self.previous_queries: set[str] = set()  # the earlier run's question (and its parts), to tell an answer
+        self.previous = PreviousRun()  # what the Run a Follow-up continues tells the Conflict rule
 
     @contextmanager
     def stage(self, name: str) -> Iterator[None]:
@@ -188,9 +185,11 @@ class Pipeline:
             raise RunNotFound(run.request.previous_run_id)
         run.previous_request = record.request
         earlier = (record.response, *record.response.additional_answers)
-        run.answered = {a.clarification.field: a.clarification.reason for a in earlier if a.clarification}
         parts = record.plan.requests if isinstance(record.plan, MultiAnswerPlan) else []
-        run.previous_queries = {record.request.query, *parts}
+        run.previous = PreviousRun(
+            answered={a.clarification.field: a.clarification.reason for a in earlier if a.clarification},
+            queries={record.request.query, *parts},
+        )
         return record.plan
 
     async def _execute(self, run: _Run, previous: QueryPlan | None) -> None:
@@ -259,8 +258,14 @@ class Pipeline:
             return
         target.applied_filters = filters = gate.filters
         target.assumptions.extend(gate.assumptions)
-        if await self._ask_about_conflict(run, target, plan, gate):
-            return
+        if gate.conflicts:
+            with run.stage("clarify"):
+                settled = await conflicts.resolve(gate.conflicts, plan, run.request, run.previous, self.client)
+            target.assumptions.extend(settled.assumptions)
+            if settled.clarification:
+                target.clarification = settled.clarification
+                _finish(target, Outcome.CLARIFICATION_REQUIRED, settled.clarification.question)
+                return
         version = await self.client.version()
         target.source = SourceInfo(
             api_version=version.api_version, data_timestamp=version.data_timestamp, retrieved_at=datetime.now(UTC)
@@ -277,8 +282,8 @@ class Pipeline:
         target.source.cohort_size = len(cohort.trials)
         target.assumptions.extend(cohort.assumptions)
 
-        if filters.sponsor and not filters.sponsor_exact and filters.sponsor_role == "lead":
-            question = clarify.sponsor_ambiguity(cohort.trials, filters.sponsor)
+        if filters.sponsor_is_ambiguous_term():
+            question = clarify.sponsor_ambiguity(cohort.trials, filters.sponsor or "")
             if question:
                 target.clarification = question
                 _finish(target, Outcome.CLARIFICATION_REQUIRED, question.question)
@@ -293,7 +298,7 @@ class Pipeline:
 
     async def _no_data(self, run: _Run, target: Answer, filters: AppliedFilters) -> None:
         """No trial matches: say how the question was read, and offer corrections counted live."""
-        read = describe_filters(filters)
+        read = filters.describe()
         with run.stage("suggest"):
             if unknown := await suggest.unknown_drugs(filters, self.client):
                 names = ", ".join(f"'{d}'" for d in unknown)
@@ -308,46 +313,13 @@ class Pipeline:
                     message += " Removing one filter finds trials; see the suggestions."
         _finish(target, Outcome.NO_DATA, message)
 
-    async def _ask_about_conflict(self, run: _Run, target: Answer, plan: AnswerPlan, gate: GateResult) -> bool:
-        """When a structured field contradicts the question, ask which value is meant, unless the field
-        answers the previous run's Clarification (an answer is final) or both names are the same drug."""
-        # The previous run's answers settle a field only for that question: a Clarification answer resends
-        # it (or its part), a refinement continues it. A new question with a stale field is asked again.
-        continuing = plan.relation == "refine" or run.request.query in run.previous_queries
-        for conflict in gate.conflicts:
-            asked, given = clarify.show_value(conflict.question_value), clarify.show_value(conflict.field_value)
-            if (
-                continuing and conflict.request_field in run.answered
-            ):  # e.g. which Merck, or which of two conflicting values
-                if run.answered[conflict.request_field] == "conflict":
-                    target.assumptions.append(f"Used {given}, as you chose; the question says {asked}.")
-                continue
-            names, others = conflict.question_value, conflict.field_value
-            if conflict.request_field == "drug_name" and isinstance(names, list) and isinstance(others, list):
-                with run.stage("clarify"):
-                    same = await clarify.same_drug(names, others, self.client)
-                if same:
-                    target.assumptions.append(
-                        f"'{asked}' in the question and '{given}' in your filters are the same drug ({same})."
-                    )
-                    continue
-            target.clarification = clarify.conflict_question(conflict)
-            _finish(target, Outcome.CLARIFICATION_REQUIRED, target.clarification.question)
-            return True
-        return False
-
     async def _compare(self, run: _Run, target: Answer, plan: AnswerPlan, base: AppliedFilters, index: int) -> None:
         sides: dict[str, list[Trial]] = {}
         assert target.source
         with run.stage("retrieve"):
             for side in plan.compare_sides:
-                f = base.model_copy(deep=True)
-                if side.drug:
-                    f.drugs, label = [side.drug], side.drug
-                elif side.condition:
-                    f.conditions, label = [side.condition], side.condition
-                else:
-                    f.sponsor, f.sponsor_role, f.sponsor_exact, label = side.sponsor, "lead", False, side.sponsor
+                label = side.drug or side.condition or side.sponsor
+                f = base.for_side(drug=side.drug, condition=side.condition, sponsor=side.sponsor)
                 cohort = await fetch_cohort(self.client, f)
                 sides[label or "?"] = cohort.trials
                 target.assumptions.extend(cohort.assumptions)
@@ -355,7 +327,7 @@ class Pipeline:
         trials = {t.nct_id: t for ts in sides.values() for t in ts}
         target.source.cohort_size = len(trials)
         if not trials:
-            read = describe_filters(base)
+            read = base.describe()
             within = "" if read == "all trials" else f" with {read}"
             _finish(
                 target,
