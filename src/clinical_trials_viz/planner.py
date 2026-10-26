@@ -8,8 +8,6 @@ import asyncio
 import json
 import logging
 import os
-from collections.abc import Iterator
-from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Any, Protocol
@@ -23,7 +21,6 @@ from pydantic_ai import (
     ModelHTTPError,
     ModelSettings,
     ToolOutput,
-    UsageLimitExceeded,
     UsageLimits,
     UserError,
 )
@@ -37,6 +34,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 
 from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
 from clinical_trials_viz.catalog import CATALOG_VERSION, DIMENSIONS, PHASE_LABELS, OverallStatus
+from clinical_trials_viz.ledger import Step, current_ledger, run_ledger
 from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, QueryPlan, UnsupportedPlan
 
 
@@ -113,7 +111,6 @@ starts a new question (relation "new")."""
 @dataclass
 class PlannerResult:
     plan: QueryPlan
-    model_calls: int
     model_name: str | None  # the model that produced the plan (the fallback, if the primary failed)
     messages: list[ModelMessage] = field(default_factory=list)
     model_failures: list[str] = field(default_factory=list)  # e.g. ["gpt-5.4-mini: HTTP 503"], before a fallback
@@ -122,7 +119,6 @@ class PlannerResult:
 @dataclass
 class SplitResult:
     requests: list[str]  # the separate questions in a message, each standalone (one item: a single question)
-    model_calls: int
     model_name: str | None
     model_failures: list[str] = field(default_factory=list)
 
@@ -157,8 +153,6 @@ questions it asks. You never answer them.
 - Otherwise keep the user's words. Never add a question the user did not ask; never drop one.
 - A message that asks one thing: return it unchanged as the only item."""
 
-SPLIT_MAX_CALLS = 2  # the split call and, if the primary model fails, the fallback's attempt
-
 
 class Planner(Protocol):
     async def split(self, message: str) -> SplitResult: ...
@@ -170,7 +164,6 @@ class Planner(Protocol):
         previous_plan: QueryPlan | None,
         *,
         repair: tuple[list[ModelMessage], list[str]] | None = None,
-        max_calls: int = 3,
         context: str | None = None,
     ) -> PlannerResult: ...
 
@@ -238,54 +231,6 @@ def describe_model_error(exc: ModelAPIError) -> str:
 _model_failures: ContextVar[list[str] | None] = ContextVar("planner_model_failures", default=None)
 
 
-class CallBudgetExhausted(UsageLimitExceeded):
-    """A model attempt refused because this plan() call's budget is spent. Not a provider error, so
-    the FallbackModel does not move on to the next model."""
-
-
-@dataclass
-class _CallBudget:
-    """Provider attempts in one plan() call. pydantic-ai counts a request answered by the fallback
-    once; this counts every attempt, the failed ones included (harness-design: every attempt counts)."""
-
-    limit: int
-    used: int = 0
-
-
-_call_budget: ContextVar[_CallBudget | None] = ContextVar("planner_call_budget", default=None)
-
-
-@dataclass
-class _RunCalls:
-    """Model calls across the plan() calls of one Run."""
-
-    failed: dict[str, str] = field(default_factory=dict)  # model -> its outage; later calls in the Run skip it
-    attempts: int = 0  # every provider attempt in the Run
-    reported: int = 0  # attempts already counted in a returned PlannerResult
-
-
-_run_calls: ContextVar[_RunCalls | None] = ContextVar("planner_run_calls", default=None)
-
-
-@contextmanager
-def run_scope() -> Iterator[None]:
-    """Share provider failures and the call count between the plan() calls of one Run."""
-    token = _run_calls.set(_RunCalls())
-    try:
-        yield
-    finally:
-        _run_calls.reset(token)
-
-
-def take_unreported_calls() -> int:
-    """Attempts made in this Run that no PlannerResult reported, because plan() raised. Each is counted once."""
-    calls = _run_calls.get()
-    if calls is None:
-        return 0
-    unreported, calls.reported = calls.attempts - calls.reported, calls.attempts
-    return unreported
-
-
 class _ReportingModel(WrapperModel):
     """One planner model behind its circuit breaker. Notes a provider failure (log and response
     warning), then re-raises it so the FallbackModel moves on to the next model; while the breaker is
@@ -301,12 +246,11 @@ class _ReportingModel(WrapperModel):
         model_settings: ModelSettings | None,
         model_request_parameters: ModelRequestParameters,
     ) -> ModelResponse:
-        if (budget := _call_budget.get()) is not None and budget.used >= budget.limit:
-            raise CallBudgetExhausted(f"The {budget.limit} model call(s) allowed for this question are used up.")
-        run_calls = _run_calls.get()
-        if run_calls is not None and self.model_name in run_calls.failed:
-            earlier = run_calls.failed[self.model_name]
-            raise ModelAPIError(self.model_name, f"{earlier} earlier in this run; not called again")
+        ledger = current_ledger()
+        if ledger is not None:
+            ledger.require_room()  # refuses past the step's cap; not a provider error, so no fallback
+            if (earlier := ledger.failure_of(self.model_name)) is not None:
+                raise ModelAPIError(self.model_name, f"{earlier} earlier in this run; not called again")
         try:
             self._breaker.check()
         except CircuitOpen as exc:
@@ -315,17 +259,15 @@ class _ReportingModel(WrapperModel):
             )
             self._note(skipped)
             raise skipped from exc
-        if budget is not None:
-            budget.used += 1
-        if run_calls is not None:
-            run_calls.attempts += 1
+        if ledger is not None:
+            ledger.record()  # every attempt counts, a failed one included
         try:
             response = await super().request(messages, model_settings, model_request_parameters)
         except ModelAPIError as exc:
             if is_outage(exc):
                 self._breaker.failure()
-                if run_calls is not None:
-                    run_calls.failed[self.model_name] = describe_model_error(exc).removeprefix(f"{self.model_name}: ")
+                if ledger is not None:
+                    ledger.model_failed(self.model_name, describe_model_error(exc).removeprefix(f"{self.model_name}: "))
             else:
                 self._breaker.success()  # it answered; the configuration is at fault
             self._note(exc)
@@ -436,27 +378,31 @@ class LLMPlanner:
             name="splitter",
         )
 
-    async def split(self, message: str) -> SplitResult:
-        """The separate questions in a message, each rewritten to stand alone. One model call (two if
-        the primary fails); its calls are counted like planning calls, outside planning's budget."""
+    async def _run(
+        self, agent: Agent[Any, Any], step: Step, prompt: str, what: str, **kwargs: Any
+    ) -> tuple[Any, list[str]]:
+        """Run one model step inside the Run's ledger, within the deadline; also return the provider
+        failures that a fallback rescued (for the response's warning)."""
         failures: list[str] = []
-        budget = _CallBudget(SPLIT_MAX_CALLS)
-        token, budget_token = _model_failures.set(failures), _call_budget.set(budget)
+        token = _model_failures.set(failures)
         try:
-            async with asyncio.timeout(self._deadline):
-                result = await self._splitter.run(
-                    f"Message: {message}", usage_limits=UsageLimits(request_limit=SPLIT_MAX_CALLS)
-                )
+            with run_ledger() as ledger, ledger.step(step):
+                limits = UsageLimits(request_limit=max(1, ledger.remaining(step)))
+                async with asyncio.timeout(self._deadline):  # None: no deadline
+                    result = await agent.run(prompt, usage_limits=limits, **kwargs)
         except TimeoutError as exc:
-            raise PlannerTimeout(f"Splitting the message took longer than {self._deadline:g} s") from exc
+            raise PlannerTimeout(f"{what} took longer than {self._deadline:g} s") from exc
         finally:
             _model_failures.reset(token)
-            _call_budget.reset(budget_token)
-        if (run_calls := _run_calls.get()) is not None:
-            run_calls.reported += budget.used
+        return result, failures
+
+    async def split(self, message: str) -> SplitResult:
+        """The separate questions in a message, each rewritten to stand alone. One model call (two if
+        the primary fails), recorded in the Run's ledger as the split step."""
+        result, failures = await self._run(self._splitter, Step.SPLIT, f"Message: {message}", "Splitting the message")
         requests = [r.strip() for r in result.output.requests if r.strip()] or [message]
         model_name = result.response.model_name if result.response else None
-        return SplitResult(requests, budget.used, model_name, failures)
+        return SplitResult(requests, model_name, failures)
 
     async def plan(
         self,
@@ -465,27 +411,15 @@ class LLMPlanner:
         previous_plan: QueryPlan | None,
         *,
         repair: tuple[list[ModelMessage], list[str]] | None = None,
-        max_calls: int = 3,
         context: str | None = None,
     ) -> PlannerResult:
-        limits = UsageLimits(request_limit=max_calls)
+        """A Query Plan for one question. Its attempts are recorded in the Run's ledger as planning; the
+        caller narrows the cap for one part of a multi-part Question (`CallLedger.cap`)."""
         if repair:
             history, errors = repair
             prompt = "Your plan failed validation. Return a corrected plan.\nProblems:\n- " + "\n- ".join(errors)
         else:
             history, prompt = None, build_prompt(question, structured, previous_plan, context)
-        failures: list[str] = []
-        budget = _CallBudget(max_calls)
-        token, budget_token = _model_failures.set(failures), _call_budget.set(budget)
-        try:
-            async with asyncio.timeout(self._deadline):  # None: no deadline
-                result = await self._agent.run(prompt, message_history=history, usage_limits=limits)
-        except TimeoutError as exc:
-            raise PlannerTimeout(f"Planning took longer than {self._deadline:g} s") from exc
-        finally:
-            _model_failures.reset(token)
-            _call_budget.reset(budget_token)
+        result, failures = await self._run(self._agent, Step.PLANNING, prompt, "Planning", message_history=history)
         response_model = result.response.model_name if result.response else None
-        if (run_calls := _run_calls.get()) is not None:
-            run_calls.reported += budget.used
-        return PlannerResult(result.output, budget.used, response_model, result.all_messages(), failures)
+        return PlannerResult(result.output, response_model, result.all_messages(), failures)

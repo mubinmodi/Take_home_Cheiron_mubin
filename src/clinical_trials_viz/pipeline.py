@@ -19,6 +19,7 @@ from clinical_trials_viz.cohort import Cohort, fetch_cohort
 from clinical_trials_viz.ctgov.client import CtGovClient, UpstreamError, count_requests
 from clinical_trials_viz.ctgov.trial import Trial
 from clinical_trials_viz.failures import Failure, classify
+from clinical_trials_viz.ledger import run_ledger
 from clinical_trials_viz.models.plan import (
     AnswerPlan,
     ClarifyPlan,
@@ -42,8 +43,8 @@ from clinical_trials_viz.models.response import (
 )
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import drug_drug_network, sponsor_drug_network
-from clinical_trials_viz.planner import Planner, run_scope, take_unreported_calls
-from clinical_trials_viz.planning import CallTally, plan_question
+from clinical_trials_viz.planner import Planner
+from clinical_trials_viz.planning import plan_question
 from clinical_trials_viz.render import chart_problem
 from clinical_trials_viz.runs import RunStore, StoreUnavailable, new_run_id
 from clinical_trials_viz.spec_builder import (
@@ -98,7 +99,6 @@ class _Run:
         self.base_url = base_url  # of chart_url links
         self.previous_request = previous_request  # for Follow-ups: carried over when the plan refines
         self.response = QueryResponse(run_id=new_run_id(), outcome=Outcome.INTERNAL_ERROR)
-        self.model_calls = CallTally()  # every model call of the Run, kept even when planning fails
         self.timings: dict[str, float] = {}
         self.stage_name = "plan"  # the stage under way, reported if the run deadline passes
         self.parts: Sequence[AnswerPlan | ClarifyPlan | UnsupportedPlan] = ()  # the Question's parts, once planned
@@ -175,7 +175,7 @@ class Pipeline:
         with tracer.start_as_current_span("run") as span, count_requests() as requests:
             span.set_attribute("run.id", run.response.run_id)
             deadline = asyncio.timeout(self.run_deadline)
-            with run_scope():
+            with run_ledger() as ledger:  # every model call of the Run, kept even when planning fails
                 try:
                     async with deadline:
                         previous = await self._load_previous(run)
@@ -187,11 +187,10 @@ class Pipeline:
                         self._stop_at_deadline(run)
                     else:
                         _fail(run.response, classify(exc, run.response.run_id))
-                run.model_calls.calls += take_unreported_calls()  # attempts of a planning step that failed
             span.set_attribute("run.outcome", run.response.outcome.value)
 
         response = run.response
-        response.model_calls = run.model_calls.calls
+        response.model_calls = ledger.total
         response.timings_ms = run.timings
         api_requests = requests[0]
         for answer in (response, *response.additional_answers):
@@ -230,7 +229,7 @@ class Pipeline:
     async def _execute(self, run: _Run, previous: QueryPlan | None) -> None:
         with run.stage("plan"):
             planning = await plan_question(
-                self.planner, run.request, previous, run.previous_request, await self.known_countries(), run.model_calls
+                self.planner, run.request, previous, run.previous_request, await self.known_countries()
             )
         run.request = planning.request
         response = run.response

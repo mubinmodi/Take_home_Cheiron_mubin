@@ -10,9 +10,9 @@ from dataclasses import dataclass
 from pydantic_ai import FallbackExceptionGroup, ModelAPIError, UnexpectedModelBehavior, UsageLimitExceeded
 
 from clinical_trials_viz.ctgov.client import ScopeTooLarge, UpstreamError
+from clinical_trials_viz.ledger import CallBudgetExhausted
 from clinical_trials_viz.models.response import ErrorCode, ErrorInfo, Outcome
 from clinical_trials_viz.planner import (
-    CallBudgetExhausted,
     PlannerNotConfigured,
     PlannerTimeout,
     describe_model_error,

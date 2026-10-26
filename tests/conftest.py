@@ -12,6 +12,7 @@ import respx
 from clinical_trials_viz.api import create_app
 from clinical_trials_viz.config import Settings
 from clinical_trials_viz.ctgov.trial import Trial, parse_trial
+from clinical_trials_viz.ledger import Step, run_ledger
 from clinical_trials_viz.models.plan import QueryPlan
 from clinical_trials_viz.planner import PlannerResult, SplitResult
 from clinical_trials_viz.validate import separate_requests
@@ -53,11 +54,9 @@ class ScriptedPlanner:
 
     async def split(self, message: str) -> SplitResult:
         """Stands in for the model's split step: the given split, else the code splitter."""
-        return SplitResult(self.splits.get(message) or separate_requests(message), 0, "scripted")
+        return SplitResult(self.splits.get(message) or separate_requests(message), "scripted")
 
-    async def plan(
-        self, question, structured, previous_plan, *, repair=None, max_calls=3, context=None
-    ) -> PlannerResult:
+    async def plan(self, question, structured, previous_plan, *, repair=None, context=None) -> PlannerResult:
         self.calls.append(
             {
                 "question": question,
@@ -67,7 +66,9 @@ class ScriptedPlanner:
                 "context": context,
             }
         )
-        return PlannerResult(self.plans.pop(0), 1, "scripted", [])
+        with run_ledger() as ledger, ledger.step(Step.PLANNING):
+            ledger.record()  # a stand-in for one model call, counted as a real planner's would be
+        return PlannerResult(self.plans.pop(0), "scripted", [])
 
 
 @pytest.fixture

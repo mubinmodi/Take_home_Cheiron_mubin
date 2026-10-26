@@ -193,7 +193,8 @@ Code map (`src/clinical_trials_viz/`):
 |---|---|
 | `pipeline.py` | The fixed workflow and outcomes |
 | `planning.py` | Split a multi-part question; plan each part; gate and one repair |
-| `planner.py` | The model step |
+| `planner.py` | The model steps (split, plan) |
+| `ledger.py` | The Run's model-call ledger: every attempt recorded once, the call caps enforced |
 | `validate.py` | Merge structured fields; semantic gate |
 | `cohort.py` | Compile filters, retrieve, drug match check |
 | `analyze.py`, `network.py` | All counting |
