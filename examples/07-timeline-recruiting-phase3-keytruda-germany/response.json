@@ -103,17 +103,6 @@
     },
     "data": [
       {
-        "trial": "NCT05899608 \u00b7 Clinical Study of Ivonescimab for First-line Treat",
-        "nct_id": "NCT05899608",
-        "start": "2023-10-26",
-        "end": "2028-12-31",
-        "dates": "Includes estimated dates",
-        "status": "RECRUITING",
-        "trial_ids": [
-          "NCT05899608"
-        ]
-      },
-      {
         "trial": "NCT05920356 \u00b7 A Study Evaluating Sotorasib Platinum Doublet Comb",
         "nct_id": "NCT05920356",
         "start": "2023-11-16",
@@ -194,7 +183,7 @@
         "trial": "NCT06345729 \u00b7 A Study of Calderasib (MK-1084) Plus Pembrolizumab",
         "nct_id": "NCT06345729",
         "start": "2024-05-24",
-        "end": "2029-02-19",
+        "end": "2028-01-24",
         "dates": "Includes estimated dates",
         "status": "RECRUITING",
         "trial_ids": [
@@ -642,6 +631,17 @@
         ]
       },
       {
+        "trial": "NCT07365319 \u00b7 A Safety and Efficacy Study of EIK1001 in Combinat",
+        "nct_id": "NCT07365319",
+        "start": "2026-06-15",
+        "end": "2035-12-31",
+        "dates": "Includes estimated dates",
+        "status": "RECRUITING",
+        "trial_ids": [
+          "NCT07365319"
+        ]
+      },
+      {
         "trial": "NCT07720284 \u00b7 An Open-label Study to Investigate the Efficacy an",
         "nct_id": "NCT07720284",
         "start": "2026-07-16",
@@ -657,7 +657,6 @@
       "units": "trials",
       "sort": "data_order",
       "category_order": [
-        "NCT05899608 \u00b7 Clinical Study of Ivonescimab for First-line Treat",
         "NCT05920356 \u00b7 A Study Evaluating Sotorasib Platinum Doublet Comb",
         "NCT06103864 \u00b7 A Phase III Study of Dato-DXd With or Without Durv",
         "NCT06170788 \u00b7 Sacituzumab Tirumotecan (MK-2870) in Combination W",
@@ -706,6 +705,7 @@
         "NCT07216703 \u00b7 A Clinical Study of Sacituzumab Tirumotecan (MK-28",
         "NCT07361510 \u00b7 A Study to Evaluate the Efficacy of Pumitamig Vers",
         "NCT07513376 \u00b7 A Clinical Trial of Adjuvant Intismeran (V940) Wit",
+        "NCT07365319 \u00b7 A Safety and Efficacy Study of EIK1001 in Combinat",
         "NCT07720284 \u00b7 An Open-label Study to Investigate the Efficacy an"
       ],
       "series_order": [
@@ -720,54 +720,8 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_d554c8bb723644758c6d3ac4689a1758/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_0a4c544ed07141bea084442f46062567/chart.png",
   "evidence": {
-    "NCT05899608": {
-      "nct_id": "NCT05899608",
-      "title": "Clinical Study of Ivonescimab for First-line Treatment of Metastatic NSCLC Patients",
-      "url": "https://clinicaltrials.gov/study/NCT05899608",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05899608",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "pembrolizumab"
-        ],
-        "protocolSection.designModule.phases": [
-          "PHASE3"
-        ],
-        "protocolSection.statusModule.overallStatus": "RECRUITING",
-        "protocolSection.contactsLocationsModule.locations.country": [
-          "United States",
-          "Belgium",
-          "Canada",
-          "China",
-          "France",
-          "Germany",
-          "Greece",
-          "Ireland",
-          "Italy",
-          "Japan",
-          "Mexico",
-          "Poland",
-          "Serbia",
-          "Spain",
-          "Sweden",
-          "Turkey (T\u00fcrkiye)",
-          "United Kingdom"
-        ],
-        "protocolSection.statusModule.startDateStruct": {
-          "date": "2023-10-26",
-          "type": "ACTUAL"
-        },
-        "protocolSection.statusModule.primaryCompletionDateStruct": {
-          "date": "2028-12-31",
-          "type": "ESTIMATED"
-        },
-        "protocolSection.statusModule.completionDateStruct": {
-          "date": "2029-12-31",
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT05920356": {
       "nct_id": "NCT05920356",
       "title": "A Study Evaluating Sotorasib Platinum Doublet Combination Versus Pembrolizumab Platinum Doublet Combination as a Front-Line Therapy in Participants With Stage IV or Advanced Stage IIIB/C Nonsquamous Non-Small Cell Lung Cancers (CodeBreaK 202)",
@@ -1222,6 +1176,8 @@
           "Canada",
           "Chile",
           "China",
+          "Colombia",
+          "Costa Rica",
           "France",
           "Georgia",
           "Germany",
@@ -1232,6 +1188,7 @@
           "Mexico",
           "Netherlands",
           "New Zealand",
+          "Peru",
           "Philippines",
           "Poland",
           "Romania",
@@ -1246,7 +1203,7 @@
           "type": "ACTUAL"
         },
         "protocolSection.statusModule.primaryCompletionDateStruct": {
-          "date": "2029-02-19",
+          "date": "2028-01-24",
           "type": "ESTIMATED"
         },
         "protocolSection.statusModule.completionDateStruct": {
@@ -1489,6 +1446,7 @@
           "United States",
           "Austria",
           "Belgium",
+          "Canada",
           "Czechia",
           "France",
           "Germany",
@@ -1912,7 +1870,7 @@
     },
     "NCT06712316": {
       "nct_id": "NCT06712316",
-      "title": "Safety, Efficacy, and Pharmacokinetics of BNT327 in Combination With Chemotherapy and Other Investigational Agents for Lung Cancer",
+      "title": "Safety, Efficacy, and Pharmacokinetics of BNT327 in Combination With Chemotherapy and Other Investigational Agents for Lung Cancer (ROSETTA Lung-02)",
       "url": "https://clinicaltrials.gov/study/NCT06712316",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06712316",
@@ -2812,6 +2770,7 @@
           "Poland",
           "Portugal",
           "Romania",
+          "Saudi Arabia",
           "Singapore",
           "South Africa",
           "South Korea",
@@ -2988,6 +2947,7 @@
           "Italy",
           "Japan",
           "Malaysia",
+          "Mexico",
           "Poland",
           "Portugal",
           "Romania",
@@ -3473,6 +3433,7 @@
           "Brazil",
           "Canada",
           "Chile",
+          "Colombia",
           "France",
           "Germany",
           "Greece",
@@ -3498,6 +3459,50 @@
         },
         "protocolSection.statusModule.completionDateStruct": {
           "date": "2038-05-11",
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07365319": {
+      "nct_id": "NCT07365319",
+      "title": "A Safety and Efficacy Study of EIK1001 in Combination With Pembrolizumab and Chemotherapy in Participants With Stage 4 Non-Small Cell Lung Cancer.",
+      "url": "https://clinicaltrials.gov/study/NCT07365319",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07365319",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "CP protocol",
+          "130-nm albumin-bound paclitaxel",
+          "Carboplatin",
+          "Pemetrexed",
+          "Cisplatin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2",
+          "PHASE3"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States",
+          "Australia",
+          "Belgium",
+          "Germany",
+          "Greece",
+          "Poland",
+          "South Africa",
+          "South Korea",
+          "Spain"
+        ],
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-06-15",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2035-12-31",
+          "type": "ESTIMATED"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2040-12-31",
           "type": "ESTIMATED"
         }
       }
@@ -3560,8 +3565,8 @@
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:10:57.839378Z",
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:52:25.842695Z",
     "search_matches": 56,
     "cohort_size": 55,
     "api_requests": 1
@@ -3600,15 +3605,14 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_d554c8bb723644758c6d3ac4689a1758",
+  "run_id": "run_0a4c544ed07141bea084442f46062567",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 3026.1,
-    "retrieve": 198.2,
-    "analyze": 0.2,
-    "verify": 0.6
+    "plan": 2200.1,
+    "retrieve": 187.4,
+    "analyze": 0.5
   }
 }

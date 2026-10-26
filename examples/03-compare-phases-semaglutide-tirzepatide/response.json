@@ -42,7 +42,7 @@
   "visualization": {
     "type": "grouped_bar_chart",
     "title": "Trials by phase: semaglutide vs tirzepatide",
-    "subtitle": "824 trials",
+    "subtitle": "849 trials",
     "encoding": {
       "x": {
         "field": "phase",
@@ -220,7 +220,7 @@
       {
         "phase": "Phase 2",
         "group": "semaglutide only",
-        "trial_count": 123,
+        "trial_count": 127,
         "trial_ids": [
           "NCT00696657",
           "NCT01923181",
@@ -281,6 +281,7 @@
           "NCT06050577",
           "NCT06057077",
           "NCT06072963",
+          "NCT06073184",
           "NCT06131372",
           "NCT06173778",
           "NCT06256549",
@@ -344,13 +345,16 @@
           "NCT07812597",
           "NCT07819227",
           "NCT07820358",
-          "NCT07836140"
+          "NCT07836140",
+          "NCT07871799",
+          "NCT07879612",
+          "NCT07891156"
         ]
       },
       {
         "phase": "Phase 3",
         "group": "semaglutide only",
-        "trial_count": 160,
+        "trial_count": 163,
         "trial_ids": [
           "NCT01720446",
           "NCT01885208",
@@ -443,6 +447,7 @@
           "NCT05996848",
           "NCT06041217",
           "NCT06045221",
+          "NCT06058585",
           "NCT06065540",
           "NCT06082063",
           "NCT06083675",
@@ -511,13 +516,15 @@
           "NCT07770282",
           "NCT07770841",
           "NCT07797036",
-          "NCT07845994"
+          "NCT07845994",
+          "NCT07866066",
+          "NCT07891156"
         ]
       },
       {
         "phase": "Phase 4",
         "group": "semaglutide only",
-        "trial_count": 92,
+        "trial_count": 100,
         "trial_ids": [
           "NCT03292315",
           "NCT03596450",
@@ -610,13 +617,21 @@
           "NCT07732218",
           "NCT07769047",
           "NCT07770152",
-          "NCT07783854"
+          "NCT07783854",
+          "NCT07858331",
+          "NCT07859137",
+          "NCT07859150",
+          "NCT07859163",
+          "NCT07859176",
+          "NCT07859189",
+          "NCT07870538",
+          "NCT07872904"
         ]
       },
       {
         "phase": "Not applicable",
         "group": "semaglutide only",
-        "trial_count": 39,
+        "trial_count": 41,
         "trial_ids": [
           "NCT04174755",
           "NCT04383197",
@@ -656,13 +671,15 @@
           "NCT07713992",
           "NCT07732426",
           "NCT07779343",
-          "NCT07849348"
+          "NCT07849348",
+          "NCT07874932",
+          "NCT07874971"
         ]
       },
       {
         "phase": "Not reported",
         "group": "semaglutide only",
-        "trial_count": 65,
+        "trial_count": 66,
         "trial_ids": [
           "NCT03457012",
           "NCT03631186",
@@ -728,7 +745,8 @@
           "NCT07619495",
           "NCT07621419",
           "NCT07627074",
-          "NCT07850765"
+          "NCT07850765",
+          "NCT07881770"
         ]
       },
       {
@@ -747,7 +765,7 @@
       {
         "phase": "Phase 1",
         "group": "tirzepatide only",
-        "trial_count": 33,
+        "trial_count": 34,
         "trial_ids": [
           "NCT02759107",
           "NCT03322631",
@@ -781,7 +799,8 @@
           "NCT07559500",
           "NCT07782359",
           "NCT07803744",
-          "NCT07842640"
+          "NCT07842640",
+          "NCT07868354"
         ]
       },
       {
@@ -797,7 +816,6 @@
           "NCT05912621",
           "NCT05933499",
           "NCT06037252",
-          "NCT06073184",
           "NCT06143956",
           "NCT06162715",
           "NCT06180616",
@@ -856,13 +874,14 @@
           "NCT07747805",
           "NCT07796477",
           "NCT07825857",
-          "NCT07846865"
+          "NCT07846865",
+          "NCT07874828"
         ]
       },
       {
         "phase": "Phase 3",
         "group": "tirzepatide only",
-        "trial_count": 46,
+        "trial_count": 49,
         "trial_ids": [
           "NCT03730662",
           "NCT03861039",
@@ -909,13 +928,16 @@
           "NCT07817875",
           "NCT07829198",
           "NCT07834398",
-          "NCT07846865"
+          "NCT07846865",
+          "NCT07881432",
+          "NCT07881458",
+          "NCT07889648"
         ]
       },
       {
         "phase": "Phase 4",
         "group": "tirzepatide only",
-        "trial_count": 35,
+        "trial_count": 36,
         "trial_ids": [
           "NCT05433584",
           "NCT05553093",
@@ -951,13 +973,14 @@
           "NCT07707778",
           "NCT07715929",
           "NCT07756359",
-          "NCT07777575"
+          "NCT07777575",
+          "NCT07893457"
         ]
       },
       {
         "phase": "Not applicable",
         "group": "tirzepatide only",
-        "trial_count": 9,
+        "trial_count": 10,
         "trial_ids": [
           "NCT06301256",
           "NCT07176663",
@@ -967,13 +990,14 @@
           "NCT07382024",
           "NCT07443956",
           "NCT07574723",
-          "NCT07811895"
+          "NCT07811895",
+          "NCT07866183"
         ]
       },
       {
         "phase": "Not reported",
         "group": "tirzepatide only",
-        "trial_count": 12,
+        "trial_count": 13,
         "trial_ids": [
           "NCT05766358",
           "NCT06485089",
@@ -986,7 +1010,8 @@
           "NCT07504172",
           "NCT07567378",
           "NCT07638592",
-          "NCT07847515"
+          "NCT07847515",
+          "NCT07889453"
         ]
       },
       {
@@ -1056,7 +1081,7 @@
       {
         "phase": "Not reported",
         "group": "Both",
-        "trial_count": 15,
+        "trial_count": 16,
         "trial_ids": [
           "NCT05756764",
           "NCT06354101",
@@ -1072,7 +1097,8 @@
           "NCT07640139",
           "NCT07653412",
           "NCT07701005",
-          "NCT07760532"
+          "NCT07760532",
+          "NCT07858864"
         ]
       }
     ],
@@ -1095,12 +1121,12 @@
       ],
       "other_bucket": false,
       "multi_valued": true,
-      "cohort_size": 824,
+      "cohort_size": 849,
       "bipartite": false,
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_5cd50df39c644e30a336d4d2f61ec15a/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_83f8cc1cef5e4f92a8aa1b36ba8ad360/chart.png",
   "evidence": {
     "NCT05249881": {
       "nct_id": "NCT05249881",
@@ -3749,6 +3775,21 @@
         ]
       }
     },
+    "NCT06073184": {
+      "nct_id": "NCT06073184",
+      "title": "Weight-loss Drug for Fertility-Sparing Treatment of Atypical Hyperplasia and Low-grade Cancer of the Endometrium",
+      "url": "https://clinicaltrials.gov/study/NCT06073184",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06073184",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide",
+          "Levonorgestrel"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2"
+        ]
+      }
+    },
     "NCT06131372": {
       "nct_id": "NCT06131372",
       "title": "A Research Study to See if Kidney Damage in People With Chronic Kidney Disease and Type 2 Diabetes Living With Overweight or Obesity Can be Reduced by CagriSema Compared to Semaglutide, Cagrilintide and Placebo",
@@ -4611,6 +4652,52 @@
         ],
         "protocolSection.designModule.phases": [
           "PHASE2"
+        ]
+      }
+    },
+    "NCT07871799": {
+      "nct_id": "NCT07871799",
+      "title": "ELITE: Deep Profiling and Algorithmic Polytherapy to Map Individual Response in Healthy Aging",
+      "url": "https://clinicaltrials.gov/study/NCT07871799",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07871799",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Metformin",
+          "semaglutide",
+          "empagliflozin"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2"
+        ]
+      }
+    },
+    "NCT07879612": {
+      "nct_id": "NCT07879612",
+      "title": "Semaglutide for the Treatment of Cannabis Use Disorder",
+      "url": "https://clinicaltrials.gov/study/NCT07879612",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07879612",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2"
+        ]
+      }
+    },
+    "NCT07891156": {
+      "nct_id": "NCT07891156",
+      "title": "Lean Mass Changes With Semaglutide in Adults With Type 1 Diabetes and Overweight/Obesity.",
+      "url": "https://clinicaltrials.gov/study/NCT07891156",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07891156",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide",
+          "Saline Solution"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2",
+          "PHASE3"
         ]
       }
     },
@@ -5861,6 +5948,21 @@
         ]
       }
     },
+    "NCT06058585": {
+      "nct_id": "NCT06058585",
+      "title": "The Chronic Kidney Disease Adaptive Platform Trial Investigating Various Agents for Therapeutic Effect",
+      "url": "https://clinicaltrials.gov/study/NCT06058585",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06058585",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "finerenone",
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ]
+      }
+    },
     "NCT06065540": {
       "nct_id": "NCT06065540",
       "title": "A Research Study to See How Well CagriSema Compared to Semaglutide, Cagrilintide and Placebo Lowers Blood Sugar and Body Weight in People With Type 2 Diabetes Treated With Metformin With or Without an SGLT2 Inhibitor",
@@ -6115,7 +6217,7 @@
     },
     "NCT06716216": {
       "nct_id": "NCT06716216",
-      "title": "A Study of BGM0504 in Participants with Type 2 Diabetes",
+      "title": "A Study of BGM0504 in Participants With Type 2 Diabetes",
       "url": "https://clinicaltrials.gov/study/NCT06716216",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06716216",
@@ -6747,6 +6849,20 @@
       "url": "https://clinicaltrials.gov/study/NCT07845994",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07845994",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ]
+      }
+    },
+    "NCT07866066": {
+      "nct_id": "NCT07866066",
+      "title": "Maridebart Cafraglutide Versus Semaglutide in Participants With Type 2 Diabetes",
+      "url": "https://clinicaltrials.gov/study/NCT07866066",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07866066",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "semaglutide"
         ],
@@ -8149,6 +8265,124 @@
         ]
       }
     },
+    "NCT07858331": {
+      "nct_id": "NCT07858331",
+      "title": "Patient-centred Intervention With Virtual Support for Obesity and Kidney Transplant Access",
+      "url": "https://clinicaltrials.gov/study/NCT07858331",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07858331",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
+    "NCT07859137": {
+      "nct_id": "NCT07859137",
+      "title": "Semaglutide Before Primary Metabolic and Bariatric Surgery in Patients With BMI 60 kg/m\u00b2 or Higher",
+      "url": "https://clinicaltrials.gov/study/NCT07859137",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859137",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Semaglutide weekly injection",
+          "Placebo"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
+    "NCT07859150": {
+      "nct_id": "NCT07859150",
+      "title": "Semaglutide 2.4 mg Once Weekly for Recurrent Weight Gain After Metabolic and Bariatric Surgery (RESURGE)",
+      "url": "https://clinicaltrials.gov/study/NCT07859150",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859150",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Semaglutide weekly injection",
+          "Placabo"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
+    "NCT07859163": {
+      "nct_id": "NCT07859163",
+      "title": "Semaglutide Given Before and After Conversion of Sleeve Gastrectomy to Roux-en-Y Gastric Bypass for Recurrent Weight Gain",
+      "url": "https://clinicaltrials.gov/study/NCT07859163",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859163",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Semaglutide weekly injection",
+          "Placebo"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
+    "NCT07859176": {
+      "nct_id": "NCT07859176",
+      "title": "Tapered Versus Abrupt Discontinuation of Semaglutide After Treatment of Recurrent Weight Gain or Suboptimal Response Following Metabolic and Bariatric Surgery",
+      "url": "https://clinicaltrials.gov/study/NCT07859176",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859176",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Semaglutide weekly injection",
+          "Placebo"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
+    "NCT07859189": {
+      "nct_id": "NCT07859189",
+      "title": "Immediate Versus Criterion-triggered Semaglutide for Suboptimal Clinical Response One Year After Primary Metabolic and Bariatric Surgery",
+      "url": "https://clinicaltrials.gov/study/NCT07859189",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859189",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Semaglutide weekly injection",
+          "Placebo"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
+    "NCT07870538": {
+      "nct_id": "NCT07870538",
+      "title": "A Neuropsychobiological Approach to Optimize Patient Selection for GLP-1-based Pharmacotherapy for Weight Management Across the Binge Eating Spectrum",
+      "url": "https://clinicaltrials.gov/study/NCT07870538",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07870538",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Semaglutide 3,2 mg/ml"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
+    "NCT07872904": {
+      "nct_id": "NCT07872904",
+      "title": "FutureShape Family",
+      "url": "https://clinicaltrials.gov/study/NCT07872904",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07872904",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Standard of Care",
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
     "NCT04174755": {
       "nct_id": "NCT04174755",
       "title": "Semaglutide's Efficacy in Achieving Weight Loss for Those With HIV",
@@ -8429,7 +8663,7 @@
     },
     "NCT06715514": {
       "nct_id": "NCT06715514",
-      "title": "Menopausal Hormone Therapy, GLP-1 Agonists, and Glucose and Energy Homeostasis in Postmenopausal Women With Diabetes",
+      "title": "Menopausal Hormone Therapy, GLP-1 Agonists, and Glucose and Energy Homeostasis in Postmenopausal Women With Overweight/Obesity and Impaired Glucose Homeostasis",
       "url": "https://clinicaltrials.gov/study/NCT06715514",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06715514",
@@ -8714,6 +8948,34 @@
         "protocolSection.identificationModule.nctId": "NCT07849348",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "finerenone",
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": [
+          "NA"
+        ]
+      }
+    },
+    "NCT07874932": {
+      "nct_id": "NCT07874932",
+      "title": "Long-Term Effects of Semaglutide on Body Composition and Performance in Running",
+      "url": "https://clinicaltrials.gov/study/NCT07874932",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07874932",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": [
+          "NA"
+        ]
+      }
+    },
+    "NCT07874971": {
+      "nct_id": "NCT07874971",
+      "title": "Short Term Effects of Semaglutide on Body Composition and Performance",
+      "url": "https://clinicaltrials.gov/study/NCT07874971",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07874971",
+        "derivedSection.interventionBrowseModule.meshes.term": [
           "semaglutide"
         ],
         "protocolSection.designModule.phases": [
@@ -9531,6 +9793,18 @@
         "protocolSection.designModule.phases": []
       }
     },
+    "NCT07881770": {
+      "nct_id": "NCT07881770",
+      "title": "Semaglutide Health Outcomes and Patient Adherence in Australia",
+      "url": "https://clinicaltrials.gov/study/NCT07881770",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07881770",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide"
+        ],
+        "protocolSection.designModule.phases": []
+      }
+    },
     "NCT06734273": {
       "nct_id": "NCT06734273",
       "title": "Randomized Control Trial of Sleeve Gastrectomy With Tirzepatide in Maximizing Weight Loss",
@@ -10088,6 +10362,20 @@
         ]
       }
     },
+    "NCT07868354": {
+      "nct_id": "NCT07868354",
+      "title": "A Research Study Investigating How Adults With Overweight or Obesity, With or Without Type 2 Diabetes, Tolerate Switching to a New Treatment (Zenagamtide) From Their Current Tirzepatide Medication",
+      "url": "https://clinicaltrials.gov/study/NCT07868354",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07868354",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE1"
+        ]
+      }
+    },
     "NCT03131687": {
       "nct_id": "NCT03131687",
       "title": "A Study of Tirzepatide (LY3298176) in Participants With Type 2 Diabetes Mellitus",
@@ -10198,21 +10486,6 @@
         "protocolSection.identificationModule.nctId": "NCT06037252",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Tirzepatide"
-        ],
-        "protocolSection.designModule.phases": [
-          "PHASE2"
-        ]
-      }
-    },
-    "NCT06073184": {
-      "nct_id": "NCT06073184",
-      "title": "Weight-loss Drug for Fertility-Sparing Treatment of Atypical Hyperplasia and Low-grade Cancer of the Endometrium",
-      "url": "https://clinicaltrials.gov/study/NCT06073184",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06073184",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Tirzepatide",
-          "Levonorgestrel"
         ],
         "protocolSection.designModule.phases": [
           "PHASE2"
@@ -11009,6 +11282,20 @@
         ]
       }
     },
+    "NCT07874828": {
+      "nct_id": "NCT07874828",
+      "title": "PROACT AYA: Preventing Overweight/Obesity-Associated Cardiotoxicity With Tirzepatide In Adolescent And Young Adult Cancer Survivors - A Phase 2 Single-Arm, Single-Center Feasibility Study",
+      "url": "https://clinicaltrials.gov/study/NCT07874828",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07874828",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE2"
+        ]
+      }
+    },
     "NCT03730662": {
       "nct_id": "NCT03730662",
       "title": "A Study of Tirzepatide (LY3298176) Once a Week Versus Insulin Glargine Once a Day in Participants With Type 2 Diabetes and Increased Cardiovascular Risk",
@@ -11615,6 +11902,48 @@
         ]
       }
     },
+    "NCT07881432": {
+      "nct_id": "NCT07881432",
+      "title": "A Study of EloraTZP in Adult Participants With Obesity Without Type 2 Diabetes",
+      "url": "https://clinicaltrials.gov/study/NCT07881432",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07881432",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ]
+      }
+    },
+    "NCT07881458": {
+      "nct_id": "NCT07881458",
+      "title": "A Study of EloraTZP in Adult Participants With Obesity or Overweight and Type 2 Diabetes",
+      "url": "https://clinicaltrials.gov/study/NCT07881458",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07881458",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ]
+      }
+    },
+    "NCT07889648": {
+      "nct_id": "NCT07889648",
+      "title": "A Clinical Study to Evaluate the Effects of Enicepatide Versus Tirzepatide in Participants With Type 2 Diabetes and Inadequate Blood Sugar Control on Oral Glucose-Lowering Medications",
+      "url": "https://clinicaltrials.gov/study/NCT07889648",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07889648",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE3"
+        ]
+      }
+    },
     "NCT05433584": {
       "nct_id": "NCT05433584",
       "title": "A Study of Tirzepatide Compared With Intensified Conventional Care in Adult Participants With Type 2 Diabetes",
@@ -12119,6 +12448,20 @@
         ]
       }
     },
+    "NCT07893457": {
+      "nct_id": "NCT07893457",
+      "title": "Effects of Tirzepatide on Esophagogastric Junction Mechanics, Reflux Burden, and Gastric Physiology in Adults With Obesity",
+      "url": "https://clinicaltrials.gov/study/NCT07893457",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07893457",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": [
+          "PHASE4"
+        ]
+      }
+    },
     "NCT06301256": {
       "nct_id": "NCT06301256",
       "title": "Evaluate the Efficacy of TIRZEPATIDE for the Treatment of Moderate to Severe HS Hidradenitis Suppurativa",
@@ -12242,6 +12585,20 @@
       "url": "https://clinicaltrials.gov/study/NCT07811895",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07811895",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": [
+          "NA"
+        ]
+      }
+    },
+    "NCT07866183": {
+      "nct_id": "NCT07866183",
+      "title": "Trial of Innovative Fat-loss Focused Approaches in Patients With Class I Obesity: a Comparative Study",
+      "url": "https://clinicaltrials.gov/study/NCT07866183",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07866183",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Tirzepatide"
         ],
@@ -12390,6 +12747,18 @@
       "url": "https://clinicaltrials.gov/study/NCT07847515",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07847515",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Tirzepatide"
+        ],
+        "protocolSection.designModule.phases": []
+      }
+    },
+    "NCT07889453": {
+      "nct_id": "NCT07889453",
+      "title": "Metabolic Effects of Switching From Injectable Semaglutide to Tirzepatide",
+      "url": "https://clinicaltrials.gov/study/NCT07889453",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07889453",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Tirzepatide"
         ],
@@ -12984,21 +13353,35 @@
         ],
         "protocolSection.designModule.phases": []
       }
+    },
+    "NCT07858864": {
+      "nct_id": "NCT07858864",
+      "title": "GLP-1 Receptor Agonist Use and Sarcopenia in Obese Individuals Without Diabetes",
+      "url": "https://clinicaltrials.gov/study/NCT07858864",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07858864",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide",
+          "Tirzepatide",
+          "Standard of Care"
+        ],
+        "protocolSection.designModule.phases": []
+      }
     }
   },
   "assumptions": [
-    "146 of 769 search matches for 'semaglutide' were excluded because 'semaglutide' is not one of their drug interventions.",
-    "57 of 296 search matches for 'tirzepatide' were excluded because 'tirzepatide' is not one of their drug interventions.",
+    "149 of 790 search matches for 'semaglutide' were excluded because 'semaglutide' is not one of their drug interventions.",
+    "60 of 307 search matches for 'tirzepatide' were excluded because 'tirzepatide' is not one of their drug interventions.",
     "Trials that involve more than one compared side are shown as 'Both'.",
     "A trial can have several phase values, so categories can add up to more than the total."
   ],
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:10:21.648294Z",
-    "search_matches": 1065,
-    "cohort_size": 824,
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:51:55.411889Z",
+    "search_matches": 1097,
+    "cohort_size": 849,
     "api_requests": 2
   },
   "verification": {
@@ -13039,15 +13422,14 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_5cd50df39c644e30a336d4d2f61ec15a",
+  "run_id": "run_83f8cc1cef5e4f92a8aa1b36ba8ad360",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 2193.6,
-    "retrieve": 1115.8,
-    "analyze": 1.9,
-    "verify": 4.8
+    "plan": 2232.9,
+    "retrieve": 1030.8,
+    "analyze": 3.6
   }
 }

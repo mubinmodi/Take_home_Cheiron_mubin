@@ -39,7 +39,7 @@
   "visualization": {
     "type": "network_graph",
     "title": "Drugs given together in the same arm: pembrolizumab",
-    "subtitle": "1,804 trials with a same-arm drug combination \u00b7 showing 25 nodes, 60 links",
+    "subtitle": "1,817 trials with a same-arm drug combination \u00b7 showing 25 nodes, 60 links",
     "encoding": {
       "color": {
         "field": "kind",
@@ -95,7 +95,7 @@
           "id": "drug:pembrolizumab",
           "label": "pembrolizumab",
           "kind": "drug",
-          "trial_count": 1739,
+          "trial_count": 1751,
           "trial_ids": [
             "NCT01174121",
             "NCT01676753",
@@ -1319,7 +1319,6 @@
             "NCT05653882",
             "NCT05656235",
             "NCT05668949",
-            "NCT05669352",
             "NCT05669846",
             "NCT05673200",
             "NCT05675579",
@@ -1547,6 +1546,7 @@
             "NCT06452277",
             "NCT06460961",
             "NCT06462794",
+            "NCT06465069",
             "NCT06469944",
             "NCT06470282",
             "NCT06475235",
@@ -1682,6 +1682,7 @@
             "NCT07016399",
             "NCT07017829",
             "NCT07018570",
+            "NCT07020221",
             "NCT07021989",
             "NCT07026474",
             "NCT07027124",
@@ -1735,6 +1736,7 @@
             "NCT07244393",
             "NCT07247110",
             "NCT07252739",
+            "NCT07254585",
             "NCT07255664",
             "NCT07262619",
             "NCT07264816",
@@ -1765,6 +1767,7 @@
             "NCT07436390",
             "NCT07452224",
             "NCT07455032",
+            "NCT07458347",
             "NCT07460206",
             "NCT07465276",
             "NCT07466927",
@@ -1819,6 +1822,7 @@
             "NCT07762716",
             "NCT07765433",
             "NCT07770100",
+            "NCT07772882",
             "NCT07777822",
             "NCT07786428",
             "NCT07793942",
@@ -1835,14 +1839,22 @@
             "NCT07840456",
             "NCT07843550",
             "NCT07845786",
-            "NCT07853690"
+            "NCT07850791",
+            "NCT07853690",
+            "NCT07862751",
+            "NCT07865910",
+            "NCT07877584",
+            "NCT07886905",
+            "NCT07889232",
+            "NCT07890493",
+            "NCT07890714"
           ]
         },
         {
           "id": "drug:carboplatin",
           "label": "carboplatin",
           "kind": "drug",
-          "trial_count": 295,
+          "trial_count": 302,
           "trial_ids": [
             "NCT01704287",
             "NCT02009449",
@@ -2128,6 +2140,7 @@
             "NCT07341867",
             "NCT07365319",
             "NCT07420439",
+            "NCT07458347",
             "NCT07486817",
             "NCT07622186",
             "NCT07668154",
@@ -2138,14 +2151,20 @@
             "NCT07756645",
             "NCT07786428",
             "NCT07793942",
-            "NCT07845786"
+            "NCT07845786",
+            "NCT07862751",
+            "NCT07865910",
+            "NCT07877584",
+            "NCT07885709",
+            "NCT07889232",
+            "NCT07890493"
           ]
         },
         {
           "id": "drug:cisplatin",
           "label": "cisplatin",
           "kind": "drug",
-          "trial_count": 215,
+          "trial_count": 216,
           "trial_ids": [
             "NCT01840579",
             "NCT02142738",
@@ -2361,14 +2380,15 @@
             "NCT07793942",
             "NCT07801027",
             "NCT07829783",
-            "NCT07853690"
+            "NCT07853690",
+            "NCT07877584"
           ]
         },
         {
           "id": "drug:paclitaxel",
           "label": "paclitaxel",
           "kind": "drug",
-          "trial_count": 195,
+          "trial_count": 198,
           "trial_ids": [
             "NCT01704287",
             "NCT01840579",
@@ -2562,16 +2582,19 @@
             "NCT07634094",
             "NCT07744698",
             "NCT07756645",
+            "NCT07772882",
             "NCT07786428",
             "NCT07793942",
-            "NCT07845786"
+            "NCT07845786",
+            "NCT07862751",
+            "NCT07890493"
           ]
         },
         {
           "id": "drug:pemetrexed",
           "label": "pemetrexed",
           "kind": "drug",
-          "trial_count": 165,
+          "trial_count": 170,
           "trial_ids": [
             "NCT01840579",
             "NCT02039674",
@@ -2733,11 +2756,16 @@
             "NCT07190248",
             "NCT07415031",
             "NCT07420439",
+            "NCT07458347",
             "NCT07486817",
             "NCT07524257",
             "NCT07739966",
             "NCT07777822",
-            "NCT07793942"
+            "NCT07793942",
+            "NCT07865910",
+            "NCT07877584",
+            "NCT07885709",
+            "NCT07890493"
           ]
         },
         {
@@ -2990,7 +3018,7 @@
           "id": "drug:nivolumab",
           "label": "nivolumab",
           "kind": "drug",
-          "trial_count": 104,
+          "trial_count": 105,
           "trial_ids": [
             "NCT02009449",
             "NCT02054520",
@@ -3095,14 +3123,15 @@
             "NCT07718139",
             "NCT07720284",
             "NCT07770100",
-            "NCT07856212"
+            "NCT07856212",
+            "NCT07885709"
           ]
         },
         {
           "id": "drug:cyclophosphamide",
           "label": "cyclophosphamide",
           "kind": "drug",
-          "trial_count": 80,
+          "trial_count": 82,
           "trial_ids": [
             "NCT01174121",
             "NCT01822652",
@@ -3183,7 +3212,9 @@
             "NCT07199413",
             "NCT07255664",
             "NCT07300475",
-            "NCT07341867"
+            "NCT07341867",
+            "NCT07772882",
+            "NCT07862751"
           ]
         },
         {
@@ -3268,6 +3299,79 @@
           ]
         },
         {
+          "id": "drug:bevacizumab",
+          "label": "bevacizumab",
+          "kind": "drug",
+          "trial_count": 65,
+          "trial_ids": [
+            "NCT02039674",
+            "NCT02313272",
+            "NCT02337491",
+            "NCT02348008",
+            "NCT02563002",
+            "NCT02606305",
+            "NCT02794571",
+            "NCT02853318",
+            "NCT03367871",
+            "NCT03396926",
+            "NCT03475004",
+            "NCT03596281",
+            "NCT03635567",
+            "NCT03661723",
+            "NCT03740165",
+            "NCT03768063",
+            "NCT03786081",
+            "NCT03813394",
+            "NCT03872947",
+            "NCT03878524",
+            "NCT03899155",
+            "NCT04107168",
+            "NCT04121455",
+            "NCT04185883",
+            "NCT04262466",
+            "NCT04262687",
+            "NCT04919629",
+            "NCT05007106",
+            "NCT05083481",
+            "NCT05101070",
+            "NCT05116189",
+            "NCT05158062",
+            "NCT05203172",
+            "NCT05231122",
+            "NCT05239741",
+            "NCT05431582",
+            "NCT05440708",
+            "NCT05446870",
+            "NCT05482893",
+            "NCT05579366",
+            "NCT05585814",
+            "NCT05719558",
+            "NCT05751187",
+            "NCT05797168",
+            "NCT05824975",
+            "NCT05834348",
+            "NCT06004245",
+            "NCT06047379",
+            "NCT06083844",
+            "NCT06400472",
+            "NCT06447662",
+            "NCT06543576",
+            "NCT06551142",
+            "NCT06576037",
+            "NCT06704724",
+            "NCT06771622",
+            "NCT06843447",
+            "NCT06976944",
+            "NCT07054567",
+            "NCT07157969",
+            "NCT07198074",
+            "NCT07216703",
+            "NCT07286266",
+            "NCT07420439",
+            "NCT07772882"
+          ]
+        },
+        {
           "id": "drug:capecitabine",
           "label": "capecitabine",
           "kind": "drug",
@@ -3338,78 +3442,6 @@
             "NCT07801027",
             "NCT07829783",
             "NCT07856212"
-          ]
-        },
-        {
-          "id": "drug:bevacizumab",
-          "label": "bevacizumab",
-          "kind": "drug",
-          "trial_count": 64,
-          "trial_ids": [
-            "NCT02039674",
-            "NCT02313272",
-            "NCT02337491",
-            "NCT02348008",
-            "NCT02563002",
-            "NCT02606305",
-            "NCT02794571",
-            "NCT02853318",
-            "NCT03367871",
-            "NCT03396926",
-            "NCT03475004",
-            "NCT03596281",
-            "NCT03635567",
-            "NCT03661723",
-            "NCT03740165",
-            "NCT03768063",
-            "NCT03786081",
-            "NCT03813394",
-            "NCT03872947",
-            "NCT03878524",
-            "NCT03899155",
-            "NCT04107168",
-            "NCT04121455",
-            "NCT04185883",
-            "NCT04262466",
-            "NCT04262687",
-            "NCT04919629",
-            "NCT05007106",
-            "NCT05083481",
-            "NCT05101070",
-            "NCT05116189",
-            "NCT05158062",
-            "NCT05203172",
-            "NCT05231122",
-            "NCT05239741",
-            "NCT05431582",
-            "NCT05440708",
-            "NCT05446870",
-            "NCT05482893",
-            "NCT05579366",
-            "NCT05585814",
-            "NCT05719558",
-            "NCT05751187",
-            "NCT05797168",
-            "NCT05824975",
-            "NCT05834348",
-            "NCT06004245",
-            "NCT06047379",
-            "NCT06083844",
-            "NCT06400472",
-            "NCT06447662",
-            "NCT06543576",
-            "NCT06551142",
-            "NCT06576037",
-            "NCT06704724",
-            "NCT06771622",
-            "NCT06843447",
-            "NCT06976944",
-            "NCT07054567",
-            "NCT07157969",
-            "NCT07198074",
-            "NCT07216703",
-            "NCT07286266",
-            "NCT07420439"
           ]
         },
         {
@@ -3617,7 +3649,7 @@
           "id": "drug:cetuximab",
           "label": "cetuximab",
           "kind": "drug",
-          "trial_count": 47,
+          "trial_count": 48,
           "trial_ids": [
             "NCT02252042",
             "NCT02318901",
@@ -3665,7 +3697,8 @@
             "NCT07223047",
             "NCT07247110",
             "NCT07252739",
-            "NCT07415031"
+            "NCT07415031",
+            "NCT07458347"
           ]
         },
         {
@@ -3726,7 +3759,7 @@
           "id": "drug:doxorubicin",
           "label": "doxorubicin",
           "kind": "drug",
-          "trial_count": 41,
+          "trial_count": 42,
           "trial_ids": [
             "NCT02419495",
             "NCT02483247",
@@ -3768,7 +3801,8 @@
             "NCT07016399",
             "NCT07300475",
             "NCT07341867",
-            "NCT07823491"
+            "NCT07823491",
+            "NCT07862751"
           ]
         },
         {
@@ -3824,7 +3858,7 @@
           "id": "drug:enfortumab vedotin",
           "label": "enfortumab vedotin",
           "kind": "drug",
-          "trial_count": 37,
+          "trial_count": 38,
           "trial_ids": [
             "NCT03288545",
             "NCT03547973",
@@ -3862,7 +3896,8 @@
             "NCT07667335",
             "NCT07720284",
             "NCT07815665",
-            "NCT07822373"
+            "NCT07822373",
+            "NCT07890714"
           ]
         },
         {
@@ -4058,7 +4093,7 @@
           "source": "drug:carboplatin",
           "target": "drug:pembrolizumab",
           "kind": "same_arm",
-          "trial_count": 254,
+          "trial_count": 260,
           "trial_ids": [
             "NCT01704287",
             "NCT02039674",
@@ -4304,6 +4339,7 @@
             "NCT07318883",
             "NCT07341867",
             "NCT07365319",
+            "NCT07458347",
             "NCT07486817",
             "NCT07622186",
             "NCT07668154",
@@ -4313,14 +4349,19 @@
             "NCT07744126",
             "NCT07756645",
             "NCT07786428",
-            "NCT07845786"
+            "NCT07845786",
+            "NCT07862751",
+            "NCT07865910",
+            "NCT07877584",
+            "NCT07889232",
+            "NCT07890493"
           ]
         },
         {
           "source": "drug:cisplatin",
           "target": "drug:pembrolizumab",
           "kind": "same_arm",
-          "trial_count": 188,
+          "trial_count": 189,
           "trial_ids": [
             "NCT01840579",
             "NCT02194738",
@@ -4509,14 +4550,15 @@
             "NCT07765433",
             "NCT07801027",
             "NCT07829783",
-            "NCT07853690"
+            "NCT07853690",
+            "NCT07877584"
           ]
         },
         {
           "source": "drug:paclitaxel",
           "target": "drug:pembrolizumab",
           "kind": "same_arm",
-          "trial_count": 160,
+          "trial_count": 163,
           "trial_ids": [
             "NCT01704287",
             "NCT01840579",
@@ -4676,15 +4718,18 @@
             "NCT07524257",
             "NCT07634094",
             "NCT07756645",
+            "NCT07772882",
             "NCT07786428",
-            "NCT07845786"
+            "NCT07845786",
+            "NCT07862751",
+            "NCT07890493"
           ]
         },
         {
           "source": "drug:pembrolizumab",
           "target": "drug:pemetrexed",
           "kind": "same_arm",
-          "trial_count": 143,
+          "trial_count": 146,
           "trial_ids": [
             "NCT01840579",
             "NCT02039674",
@@ -4741,7 +4786,6 @@
             "NCT04396457",
             "NCT04452214",
             "NCT04524689",
-            "NCT04533451",
             "NCT04619797",
             "NCT04622007",
             "NCT04638582",
@@ -4825,17 +4869,21 @@
             "NCT07178795",
             "NCT07190248",
             "NCT07415031",
+            "NCT07458347",
             "NCT07486817",
             "NCT07524257",
             "NCT07739966",
-            "NCT07777822"
+            "NCT07777822",
+            "NCT07865910",
+            "NCT07877584",
+            "NCT07890493"
           ]
         },
         {
           "source": "drug:carboplatin",
           "target": "drug:pemetrexed",
           "kind": "same_arm",
-          "trial_count": 122,
+          "trial_count": 126,
           "trial_ids": [
             "NCT02039674",
             "NCT02142738",
@@ -4958,14 +5006,18 @@
             "NCT07190248",
             "NCT07486817",
             "NCT07739966",
-            "NCT07793942"
+            "NCT07793942",
+            "NCT07865910",
+            "NCT07877584",
+            "NCT07885709",
+            "NCT07890493"
           ]
         },
         {
           "source": "drug:carboplatin",
           "target": "drug:paclitaxel",
           "kind": "same_arm",
-          "trial_count": 120,
+          "trial_count": 122,
           "trial_ids": [
             "NCT01704287",
             "NCT02039674",
@@ -5086,7 +5138,9 @@
             "NCT07756645",
             "NCT07786428",
             "NCT07793942",
-            "NCT07845786"
+            "NCT07845786",
+            "NCT07862751",
+            "NCT07890493"
           ]
         },
         {
@@ -5218,96 +5272,10 @@
           ]
         },
         {
-          "source": "drug:cisplatin",
-          "target": "drug:pemetrexed",
-          "kind": "same_arm",
-          "trial_count": 78,
-          "trial_ids": [
-            "NCT01840579",
-            "NCT02142738",
-            "NCT02194738",
-            "NCT02578680",
-            "NCT02784171",
-            "NCT02794571",
-            "NCT02862457",
-            "NCT03085914",
-            "NCT03425643",
-            "NCT03515837",
-            "NCT03564691",
-            "NCT03631199",
-            "NCT03631784",
-            "NCT03645928",
-            "NCT03664024",
-            "NCT03760575",
-            "NCT03829319",
-            "NCT03950674",
-            "NCT03976323",
-            "NCT04083599",
-            "NCT04153565",
-            "NCT04194944",
-            "NCT04198766",
-            "NCT04222972",
-            "NCT04253964",
-            "NCT04267848",
-            "NCT04380636",
-            "NCT04524689",
-            "NCT04619797",
-            "NCT04716933",
-            "NCT04750083",
-            "NCT04956640",
-            "NCT04956692",
-            "NCT05017012",
-            "NCT05048797",
-            "NCT05226598",
-            "NCT05298423",
-            "NCT05382559",
-            "NCT05410145",
-            "NCT05555732",
-            "NCT05687266",
-            "NCT05722015",
-            "NCT05751187",
-            "NCT05789082",
-            "NCT05791097",
-            "NCT06008093",
-            "NCT06119581",
-            "NCT06151574",
-            "NCT06162221",
-            "NCT06212752",
-            "NCT06236438",
-            "NCT06312137",
-            "NCT06318286",
-            "NCT06447662",
-            "NCT06452277",
-            "NCT06463665",
-            "NCT06561386",
-            "NCT06561685",
-            "NCT06585189",
-            "NCT06607185",
-            "NCT06607393",
-            "NCT06627647",
-            "NCT06632327",
-            "NCT06687369",
-            "NCT06704724",
-            "NCT06745882",
-            "NCT06772623",
-            "NCT06788912",
-            "NCT06793215",
-            "NCT06875310",
-            "NCT06917079",
-            "NCT07063745",
-            "NCT07122687",
-            "NCT07178795",
-            "NCT07190248",
-            "NCT07486817",
-            "NCT07524257",
-            "NCT07793942"
-          ]
-        },
-        {
           "source": "drug:cyclophosphamide",
           "target": "drug:pembrolizumab",
           "kind": "same_arm",
-          "trial_count": 78,
+          "trial_count": 80,
           "trial_ids": [
             "NCT01174121",
             "NCT01822652",
@@ -5386,7 +5354,96 @@
             "NCT07199413",
             "NCT07255664",
             "NCT07300475",
-            "NCT07341867"
+            "NCT07341867",
+            "NCT07772882",
+            "NCT07862751"
+          ]
+        },
+        {
+          "source": "drug:cisplatin",
+          "target": "drug:pemetrexed",
+          "kind": "same_arm",
+          "trial_count": 79,
+          "trial_ids": [
+            "NCT01840579",
+            "NCT02142738",
+            "NCT02194738",
+            "NCT02578680",
+            "NCT02784171",
+            "NCT02794571",
+            "NCT02862457",
+            "NCT03085914",
+            "NCT03425643",
+            "NCT03515837",
+            "NCT03564691",
+            "NCT03631199",
+            "NCT03631784",
+            "NCT03645928",
+            "NCT03664024",
+            "NCT03760575",
+            "NCT03829319",
+            "NCT03950674",
+            "NCT03976323",
+            "NCT04083599",
+            "NCT04153565",
+            "NCT04194944",
+            "NCT04198766",
+            "NCT04222972",
+            "NCT04253964",
+            "NCT04267848",
+            "NCT04380636",
+            "NCT04524689",
+            "NCT04619797",
+            "NCT04716933",
+            "NCT04750083",
+            "NCT04956640",
+            "NCT04956692",
+            "NCT05017012",
+            "NCT05048797",
+            "NCT05226598",
+            "NCT05298423",
+            "NCT05382559",
+            "NCT05410145",
+            "NCT05555732",
+            "NCT05687266",
+            "NCT05722015",
+            "NCT05751187",
+            "NCT05789082",
+            "NCT05791097",
+            "NCT06008093",
+            "NCT06119581",
+            "NCT06151574",
+            "NCT06162221",
+            "NCT06212752",
+            "NCT06236438",
+            "NCT06312137",
+            "NCT06318286",
+            "NCT06447662",
+            "NCT06452277",
+            "NCT06463665",
+            "NCT06561386",
+            "NCT06561685",
+            "NCT06585189",
+            "NCT06607185",
+            "NCT06607393",
+            "NCT06627647",
+            "NCT06632327",
+            "NCT06687369",
+            "NCT06704724",
+            "NCT06745882",
+            "NCT06772623",
+            "NCT06788912",
+            "NCT06793215",
+            "NCT06875310",
+            "NCT06917079",
+            "NCT07063745",
+            "NCT07122687",
+            "NCT07178795",
+            "NCT07190248",
+            "NCT07486817",
+            "NCT07524257",
+            "NCT07793942",
+            "NCT07877584"
           ]
         },
         {
@@ -5601,7 +5658,7 @@
           "source": "drug:carboplatin",
           "target": "drug:cisplatin",
           "kind": "same_arm",
-          "trial_count": 49,
+          "trial_count": 50,
           "trial_ids": [
             "NCT02194738",
             "NCT02853305",
@@ -5651,7 +5708,8 @@
             "NCT07122687",
             "NCT07486817",
             "NCT07622186",
-            "NCT07668154"
+            "NCT07668154",
+            "NCT07877584"
           ]
         },
         {
@@ -5816,6 +5874,56 @@
           ]
         },
         {
+          "source": "drug:bevacizumab",
+          "target": "drug:pembrolizumab",
+          "kind": "same_arm",
+          "trial_count": 42,
+          "trial_ids": [
+            "NCT02039674",
+            "NCT02313272",
+            "NCT02337491",
+            "NCT02348008",
+            "NCT02563002",
+            "NCT02853318",
+            "NCT03367871",
+            "NCT03396926",
+            "NCT03475004",
+            "NCT03596281",
+            "NCT03635567",
+            "NCT03661723",
+            "NCT03740165",
+            "NCT03786081",
+            "NCT03813394",
+            "NCT03878524",
+            "NCT04107168",
+            "NCT04262687",
+            "NCT04919629",
+            "NCT05007106",
+            "NCT05101070",
+            "NCT05116189",
+            "NCT05158062",
+            "NCT05231122",
+            "NCT05431582",
+            "NCT05446870",
+            "NCT05585814",
+            "NCT05751187",
+            "NCT05834348",
+            "NCT06047379",
+            "NCT06083844",
+            "NCT06543576",
+            "NCT06551142",
+            "NCT06771622",
+            "NCT06843447",
+            "NCT06976944",
+            "NCT07054567",
+            "NCT07157969",
+            "NCT07198074",
+            "NCT07216703",
+            "NCT07286266",
+            "NCT07772882"
+          ]
+        },
+        {
           "source": "drug:cisplatin",
           "target": "drug:gemcitabine",
           "kind": "same_arm",
@@ -5863,55 +5971,6 @@
             "NCT07801027",
             "NCT07829783",
             "NCT07853690"
-          ]
-        },
-        {
-          "source": "drug:bevacizumab",
-          "target": "drug:pembrolizumab",
-          "kind": "same_arm",
-          "trial_count": 41,
-          "trial_ids": [
-            "NCT02039674",
-            "NCT02313272",
-            "NCT02337491",
-            "NCT02348008",
-            "NCT02563002",
-            "NCT02853318",
-            "NCT03367871",
-            "NCT03396926",
-            "NCT03475004",
-            "NCT03596281",
-            "NCT03635567",
-            "NCT03661723",
-            "NCT03740165",
-            "NCT03786081",
-            "NCT03813394",
-            "NCT03878524",
-            "NCT04107168",
-            "NCT04262687",
-            "NCT04919629",
-            "NCT05007106",
-            "NCT05101070",
-            "NCT05116189",
-            "NCT05158062",
-            "NCT05231122",
-            "NCT05431582",
-            "NCT05446870",
-            "NCT05585814",
-            "NCT05751187",
-            "NCT05834348",
-            "NCT06047379",
-            "NCT06083844",
-            "NCT06543576",
-            "NCT06551142",
-            "NCT06771622",
-            "NCT06843447",
-            "NCT06976944",
-            "NCT07054567",
-            "NCT07157969",
-            "NCT07198074",
-            "NCT07216703",
-            "NCT07286266"
           ]
         },
         {
@@ -6015,7 +6074,7 @@
           "source": "drug:paclitaxel",
           "target": "drug:pemetrexed",
           "kind": "same_arm",
-          "trial_count": 39,
+          "trial_count": 40,
           "trial_ids": [
             "NCT02142738",
             "NCT02194738",
@@ -6055,7 +6114,8 @@
             "NCT06908993",
             "NCT07063745",
             "NCT07420439",
-            "NCT07524257"
+            "NCT07524257",
+            "NCT07890493"
           ]
         },
         {
@@ -6108,7 +6168,7 @@
           "source": "drug:doxorubicin",
           "target": "drug:pembrolizumab",
           "kind": "same_arm",
-          "trial_count": 37,
+          "trial_count": 38,
           "trial_ids": [
             "NCT02541565",
             "NCT02622074",
@@ -6146,14 +6206,15 @@
             "NCT07016399",
             "NCT07300475",
             "NCT07341867",
-            "NCT07823491"
+            "NCT07823491",
+            "NCT07862751"
           ]
         },
         {
           "source": "drug:enfortumab vedotin",
           "target": "drug:pembrolizumab",
           "kind": "same_arm",
-          "trial_count": 36,
+          "trial_count": 37,
           "trial_ids": [
             "NCT03288545",
             "NCT03606174",
@@ -6190,7 +6251,8 @@
             "NCT07667335",
             "NCT07720284",
             "NCT07815665",
-            "NCT07822373"
+            "NCT07822373",
+            "NCT07890714"
           ]
         },
         {
@@ -6479,6 +6541,38 @@
           ]
         },
         {
+          "source": "drug:cyclophosphamide",
+          "target": "drug:doxorubicin",
+          "kind": "same_arm",
+          "trial_count": 24,
+          "trial_ids": [
+            "NCT02419495",
+            "NCT02541565",
+            "NCT02622074",
+            "NCT02957968",
+            "NCT03036488",
+            "NCT03407144",
+            "NCT03725059",
+            "NCT04443348",
+            "NCT05008224",
+            "NCT05020860",
+            "NCT05112536",
+            "NCT05177796",
+            "NCT05645380",
+            "NCT05929768",
+            "NCT06112379",
+            "NCT06245889",
+            "NCT06318897",
+            "NCT06797635",
+            "NCT06829199",
+            "NCT06966700",
+            "NCT07016399",
+            "NCT07300475",
+            "NCT07341867",
+            "NCT07862751"
+          ]
+        },
+        {
           "source": "drug:epacadostat",
           "target": "drug:pembrolizumab",
           "kind": "same_arm",
@@ -6508,37 +6602,6 @@
             "NCT03602586",
             "NCT03823131",
             "NCT03832673"
-          ]
-        },
-        {
-          "source": "drug:cyclophosphamide",
-          "target": "drug:doxorubicin",
-          "kind": "same_arm",
-          "trial_count": 23,
-          "trial_ids": [
-            "NCT02419495",
-            "NCT02541565",
-            "NCT02622074",
-            "NCT02957968",
-            "NCT03036488",
-            "NCT03407144",
-            "NCT03725059",
-            "NCT04443348",
-            "NCT05008224",
-            "NCT05020860",
-            "NCT05112536",
-            "NCT05177796",
-            "NCT05645380",
-            "NCT05929768",
-            "NCT06112379",
-            "NCT06245889",
-            "NCT06318897",
-            "NCT06797635",
-            "NCT06829199",
-            "NCT06966700",
-            "NCT07016399",
-            "NCT07300475",
-            "NCT07341867"
           ]
         },
         {
@@ -6634,6 +6697,36 @@
           ]
         },
         {
+          "source": "drug:cyclophosphamide",
+          "target": "drug:paclitaxel",
+          "kind": "same_arm",
+          "trial_count": 22,
+          "trial_ids": [
+            "NCT02622074",
+            "NCT02957968",
+            "NCT03036488",
+            "NCT03289819",
+            "NCT03725059",
+            "NCT04443348",
+            "NCT05020860",
+            "NCT05112536",
+            "NCT05177796",
+            "NCT05681728",
+            "NCT05929768",
+            "NCT06112379",
+            "NCT06245889",
+            "NCT06318897",
+            "NCT06797635",
+            "NCT06829199",
+            "NCT06966700",
+            "NCT07016399",
+            "NCT07300475",
+            "NCT07341867",
+            "NCT07772882",
+            "NCT07862751"
+          ]
+        },
+        {
           "source": "drug:bevacizumab",
           "target": "drug:carboplatin",
           "kind": "same_arm",
@@ -6662,38 +6755,10 @@
           ]
         },
         {
-          "source": "drug:cyclophosphamide",
-          "target": "drug:paclitaxel",
-          "kind": "same_arm",
-          "trial_count": 20,
-          "trial_ids": [
-            "NCT02622074",
-            "NCT02957968",
-            "NCT03036488",
-            "NCT03289819",
-            "NCT03725059",
-            "NCT04443348",
-            "NCT05020860",
-            "NCT05112536",
-            "NCT05177796",
-            "NCT05681728",
-            "NCT05929768",
-            "NCT06112379",
-            "NCT06245889",
-            "NCT06318897",
-            "NCT06797635",
-            "NCT06829199",
-            "NCT06966700",
-            "NCT07016399",
-            "NCT07300475",
-            "NCT07341867"
-          ]
-        },
-        {
           "source": "drug:bevacizumab",
           "target": "drug:paclitaxel",
           "kind": "same_arm",
-          "trial_count": 19,
+          "trial_count": 20,
           "trial_ids": [
             "NCT02039674",
             "NCT03367871",
@@ -6713,14 +6778,15 @@
             "NCT07198074",
             "NCT07216703",
             "NCT07286266",
-            "NCT07420439"
+            "NCT07420439",
+            "NCT07772882"
           ]
         },
         {
           "source": "drug:carboplatin",
           "target": "drug:doxorubicin",
           "kind": "same_arm",
-          "trial_count": 19,
+          "trial_count": 20,
           "trial_ids": [
             "NCT02622074",
             "NCT02957968",
@@ -6740,14 +6806,15 @@
             "NCT06966700",
             "NCT07016399",
             "NCT07300475",
-            "NCT07341867"
+            "NCT07341867",
+            "NCT07862751"
           ]
         },
         {
           "source": "drug:carboplatin",
           "target": "drug:cyclophosphamide",
           "kind": "same_arm",
-          "trial_count": 18,
+          "trial_count": 19,
           "trial_ids": [
             "NCT02622074",
             "NCT02957968",
@@ -6766,7 +6833,35 @@
             "NCT06966700",
             "NCT07016399",
             "NCT07300475",
-            "NCT07341867"
+            "NCT07341867",
+            "NCT07862751"
+          ]
+        },
+        {
+          "source": "drug:doxorubicin",
+          "target": "drug:paclitaxel",
+          "kind": "same_arm",
+          "trial_count": 19,
+          "trial_ids": [
+            "NCT02622074",
+            "NCT02957968",
+            "NCT03036488",
+            "NCT03725059",
+            "NCT04443348",
+            "NCT05020860",
+            "NCT05112536",
+            "NCT05177796",
+            "NCT05929768",
+            "NCT06112379",
+            "NCT06245889",
+            "NCT06318897",
+            "NCT06797635",
+            "NCT06829199",
+            "NCT06966700",
+            "NCT07016399",
+            "NCT07300475",
+            "NCT07341867",
+            "NCT07862751"
           ]
         },
         {
@@ -6793,32 +6888,6 @@
             "NCT06912087",
             "NCT07204340",
             "NCT07252739"
-          ]
-        },
-        {
-          "source": "drug:doxorubicin",
-          "target": "drug:paclitaxel",
-          "kind": "same_arm",
-          "trial_count": 18,
-          "trial_ids": [
-            "NCT02622074",
-            "NCT02957968",
-            "NCT03036488",
-            "NCT03725059",
-            "NCT04443348",
-            "NCT05020860",
-            "NCT05112536",
-            "NCT05177796",
-            "NCT05929768",
-            "NCT06112379",
-            "NCT06245889",
-            "NCT06318897",
-            "NCT06797635",
-            "NCT06829199",
-            "NCT06966700",
-            "NCT07016399",
-            "NCT07300475",
-            "NCT07341867"
           ]
         },
         {
@@ -7170,7 +7239,7 @@
       "sort": "data_order",
       "other_bucket": false,
       "multi_valued": false,
-      "cohort_size": 1804,
+      "cohort_size": 1817,
       "node_kinds": [
         "drug"
       ],
@@ -7179,7 +7248,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_0b907e57160a41a58cc417197738a73a/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_5bf0c0d1774f4f42abcd3baae2df261f/chart.png",
   "evidence": {
     "NCT01174121": {
       "nct_id": "NCT01174121",
@@ -14621,8 +14690,8 @@
           "Doxorubicin",
           "Epirubicin",
           "Cyclophosphamide",
-          "Filgrastim",
-          "pegfilgrastim"
+          "pegfilgrastim",
+          "Filgrastim"
         ],
         "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
           "carboplatin + cyclophosphamide": [
@@ -14637,11 +14706,11 @@
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
-          "carboplatin + filgrastim": [
+          "carboplatin + paclitaxel": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
-          "carboplatin + paclitaxel": [
+          "carboplatin + pegfilgrastim": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
@@ -14656,65 +14725,65 @@
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
-          "cyclophosphamide + filgrastim": [
+          "cyclophosphamide + paclitaxel": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
-          "cyclophosphamide + paclitaxel": [
+          "cyclophosphamide + pegfilgrastim": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
           "cyclophosphamide + pembrolizumab": [
             "Pembrolizumab + Chemotherapy"
           ],
-          "doxorubicin + filgrastim": [
+          "doxorubicin + paclitaxel": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
-          "doxorubicin + paclitaxel": [
+          "doxorubicin + pegfilgrastim": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
           "doxorubicin + pembrolizumab": [
             "Pembrolizumab + Chemotherapy"
           ],
-          "epirubicin + filgrastim": [
+          "epirubicin + paclitaxel": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
-          "epirubicin + paclitaxel": [
+          "epirubicin + pegfilgrastim": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
           ],
           "epirubicin + pembrolizumab": [
             "Pembrolizumab + Chemotherapy"
           ],
-          "filgrastim + paclitaxel": [
+          "paclitaxel + pegfilgrastim": [
             "Pembrolizumab + Chemotherapy",
             "Placebo + Chemotherapy"
-          ],
-          "filgrastim + pembrolizumab": [
-            "Pembrolizumab + Chemotherapy"
           ],
           "paclitaxel + pembrolizumab": [
             "Pembrolizumab + Chemotherapy"
           ],
-          "carboplatin + pegfilgrastim": [
+          "pegfilgrastim + pembrolizumab": [
+            "Pembrolizumab + Chemotherapy"
+          ],
+          "carboplatin + filgrastim": [
             "Placebo + Chemotherapy"
           ],
-          "cyclophosphamide + pegfilgrastim": [
+          "cyclophosphamide + filgrastim": [
             "Placebo + Chemotherapy"
           ],
-          "doxorubicin + pegfilgrastim": [
+          "doxorubicin + filgrastim": [
             "Placebo + Chemotherapy"
           ],
-          "epirubicin + pegfilgrastim": [
+          "epirubicin + filgrastim": [
+            "Placebo + Chemotherapy"
+          ],
+          "filgrastim + paclitaxel": [
             "Placebo + Chemotherapy"
           ],
           "filgrastim + pegfilgrastim": [
-            "Placebo + Chemotherapy"
-          ],
-          "paclitaxel + pegfilgrastim": [
             "Placebo + Chemotherapy"
           ]
         }
@@ -33364,28 +33433,32 @@
         ],
         "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
           "dazostinag + pembrolizumab": [
-            "Arm A: Japan Safety Lead-in Dazostinag + Pembrolizumab",
-            "Arm B: Japan Safety Lead-in Dazostinag Transitioned to Pembrolizumab",
-            "Part 1B (Combination Dose Escalation Phase): Dazostinag + Pembrolizumab",
-            "Part 2A (SCCHN CPS \u2265 1 Dose Expansion and Optimization Phase): Dazostinag + Pembrolizumab",
-            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab + Chemotherapy",
-            "Part 3A (Expansion Phase in CRC): Dazostinag + Pembrolizumab in MSI-H/dMMR CRC",
-            "Part 3B (Expansion Phase in CRC): Dazostinag + Pembrolizumab in MSS/pMMR CRC"
+            "Part 1B (Combination Dose Escalation Phase): 10.5 mg Dazostinag + Pembrolizumab",
+            "Part 1B (Combination Dose Escalation Phase): 14.0 mg Dazostinag + Pembrolizumab",
+            "Part 1B (Combination Dose Escalation Phase): 3.5 mg Dazostinag + Pembrolizumab",
+            "Part 1B (Combination Dose Escalation Phase): 5.0 mg Dazostinag + Pembrolizumab",
+            "Part 1B (Combination Dose Escalation Phase): 7.0 mg Dazostinag + Pembrolizumab",
+            "Part 1B (Combination Dose Escalation Phase): 9.0 mg Dazostinag + Pembrolizumab",
+            "Part 1B (Combination Dose Escalation Phase): \u2264 2.5 mg Dazostinag + Pembrolizumab",
+            "Part 2A SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab",
+            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab+ Chemotherapy",
+            "Part 3A (CRC Dose Expansion Phase): Dazostinag + Pembrolizumab in MSI-H/dMMR CRC",
+            "Part 3B (CRC Dose Expansion Phase ): Dazostinag + Pembrolizumab in MSS/pMMR CRC"
           ],
           "dazostinag + fluorouracil": [
-            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab + Chemotherapy"
+            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab+ Chemotherapy"
           ],
           "dazostinag + platinum": [
-            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab + Chemotherapy"
+            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab+ Chemotherapy"
           ],
           "fluorouracil + pembrolizumab": [
-            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab + Chemotherapy"
+            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab+ Chemotherapy"
           ],
           "fluorouracil + platinum": [
-            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab + Chemotherapy"
+            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab+ Chemotherapy"
           ],
           "pembrolizumab + platinum": [
-            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab + Chemotherapy"
+            "Part 2B (SCCHN Dose Expansion Phase): Dazostinag + Pembrolizumab+ Chemotherapy"
           ]
         }
       }
@@ -34490,9 +34563,6 @@
             "Group B (pembrolizumab, pemetrexed, carboplatin)"
           ],
           "carboplatin + pemetrexed": [
-            "Group B (pembrolizumab, pemetrexed, carboplatin)"
-          ],
-          "pembrolizumab + pemetrexed": [
             "Group B (pembrolizumab, pemetrexed, carboplatin)"
           ]
         }
@@ -46283,7 +46353,9 @@
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Carboplatin",
           "Bevacizumab",
-          "pembrolizumab"
+          "pembrolizumab",
+          "Erythromycin",
+          "Itraconazole"
         ],
         "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
           "carboplatin + rina-s": [
@@ -46293,7 +46365,13 @@
             "Part D2 and I"
           ],
           "pembrolizumab + rina-s": [
-            "Part D3 and D4"
+            "Part D3, D4 and D5"
+          ],
+          "erythromycin + rina-s": [
+            "Part L"
+          ],
+          "itraconazole + rina-s": [
+            "Part L"
           ]
         }
       }
@@ -46905,23 +46983,6 @@
           "c188-9 compound + pembrolizumab": [
             "Part 1 (Dose Escalation)",
             "Part 2 (Dose Expansion)"
-          ]
-        }
-      }
-    },
-    "NCT05669352": {
-      "nct_id": "NCT05669352",
-      "title": "A Study of Oral IRAK-4 Inhibitor CA-4948 in Combination With Pembrolizumab and Stereotactic Radiosurgery in Patients With Melanoma Brain Metastases",
-      "url": "https://clinicaltrials.gov/study/NCT05669352",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05669352",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "CA-4948",
-          "pembrolizumab"
-        ],
-        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
-          "ca-4948 + pembrolizumab": [
-            "CA-4948 and Pembrolizumab"
           ]
         }
       }
@@ -55480,6 +55541,22 @@
         }
       }
     },
+    "NCT06465069": {
+      "nct_id": "NCT06465069",
+      "title": "A Study of LY4052031 in Participants With Advanced or Metastatic Urothelial Cancer or Other Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT06465069",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06465069",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "ly4052031 + pembrolizumab": [
+            "LY4052031+ Pembrolizumab (Dose-expansion, Cohort D)"
+          ]
+        }
+      }
+    },
     "NCT06469944": {
       "nct_id": "NCT06469944",
       "title": "Substudy 06C: A Study of Investigational Agents With Pembrolizumab (MK-3475) and Chemotherapy in Participants With First-Line Locally Advanced Unresectable/Metastatic Gastroesophageal Adenocarcinoma (MK-3475-06C/KEYMAKER-U06)",
@@ -59484,7 +59561,7 @@
     },
     "NCT06712316": {
       "nct_id": "NCT06712316",
-      "title": "Safety, Efficacy, and Pharmacokinetics of BNT327 in Combination With Chemotherapy and Other Investigational Agents for Lung Cancer",
+      "title": "Safety, Efficacy, and Pharmacokinetics of BNT327 in Combination With Chemotherapy and Other Investigational Agents for Lung Cancer (ROSETTA Lung-02)",
       "url": "https://clinicaltrials.gov/study/NCT06712316",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06712316",
@@ -61237,7 +61314,7 @@
     },
     "NCT06843447": {
       "nct_id": "NCT06843447",
-      "title": "A Clinical Study of Raludotatug Deruxtecan in People With Ovarian Cancer (MK-5909-003)",
+      "title": "A Clinical Study of Raludotatug Deruxtecan in People With Ovarian Cancer (MK-5909-003).",
       "url": "https://clinicaltrials.gov/study/NCT06843447",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06843447",
@@ -63053,6 +63130,54 @@
         }
       }
     },
+    "NCT07020221": {
+      "nct_id": "NCT07020221",
+      "title": "A Phase 1/2 Study of VS-7375 in Patients With KRAS G12D-Mutated Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07020221",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07020221",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Cetuximab",
+          "Carboplatin",
+          "Pemetrexed",
+          "pembrolizumab",
+          "Gemcitabine",
+          "130-nm albumin-bound paclitaxel",
+          "defactinib",
+          "Midazolam",
+          "repaglinide"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "carboplatin + vs-7375": [
+            "VS-7375 + Carboplatin/Pemetrexed/Pembrolizumab Dose Escalation",
+            "VS-7375 + Carboplatin/Pemetrexed/Pembrolizumab Dose Expansion"
+          ],
+          "cetuximab + vs-7375": [
+            "VS-7375 + Cetuximab Dose Escalation",
+            "VS-7375 + Cetuximab Dose Expansion"
+          ],
+          "defactinib + vs-7375": [
+            "VS-7375 + Defactinib Dose Escalation"
+          ],
+          "gemcitabine + vs-7375": [
+            "VS-7375 + Gemcitabine/Nab-Paclitaxel Dose Escalation",
+            "VS-7375 + Gemcitabine/Nab-Paclitaxel Dose Expansion"
+          ],
+          "midazolam + repaglinide": [
+            "VS-7375 + Midazolam and Repaglinide Drug-Drug Interaction"
+          ],
+          "midazolam + vs-7375": [
+            "VS-7375 + Midazolam and Repaglinide Drug-Drug Interaction"
+          ],
+          "repaglinide + vs-7375": [
+            "VS-7375 + Midazolam and Repaglinide Drug-Drug Interaction"
+          ],
+          "pembrolizumab + vs-7375": [
+            "VS-7375 + Pembrolizumab Dose Escalation"
+          ]
+        }
+      }
+    },
     "NCT07021989": {
       "nct_id": "NCT07021989",
       "title": "ctDNA-Guided Therapy for Relapsed/Refractory Hodgkin Lymphoma",
@@ -64662,6 +64787,25 @@
         }
       }
     },
+    "NCT07254585": {
+      "nct_id": "NCT07254585",
+      "title": "SYS6010 Combined With Enlonstobart In Recurrent Or Metastatic Head And Neck Squamous Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT07254585",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07254585",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "enlonstobart injection + sys6010 injection": [
+            "SYS6010 combined with enlonstobart group"
+          ],
+          "pembrolizumab + sys6010 injection": [
+            "SYS6010 combined with pembrolizumab group"
+          ]
+        }
+      }
+    },
     "NCT07255664": {
       "nct_id": "NCT07255664",
       "title": "A FIH, Phase I/IIa, Trial Assessing Feasibility of Administrations of TIL-based Immunotherapy in Patients With Metastatic CRC and PC",
@@ -65803,6 +65947,60 @@
         "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
           "intradermal injection of cadi-05 + pembrolizumab": [
             "Treatment with CADI-05 and pembrolizumab"
+          ]
+        }
+      }
+    },
+    "NCT07458347": {
+      "nct_id": "NCT07458347",
+      "title": "A Phase 1 Dose Escalation and Dose Expansion Trial of KST-6051 in Participants With Advanced Solid Tumors With Kirsten Rat Sarcoma Viral Oncogene Homolog (KRAS) Mutation",
+      "url": "https://clinicaltrials.gov/study/NCT07458347",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07458347",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Cetuximab",
+          "pembrolizumab",
+          "IFL protocol",
+          "Pemetrexed",
+          "Carboplatin"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "cetuximab + kst-6051": [
+            "KST-6051 Dose Escalation Combination Therapy with Cetuximab",
+            "KST-6051 Dose Expansion Combination Therapy with Cetuximab",
+            "KST-6051 Dose Expansion Combination Therapy with Cetuximab and mFOLFOX6 or FOLFIRI"
+          ],
+          "gemcitabine/nab-paclitaxel + kst-6051": [
+            "KST-6051 Dose Escalation Combination Therapy with Gemcitabine/Nab-paclitaxel",
+            "KST-6051 Dose Expansion Combination Therapy with Gemcitabine/nab-paclitaxel"
+          ],
+          "kst-6051 + pembrolizumab": [
+            "KST-6051 Dose Escalation Combination Therapy with Pembrolizumab",
+            "KST-6051 Dose Expansion Combination Therapy with Pembrolizumab and Pemetrexed/carboplatin"
+          ],
+          "cetuximab + folfiri": [
+            "KST-6051 Dose Expansion Combination Therapy with Cetuximab and mFOLFOX6 or FOLFIRI"
+          ],
+          "cetuximab + mfolfox6": [
+            "KST-6051 Dose Expansion Combination Therapy with Cetuximab and mFOLFOX6 or FOLFIRI"
+          ],
+          "folfiri + kst-6051": [
+            "KST-6051 Dose Expansion Combination Therapy with Cetuximab and mFOLFOX6 or FOLFIRI"
+          ],
+          "kst-6051 + mfolfox6": [
+            "KST-6051 Dose Expansion Combination Therapy with Cetuximab and mFOLFOX6 or FOLFIRI"
+          ],
+          "carboplatin + kst-6051": [
+            "KST-6051 Dose Expansion Combination Therapy with Pembrolizumab and Pemetrexed/carboplatin"
+          ],
+          "carboplatin + pembrolizumab": [
+            "KST-6051 Dose Expansion Combination Therapy with Pembrolizumab and Pemetrexed/carboplatin"
+          ],
+          "kst-6051 + pemetrexed": [
+            "KST-6051 Dose Expansion Combination Therapy with Pembrolizumab and Pemetrexed/carboplatin"
+          ],
+          "pembrolizumab + pemetrexed": [
+            "KST-6051 Dose Expansion Combination Therapy with Pembrolizumab and Pemetrexed/carboplatin"
           ]
         }
       }
@@ -67403,6 +67601,60 @@
         }
       }
     },
+    "NCT07772882": {
+      "nct_id": "NCT07772882",
+      "title": "Study of Supplemental Arginine With Chemotherapy and Immunotherapy in Platinum Resistant Ovarian, Fallopian Tube, and Peritoneal Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07772882",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07772882",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Arginine",
+          "pembrolizumab",
+          "Bevacizumab",
+          "Paclitaxel",
+          "Dimethoate",
+          "Cyclophosphamide"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "arginine + bevacizumab": [
+            "CPS<1, must be assigned to Cohort B",
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "arginine + cyclophosphamide": [
+            "CPS<1, must be assigned to Cohort B",
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "arginine + pembrolizumab": [
+            "CPS<1, must be assigned to Cohort B",
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "bevacizumab + cyclophosphamide": [
+            "CPS<1, must be assigned to Cohort B",
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "bevacizumab + pembrolizumab": [
+            "CPS<1, must be assigned to Cohort B",
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "cyclophosphamide + pembrolizumab": [
+            "CPS<1, must be assigned to Cohort B",
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "arginine + paclitaxel": [
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "bevacizumab + paclitaxel": [
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "cyclophosphamide + paclitaxel": [
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ],
+          "paclitaxel + pembrolizumab": [
+            "CPS>1, physician's choice for Cohort A or Cohort B"
+          ]
+        }
+      }
+    },
     "NCT07777822": {
       "nct_id": "NCT07777822",
       "title": "Study of Pembrolizumab + Pemetrexed + Platinum Chemotherapy With or Without Zoldonrasib as First Line Treatment in Metastatic Non-squamous RAS G12D-Mutated NSCLC",
@@ -67673,8 +67925,8 @@
         ],
         "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
           "pembrolizumab + porustobart": [
-            "Arm 1",
-            "Arm 2"
+            "Dose Schedule 1 - Porustobart + Pembrolizumab",
+            "Dose Schedule 2 - Porustobart + Pembrolizumab"
           ]
         }
       }
@@ -67963,6 +68215,22 @@
         }
       }
     },
+    "NCT07850791": {
+      "nct_id": "NCT07850791",
+      "title": "A Prospective Study of Sacituzumab Tirumotecan Plus Pembrolizumab for Advanced Biliary Tract Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07850791",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07850791",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "pembrolizumab + sacituzumab tirumotecan (skb264)": [
+            "sacituzumab tirumotecan combined with pembrolizumab"
+          ]
+        }
+      }
+    },
     "NCT07853690": {
       "nct_id": "NCT07853690",
       "title": "Histotripsy in Biliary Tract Cancer",
@@ -67998,6 +68266,294 @@
           ],
           "durvalumab + pembrolizumab": [
             "Cohort 2: Patients not eligible for chemoimmunotherapy"
+          ]
+        }
+      }
+    },
+    "NCT07862751": {
+      "nct_id": "NCT07862751",
+      "title": "US/PA/E Imaging for Early Identification of Tumor Response in Patients With Stage II-III Triple Negative Breast Cancer Receiving Neoadjuvant Immunotherapy and Chemotherapy",
+      "url": "https://clinicaltrials.gov/study/NCT07862751",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07862751",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Magnetic Resonance Spectroscopy",
+          "High-Energy Shock Waves",
+          "pembrolizumab",
+          "Carboplatin",
+          "Paclitaxel",
+          "Doxorubicin",
+          "Cyclophosphamide"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "carboplatin + cyclophosphamide": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "carboplatin + doxorubicin": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "carboplatin + paclitaxel": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "carboplatin + pembrolizumab": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "cyclophosphamide + doxorubicin": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "cyclophosphamide + paclitaxel": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "cyclophosphamide + pembrolizumab": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "doxorubicin + paclitaxel": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "doxorubicin + pembrolizumab": [
+            "Diagnostic (US/PA/E)"
+          ],
+          "paclitaxel + pembrolizumab": [
+            "Diagnostic (US/PA/E)"
+          ]
+        }
+      }
+    },
+    "NCT07865910": {
+      "nct_id": "NCT07865910",
+      "title": "A Study to Learn the Safety and Efficacy of HLX37 in Combination With Chemotherapy for First-line Treatment in Adult Participants With Locally Advanced or Metastatic Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07865910",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07865910",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Single Person",
+          "Carboplatin",
+          "130-nm albumin-bound paclitaxel",
+          "Pemetrexed"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "carboplatin + investigational drug: hlx37 dose1, iv, q3w": [
+            "nsq-NSCLC-Arm1",
+            "sq-NSCLC-Arm1"
+          ],
+          "carboplatin + pemetrexed": [
+            "nsq-NSCLC-Arm1",
+            "nsq-NSCLC-Arm3",
+            "nsq-NSCLC-Arm2"
+          ],
+          "investigational drug: hlx37 dose1, iv, q3w + pemetrexed": [
+            "nsq-NSCLC-Arm1"
+          ],
+          "carboplatin + paclitaxel or nab-paclitaxel": [
+            "sq-NSCLC-Arm1",
+            "sq-NSCLC-Arm3",
+            "sq-NSCLC-Arm2"
+          ],
+          "investigational drug: hlx37 dose1, iv, q3w + paclitaxel or nab-paclitaxel": [
+            "sq-NSCLC-Arm1"
+          ],
+          "carboplatin + pembrolizumab": [
+            "nsq-NSCLC-Arm3",
+            "sq-NSCLC-Arm3"
+          ],
+          "pembrolizumab + pemetrexed": [
+            "nsq-NSCLC-Arm3"
+          ],
+          "paclitaxel or nab-paclitaxel + pembrolizumab": [
+            "sq-NSCLC-Arm3"
+          ],
+          "carboplatin + investigational drug: hlx37 dose2, iv, q3w": [
+            "nsq-NSCLC-Arm2",
+            "sq-NSCLC-Arm2"
+          ],
+          "investigational drug: hlx37 dose2, iv, q3w + pemetrexed": [
+            "nsq-NSCLC-Arm2"
+          ],
+          "investigational drug: hlx37 dose2, iv, q3w + paclitaxel or nab-paclitaxel": [
+            "sq-NSCLC-Arm2"
+          ]
+        }
+      }
+    },
+    "NCT07877584": {
+      "nct_id": "NCT07877584",
+      "title": "PD-1 Blockade Alone Versus in Combination With Chemotherapy as First Line Therapy in Females With Advanced NSCLC & PD-L1 Expression \u226550%",
+      "url": "https://clinicaltrials.gov/study/NCT07877584",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07877584",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "pembrolizumab",
+          "Carboplatin",
+          "Cisplatin",
+          "Pemetrexed",
+          "130-nm albumin-bound paclitaxel"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "130-nm albumin-bound paclitaxel + carboplatin": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "130-nm albumin-bound paclitaxel + cisplatin": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "130-nm albumin-bound paclitaxel + pembrolizumab": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "130-nm albumin-bound paclitaxel + pemetrexed": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "carboplatin + cisplatin": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "carboplatin + pembrolizumab": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "carboplatin + pemetrexed": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "cisplatin + pembrolizumab": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "cisplatin + pemetrexed": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ],
+          "pembrolizumab + pemetrexed": [
+            "Pembrolizumab (200 mg intravenously every 3 weeks) plus chemotherapy"
+          ]
+        }
+      }
+    },
+    "NCT07886905": {
+      "nct_id": "NCT07886905",
+      "title": "Pulsed Stereotactic Ablative Radiotherapy (PULSAR) With Systematic Therapy for Thyroid Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07886905",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07886905",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "dabrafenib",
+          "trametinib",
+          "pembrolizumab",
+          "DEAE-Dextran"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "dabrafenib + pembrolizumab": [
+            "PULSAR + DT +/- Pembrolizumab"
+          ],
+          "dabrafenib + trametinib": [
+            "PULSAR + DT +/- Pembrolizumab"
+          ],
+          "pembrolizumab + trametinib": [
+            "PULSAR + DT +/- Pembrolizumab"
+          ]
+        }
+      }
+    },
+    "NCT07889232": {
+      "nct_id": "NCT07889232",
+      "title": "Tocilizumab Combined With First-Line Chemo-Immunotherapy in Metastatic Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07889232",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07889232",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "tocilizumab",
+          "pembrolizumab",
+          "Carboplatin",
+          "Pemetrexed",
+          "taxane"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "carboplatin + pembrolizumab": [
+            "Single Arm"
+          ],
+          "carboplatin + tocilizumab": [
+            "Single Arm"
+          ],
+          "pembrolizumab + tocilizumab": [
+            "Single Arm"
+          ]
+        }
+      }
+    },
+    "NCT07890493": {
+      "nct_id": "NCT07890493",
+      "title": "Immune Checkpoint Blockade and Chemotherapy With or Without Fecal Microbiota Transplant in Advanced Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07890493",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07890493",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Carboplatin",
+          "Pemetrexed",
+          "Paclitaxel",
+          "pembrolizumab"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "carboplatin + lnd101": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy"
+          ],
+          "carboplatin + paclitaxel": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy",
+            "Arm 1: Standard of Care ICB + Chemotherapy"
+          ],
+          "carboplatin + pembrolizumab": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy",
+            "Arm 1: Standard of Care ICB + Chemotherapy"
+          ],
+          "carboplatin + pemetrexed": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy",
+            "Arm 1: Standard of Care ICB + Chemotherapy"
+          ],
+          "lnd101 + paclitaxel": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy"
+          ],
+          "lnd101 + pembrolizumab": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy"
+          ],
+          "lnd101 + pemetrexed": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy"
+          ],
+          "paclitaxel + pembrolizumab": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy",
+            "Arm 1: Standard of Care ICB + Chemotherapy"
+          ],
+          "paclitaxel + pemetrexed": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy",
+            "Arm 1: Standard of Care ICB + Chemotherapy"
+          ],
+          "pembrolizumab + pemetrexed": [
+            "Arm 2: FMT + Standard of care ICB + Chemotherapy",
+            "Arm 1: Standard of Care ICB + Chemotherapy"
+          ]
+        }
+      }
+    },
+    "NCT07890714": {
+      "nct_id": "NCT07890714",
+      "title": "A Study of Dato-DXd in Participants With Solid Tumors [TROPION-PanTumor04 (TP04)]",
+      "url": "https://clinicaltrials.gov/study/NCT07890714",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07890714",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "enfortumab vedotin",
+          "pembrolizumab"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "dato-dxd + enfortumab vedotin": [
+            "Sub-study 1: Phase 1: Part 1: Dato-DXd + EV",
+            "Sub-study 1: Phase 1: Part 2: Dato-DXd + EV + Pembrolizumab",
+            "Sub-study 1: Phase 2: Group A: Dato-DXd + EV + Pembrolizumab"
+          ],
+          "dato-dxd + pembrolizumab": [
+            "Sub-study 1: Phase 1: Part 2: Dato-DXd + EV + Pembrolizumab",
+            "Sub-study 1: Phase 2: Group A: Dato-DXd + EV + Pembrolizumab"
+          ],
+          "enfortumab vedotin + pembrolizumab": [
+            "Sub-study 1: Phase 1: Part 2: Dato-DXd + EV + Pembrolizumab",
+            "Sub-study 1: Phase 2: Group A: Dato-DXd + EV + Pembrolizumab",
+            "Sub-study 1: Phase 2: Group B: EV + Pembrolizumab"
+          ],
+          "dato-dxd + olomorasib": [
+            "Sub-study 2: Phase 1: Cohort A: Dato-DXd + Olomorasib",
+            "Sub-study 2: Phase 2: Dato-DXd + Olomorasib"
           ]
         }
       }
@@ -68254,38 +68810,6 @@
         }
       }
     },
-    "NCT07020221": {
-      "nct_id": "NCT07020221",
-      "title": "A Phase 1/2 Study of VS-7375 in Patients With KRAS G12D-Mutated Solid Tumors",
-      "url": "https://clinicaltrials.gov/study/NCT07020221",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07020221",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Cetuximab",
-          "Carboplatin",
-          "Pemetrexed",
-          "pembrolizumab",
-          "Gemcitabine",
-          "130-nm albumin-bound paclitaxel"
-        ],
-        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
-          "cetuximab + vs-7375": [
-            "Cetuximab + VS-7375 Dose Escalation",
-            "Cetuximab + VS-7375 Recommended Phase 2 Dose Expansion"
-          ],
-          "carboplatin + vs-7375": [
-            "VS-7375 + Carboplatin/Pemetrexed/Pembrolizumab Dose Escalation",
-            "VS-7375 + Carboplatin/Pemetrexed/Pembrolizumab Dose Expansion"
-          ],
-          "gemcitabine + vs-7375": [
-            "VS-7375 + Gemcitabine Dose Escalation",
-            "VS-7375 + Gemcitabine Dose Expansion",
-            "VS-7375 + Gemcitabine/Nab-Paclitaxel Dose Escalation",
-            "VS-7375 + Gemcitabine/Nab-Paclitaxel Dose Expansion"
-          ]
-        }
-      }
-    },
     "NCT07122687": {
       "nct_id": "NCT07122687",
       "title": "IBI363 Combined With Chemotherapy or Pembrolizumab Combined With Chemotherapy as Neoadjuvant Therapy in Resectable Stage IB-III Non-Squamous Non-Small Cell Lung Cancer",
@@ -68328,6 +68852,57 @@
           ],
           "keytruda + pemetrexed": [
             "Keytruda"
+          ]
+        }
+      }
+    },
+    "NCT07885709": {
+      "nct_id": "NCT07885709",
+      "title": "MRD and Imaging Guided Adaptive Neoadjuvant Therapy for Resectable NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT07885709",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07885709",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Immune Checkpoint Inhibitors",
+          "Nivolumab",
+          "pembrolizumab",
+          "toripalimab",
+          "tislelizumab",
+          "Carboplatin",
+          "130-nm albumin-bound paclitaxel",
+          "Pemetrexed",
+          "anlotinib"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "anlotinib + carboplatin": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "anlotinib + nab-paclitaxel": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "anlotinib + nivolumab": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "anlotinib + pemetrexed": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "carboplatin + nab-paclitaxel": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "carboplatin + nivolumab": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "carboplatin + pemetrexed": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "nab-paclitaxel + nivolumab": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "nab-paclitaxel + pemetrexed": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
+          ],
+          "nivolumab + pemetrexed": [
+            "ctDNA-MRD and imaging-guided dynamic neoadjuvant therapy"
           ]
         }
       }
@@ -68977,45 +69552,6 @@
         }
       }
     },
-    "NCT05849480": {
-      "nct_id": "NCT05849480",
-      "title": "A Study of CDX-1140, a CD40 Agonist, in Combination With Capecitabine and Oxaliplatin (CAPOX) and Keytruda in Subjects With Biliary Tract Carcinoma (BTC)",
-      "url": "https://clinicaltrials.gov/study/NCT05849480",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05849480",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Oxaliplatin",
-          "Capecitabine",
-          "pembrolizumab"
-        ],
-        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
-          "capecitabine + cdx-1140": [
-            "Phase I",
-            "Phase II"
-          ],
-          "capecitabine + keytruda": [
-            "Phase I",
-            "Phase II"
-          ],
-          "capecitabine + oxaliplatin": [
-            "Phase I",
-            "Phase II"
-          ],
-          "cdx-1140 + keytruda": [
-            "Phase I",
-            "Phase II"
-          ],
-          "cdx-1140 + oxaliplatin": [
-            "Phase I",
-            "Phase II"
-          ],
-          "keytruda + oxaliplatin": [
-            "Phase I",
-            "Phase II"
-          ]
-        }
-      }
-    },
     "NCT04262466": {
       "nct_id": "NCT04262466",
       "title": "Safety and Efficacy of IMC-F106C as a Single Agent and in Combination With Checkpoint Inhibitors",
@@ -69102,6 +69638,45 @@
           ],
           "leucovorin + oxaliplatin": [
             "Standard of Care Chemotherapy"
+          ]
+        }
+      }
+    },
+    "NCT05849480": {
+      "nct_id": "NCT05849480",
+      "title": "A Study of CDX-1140, a CD40 Agonist, in Combination With Capecitabine and Oxaliplatin (CAPOX) and Keytruda in Subjects With Biliary Tract Carcinoma (BTC)",
+      "url": "https://clinicaltrials.gov/study/NCT05849480",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05849480",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Oxaliplatin",
+          "Capecitabine",
+          "pembrolizumab"
+        ],
+        "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)": {
+          "capecitabine + cdx-1140": [
+            "Phase I",
+            "Phase II"
+          ],
+          "capecitabine + keytruda": [
+            "Phase I",
+            "Phase II"
+          ],
+          "capecitabine + oxaliplatin": [
+            "Phase I",
+            "Phase II"
+          ],
+          "cdx-1140 + keytruda": [
+            "Phase I",
+            "Phase II"
+          ],
+          "cdx-1140 + oxaliplatin": [
+            "Phase I",
+            "Phase II"
+          ],
+          "keytruda + oxaliplatin": [
+            "Phase I",
+            "Phase II"
           ]
         }
       }
@@ -69199,22 +69774,22 @@
     }
   },
   "assumptions": [
-    "348 of 2968 search matches for 'pembrolizumab' were excluded because 'pembrolizumab' is not one of their drug interventions.",
+    "355 of 2993 search matches for 'pembrolizumab' were excluded because 'pembrolizumab' is not one of their drug interventions.",
     "A link means both drugs are given in the same arm of at least 2 trials; drugs only listed in different arms of a trial (e.g. drug vs comparator) are not linked.",
-    "Network shows the top 25 drugs by number of trials with a same-arm combination; 1198 such drugs were found.",
+    "Network shows the top 25 drugs by number of trials with a same-arm combination; 1211 such drugs were found.",
     "Drugs an arm offers as alternatives (its description reads e.g. 'cisplatin or carboplatin') are not a combination; arms without a description are taken as given together.",
     "Supplements, placebo, saline and 'standard of care' are not counted as drugs.",
     "Showing the 60 strongest of 176 links.",
-    "408 drug pairs appear in an arm only as alternatives and are not counted as combinations.",
+    "414 drug pairs appear in an arm only as alternatives and are not counted as combinations.",
     "7 trials list two or more drugs but do not record which arm receives them, so they cannot show a combination and are left out."
   ],
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:11:03.191549Z",
-    "search_matches": 2968,
-    "cohort_size": 2620,
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:52:32.282711Z",
+    "search_matches": 2993,
+    "cohort_size": 2638,
     "api_requests": 3
   },
   "verification": {
@@ -69251,15 +69826,14 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_0b907e57160a41a58cc417197738a73a",
+  "run_id": "run_5bf0c0d1774f4f42abcd3baae2df261f",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 1761.9,
-    "retrieve": 2729.5,
-    "analyze": 865.6,
-    "verify": 4249.2
+    "plan": 2212.4,
+    "retrieve": 2513.9,
+    "analyze": 5564.4
   }
 }

@@ -44,7 +44,7 @@
   "visualization": {
     "type": "bar_chart",
     "title": "Trials by country: melanoma; recruiting",
-    "subtitle": "480 trials",
+    "subtitle": "485 trials",
     "encoding": {
       "x": {
         "field": "country",
@@ -72,7 +72,7 @@
     "data": [
       {
         "country": "United States",
-        "trial_count": 246,
+        "trial_count": 248,
         "trial_ids": [
           "NCT00001823",
           "NCT00040352",
@@ -152,7 +152,6 @@
           "NCT05136196",
           "NCT05144698",
           "NCT05155033",
-          "NCT05225428",
           "NCT05267626",
           "NCT05269381",
           "NCT05280314",
@@ -171,6 +170,7 @@
           "NCT05588453",
           "NCT05592626",
           "NCT05607095",
+          "NCT05629546",
           "NCT05655312",
           "NCT05669430",
           "NCT05704647",
@@ -219,7 +219,6 @@
           "NCT06330064",
           "NCT06332755",
           "NCT06362369",
-          "NCT06365619",
           "NCT06398418",
           "NCT06400550",
           "NCT06413680",
@@ -246,7 +245,6 @@
           "NCT06627244",
           "NCT06660420",
           "NCT06666790",
-          "NCT06673095",
           "NCT06675643",
           "NCT06683755",
           "NCT06697301",
@@ -310,16 +308,20 @@
           "NCT07584226",
           "NCT07621614",
           "NCT07628634",
+          "NCT07631325",
           "NCT07634380",
           "NCT07636785",
           "NCT07661966",
+          "NCT07664735",
           "NCT07675967",
           "NCT07704918",
           "NCT07740941",
           "NCT07749586",
           "NCT07751042",
+          "NCT07796061",
           "NCT07804186",
-          "NCT07830225"
+          "NCT07830225",
+          "NCT07890415"
         ]
       },
       {
@@ -389,7 +391,7 @@
       },
       {
         "country": "Australia",
-        "trial_count": 52,
+        "trial_count": 50,
         "trial_ids": [
           "NCT02402244",
           "NCT02821013",
@@ -400,7 +402,6 @@
           "NCT04895709",
           "NCT04913285",
           "NCT05086692",
-          "NCT05180942",
           "NCT05267626",
           "NCT05280314",
           "NCT05549297",
@@ -440,14 +441,13 @@
           "NCT07203391",
           "NCT07339176",
           "NCT07341737",
-          "NCT07421739",
           "NCT07565285",
           "NCT07751042"
         ]
       },
       {
         "country": "France",
-        "trial_count": 49,
+        "trial_count": 50,
         "trial_ids": [
           "NCT02332668",
           "NCT02828202",
@@ -496,6 +496,7 @@
           "NCT07230613",
           "NCT07302607",
           "NCT07354152",
+          "NCT07376512",
           "NCT07492680",
           "NCT07519655"
         ]
@@ -548,7 +549,7 @@
       },
       {
         "country": "Germany",
-        "trial_count": 36,
+        "trial_count": 37,
         "trial_ids": [
           "NCT02332668",
           "NCT03340506",
@@ -585,12 +586,13 @@
           "NCT07600476",
           "NCT07649681",
           "NCT07680452",
-          "NCT07788729"
+          "NCT07788729",
+          "NCT07883954"
         ]
       },
       {
         "country": "Spain",
-        "trial_count": 36,
+        "trial_count": 37,
         "trial_ids": [
           "NCT03340506",
           "NCT03567889",
@@ -627,7 +629,8 @@
           "NCT07070232",
           "NCT07476326",
           "NCT07492680",
-          "NCT07519655"
+          "NCT07519655",
+          "NCT07883954"
         ]
       },
       {
@@ -672,7 +675,7 @@
       },
       {
         "country": "United Kingdom",
-        "trial_count": 29,
+        "trial_count": 30,
         "trial_ids": [
           "NCT02332668",
           "NCT03829254",
@@ -702,12 +705,13 @@
           "NCT07070232",
           "NCT07144306",
           "NCT07440290",
-          "NCT07718243"
+          "NCT07718243",
+          "NCT07883954"
         ]
       },
       {
         "country": "Netherlands",
-        "trial_count": 27,
+        "trial_count": 28,
         "trial_ids": [
           "NCT03340506",
           "NCT03685890",
@@ -732,6 +736,7 @@
           "NCT07206017",
           "NCT07224425",
           "NCT07310758",
+          "NCT07501780",
           "NCT07511933",
           "NCT07530887",
           "NCT07686835",
@@ -740,7 +745,7 @@
       },
       {
         "country": "Other",
-        "trial_count": 93,
+        "trial_count": 96,
         "trial_ids": [
           "NCT00722228",
           "NCT01438658",
@@ -830,11 +835,14 @@
           "NCT07492680",
           "NCT07501117",
           "NCT07519655",
+          "NCT07574047",
           "NCT07581509",
           "NCT07635732",
           "NCT07680699",
-          "NCT07761871",
-          "NCT07808164"
+          "NCT07694414",
+          "NCT07808164",
+          "NCT07870265",
+          "NCT07883954"
         ]
       }
     ],
@@ -857,12 +865,12 @@
       "top_n": 10,
       "other_bucket": true,
       "multi_valued": true,
-      "cohort_size": 480,
+      "cohort_size": 485,
       "bipartite": false,
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_5a84acee71764142ac63bcdd23ed4cbf/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_be7ffdaf3a5e4bc0a14aa271a3c4c0da/chart.png",
   "evidence": {
     "NCT00001823": {
       "nct_id": "NCT00001823",
@@ -1339,6 +1347,7 @@
           "Hungary",
           "Japan",
           "Netherlands",
+          "Russia",
           "Spain",
           "Thailand"
         ]
@@ -2401,7 +2410,8 @@
           "Ireland",
           "Portugal",
           "South Korea",
-          "Spain"
+          "Spain",
+          "Switzerland"
         ]
       }
     },
@@ -2498,28 +2508,6 @@
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Melanoma",
           "Carcinoma, Renal Cell"
-        ],
-        "protocolSection.statusModule.overallStatus": "RECRUITING",
-        "protocolSection.contactsLocationsModule.locations.country": [
-          "United States"
-        ]
-      }
-    },
-    "NCT05225428": {
-      "nct_id": "NCT05225428",
-      "title": "Video Education With Result Dependent dIsclosure",
-      "url": "https://clinicaltrials.gov/study/NCT05225428",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05225428",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Ovarian Neoplasms",
-          "Pancreatic Neoplasms",
-          "Prostatic Neoplasms",
-          "Colorectal Neoplasms",
-          "Kidney Neoplasms",
-          "Melanoma",
-          "Sarcoma"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
@@ -2937,6 +2925,21 @@
         "protocolSection.identificationModule.nctId": "NCT05607095",
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Uveal Melanoma",
+          "Melanoma"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States"
+        ]
+      }
+    },
+    "NCT05629546": {
+      "nct_id": "NCT05629546",
+      "title": "Memory-Like Natural Killer Cells With Nivolumab and Relatlimab in Advanced or Metastatic Melanoma After Progression on Checkpoint Inhibitors",
+      "url": "https://clinicaltrials.gov/study/NCT05629546",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05629546",
+        "derivedSection.conditionBrowseModule.meshes.term": [
           "Melanoma"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
@@ -3950,21 +3953,6 @@
         ]
       }
     },
-    "NCT06365619": {
-      "nct_id": "NCT06365619",
-      "title": "Neoadjuvant Ipilimumab/Nivolumab for Patients With Recurrent, High Risk, Resectable Melanoma",
-      "url": "https://clinicaltrials.gov/study/NCT06365619",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06365619",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Melanoma"
-        ],
-        "protocolSection.statusModule.overallStatus": "RECRUITING",
-        "protocolSection.contactsLocationsModule.locations.country": [
-          "United States"
-        ]
-      }
-    },
     "NCT06398418": {
       "nct_id": "NCT06398418",
       "title": "R-5780-01 In Combination With PD-1 Checkpoint Inhibitors (Checkpoint Protein on Immune Cells Called T Cells) in Patients With Solid Tumors",
@@ -4403,22 +4391,6 @@
         "protocolSection.identificationModule.nctId": "NCT06666790",
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Melanoma"
-        ],
-        "protocolSection.statusModule.overallStatus": "RECRUITING",
-        "protocolSection.contactsLocationsModule.locations.country": [
-          "United States"
-        ]
-      }
-    },
-    "NCT06673095": {
-      "nct_id": "NCT06673095",
-      "title": "Narrow Excision Versus Wide Excision for the Treatment of Adults With Invasive Cutaneous Melanoma, ICEMAN Trial",
-      "url": "https://clinicaltrials.gov/study/NCT06673095",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06673095",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Clinical Stage IA Cutaneous Melanoma AJCC v8",
-          "Clinical Stage IB Cutaneous Melanoma AJCC v8"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
@@ -5701,6 +5673,21 @@
         ]
       }
     },
+    "NCT07631325": {
+      "nct_id": "NCT07631325",
+      "title": "Axelopran and Nivolumab in PD-1-Refractory Metastatic Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT07631325",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07631325",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Unresectable Cutaneous Melanoma"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States"
+        ]
+      }
+    },
     "NCT07634380": {
       "nct_id": "NCT07634380",
       "title": "Sitagliptin With Pembro in RCC and Melanoma",
@@ -5745,6 +5732,22 @@
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Melanoma",
           "Carcinoma, Non-Small-Cell Lung"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States"
+        ]
+      }
+    },
+    "NCT07664735": {
+      "nct_id": "NCT07664735",
+      "title": "A Phase 1 Study to Evaluate OPB-201 in Recurrent Endometrial and Platinum-resistant Ovarian Cancer.",
+      "url": "https://clinicaltrials.gov/study/NCT07664735",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07664735",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Endometrial Neoplasms",
+          "Ovarian Neoplasms"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
@@ -5854,6 +5857,22 @@
         ]
       }
     },
+    "NCT07796061": {
+      "nct_id": "NCT07796061",
+      "title": "Blood-Brain Barrier Disruption Using Exablate Magnetic Resonance-Guided Low Intensity Focused Ultrasound With Microbubbles in Combination With T-Cell Infusion in Patients With Newly Diagnosed Diffuse Midline Glioma (LIFT)",
+      "url": "https://clinicaltrials.gov/study/NCT07796061",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07796061",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "DMG",
+          "DIPG"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States"
+        ]
+      }
+    },
     "NCT07804186": {
       "nct_id": "NCT07804186",
       "title": "Study of Adjuvant Darovasertib and Crizotinib in Participants With Primary Non-metastatic Uveal Melanoma",
@@ -5878,6 +5897,25 @@
         "protocolSection.identificationModule.nctId": "NCT07830225",
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Melanoma"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "United States"
+        ]
+      }
+    },
+    "NCT07890415": {
+      "nct_id": "NCT07890415",
+      "title": "Using an Artificial Intelligence (AI) Tool for Melanoma Diagnosis",
+      "url": "https://clinicaltrials.gov/study/NCT07890415",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07890415",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Melanoma",
+          "Hemangioma",
+          "Nevus, Pigmented",
+          "Nevus",
+          "Keratosis, Seborrheic"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
@@ -6291,7 +6329,7 @@
     },
     "NCT07099430": {
       "nct_id": "NCT07099430",
-      "title": "A Trial of LBL-024 Monotherapy, LBL-024 Combined With LBL-007 or Toripalimab in Patients With Advanced Melanoma",
+      "title": "A Trial of LBL-024 Monotherapy or Combination With Toripalimab in Patients With Advanced Melanoma.",
       "url": "https://clinicaltrials.gov/study/NCT07099430",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07099430",
@@ -6732,6 +6770,7 @@
           "Breast Neoplasms",
           "Pancreatic Neoplasms",
           "Ovarian Neoplasms",
+          "Cholangiocarcinoma",
           "Neoplasms"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
@@ -6804,22 +6843,6 @@
         "protocolSection.contactsLocationsModule.locations.country": [
           "Australia",
           "Norway"
-        ]
-      }
-    },
-    "NCT05180942": {
-      "nct_id": "NCT05180942",
-      "title": "Statins and prOgression of Coronary atheRosclerosis in melanomA Patients Treated With chEckpoint inhibitorS",
-      "url": "https://clinicaltrials.gov/study/NCT05180942",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05180942",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Melanoma",
-          "Atherosclerosis"
-        ],
-        "protocolSection.statusModule.overallStatus": "RECRUITING",
-        "protocolSection.contactsLocationsModule.locations.country": [
-          "Australia"
         ]
       }
     },
@@ -7033,22 +7056,6 @@
           "Ovarian Neoplasms",
           "Endometrial Neoplasms",
           "Colorectal Neoplasms"
-        ],
-        "protocolSection.statusModule.overallStatus": "RECRUITING",
-        "protocolSection.contactsLocationsModule.locations.country": [
-          "Australia"
-        ]
-      }
-    },
-    "NCT07421739": {
-      "nct_id": "NCT07421739",
-      "title": "Choroidal Melanoma Patient-Reported Outcome Study (CM-PRO) in a Subset of AU-011-301 (CoMpass) Subjects",
-      "url": "https://clinicaltrials.gov/study/NCT07421739",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07421739",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Uveal Melanoma",
-          "Eye Neoplasms"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
@@ -7572,6 +7579,22 @@
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07354152",
         "derivedSection.conditionBrowseModule.meshes.term": [
+          "Melanoma"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "France"
+        ]
+      }
+    },
+    "NCT07376512": {
+      "nct_id": "NCT07376512",
+      "title": "Predicting Response to Anti-PD-1/PD-L1 Immunotherapy by Plasma Extracellular Vesicle Analysis",
+      "url": "https://clinicaltrials.gov/study/NCT07376512",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07376512",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Carcinoma, Non-Small-Cell Lung",
           "Melanoma"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
@@ -8191,6 +8214,24 @@
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
           "Germany"
+        ]
+      }
+    },
+    "NCT07883954": {
+      "nct_id": "NCT07883954",
+      "title": "Development and Multi-Centre Validation of a Novel Non-Invasive Melanoma Molecular Diagnostic Test",
+      "url": "https://clinicaltrials.gov/study/NCT07883954",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07883954",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Melanoma"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "Belgium",
+          "Germany",
+          "Spain",
+          "United Kingdom"
         ]
       }
     },
@@ -8982,6 +9023,24 @@
           "Melanoma",
           "Breast Neoplasms",
           "Head and Neck Neoplasms"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "Netherlands"
+        ]
+      }
+    },
+    "NCT07501780": {
+      "nct_id": "NCT07501780",
+      "title": "Real-world Evaluation of the Implementation of LC-OCT in Daily Clinical Practice",
+      "url": "https://clinicaltrials.gov/study/NCT07501780",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07501780",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Carcinoma, Basal Cell",
+          "Neoplasms",
+          "Neoplasms, Basal Cell",
+          "Carcinoma"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
@@ -9815,6 +9874,21 @@
         ]
       }
     },
+    "NCT07574047": {
+      "nct_id": "NCT07574047",
+      "title": "MELCHRONO: A Prospective Randomized Study Investigating Chrono-immunotherapy for Advanced Melanoma.",
+      "url": "https://clinicaltrials.gov/study/NCT07574047",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07574047",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Melanoma"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "Switzerland"
+        ]
+      }
+    },
     "NCT07581509": {
       "nct_id": "NCT07581509",
       "title": "Pharmacokinetics, Safety, and Immunogenicity of Bmab1800 and Keytruda\u00ae as Adjuvant Monotherapy in Patients With Melanoma",
@@ -9860,19 +9934,18 @@
         ]
       }
     },
-    "NCT07761871": {
-      "nct_id": "NCT07761871",
-      "title": "Exercise and Nutritional Intervention in Patients With Melanoma Receiving Immunotherapy",
-      "url": "https://clinicaltrials.gov/study/NCT07761871",
+    "NCT07694414": {
+      "nct_id": "NCT07694414",
+      "title": "Rituximab for Treatment of Checkpoint Inhibitor Induced Immune-related Adverse Events",
+      "url": "https://clinicaltrials.gov/study/NCT07694414",
       "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07761871",
+        "protocolSection.identificationModule.nctId": "NCT07694414",
         "derivedSection.conditionBrowseModule.meshes.term": [
-          "Melanoma",
-          "Sarcopenia"
+          "Melanoma"
         ],
         "protocolSection.statusModule.overallStatus": "RECRUITING",
         "protocolSection.contactsLocationsModule.locations.country": [
-          "Slovenia"
+          "Denmark"
         ]
       }
     },
@@ -9898,6 +9971,21 @@
           "Vietnam"
         ]
       }
+    },
+    "NCT07870265": {
+      "nct_id": "NCT07870265",
+      "title": "Detection of the BRAF V600E Mutation in Liquid Biopsy Using the CRISPR/Cas12a System",
+      "url": "https://clinicaltrials.gov/study/NCT07870265",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07870265",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Melanoma"
+        ],
+        "protocolSection.statusModule.overallStatus": "RECRUITING",
+        "protocolSection.contactsLocationsModule.locations.country": [
+          "Czechia"
+        ]
+      }
     }
   },
   "assumptions": [
@@ -9909,10 +9997,10 @@
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:10:18.706917Z",
-    "search_matches": 480,
-    "cohort_size": 480,
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:51:52.547376Z",
+    "search_matches": 485,
+    "cohort_size": 485,
     "api_requests": 1
   },
   "verification": {
@@ -9957,15 +10045,14 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_5a84acee71764142ac63bcdd23ed4cbf",
+  "run_id": "run_be7ffdaf3a5e4bc0a14aa271a3c4c0da",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 2700.0,
-    "retrieve": 578.8,
-    "analyze": 4.9,
-    "verify": 111.3
+    "plan": 1968.2,
+    "retrieve": 473.1,
+    "analyze": 102.6
   }
 }

@@ -5,9 +5,9 @@
     "outcome": "success",
     "type": "time_series",
     "title": "Trials by start year: Pembrolizumab",
-    "cited_trials": 2620,
+    "cited_trials": 2638,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": "chart.png"
   },
@@ -17,9 +17,9 @@
     "outcome": "success",
     "type": "bar_chart",
     "title": "Trials by country: melanoma; recruiting",
-    "cited_trials": 480,
+    "cited_trials": 485,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": "chart.png"
   },
@@ -29,9 +29,9 @@
     "outcome": "success",
     "type": "grouped_bar_chart",
     "title": "Trials by phase: semaglutide vs tirzepatide",
-    "cited_trials": 824,
+    "cited_trials": 849,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": "chart.png"
   },
@@ -41,9 +41,9 @@
     "outcome": "success",
     "type": "network_graph",
     "title": "Lead sponsors and drugs: glioblastoma",
-    "cited_trials": 975,
+    "cited_trials": 978,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": "chart.png"
   },
@@ -55,7 +55,7 @@
     "title": null,
     "cited_trials": 0,
     "verification": null,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": null
   },
@@ -65,10 +65,10 @@
     "outcome": "success",
     "type": "histogram",
     "title": "Trials by enrollment: breast cancer",
-    "cited_trials": 16873,
+    "cited_trials": 16950,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
-    "model_calls": 3,
+    "data_timestamp": "2026-10-26T09:00:04",
+    "model_calls": 2,
     "chart": "chart.png"
   },
   {
@@ -79,7 +79,7 @@
     "title": "Trial timeline: Keytruda; Phase 3; recruiting; in Germany",
     "cited_trials": 50,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": "chart.png"
   },
@@ -89,9 +89,9 @@
     "outcome": "success",
     "type": "scatter_plot",
     "title": "Enrollment vs duration: semaglutide; completed",
-    "cited_trials": 309,
+    "cited_trials": 313,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": "chart.png"
   },
@@ -101,9 +101,9 @@
     "outcome": "success",
     "type": "network_graph",
     "title": "Drugs given together in the same arm: pembrolizumab",
-    "cited_trials": 1776,
+    "cited_trials": 1788,
     "verification": true,
-    "data_timestamp": "2026-10-02T09:00:04",
+    "data_timestamp": "2026-10-26T09:00:04",
     "model_calls": 2,
     "chart": "chart.png"
   }

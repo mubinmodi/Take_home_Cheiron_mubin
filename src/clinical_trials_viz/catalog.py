@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 # Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS);
-# 2026-10-26.1 marked the time axis (DimensionInfo.temporal).
-CATALOG_VERSION = "2026-10-26.1"
+# 2026-10-26.1 marked the time axis (DimensionInfo.temporal); 2026-10-26.2 sponsor ambiguity at 5%.
+CATALOG_VERSION = "2026-10-26.2"
 
 
 class Phase(StrEnum):
@@ -276,7 +276,7 @@ PINNED_FIELDS: dict[str, tuple[str, str]] = {
 # Drug identity: the MeSH term shared by at least this share of search matches.
 DRUG_IDENTITY_MIN_SHARE = 0.5
 # Sponsor ambiguity: a second distinct lead sponsor with at least this share triggers a Clarification.
-SPONSOR_AMBIGUITY_MIN_SHARE = 0.1
+SPONSOR_AMBIGUITY_MIN_SHARE = 0.05  # 2026-10-26: was 0.1, which sat on the edge for "Merck" (Merck KGaA ~10%)
 DRUG_CLASS_OPTIONS = 8
 
 # Fields requested from the API for every Trial (keeps pages small and fast).

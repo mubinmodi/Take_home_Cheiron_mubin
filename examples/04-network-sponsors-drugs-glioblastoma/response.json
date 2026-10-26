@@ -39,7 +39,7 @@
   "visualization": {
     "type": "network_graph",
     "title": "Lead sponsors and drugs: glioblastoma",
-    "subtitle": "1,736 trials with a drug and a lead sponsor \u00b7 showing 33 nodes, 52 links",
+    "subtitle": "1,742 trials with a drug and a lead sponsor \u00b7 showing 33 nodes, 52 links",
     "encoding": {
       "color": {
         "field": "kind",
@@ -95,7 +95,7 @@
           "id": "sponsor:National Cancer Institute (NCI)",
           "label": "National Cancer Institute (NCI)",
           "kind": "sponsor",
-          "trial_count": 128,
+          "trial_count": 127,
           "trial_ids": [
             "NCT00004028",
             "NCT00004080",
@@ -211,7 +211,6 @@
             "NCT03027388",
             "NCT03107780",
             "NCT03212274",
-            "NCT03581292",
             "NCT03718767",
             "NCT03919071",
             "NCT04145115",
@@ -663,7 +662,7 @@
           "id": "drug:temozolomide",
           "label": "temozolomide",
           "kind": "drug",
-          "trial_count": 421,
+          "trial_count": 424,
           "trial_ids": [
             "NCT00003176",
             "NCT00003464",
@@ -988,7 +987,6 @@
             "NCT04280848",
             "NCT04324840",
             "NCT04373785",
-            "NCT04385173",
             "NCT04388033",
             "NCT04388475",
             "NCT04396860",
@@ -1085,7 +1083,11 @@
             "NCT07758062",
             "NCT07762716",
             "NCT07789379",
-            "NCT07811297"
+            "NCT07811297",
+            "NCT07859059",
+            "NCT07873996",
+            "NCT07888647",
+            "NCT07894549"
           ]
         },
         {
@@ -1778,7 +1780,7 @@
           "source": "sponsor:National Cancer Institute (NCI)",
           "target": "drug:temozolomide",
           "kind": "sponsors_trials_of",
-          "trial_count": 31,
+          "trial_count": 30,
           "trial_ids": [
             "NCT00039494",
             "NCT00049387",
@@ -1807,7 +1809,6 @@
             "NCT02395692",
             "NCT02942264",
             "NCT03018288",
-            "NCT03581292",
             "NCT04216329",
             "NCT04396860",
             "NCT05432804"
@@ -2467,7 +2468,7 @@
       "sort": "data_order",
       "other_bucket": false,
       "multi_valued": false,
-      "cohort_size": 1736,
+      "cohort_size": 1742,
       "node_kinds": [
         "sponsor",
         "drug"
@@ -2477,7 +2478,7 @@
       "y_scale": "linear"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_d80d895002f4434893b2e1e21887aa95/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_80b400ebc2cf496b8bcfe858f1f76c0e/chart.png",
   "evidence": {
     "NCT00004028": {
       "nct_id": "NCT00004028",
@@ -4792,26 +4793,6 @@
           "Specimen Handling",
           "Magnetic Resonance Spectroscopy",
           "olaparib"
-        ]
-      }
-    },
-    "NCT03581292": {
-      "nct_id": "NCT03581292",
-      "title": "Veliparib, Radiation Therapy, and Temozolomide in Treating Patients With Newly Diagnosed Malignant Glioma Without H3 K27M or BRAFV600 Mutations",
-      "url": "https://clinicaltrials.gov/study/NCT03581292",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT03581292",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Astrocytoma",
-          "Glioblastoma",
-          "Glioma"
-        ],
-        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "National Cancer Institute (NCI)",
-        "derivedSection.interventionBrowseModule.meshes.term": [
-          "Radiotherapy",
-          "Radiation",
-          "Temozolomide",
-          "veliparib"
         ]
       }
     },
@@ -14686,6 +14667,26 @@
         ]
       }
     },
+    "NCT03581292": {
+      "nct_id": "NCT03581292",
+      "title": "Veliparib, Radiation Therapy, and Temozolomide in Treating Patients With Newly Diagnosed Malignant Glioma Without H3 K27M or BRAFV600 Mutations",
+      "url": "https://clinicaltrials.gov/study/NCT03581292",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT03581292",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Astrocytoma",
+          "Glioblastoma",
+          "Glioma"
+        ],
+        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "Children's Oncology Group",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Radiotherapy",
+          "Radiation",
+          "Temozolomide",
+          "veliparib"
+        ]
+      }
+    },
     "NCT03587038": {
       "nct_id": "NCT03587038",
       "title": "OKN-007 in Combination With Adjuvant Temozolomide Chemoradiotherapy for Newly Diagnosed Glioblastoma",
@@ -15211,21 +15212,6 @@
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Radiotherapy, Intensity-Modulated",
           "Radiotherapy",
-          "Temozolomide"
-        ]
-      }
-    },
-    "NCT04385173": {
-      "nct_id": "NCT04385173",
-      "title": "Pilot Study of B7-H3 CAR-T in Treating Patients With Recurrent and Refractory Glioblastoma",
-      "url": "https://clinicaltrials.gov/study/NCT04385173",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT04385173",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Glioblastoma"
-        ],
-        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "Second Affiliated Hospital, Zhejiang University, School of Medicine",
-        "derivedSection.interventionBrowseModule.meshes.term": [
           "Temozolomide"
         ]
       }
@@ -16649,6 +16635,78 @@
           "anlotinib",
           "Temozolomide",
           "Lomustine"
+        ]
+      }
+    },
+    "NCT07859059": {
+      "nct_id": "NCT07859059",
+      "title": "Metronomic Temozolomide With Dexbrompheniramine for Recurrent High-Grade Glioma/Glioblastoma",
+      "url": "https://clinicaltrials.gov/study/NCT07859059",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859059",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Glioma",
+          "Glioblastoma",
+          "Gliosarcoma",
+          "Recurrence"
+        ],
+        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "University of Nebraska",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "dexbrompheniramine",
+          "brompheniramine maleate, pseudoephedrine sulfate drug combination",
+          "Temozolomide"
+        ]
+      }
+    },
+    "NCT07873996": {
+      "nct_id": "NCT07873996",
+      "title": "Tris-CAR-T Cell Therapy Targeting CD44 and CD133 in Newly Diagnosed Glioblastoma",
+      "url": "https://clinicaltrials.gov/study/NCT07873996",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07873996",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Glioblastoma"
+        ],
+        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "Beijing Tiantan Hospital",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Temozolomide",
+          "Radiotherapy"
+        ]
+      }
+    },
+    "NCT07888647": {
+      "nct_id": "NCT07888647",
+      "title": "IDH1-vac in Patients With Newly Diagnosed IDH1R132H-positive High-grade Astrocytomas",
+      "url": "https://clinicaltrials.gov/study/NCT07888647",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07888647",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Astrocytoma",
+          "Lymphoma, Follicular",
+          "Glioblastoma",
+          "Glioma",
+          "Brain Neoplasms"
+        ],
+        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "German Cancer Research Center",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Temozolomide",
+          "Imiquimod"
+        ]
+      }
+    },
+    "NCT07894549": {
+      "nct_id": "NCT07894549",
+      "title": "A Single-Arm, Open-Label, Multicenter Clinical Study of Teniposide Combined With Temozolomide for the Treatment of Newly Diagnosed Glioblastoma (nGBM) With MGMT Promotor Region Unmethylated",
+      "url": "https://clinicaltrials.gov/study/NCT07894549",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07894549",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Newly Diagnosed Glioblastoma",
+          "MGMT-Unmethylated Glioblastoma"
+        ],
+        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "Sun Yat-sen University",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Temozolomide"
         ]
       }
     },
@@ -19572,7 +19630,7 @@
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Glioblastoma"
         ],
-        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "Patrick Wen, MD",
+        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name": "Gilbert Youssef",
         "derivedSection.interventionBrowseModule.meshes.term": [
           "Nivolumab",
           "Ipilimumab",
@@ -20875,19 +20933,19 @@
     }
   },
   "assumptions": [
-    "Network shows the top 15 lead sponsors and top 25 drugs by trial count, linked when at least 2 trials share them; 664 sponsors and 1149 drugs were found in total.",
+    "Network shows the top 15 lead sponsors and top 25 drugs by trial count, linked when at least 2 trials share them; 664 sponsors and 1156 drugs were found in total.",
     "A link means the sponsor leads trials that give the drug (lead sponsors only; collaborators not included).",
     "Supplements, placebo, saline and 'standard of care' are not counted as drugs.",
     "7 top sponsors or drugs had no link above the threshold and are not shown.",
-    "533 trials have no drug intervention (or no lead sponsor) and are not in the network."
+    "536 trials have no drug intervention (or no lead sponsor) and are not in the network."
   ],
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:10:24.858721Z",
-    "search_matches": 2269,
-    "cohort_size": 2269,
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:51:58.785907Z",
+    "search_matches": 2278,
+    "cohort_size": 2278,
     "api_requests": 3
   },
   "verification": {
@@ -20924,15 +20982,14 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_d80d895002f4434893b2e1e21887aa95",
+  "run_id": "run_80b400ebc2cf496b8bcfe858f1f76c0e",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 2010.5,
-    "retrieve": 1712.8,
-    "analyze": 16.4,
-    "verify": 15.5
+    "plan": 2270.1,
+    "retrieve": 2413.5,
+    "analyze": 28.2
   }
 }

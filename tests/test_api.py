@@ -431,9 +431,9 @@ async def test_sponsor_clarification_offers_all_of_these_and_accepts_it(make_cli
 
     from clinical_trials_viz import catalog, clarify
 
-    # In the saved records no sponsor reaches the default 10% share, so lower it for this test.
+    # In the saved records no second sponsor reaches the default 5% share, so lower it for this test.
     monkeypatch.setattr(clarify, "SPONSOR_AMBIGUITY_MIN_SHARE", 0.02)
-    assert catalog.SPONSOR_AMBIGUITY_MIN_SHARE == 0.1
+    assert catalog.SPONSOR_AMBIGUITY_MIN_SHARE == 0.05
     by_sponsor = Counter(t.lead_sponsor for t in trials)
     plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(sponsor="Cancer"), group_by=Dimension.PHASE)
     async for client in make_client(ScriptedPlanner(plan, plan)):

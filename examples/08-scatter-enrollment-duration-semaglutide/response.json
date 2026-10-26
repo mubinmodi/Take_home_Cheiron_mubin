@@ -43,7 +43,7 @@
   "visualization": {
     "type": "scatter_plot",
     "title": "Enrollment vs duration: semaglutide; completed",
-    "subtitle": "309 of 309 trials",
+    "subtitle": "313 of 313 trials",
     "encoding": {
       "x": {
         "field": "duration_months",
@@ -1750,6 +1750,16 @@
         ]
       },
       {
+        "nct_id": "NCT05073835",
+        "title": "Semaglutide 2.4 mg in Patients With Poor Weight-loss",
+        "duration_months": 29.2,
+        "enrollment": 70,
+        "values": "Actual values",
+        "trial_ids": [
+          "NCT05073835"
+        ]
+      },
+      {
         "nct_id": "NCT05078255",
         "title": "The Separate and Combined Effects of Long-term GIP and GLP-1 Receptor Activation in Patients with Type 2 Diabetes",
         "duration_months": 35.3,
@@ -2960,6 +2970,16 @@
         ]
       },
       {
+        "nct_id": "NCT06896981",
+        "title": "Semaglutide in Women With Polycystic Ovary Syndrome and Obesity",
+        "duration_months": 10.0,
+        "enrollment": 31,
+        "values": "Actual values",
+        "trial_ids": [
+          "NCT06896981"
+        ]
+      },
+      {
         "nct_id": "NCT06914102",
         "title": "Emulation of the STEP-HFpEF DM Heart Failure Trial in Healthcare Claims Data",
         "duration_months": 4.5,
@@ -3080,6 +3100,16 @@
         ]
       },
       {
+        "nct_id": "NCT07424430",
+        "title": "Real-world Canadian Retrospective Study Evaluating Longitudinal Semaglutide Use on Cardio-Kidney-Metabolic Outcomes",
+        "duration_months": 7.2,
+        "enrollment": 3392,
+        "values": "Actual values",
+        "trial_ids": [
+          "NCT07424430"
+        ]
+      },
+      {
         "nct_id": "NCT07610174",
         "title": "Effects of Dapagliflozin, Semaglutide, and Their Combination in Heart Failure Patients With Prosthetic Heart Valves",
         "duration_months": 10.9,
@@ -3178,6 +3208,16 @@
         "trial_ids": [
           "NCT07850765"
         ]
+      },
+      {
+        "nct_id": "NCT07871799",
+        "title": "ELITE: Deep Profiling and Algorithmic Polytherapy to Map Individual Response in Healthy Aging",
+        "duration_months": 3.3,
+        "enrollment": 31,
+        "values": "Actual values",
+        "trial_ids": [
+          "NCT07871799"
+        ]
       }
     ],
     "metadata": {
@@ -3189,12 +3229,12 @@
       ],
       "other_bucket": false,
       "multi_valued": false,
-      "cohort_size": 309,
+      "cohort_size": 313,
       "bipartite": false,
       "y_scale": "symlog"
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_5099b6294b1545a8b36b370297546555/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_e747a4229b4b42c3aee405d501643b50/chart.png",
   "evidence": {
     "NCT00696657": {
       "nct_id": "NCT00696657",
@@ -7900,6 +7940,34 @@
         }
       }
     },
+    "NCT05073835": {
+      "nct_id": "NCT05073835",
+      "title": "Semaglutide 2.4 mg in Patients With Poor Weight-loss",
+      "url": "https://clinicaltrials.gov/study/NCT05073835",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05073835",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide"
+        ],
+        "protocolSection.statusModule.overallStatus": "COMPLETED",
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2022-11-01",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2025-04-09",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2025-04-09",
+          "type": "ACTUAL"
+        },
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 70,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT05078255": {
       "nct_id": "NCT05078255",
       "title": "The Separate and Combined Effects of Long-term GIP and GLP-1 Receptor Activation in Patients with Type 2 Diabetes",
@@ -11390,6 +11458,35 @@
         }
       }
     },
+    "NCT06896981": {
+      "nct_id": "NCT06896981",
+      "title": "Semaglutide in Women With Polycystic Ovary Syndrome and Obesity",
+      "url": "https://clinicaltrials.gov/study/NCT06896981",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06896981",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Metformin",
+          "semaglutide"
+        ],
+        "protocolSection.statusModule.overallStatus": "COMPLETED",
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-01-01",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2025-10-31",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2026-02-28",
+          "type": "ACTUAL"
+        },
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 31,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT06914102": {
       "nct_id": "NCT06914102",
       "title": "Emulation of the STEP-HFpEF DM Heart Failure Trial in Healthcare Claims Data",
@@ -11739,6 +11836,34 @@
         }
       }
     },
+    "NCT07424430": {
+      "nct_id": "NCT07424430",
+      "title": "Real-world Canadian Retrospective Study Evaluating Longitudinal Semaglutide Use on Cardio-Kidney-Metabolic Outcomes",
+      "url": "https://clinicaltrials.gov/study/NCT07424430",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07424430",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "semaglutide"
+        ],
+        "protocolSection.statusModule.overallStatus": "COMPLETED",
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2026-02-20",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2026-09-28",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2026-09-28",
+          "type": "ACTUAL"
+        },
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 3392,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT07610174": {
       "nct_id": "NCT07610174",
       "title": "Effects of Dapagliflozin, Semaglutide, and Their Combination in Heart Failure Patients With Prosthetic Heart Valves",
@@ -12027,19 +12152,49 @@
           "type": "ACTUAL"
         }
       }
+    },
+    "NCT07871799": {
+      "nct_id": "NCT07871799",
+      "title": "ELITE: Deep Profiling and Algorithmic Polytherapy to Map Individual Response in Healthy Aging",
+      "url": "https://clinicaltrials.gov/study/NCT07871799",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07871799",
+        "derivedSection.interventionBrowseModule.meshes.term": [
+          "Metformin",
+          "semaglutide",
+          "empagliflozin"
+        ],
+        "protocolSection.statusModule.overallStatus": "COMPLETED",
+        "protocolSection.statusModule.startDateStruct": {
+          "date": "2025-11-17",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.primaryCompletionDateStruct": {
+          "date": "2026-02-25",
+          "type": "ACTUAL"
+        },
+        "protocolSection.statusModule.completionDateStruct": {
+          "date": "2026-02-25",
+          "type": "ACTUAL"
+        },
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 31,
+          "type": "ACTUAL"
+        }
+      }
     }
   },
   "assumptions": [
-    "40 of 349 search matches for 'semaglutide' were excluded because 'semaglutide' is not one of their drug interventions.",
+    "39 of 352 search matches for 'semaglutide' were excluded because 'semaglutide' is not one of their drug interventions.",
     "Duration runs from the start date to the primary completion date (or completion date when missing); enrollment uses a symmetric log scale."
   ],
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:11:00.899254Z",
-    "search_matches": 349,
-    "cohort_size": 309,
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:52:29.530484Z",
+    "search_matches": 352,
+    "cohort_size": 313,
     "api_requests": 1
   },
   "verification": {
@@ -12076,15 +12231,14 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_5099b6294b1545a8b36b370297546555",
+  "run_id": "run_e747a4229b4b42c3aee405d501643b50",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 2202.4,
-    "retrieve": 446.9,
-    "analyze": 1.1,
-    "verify": 2.4
+    "plan": 2780.1,
+    "retrieve": 467.8,
+    "analyze": 1.9
   }
 }

@@ -38,7 +38,7 @@
   "visualization": {
     "type": "histogram",
     "title": "Trials by enrollment: breast cancer",
-    "subtitle": "16,873 trials",
+    "subtitle": "16,950 trials",
     "encoding": {
       "x": {
         "field": "enrollment_bin",
@@ -77,7 +77,7 @@
       {
         "enrollment_bin": "0",
         "enrollment_type": "Actual",
-        "trial_count": 522,
+        "trial_count": 523,
         "trial_ids": [
           "NCT00003455",
           "NCT00003536",
@@ -583,6 +583,7 @@
           "NCT06613516",
           "NCT06672224",
           "NCT06710197",
+          "NCT06807164",
           "NCT06829199",
           "NCT06852560",
           "NCT06884254",
@@ -618,7 +619,7 @@
       {
         "enrollment_bin": "1\u201320",
         "enrollment_type": "Actual",
-        "trial_count": 1724,
+        "trial_count": 1731,
         "trial_ids": [
           "NCT00002668",
           "NCT00003098",
@@ -1600,6 +1601,7 @@
           "NCT02970500",
           "NCT02971761",
           "NCT02976363",
+          "NCT02977468",
           "NCT02978586",
           "NCT02983604",
           "NCT02990845",
@@ -1873,6 +1875,7 @@
           "NCT03961685",
           "NCT03970967",
           "NCT03972540",
+          "NCT03979729",
           "NCT03981705",
           "NCT03982004",
           "NCT03983395",
@@ -2176,6 +2179,7 @@
           "NCT05488483",
           "NCT05489679",
           "NCT05500508",
+          "NCT05502224",
           "NCT05503108",
           "NCT05508984",
           "NCT05509790",
@@ -2184,6 +2188,7 @@
           "NCT05553522",
           "NCT05554354",
           "NCT05555251",
+          "NCT05556473",
           "NCT05560685",
           "NCT05562440",
           "NCT05573555",
@@ -2193,6 +2198,7 @@
           "NCT05618613",
           "NCT05622058",
           "NCT05623488",
+          "NCT05625087",
           "NCT05633979",
           "NCT05665894",
           "NCT05681611",
@@ -2293,14 +2299,15 @@
           "NCT06408168",
           "NCT06415526",
           "NCT06500858",
+          "NCT06504914",
           "NCT06529120",
           "NCT06533722",
           "NCT06536556",
           "NCT06547034",
           "NCT06557148",
           "NCT06560385",
+          "NCT06568692",
           "NCT06569719",
-          "NCT06590857",
           "NCT06604247",
           "NCT06617455",
           "NCT06625515",
@@ -2343,13 +2350,14 @@
           "NCT07680855",
           "NCT07691294",
           "NCT07798492",
-          "NCT07843121"
+          "NCT07843121",
+          "NCT07865507"
         ]
       },
       {
         "enrollment_bin": "1\u201320",
         "enrollment_type": "Estimated",
-        "trial_count": 368,
+        "trial_count": 371,
         "trial_ids": [
           "NCT00002585",
           "NCT00003000",
@@ -2433,7 +2441,6 @@
           "NCT02918474",
           "NCT02939274",
           "NCT02970786",
-          "NCT02977468",
           "NCT02982421",
           "NCT03024580",
           "NCT03075995",
@@ -2611,7 +2618,6 @@
           "NCT06569706",
           "NCT06609187",
           "NCT06617169",
-          "NCT06623396",
           "NCT06637306",
           "NCT06665178",
           "NCT06666439",
@@ -2718,7 +2724,12 @@
           "NCT07793656",
           "NCT07819981",
           "NCT07850869",
-          "NCT07856160"
+          "NCT07856160",
+          "NCT07874256",
+          "NCT07876596",
+          "NCT07876986",
+          "NCT07883460",
+          "NCT07883512"
         ]
       },
       {
@@ -2743,7 +2754,7 @@
       {
         "enrollment_bin": "21\u201350",
         "enrollment_type": "Actual",
-        "trial_count": 2213,
+        "trial_count": 2222,
         "trial_ids": [
           "NCT00002680",
           "NCT00002837",
@@ -3648,6 +3659,7 @@
           "NCT01988870",
           "NCT01990352",
           "NCT01992432",
+          "NCT01996046",
           "NCT02001974",
           "NCT02005614",
           "NCT02006979",
@@ -4657,6 +4669,7 @@
           "NCT05306002",
           "NCT05322889",
           "NCT05327218",
+          "NCT05335473",
           "NCT05338723",
           "NCT05359783",
           "NCT05361018",
@@ -4777,6 +4790,7 @@
           "NCT05976620",
           "NCT05978232",
           "NCT05978960",
+          "NCT05996107",
           "NCT06003764",
           "NCT06008158",
           "NCT06011824",
@@ -4829,6 +4843,7 @@
           "NCT06300411",
           "NCT06307470",
           "NCT06309459",
+          "NCT06322888",
           "NCT06335550",
           "NCT06336538",
           "NCT06343987",
@@ -4841,6 +4856,7 @@
           "NCT06386263",
           "NCT06388304",
           "NCT06392529",
+          "NCT06399757",
           "NCT06407037",
           "NCT06419023",
           "NCT06427473",
@@ -4857,6 +4873,7 @@
           "NCT06537336",
           "NCT06546787",
           "NCT06547164",
+          "NCT06549075",
           "NCT06570031",
           "NCT06570811",
           "NCT06572800",
@@ -4939,6 +4956,7 @@
           "NCT07448467",
           "NCT07475520",
           "NCT07510997",
+          "NCT07549685",
           "NCT07553741",
           "NCT07610148",
           "NCT07644858",
@@ -4957,13 +4975,15 @@
           "NCT07823751",
           "NCT07827079",
           "NCT07831460",
-          "NCT07850323"
+          "NCT07850323",
+          "NCT07862296",
+          "NCT07884968"
         ]
       },
       {
         "enrollment_bin": "21\u201350",
         "enrollment_type": "Estimated",
-        "trial_count": 1297,
+        "trial_count": 1300,
         "trial_ids": [
           "NCT00002475",
           "NCT00002616",
@@ -5215,7 +5235,6 @@
           "NCT03456661",
           "NCT03457467",
           "NCT03487055",
-          "NCT03492918",
           "NCT03501394",
           "NCT03509090",
           "NCT03511781",
@@ -5529,7 +5548,6 @@
           "NCT05486520",
           "NCT05491226",
           "NCT05498597",
-          "NCT05502224",
           "NCT05504707",
           "NCT05512416",
           "NCT05512780",
@@ -5543,7 +5561,6 @@
           "NCT05550090",
           "NCT05550415",
           "NCT05554380",
-          "NCT05556473",
           "NCT05560308",
           "NCT05574686",
           "NCT05575804",
@@ -5634,7 +5651,6 @@
           "NCT05983380",
           "NCT05984888",
           "NCT05992870",
-          "NCT05996107",
           "NCT06000033",
           "NCT06010862",
           "NCT06015087",
@@ -5723,7 +5739,6 @@
           "NCT06311357",
           "NCT06318507",
           "NCT06318897",
-          "NCT06322888",
           "NCT06327490",
           "NCT06330012",
           "NCT06330870",
@@ -5789,7 +5804,6 @@
           "NCT06499168",
           "NCT06500208",
           "NCT06502691",
-          "NCT06504914",
           "NCT06508216",
           "NCT06508307",
           "NCT06517212",
@@ -5811,7 +5825,6 @@
           "NCT06547476",
           "NCT06547840",
           "NCT06547853",
-          "NCT06548646",
           "NCT06551896",
           "NCT06561555",
           "NCT06568705",
@@ -5831,7 +5844,7 @@
           "NCT06616987",
           "NCT06621459",
           "NCT06622954",
-          "NCT06625879",
+          "NCT06623396",
           "NCT06629233",
           "NCT06631092",
           "NCT06633380",
@@ -5995,6 +6008,7 @@
           "NCT07117864",
           "NCT07118176",
           "NCT07122713",
+          "NCT07125950",
           "NCT07129187",
           "NCT07130643",
           "NCT07131735",
@@ -6152,7 +6166,6 @@
           "NCT07543107",
           "NCT07544134",
           "NCT07546331",
-          "NCT07549685",
           "NCT07552181",
           "NCT07552467",
           "NCT07552922",
@@ -6261,7 +6274,17 @@
           "NCT07844759",
           "NCT07847398",
           "NCT07848243",
-          "NCT07854262"
+          "NCT07854262",
+          "NCT07857226",
+          "NCT07859098",
+          "NCT07862114",
+          "NCT07862751",
+          "NCT07869355",
+          "NCT07879963",
+          "NCT07880821",
+          "NCT07881341",
+          "NCT07893730",
+          "NCT07895160"
         ]
       },
       {
@@ -6325,7 +6348,7 @@
       {
         "enrollment_bin": "51\u2013100",
         "enrollment_type": "Actual",
-        "trial_count": 1804,
+        "trial_count": 1812,
         "trial_ids": [
           "NCT00002679",
           "NCT00002998",
@@ -7372,6 +7395,7 @@
           "NCT03470935",
           "NCT03480958",
           "NCT03491917",
+          "NCT03492918",
           "NCT03499353",
           "NCT03499899",
           "NCT03502395",
@@ -7964,6 +7988,7 @@
           "NCT06184074",
           "NCT06186700",
           "NCT06187909",
+          "NCT06188520",
           "NCT06188559",
           "NCT06203197",
           "NCT06206837",
@@ -8097,11 +8122,13 @@
           "NCT07145827",
           "NCT07148141",
           "NCT07180810",
+          "NCT07217288",
           "NCT07272447",
           "NCT07274800",
           "NCT07320781",
           "NCT07334626",
           "NCT07338721",
+          "NCT07349459",
           "NCT07355946",
           "NCT07362472",
           "NCT07367074",
@@ -8113,6 +8140,7 @@
           "NCT07455110",
           "NCT07471113",
           "NCT07474246",
+          "NCT07519200",
           "NCT07581054",
           "NCT07585253",
           "NCT07596459",
@@ -8130,13 +8158,16 @@
           "NCT07803549",
           "NCT07804784",
           "NCT07807605",
-          "NCT07842614"
+          "NCT07842614",
+          "NCT07865988",
+          "NCT07882069",
+          "NCT07892157"
         ]
       },
       {
         "enrollment_bin": "51\u2013100",
         "enrollment_type": "Estimated",
-        "trial_count": 1485,
+        "trial_count": 1492,
         "trial_ids": [
           "NCT00002780",
           "NCT00002937",
@@ -8336,7 +8367,6 @@
           "NCT01980277",
           "NCT01986426",
           "NCT01990430",
-          "NCT01996046",
           "NCT02003560",
           "NCT02004834",
           "NCT02022579",
@@ -8519,7 +8549,6 @@
           "NCT03972020",
           "NCT03978780",
           "NCT03979339",
-          "NCT03979729",
           "NCT03979911",
           "NCT03983577",
           "NCT03987555",
@@ -8761,7 +8790,6 @@
           "NCT05327153",
           "NCT05327608",
           "NCT05331326",
-          "NCT05335473",
           "NCT05339113",
           "NCT05346107",
           "NCT05350722",
@@ -8954,7 +8982,6 @@
           "NCT05974449",
           "NCT05975736",
           "NCT05976815",
-          "NCT05977036",
           "NCT05982093",
           "NCT05982678",
           "NCT05986071",
@@ -9069,7 +9096,6 @@
           "NCT06357338",
           "NCT06358573",
           "NCT06360809",
-          "NCT06361940",
           "NCT06362096",
           "NCT06365788",
           "NCT06369831",
@@ -9080,7 +9106,6 @@
           "NCT06388122",
           "NCT06389006",
           "NCT06395506",
-          "NCT06399757",
           "NCT06400849",
           "NCT06401005",
           "NCT06402084",
@@ -9129,7 +9154,6 @@
           "NCT06553859",
           "NCT06557057",
           "NCT06561646",
-          "NCT06568692",
           "NCT06572098",
           "NCT06574022",
           "NCT06575049",
@@ -9138,6 +9162,7 @@
           "NCT06580002",
           "NCT06582017",
           "NCT06582615",
+          "NCT06590857",
           "NCT06592560",
           "NCT06592625",
           "NCT06595147",
@@ -9163,7 +9188,6 @@
           "NCT06679387",
           "NCT06680596",
           "NCT06685770",
-          "NCT06686394",
           "NCT06690320",
           "NCT06703567",
           "NCT06704659",
@@ -9317,7 +9341,6 @@
           "NCT07116824",
           "NCT07117630",
           "NCT07118969",
-          "NCT07125950",
           "NCT07127003",
           "NCT07130162",
           "NCT07132242",
@@ -9357,7 +9380,6 @@
           "NCT07208084",
           "NCT07209020",
           "NCT07215364",
-          "NCT07217288",
           "NCT07217990",
           "NCT07219797",
           "NCT07220135",
@@ -9406,7 +9428,6 @@
           "NCT07345221",
           "NCT07348549",
           "NCT07348744",
-          "NCT07349459",
           "NCT07357207",
           "NCT07357597",
           "NCT07358806",
@@ -9453,6 +9474,7 @@
           "NCT07447440",
           "NCT07447700",
           "NCT07454499",
+          "NCT07455955",
           "NCT07459062",
           "NCT07459673",
           "NCT07459738",
@@ -9486,7 +9508,6 @@
           "NCT07513311",
           "NCT07515300",
           "NCT07515326",
-          "NCT07519200",
           "NCT07520760",
           "NCT07521826",
           "NCT07522593",
@@ -9622,7 +9643,24 @@
           "NCT07843212",
           "NCT07844018",
           "NCT07844941",
-          "NCT07848633"
+          "NCT07848633",
+          "NCT07857486",
+          "NCT07859046",
+          "NCT07861139",
+          "NCT07862426",
+          "NCT07864792",
+          "NCT07865884",
+          "NCT07867925",
+          "NCT07872332",
+          "NCT07874880",
+          "NCT07876349",
+          "NCT07877740",
+          "NCT07881237",
+          "NCT07882147",
+          "NCT07883109",
+          "NCT07885683",
+          "NCT07889115",
+          "NCT07890766"
         ]
       },
       {
@@ -9687,7 +9725,7 @@
       {
         "enrollment_bin": "101\u2013200",
         "enrollment_type": "Actual",
-        "trial_count": 1414,
+        "trial_count": 1423,
         "trial_ids": [
           "NCT00001507",
           "NCT00001806",
@@ -10648,6 +10686,7 @@
           "NCT03619083",
           "NCT03623490",
           "NCT03624972",
+          "NCT03629509",
           "NCT03639948",
           "NCT03644186",
           "NCT03651037",
@@ -10684,6 +10723,7 @@
           "NCT03808662",
           "NCT03809988",
           "NCT03821233",
+          "NCT03824145",
           "NCT03832985",
           "NCT03838419",
           "NCT03858972",
@@ -10922,6 +10962,7 @@
           "NCT05386511",
           "NCT05397457",
           "NCT05401643",
+          "NCT05406635",
           "NCT05408676",
           "NCT05410002",
           "NCT05424068",
@@ -11018,6 +11059,7 @@
           "NCT06224244",
           "NCT06230575",
           "NCT06234488",
+          "NCT06255808",
           "NCT06257264",
           "NCT06271837",
           "NCT06275854",
@@ -11038,6 +11080,7 @@
           "NCT06534957",
           "NCT06541769",
           "NCT06543147",
+          "NCT06548646",
           "NCT06551688",
           "NCT06584396",
           "NCT06592053",
@@ -11088,6 +11131,7 @@
           "NCT07436169",
           "NCT07443787",
           "NCT07470619",
+          "NCT07547774",
           "NCT07570251",
           "NCT07588828",
           "NCT07590505",
@@ -11102,13 +11146,16 @@
           "NCT07799909",
           "NCT07817979",
           "NCT07820124",
-          "NCT07828925"
+          "NCT07828925",
+          "NCT07864909",
+          "NCT07876375",
+          "NCT07878598"
         ]
       },
       {
         "enrollment_bin": "101\u2013200",
         "enrollment_type": "Estimated",
-        "trial_count": 1233,
+        "trial_count": 1245,
         "trial_ids": [
           "NCT00002870",
           "NCT00003428",
@@ -11409,7 +11456,6 @@
           "NCT03805399",
           "NCT03808337",
           "NCT03814811",
-          "NCT03824145",
           "NCT03831308",
           "NCT03854617",
           "NCT03876886",
@@ -11689,7 +11735,6 @@
           "NCT05603078",
           "NCT05605184",
           "NCT05623241",
-          "NCT05625087",
           "NCT05628870",
           "NCT05633680",
           "NCT05636644",
@@ -11773,6 +11818,7 @@
           "NCT05958199",
           "NCT05964504",
           "NCT05975190",
+          "NCT05977036",
           "NCT05978648",
           "NCT05979220",
           "NCT05980208",
@@ -11813,6 +11859,7 @@
           "NCT06116812",
           "NCT06130111",
           "NCT06132776",
+          "NCT06135714",
           "NCT06143553",
           "NCT06144346",
           "NCT06144944",
@@ -11847,7 +11894,6 @@
           "NCT06252662",
           "NCT06254690",
           "NCT06255392",
-          "NCT06255808",
           "NCT06259162",
           "NCT06261918",
           "NCT06265025",
@@ -11873,6 +11919,7 @@
           "NCT06350500",
           "NCT06356519",
           "NCT06358625",
+          "NCT06361940",
           "NCT06364267",
           "NCT06374459",
           "NCT06380816",
@@ -11956,6 +12003,7 @@
           "NCT06662474",
           "NCT06671249",
           "NCT06672120",
+          "NCT06686394",
           "NCT06694519",
           "NCT06695845",
           "NCT06697938",
@@ -12003,7 +12051,6 @@
           "NCT06787807",
           "NCT06793553",
           "NCT06797531",
-          "NCT06807164",
           "NCT06811220",
           "NCT06811870",
           "NCT06819215",
@@ -12223,7 +12270,6 @@
           "NCT07447414",
           "NCT07449273",
           "NCT07454642",
-          "NCT07455955",
           "NCT07464457",
           "NCT07465172",
           "NCT07474090",
@@ -12248,7 +12294,6 @@
           "NCT07542405",
           "NCT07543536",
           "NCT07545122",
-          "NCT07547774",
           "NCT07549139",
           "NCT07557225",
           "NCT07558343",
@@ -12342,7 +12387,21 @@
           "NCT07848061",
           "NCT07848984",
           "NCT07852546",
-          "NCT07855627"
+          "NCT07855627",
+          "NCT07859319",
+          "NCT07860866",
+          "NCT07861932",
+          "NCT07866430",
+          "NCT07867262",
+          "NCT07876557",
+          "NCT07877376",
+          "NCT07880600",
+          "NCT07884721",
+          "NCT07887620",
+          "NCT07888556",
+          "NCT07892508",
+          "NCT07893327",
+          "NCT07895511"
         ]
       },
       {
@@ -12372,7 +12431,7 @@
       {
         "enrollment_bin": "201\u2013500",
         "enrollment_type": "Actual",
-        "trial_count": 1180,
+        "trial_count": 1182,
         "trial_ids": [
           "NCT00002520",
           "NCT00002528",
@@ -13047,6 +13106,7 @@
           "NCT02786797",
           "NCT02791581",
           "NCT02796612",
+          "NCT02798796",
           "NCT02800317",
           "NCT02805153",
           "NCT02805205",
@@ -13285,6 +13345,7 @@
           "NCT04257474",
           "NCT04258813",
           "NCT04262180",
+          "NCT04292821",
           "NCT04304924",
           "NCT04307407",
           "NCT04308720",
@@ -13329,7 +13390,6 @@
           "NCT04541420",
           "NCT04545632",
           "NCT04549207",
-          "NCT04557449",
           "NCT04563013",
           "NCT04569747",
           "NCT04576455",
@@ -13471,6 +13531,7 @@
           "NCT05838417",
           "NCT05896566",
           "NCT05898009",
+          "NCT05925257",
           "NCT05927246",
           "NCT05961280",
           "NCT05964816",
@@ -13559,7 +13620,7 @@
       {
         "enrollment_bin": "201\u2013500",
         "enrollment_type": "Estimated",
-        "trial_count": 1118,
+        "trial_count": 1122,
         "trial_ids": [
           "NCT00002544",
           "NCT00002777",
@@ -13751,7 +13812,6 @@
           "NCT02771756",
           "NCT02783079",
           "NCT02798562",
-          "NCT02798796",
           "NCT02806258",
           "NCT02838238",
           "NCT02842099",
@@ -13816,7 +13876,6 @@
           "NCT03604315",
           "NCT03604666",
           "NCT03609047",
-          "NCT03629509",
           "NCT03630913",
           "NCT03664895",
           "NCT03678883",
@@ -13898,7 +13957,6 @@
           "NCT04282031",
           "NCT04282122",
           "NCT04289935",
-          "NCT04292821",
           "NCT04296370",
           "NCT04300829",
           "NCT04302415",
@@ -13938,6 +13996,7 @@
           "NCT04547465",
           "NCT04554927",
           "NCT04555057",
+          "NCT04557449",
           "NCT04561362",
           "NCT04569955",
           "NCT04571437",
@@ -14082,7 +14141,6 @@
           "NCT05403177",
           "NCT05404087",
           "NCT05406531",
-          "NCT05406635",
           "NCT05417048",
           "NCT05429294",
           "NCT05429866",
@@ -14190,7 +14248,6 @@
           "NCT05914961",
           "NCT05917444",
           "NCT05919498",
-          "NCT05925257",
           "NCT05926024",
           "NCT05928429",
           "NCT05931445",
@@ -14248,7 +14305,6 @@
           "NCT06123988",
           "NCT06131632",
           "NCT06134375",
-          "NCT06135714",
           "NCT06144164",
           "NCT06169072",
           "NCT06176534",
@@ -14405,6 +14461,7 @@
           "NCT06834204",
           "NCT06835400",
           "NCT06836089",
+          "NCT06840886",
           "NCT06843083",
           "NCT06843096",
           "NCT06846437",
@@ -14678,7 +14735,15 @@
           "NCT07844291",
           "NCT07850154",
           "NCT07856225",
-          "NCT07856303"
+          "NCT07856303",
+          "NCT07867470",
+          "NCT07869186",
+          "NCT07870148",
+          "NCT07884487",
+          "NCT07888881",
+          "NCT07892274",
+          "NCT07894133",
+          "NCT07894874"
         ]
       },
       {
@@ -14710,7 +14775,7 @@
       {
         "enrollment_bin": "501\u20131,000",
         "enrollment_type": "Actual",
-        "trial_count": 444,
+        "trial_count": 446,
         "trial_ids": [
           "NCT00002542",
           "NCT00002772",
@@ -15101,6 +15166,7 @@
           "NCT05162846",
           "NCT05263362",
           "NCT05266300",
+          "NCT05301114",
           "NCT05306600",
           "NCT05325151",
           "NCT05374512",
@@ -15135,6 +15201,7 @@
           "NCT06149377",
           "NCT06149884",
           "NCT06161922",
+          "NCT06279364",
           "NCT06307457",
           "NCT06344793",
           "NCT06352684",
@@ -15161,7 +15228,7 @@
       {
         "enrollment_bin": "501\u20131,000",
         "enrollment_type": "Estimated",
-        "trial_count": 467,
+        "trial_count": 471,
         "trial_ids": [
           "NCT00002580",
           "NCT00002581",
@@ -15465,13 +15532,11 @@
           "NCT06164119",
           "NCT06172478",
           "NCT06185855",
-          "NCT06188520",
           "NCT06192446",
           "NCT06210776",
           "NCT06223022",
           "NCT06243432",
           "NCT06275126",
-          "NCT06279364",
           "NCT06282796",
           "NCT06317948",
           "NCT06324357",
@@ -15629,7 +15694,13 @@
           "NCT07829848",
           "NCT07831889",
           "NCT07832279",
-          "NCT07835139"
+          "NCT07835139",
+          "NCT07858825",
+          "NCT07868159",
+          "NCT07869628",
+          "NCT07879911",
+          "NCT07881679",
+          "NCT07884201"
         ]
       },
       {
@@ -15652,7 +15723,7 @@
       {
         "enrollment_bin": "1,001\u20135,000",
         "enrollment_type": "Actual",
-        "trial_count": 440,
+        "trial_count": 443,
         "trial_ids": [
           "NCT00001503",
           "NCT00002707",
@@ -16014,6 +16085,7 @@
           "NCT04478266",
           "NCT04555902",
           "NCT04638010",
+          "NCT04654208",
           "NCT04711252",
           "NCT04741503",
           "NCT04767594",
@@ -16038,6 +16110,7 @@
           "NCT05184257",
           "NCT05203458",
           "NCT05206331",
+          "NCT05225428",
           "NCT05361655",
           "NCT05364138",
           "NCT05402436",
@@ -16054,6 +16127,7 @@
           "NCT05787249",
           "NCT05798806",
           "NCT05821023",
+          "NCT05827081",
           "NCT05912933",
           "NCT05913440",
           "NCT05931042",
@@ -16099,7 +16173,7 @@
       {
         "enrollment_bin": "1,001\u20135,000",
         "enrollment_type": "Estimated",
-        "trial_count": 446,
+        "trial_count": 448,
         "trial_ids": [
           "NCT00002564",
           "NCT00002579",
@@ -16287,7 +16361,6 @@
           "NCT04625023",
           "NCT04626440",
           "NCT04638751",
-          "NCT04654208",
           "NCT04657341",
           "NCT04666805",
           "NCT04671498",
@@ -16322,7 +16395,6 @@
           "NCT05170087",
           "NCT05196269",
           "NCT05222100",
-          "NCT05225428",
           "NCT05232916",
           "NCT05243121",
           "NCT05248763",
@@ -16330,7 +16402,6 @@
           "NCT05268224",
           "NCT05296746",
           "NCT05297734",
-          "NCT05301114",
           "NCT05307757",
           "NCT05313191",
           "NCT05321823",
@@ -16364,7 +16435,6 @@
           "NCT05800132",
           "NCT05812807",
           "NCT05817175",
-          "NCT05827081",
           "NCT05841849",
           "NCT05861271",
           "NCT05868252",
@@ -16546,7 +16616,13 @@
           "NCT07827573",
           "NCT07828652",
           "NCT07837245",
-          "NCT07841704"
+          "NCT07841704",
+          "NCT07875244",
+          "NCT07878377",
+          "NCT07880106",
+          "NCT07882420",
+          "NCT07890597",
+          "NCT07894328"
         ]
       },
       {
@@ -16730,7 +16806,7 @@
       {
         "enrollment_bin": "Over 5,000",
         "enrollment_type": "Estimated",
-        "trial_count": 153,
+        "trial_count": 154,
         "trial_ids": [
           "NCT00002582",
           "NCT00003016",
@@ -16884,7 +16960,8 @@
           "NCT07698366",
           "NCT07809698",
           "NCT07814872",
-          "NCT07832396"
+          "NCT07832396",
+          "NCT07879937"
         ]
       },
       {
@@ -17176,7 +17253,7 @@
       ],
       "other_bucket": false,
       "multi_valued": false,
-      "cohort_size": 16873,
+      "cohort_size": 16950,
       "bipartite": false,
       "y_scale": "linear",
       "bins": [
@@ -17228,7 +17305,7 @@
       ]
     }
   },
-  "chart_url": "http://localhost:8000/v1/runs/run_91970cd501b04816a6d2210c7e77e639/chart.png",
+  "chart_url": "http://localhost:8000/v1/runs/run_ecdc6c0a1811420d80a996d3bbdc8120/chart.png",
   "evidence": {
     "NCT00003455": {
       "nct_id": "NCT00003455",
@@ -25475,6 +25552,22 @@
         "protocolSection.identificationModule.nctId": "NCT06710197",
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Early Stage Triple Negative ER Low Breast Cancer"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 0,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT06807164": {
+      "nct_id": "NCT06807164",
+      "title": "Serratus Plane Block (SPB) Versus Capsa\u00efcine Versus Botox-A for Chronic Neuropathic Pain in Post-mastectomy Syndrome",
+      "url": "https://clinicaltrials.gov/study/NCT06807164",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06807164",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Agnosia"
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 0,
@@ -41671,6 +41764,21 @@
         }
       }
     },
+    "NCT02977468": {
+      "nct_id": "NCT02977468",
+      "title": "Effects of MK-3475 (Pembrolizumab) on the Breast Tumor Microenvironment in Triple Negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT02977468",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT02977468",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 15,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT02978586": {
       "nct_id": "NCT02978586",
       "title": "A Pilot Study of [Ga-68]PSMA PET/MRI for the Assessment of PSMA-positive Tumors",
@@ -46092,6 +46200,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 13,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT03979729": {
+      "nct_id": "NCT03979729",
+      "title": "Breast Cancer Screening for Underserved Women: Comparing Outcomes and Lowering Recall Rates With 3D- vs. 2D-mammography",
+      "url": "https://clinicaltrials.gov/study/NCT03979729",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT03979729",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Cancer Screening"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 12,
           "type": "ACTUAL"
         }
       }
@@ -51144,6 +51267,22 @@
         }
       }
     },
+    "NCT05502224": {
+      "nct_id": "NCT05502224",
+      "title": "Multidisciplinary Approach to Fatigue",
+      "url": "https://clinicaltrials.gov/study/NCT05502224",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05502224",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Neoplasms, Germ Cell and Embryonal"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 12,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT05503108": {
       "nct_id": "NCT05503108",
       "title": "Fasting Mimicking Diet Program to ImpRovE ChemoTherapy in Hormone Receptor Postive (HR+), HER2- Breast Cancer",
@@ -51271,6 +51410,24 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 18,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT05556473": {
+      "nct_id": "NCT05556473",
+      "title": "F-Tryptophan PET/CT in Human Cancers",
+      "url": "https://clinicaltrials.gov/study/NCT05556473",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05556473",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Brain Neoplasms",
+          "Breast Neoplasms",
+          "Neuroendocrine Tumors",
+          "Rectal Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 20,
           "type": "ACTUAL"
         }
       }
@@ -51410,6 +51567,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 2,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT05625087": {
+      "nct_id": "NCT05625087",
+      "title": "Detection of Tumor DNA in the Blood of Patients Receiving Standard Therapy for Hormone Receptor-positive (HR+) Non-HER2 Expressing (HER2-) Metastatic Breast Cancer as a Tool to Select Those Who May Benefit From the Next Course of Fulvestrant in Combination With Alpelisib or Ribociclib",
+      "url": "https://clinicaltrials.gov/study/NCT05625087",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05625087",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 4,
           "type": "ACTUAL"
         }
       }
@@ -53026,6 +53198,22 @@
         }
       }
     },
+    "NCT06504914": {
+      "nct_id": "NCT06504914",
+      "title": "Preparing FIM-BCS - A Lifestyle Modification for African-American Breast Cancer Survivors",
+      "url": "https://clinicaltrials.gov/study/NCT06504914",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06504914",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Hypertension",
+          "Obesity"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 14,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT06529120": {
       "nct_id": "NCT06529120",
       "title": "Adaptation and Pilot Testing of a Mindfulness-Based Insomnia and Symptom Management Intervention for Women With Breast Cancer Receiving Treatment in Rural Medically Underserved Areas",
@@ -53118,6 +53306,22 @@
         }
       }
     },
+    "NCT06568692": {
+      "nct_id": "NCT06568692",
+      "title": "A Phase 2 Study of PCS6422 With Capecitabine in Patients With Advanced or Metastatic Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06568692",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06568692",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 20,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT06569719": {
       "nct_id": "NCT06569719",
       "title": "Effectiveness of CDT for the Treatment of Lymphedema in Breast Cancer Patients Who Received LVA Surgery",
@@ -53129,21 +53333,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 10,
-          "type": "ACTUAL"
-        }
-      }
-    },
-    "NCT06590857": {
-      "nct_id": "NCT06590857",
-      "title": "Trial of 225Ac-DOTATATE (RYZ101) in Subjects With ER+, HER2-negative Unresectable or Metastatic Breast Cancer Expressing SSTRs.",
-      "url": "https://clinicaltrials.gov/study/NCT06590857",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06590857",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 16,
           "type": "ACTUAL"
         }
       }
@@ -53830,6 +54019,22 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 16,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07865507": {
+      "nct_id": "NCT07865507",
+      "title": "Divergent Long-Term Clinical Courses in Two Men With Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07865507",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07865507",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms, Male",
+          "Disease Progression"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 2,
           "type": "ACTUAL"
         }
       }
@@ -55217,21 +55422,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 10,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT02977468": {
-      "nct_id": "NCT02977468",
-      "title": "Effects of MK-3475 (Pembrolizumab) on the Breast Tumor Microenvironment in Triple Negative Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT02977468",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT02977468",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Triple Negative Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 15,
           "type": "ESTIMATED"
         }
       }
@@ -58060,24 +58250,6 @@
         }
       }
     },
-    "NCT06623396": {
-      "nct_id": "NCT06623396",
-      "title": "A Study of Mesothelin-Targeted CAR T-Cell Therapy in People With Esophagogastric Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT06623396",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06623396",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Adenocarcinoma Of Esophagus",
-          "Peritoneal Neoplasms",
-          "Breast Neoplasms",
-          "Diabetes Mellitus"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 18,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06637306": {
       "nct_id": "NCT06637306",
       "title": "Neoadjuvant Dupilumab, Pembrolizumab, Paclitaxel, and Carboplatin in Locally Advanced Triple Negative Breast Cancer",
@@ -59786,6 +59958,81 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 20,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07874256": {
+      "nct_id": "NCT07874256",
+      "title": "Non-Contrast-Enhanced Breast MRI in the Evaluation of Newly Diagnosed Breast Cancer: A Pilot Study",
+      "url": "https://clinicaltrials.gov/study/NCT07874256",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07874256",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 20,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07876596": {
+      "nct_id": "NCT07876596",
+      "title": "A Drug-Drug Interaction Study of Rifampicin and Oral HRS-8080",
+      "url": "https://clinicaltrials.gov/study/NCT07876596",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07876596",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 18,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07876986": {
+      "nct_id": "NCT07876986",
+      "title": "Feasibility and Effectiveness of Sentinel Lymph Node Biopsy in Inflammatory Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07876986",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07876986",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 20,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07883460": {
+      "nct_id": "NCT07883460",
+      "title": "Improving Combined PET/CT and MRI of the Breast Using Dedicated Breast Positioning and Image Registration",
+      "url": "https://clinicaltrials.gov/study/NCT07883460",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07883460",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 20,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07883512": {
+      "nct_id": "NCT07883512",
+      "title": "EMBRACE (EMPA in BReast Cancer for Activity and Cardiac ProtEction)",
+      "url": "https://clinicaltrials.gov/study/NCT07883512",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07883512",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 10,
           "type": "ESTIMATED"
         }
       }
@@ -75070,6 +75317,22 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 49,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT01996046": {
+      "nct_id": "NCT01996046",
+      "title": "FDG PET/CT in Breast Cancer Bone Mets",
+      "url": "https://clinicaltrials.gov/study/NCT01996046",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT01996046",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Estrogen Receptor Positive Breast Cancer",
+          "Bone Metastases"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 26,
           "type": "ACTUAL"
         }
       }
@@ -90387,7 +90650,7 @@
     },
     "NCT05063786": {
       "nct_id": "NCT05063786",
-      "title": "Trastuzumab + Alpelisib +/- Fulvestrant vs Trastuzumab + CT in Patients With PIK3CA Mutated Previously Treated HER2+ Advanced BrEasT Cancer (ALPHABET)",
+      "title": "Trastuzumab + Alpelisib +/- Fulvestrant vs Trastuzumab + CT in PIK3CA-mutated HER2+ Advanced BC (ALPHABET)",
       "url": "https://clinicaltrials.gov/study/NCT05063786",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT05063786",
@@ -91430,6 +91693,21 @@
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Breast Diseases",
           "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 34,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT05335473": {
+      "nct_id": "NCT05335473",
+      "title": "Iribrine Plus Tucidinostat in the Treatment of HR+/HER2 Advanced Breast Cancer After CDK4/6 Inhibitor Failure",
+      "url": "https://clinicaltrials.gov/study/NCT05335473",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05335473",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "HR Positive HER2 Negative Advanced Breast Cancer"
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 34,
@@ -93384,6 +93662,21 @@
         }
       }
     },
+    "NCT05996107": {
+      "nct_id": "NCT05996107",
+      "title": "Study of Ribociclib Administered Concurrently With Postoperative Radiation Therapy in Patients With High-Risk, HR+/HER2- Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT05996107",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05996107",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 32,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT06003764": {
       "nct_id": "NCT06003764",
       "title": "Efficacy of Pulsed Electromagnetic Field Therapy on Acute Radiodermatitis in Breast Cancer Patients",
@@ -94221,6 +94514,21 @@
         }
       }
     },
+    "NCT06322888": {
+      "nct_id": "NCT06322888",
+      "title": "Resistance and Aerobic Exercise for Prevention in Women With Dense Breasts (REP-D)",
+      "url": "https://clinicaltrials.gov/study/NCT06322888",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06322888",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 46,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT06335550": {
       "nct_id": "NCT06335550",
       "title": "Surgical and Patient Reported Outcomes in Robotic Mastectomy",
@@ -94411,6 +94719,26 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 28,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT06399757": {
+      "nct_id": "NCT06399757",
+      "title": "A Study to Investigate APL-5125 in Adults With Advanced Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT06399757",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06399757",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Colorectal Neoplasms",
+          "Cholangiocarcinoma",
+          "Adenocarcinoma, Mucinous",
+          "Triple Negative Breast Neoplasms",
+          "Ovarian Neoplasms",
+          "Prostatic Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 27,
           "type": "ACTUAL"
         }
       }
@@ -94666,6 +94994,23 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 40,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT06549075": {
+      "nct_id": "NCT06549075",
+      "title": "Therapeutic Support to Strengthen Dignity, Mental Well-being and Quality of Life in Acute Palliative Care Patients.",
+      "url": "https://clinicaltrials.gov/study/NCT06549075",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06549075",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Glioblastoma",
+          "Prostatic Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 42,
           "type": "ACTUAL"
         }
       }
@@ -95990,6 +96335,24 @@
         }
       }
     },
+    "NCT07549685": {
+      "nct_id": "NCT07549685",
+      "title": "Music Therapy in Patients With Breast Cancer (IMPACT)",
+      "url": "https://clinicaltrials.gov/study/NCT07549685",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07549685",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Anxiety Disorders",
+          "Pain",
+          "Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 24,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT07553741": {
       "nct_id": "NCT07553741",
       "title": "Application and Comparison of [68Ga]Ga-FAPI-04 PET, [18F]FDG PET, and Contrast-Enhanced MRI in Predicting Pathological Response to Neoadjuvant Chemotherapy in Breast Cancer Patients",
@@ -96216,8 +96579,8 @@
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07819045",
         "derivedSection.conditionBrowseModule.meshes.term": [
-          "Metastatic Invasive Breast Cancer",
-          "Metastatic Invasive Gynecologic Cancer"
+          "Invasive Breast Carcinoma",
+          "Gynecologic Malignancies"
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 42,
@@ -96283,6 +96646,36 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 25,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07862296": {
+      "nct_id": "NCT07862296",
+      "title": "Radial Shock Wave Treatment Alongside Decongestive Care for Arm Swelling After Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07862296",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07862296",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Cancer Lymphedema"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 21,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07884968": {
+      "nct_id": "NCT07884968",
+      "title": "Multimodal Respiratory Physiotherapy in Women Receiving Radiotherapy for Breast Cancer (RESPIRA-BC)",
+      "url": "https://clinicaltrials.gov/study/NCT07884968",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07884968",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 22,
           "type": "ACTUAL"
         }
       }
@@ -100382,21 +100775,6 @@
       "url": "https://clinicaltrials.gov/study/NCT03487055",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT03487055",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 30,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT03492918": {
-      "nct_id": "NCT03492918",
-      "title": "Pembrolizumab in Combination With Paclitaxel in the Hormone Receptor-positive Metastatic Breast Cancer With High Tumor Mutational Burden Selected by Whole Exome Sequencing: Korean Cancer Study Group Trial (KCSG BR20-16)",
-      "url": "https://clinicaltrials.gov/study/NCT03492918",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT03492918",
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Breast Neoplasms"
         ],
@@ -105382,22 +105760,6 @@
         }
       }
     },
-    "NCT05502224": {
-      "nct_id": "NCT05502224",
-      "title": "Multidisciplinary Approach to Fatigue",
-      "url": "https://clinicaltrials.gov/study/NCT05502224",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05502224",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Neoplasms, Germ Cell and Embryonal"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 50,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT05504707": {
       "nct_id": "NCT05504707",
       "title": "DecipHER Trial - DC1 Tx for Early-Stage TNBC and ER Low Positive Breast Cancer",
@@ -105591,24 +105953,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 33,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT05556473": {
-      "nct_id": "NCT05556473",
-      "title": "F-Tryptophan PET/CT in Human Cancers",
-      "url": "https://clinicaltrials.gov/study/NCT05556473",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05556473",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Brain Neoplasms",
-          "Breast Neoplasms",
-          "Neuroendocrine Tumors",
-          "Rectal Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 24,
           "type": "ESTIMATED"
         }
       }
@@ -107053,21 +107397,6 @@
         }
       }
     },
-    "NCT05996107": {
-      "nct_id": "NCT05996107",
-      "title": "Study of Ribociclib Administered Concurrently With Postoperative Radiation Therapy in Patients With High-Risk, HR+/HER2- Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT05996107",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05996107",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 30,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06000033": {
       "nct_id": "NCT06000033",
       "title": "Study of Disitamab Vedotin and Anlotinib in Patients With HR-Negative, HER2-Low-Expressing Metastatic Breast Cancer",
@@ -108479,21 +108808,6 @@
         }
       }
     },
-    "NCT06322888": {
-      "nct_id": "NCT06322888",
-      "title": "Resistance and Aerobic Exercise for Prevention in Women With Dense Breasts (REP-D)",
-      "url": "https://clinicaltrials.gov/study/NCT06322888",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06322888",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 46,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06327490": {
       "nct_id": "NCT06327490",
       "title": "A Study Evaluating the Feasibility and Compliance of Manual Lymphatic Drainage Comparing Indocyanine-Green (ICG) Guided vs. Traditional Guided in Patients Undergoing Axillary Node Dissection for the Treatment of Breast Cancer",
@@ -109497,22 +109811,6 @@
         }
       }
     },
-    "NCT06504914": {
-      "nct_id": "NCT06504914",
-      "title": "Preparing FIM-BCS - A Lifestyle Modification for African-American Breast Cancer Survivors",
-      "url": "https://clinicaltrials.gov/study/NCT06504914",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06504914",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Hypertension",
-          "Obesity"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 24,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06508216": {
       "nct_id": "NCT06508216",
       "title": "A Study to Explore Safety, Tolerability, Pharmacokinetics, and Anti-tumor Activity of Novel Therapeutics in Patients With Early Relapsed Metastatic Triple-negative Breast Cancer",
@@ -109852,22 +110150,6 @@
         }
       }
     },
-    "NCT06548646": {
-      "nct_id": "NCT06548646",
-      "title": "Ultrasound-guided Thoracic Interfascial Plane Nerve Block Versus Erector Spinae Plane Block for Pain Control After Modified Radical Mastectomy",
-      "url": "https://clinicaltrials.gov/study/NCT06548646",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06548646",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Pain, Postoperative"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 50,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06551896": {
       "nct_id": "NCT06551896",
       "title": "Pemigatinib and Immune Checkpoint Inhibitor Treated FGFR1/2/3 Alteration Advanced Solid Tumor",
@@ -109983,7 +110265,7 @@
     },
     "NCT06598046": {
       "nct_id": "NCT06598046",
-      "title": "A Single-arm, Prospective Phase \u2161 Clinical Study of Utidelone Combined with Capecitabine in the Treatment of Active Brain Metastasis of TNBC",
+      "title": "A Single-arm, Prospective Phase \u2161 Clinical Study of Utidelone Combined With Capecitabine in the Treatment of Active Brain Metastasis of TNBC",
       "url": "https://clinicaltrials.gov/study/NCT06598046",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06598046",
@@ -110168,17 +110450,20 @@
         }
       }
     },
-    "NCT06625879": {
-      "nct_id": "NCT06625879",
-      "title": "The Mid-point Transverse Process to Pleura Block Versus Serratus Anterior Plane Block for Postoperative Analgesia After Modified Radical Mastectomy",
-      "url": "https://clinicaltrials.gov/study/NCT06625879",
+    "NCT06623396": {
+      "nct_id": "NCT06623396",
+      "title": "A Study of Mesothelin-Targeted CAR T-Cell Therapy in People With Esophagogastric Cancer or Malignant Peritoneal Mesothelioma",
+      "url": "https://clinicaltrials.gov/study/NCT06623396",
       "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06625879",
+        "protocolSection.identificationModule.nctId": "NCT06623396",
         "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
+          "Adenocarcinoma Of Esophagus",
+          "Peritoneal Neoplasms",
+          "Breast Neoplasms",
+          "Diabetes Mellitus"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 30,
+          "count": 32,
           "type": "ESTIMATED"
         }
       }
@@ -112806,6 +113091,21 @@
         }
       }
     },
+    "NCT07125950": {
+      "nct_id": "NCT07125950",
+      "title": "SHR2554 Combined With Endocrine Therapy in Advanced Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07125950",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07125950",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Advanced Breast Cancer"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 30,
+          "type": "ESTIMATED"
+        }
+      }
+    },
     "NCT07129187": {
       "nct_id": "NCT07129187",
       "title": "SHR-A1811 for HER2-positive Breast Cancer With Suboptimal Neoadjuvant Response",
@@ -115302,24 +115602,6 @@
         }
       }
     },
-    "NCT07549685": {
-      "nct_id": "NCT07549685",
-      "title": "Music Therapy in Patients With Breast Cancer (IMPACT)",
-      "url": "https://clinicaltrials.gov/study/NCT07549685",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07549685",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Anxiety Disorders",
-          "Pain",
-          "Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 24,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT07552181": {
       "nct_id": "NCT07552181",
       "title": "Phase II Trial of Pembrolizumab/Chemotherapy With Live Biotherapeutic Product MO-03 in Patients With Early Stage Triple Negative Breast Cancer",
@@ -116458,6 +116740,7 @@
           "Breast Neoplasms",
           "Pancreatic Neoplasms",
           "Ovarian Neoplasms",
+          "Cholangiocarcinoma",
           "Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
@@ -117058,6 +117341,159 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 48,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07857226": {
+      "nct_id": "NCT07857226",
+      "title": "Trastuzumab/Pertuzumab With Fulvestrant and Culmerciclib in HR+/HER2+ Early Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07857226",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07857226",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 31,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07859098": {
+      "nct_id": "NCT07859098",
+      "title": "Examining a New Insomnia Treatment for People Living With Secondary Breast Cancer.",
+      "url": "https://clinicaltrials.gov/study/NCT07859098",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859098",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Sleep Initiation and Maintenance Disorders",
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 50,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07862114": {
+      "nct_id": "NCT07862114",
+      "title": "A Study to Investigate the Effect of Omeprazole and Cyclosporine on Velzatinib in Healthy Participants",
+      "url": "https://clinicaltrials.gov/study/NCT07862114",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07862114",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Gastrointestinal Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 36,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07862751": {
+      "nct_id": "NCT07862751",
+      "title": "US/PA/E Imaging for Early Identification of Tumor Response in Patients With Stage II-III Triple Negative Breast Cancer Receiving Neoadjuvant Immunotherapy and Chemotherapy",
+      "url": "https://clinicaltrials.gov/study/NCT07862751",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07862751",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 32,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07869355": {
+      "nct_id": "NCT07869355",
+      "title": "BRE-13: Mediterranean Diet",
+      "url": "https://clinicaltrials.gov/study/NCT07869355",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07869355",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Obesity"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 30,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07879963": {
+      "nct_id": "NCT07879963",
+      "title": "Safety and Effectiveness Study of Single-Port Surgical System in Breast Tumor Surgery",
+      "url": "https://clinicaltrials.gov/study/NCT07879963",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07879963",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 25,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07880821": {
+      "nct_id": "NCT07880821",
+      "title": "Perioperative Mirogabalin for Pain Relief After Modified Radical Mastectomy",
+      "url": "https://clinicaltrials.gov/study/NCT07880821",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07880821",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Pain, Postoperative",
+          "Pain"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 50,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07881341": {
+      "nct_id": "NCT07881341",
+      "title": "Anatomy Impact on RT Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07881341",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07881341",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 30,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07893730": {
+      "nct_id": "NCT07893730",
+      "title": "Mapping the Enhanced Landscape of Advanced Breast Cancer fOr DYnamic Treatment Approaches",
+      "url": "https://clinicaltrials.gov/study/NCT07893730",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07893730",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 50,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07895160": {
+      "nct_id": "NCT07895160",
+      "title": "Organ Culture for Endocrine Resistant Next Line: A Treatment Selection Study in Metastatic Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07895160",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07895160",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 39,
           "type": "ESTIMATED"
         }
       }
@@ -129323,7 +129759,7 @@
     },
     "NCT02229084": {
       "nct_id": "NCT02229084",
-      "title": "Vaccination of High Risk Breast Cancer Patients",
+      "title": "Vaccination of High Risk Breast Cancer Patients - A Combined Phase I/II Feasibility-and-Efficacy Study",
       "url": "https://clinicaltrials.gov/study/NCT02229084",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT02229084",
@@ -134803,6 +135239,21 @@
         }
       }
     },
+    "NCT03492918": {
+      "nct_id": "NCT03492918",
+      "title": "Pembrolizumab and Paclitaxel in Hypermutated Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT03492918",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT03492918",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 52,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT03499353": {
       "nct_id": "NCT03499353",
       "title": "Talazoparib For Neoadjuvant Treatment Of Germline BRCA1/2 Mutation Patients With Early Human Epidermal Growth Factor Receptor 2 Negative Breast Cancer",
@@ -135462,7 +135913,7 @@
     },
     "NCT03633331": {
       "nct_id": "NCT03633331",
-      "title": "Palbociclib and Letrozole or Fulvestrant in Treating Patients With Estrogen Receptor Positive, HER2 Negative Metastatic Breast Cancer",
+      "title": "Testing the Effects of Palbociclib and Fulvestrant or Letrozole for Patients 70 Years of Age of Older With Metastatic Breast Cancer",
       "url": "https://clinicaltrials.gov/study/NCT03633331",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT03633331",
@@ -139448,7 +139899,7 @@
     },
     "NCT04561297": {
       "nct_id": "NCT04561297",
-      "title": "Assessing the Utility of Tissue Dielectric Constant (TDC) Measurements to Differentiate Breast Cancer From Healthy Breasts",
+      "title": "Assessing Tissue Dielectric Constant (TDC) to Differentiate Breast Cancer Breast Cancer From Healthy Breasts",
       "url": "https://clinicaltrials.gov/study/NCT04561297",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT04561297",
@@ -139457,7 +139908,7 @@
           "Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 60,
+          "count": 59,
           "type": "ACTUAL"
         }
       }
@@ -144454,6 +144905,22 @@
         }
       }
     },
+    "NCT06188520": {
+      "nct_id": "NCT06188520",
+      "title": "A First-in-human Dose Escalation and Expansion Study to Evaluate the Safety, and Tolerability of AZD8421 Alone or in Combination in Participants With Selected Advanced or Metastatic Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT06188520",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06188520",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "ER+ HER2- Advanced Breast Cancer",
+          "High-grade Serous Ovarian Cancer (HGSOC)"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 55,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT06188559": {
       "nct_id": "NCT06188559",
       "title": "A Study of BB-1701 in Previously Treated Participants With Human Epidermal Growth Factor Receptor 2 (HER2)-Positive or HER2-low Unresectable or Metastatic Breast Cancer",
@@ -146522,6 +146989,21 @@
         }
       }
     },
+    "NCT07217288": {
+      "nct_id": "NCT07217288",
+      "title": "Complete Decongestive Therapy Versus Non-pneumatic Compression Therapy in Post Mastectomy Lymphedema",
+      "url": "https://clinicaltrials.gov/study/NCT07217288",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07217288",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Cancer Lymphedema"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 52,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT07272447": {
       "nct_id": "NCT07272447",
       "title": "Effect of Hand Message on Catheter Insertion",
@@ -146595,6 +147077,24 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 100,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07349459": {
+      "nct_id": "NCT07349459",
+      "title": "Cardioprotective Effect of Melatonin Versus Vitamin D in Breast Cancer Patients Receiving Doxorubicin",
+      "url": "https://clinicaltrials.gov/study/NCT07349459",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07349459",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Melatonin",
+          "Breast Cancer Patients Diagnosed",
+          "Vitamin D Concentration",
+          "Doxorubicin"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 90,
           "type": "ACTUAL"
         }
       }
@@ -146767,6 +147267,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 67,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07519200": {
+      "nct_id": "NCT07519200",
+      "title": "Sexual Health and Rehabilitation for Women With Metastatic Breast Cancer (SHARE-MC): An Educational Intervention",
+      "url": "https://clinicaltrials.gov/study/NCT07519200",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07519200",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 96,
           "type": "ACTUAL"
         }
       }
@@ -147050,6 +147565,58 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 81,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07865988": {
+      "nct_id": "NCT07865988",
+      "title": "Efficacy of High-Dose Melatonin in Alleviating Radiotherapy-Induced Fatigue in Breast Cancer Patients",
+      "url": "https://clinicaltrials.gov/study/NCT07865988",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07865988",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Fatigue"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 51,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07882069": {
+      "nct_id": "NCT07882069",
+      "title": "Effect of ACTIVE-Care on Cancer-Related Fatigue, Hope, and Psychological Resilience in Adolescents With Acute Lymphoblastic Leukemia",
+      "url": "https://clinicaltrials.gov/study/NCT07882069",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07882069",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Neoplasms",
+          "Colonic Neoplasms",
+          "Breast Neoplasms",
+          "Lymphoma",
+          "Multiple Myeloma",
+          "Motor Activity",
+          "Precursor Cell Lymphoblastic Leukemia-Lymphoma"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 70,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07892157": {
+      "nct_id": "NCT07892157",
+      "title": "Cancer Patient Navigation and Readiness",
+      "url": "https://clinicaltrials.gov/study/NCT07892157",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07892157",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 64,
           "type": "ACTUAL"
         }
       }
@@ -150431,22 +150998,6 @@
         }
       }
     },
-    "NCT01996046": {
-      "nct_id": "NCT01996046",
-      "title": "FDG PET/CT in Breast Cancer Bone Mets",
-      "url": "https://clinicaltrials.gov/study/NCT01996046",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT01996046",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Estrogen Receptor Positive Breast Cancer",
-          "Bone Metastases"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 75,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT02003560": {
       "nct_id": "NCT02003560",
       "title": "Accelerated Partial Breast Irradiation With 3D-CRT and IMRT",
@@ -153335,21 +153886,6 @@
         }
       }
     },
-    "NCT03979729": {
-      "nct_id": "NCT03979729",
-      "title": "Breast Cancer Screening for Underserved Women: Comparing Outcomes and Lowering Recall Rates With 3D- vs. 2D-mammography",
-      "url": "https://clinicaltrials.gov/study/NCT03979729",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT03979729",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Cancer Screening"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 75,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT03979911": {
       "nct_id": "NCT03979911",
       "title": "Evaluation of Pertuzumab-Trastuzumab and Taxane in the Standard Treatment of Metastatic Breast Cancer",
@@ -156216,7 +156752,7 @@
           "Triple Negative Breast Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 80,
+          "count": 90,
           "type": "ESTIMATED"
         }
       }
@@ -157155,21 +157691,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 64,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT05335473": {
-      "nct_id": "NCT05335473",
-      "title": "Iribrine Plus Tucidinostat in the Treatment of HR+/HER2 Advanced Breast Cancer After CDK4/6 Inhibitor Failure",
-      "url": "https://clinicaltrials.gov/study/NCT05335473",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05335473",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "HR Positive HER2 Negative Advanced Breast Cancer"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 87,
           "type": "ESTIMATED"
         }
       }
@@ -160167,21 +160688,6 @@
         }
       }
     },
-    "NCT05977036": {
-      "nct_id": "NCT05977036",
-      "title": "BettER: Biomarker Driven Early Therapeutic Selection in Patients With HR+ HER2- Metastatic or Unresectable Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT05977036",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05977036",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 65,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT05982093": {
       "nct_id": "NCT05982093",
       "title": "Elacestrant With/Without Triptorelin in Premenopausal Women With Luminal Breast Cancer",
@@ -160420,7 +160926,7 @@
           "Mycosis Fungoides"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 85,
+          "count": 83,
           "type": "ESTIMATED"
         }
       }
@@ -161976,21 +162482,6 @@
         }
       }
     },
-    "NCT06361940": {
-      "nct_id": "NCT06361940",
-      "title": "Molecular Analyses to Predict Pathways of Endocrine Resistance Following Short Term Neoadjuvant Endocrine Treatment in Patients With Hormone Receptor-Positive HER2-negative Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT06361940",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06361940",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 100,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06362096": {
       "nct_id": "NCT06362096",
       "title": "A Multicenter, Prospective Study of Diarrhea Tolerance of Pyrotinib Combined With Trastumab and Taxane in the First-line Treatment of HER2-positive Advanced Breast Cancer",
@@ -162141,26 +162632,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 60,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT06399757": {
-      "nct_id": "NCT06399757",
-      "title": "A Study to Investigate APL-5125 in Adults With Advanced Solid Tumors",
-      "url": "https://clinicaltrials.gov/study/NCT06399757",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06399757",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Colorectal Neoplasms",
-          "Cholangiocarcinoma",
-          "Adenocarcinoma, Mucinous",
-          "Triple Negative Breast Neoplasms",
-          "Ovarian Neoplasms",
-          "Prostatic Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 100,
           "type": "ESTIMATED"
         }
       }
@@ -162726,14 +163197,15 @@
     },
     "NCT06531486": {
       "nct_id": "NCT06531486",
-      "title": "A Study of XS-02 Capsules in Patients With Advanced Solid Tumors",
+      "title": "A Phase I Study of XS-02 Capsules in Patients With Advanced Solid Tumors",
       "url": "https://clinicaltrials.gov/study/NCT06531486",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06531486",
         "derivedSection.conditionBrowseModule.meshes.term": [
           "Ovarian Neoplasms",
           "Breast Neoplasms",
-          "Endometrial Neoplasms"
+          "Endometrial Neoplasms",
+          "Osteosarcoma"
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 96,
@@ -162931,22 +163403,6 @@
         }
       }
     },
-    "NCT06568692": {
-      "nct_id": "NCT06568692",
-      "title": "A Phase 2 Study of PCS6422 With Capecitabine in Patients With Advanced or Metastatic Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT06568692",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06568692",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Triple Negative Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 90,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06572098": {
       "nct_id": "NCT06572098",
       "title": "The Effect of Complex Decongest\u0131ve Therapy on Ox\u0131dat\u0131ve Stress and Ant\u0131ox\u0131dants",
@@ -163096,6 +163552,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 60,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06590857": {
+      "nct_id": "NCT06590857",
+      "title": "Trial of 225Ac-DOTATATE (RYZ101) in Subjects With ER+, HER2-negative Unresectable or Metastatic Breast Cancer Expressing SSTRs.",
+      "url": "https://clinicaltrials.gov/study/NCT06590857",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06590857",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 64,
           "type": "ESTIMATED"
         }
       }
@@ -163476,21 +163947,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 80,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT06686394": {
-      "nct_id": "NCT06686394",
-      "title": "Study of Patritumab Deruxtecan With Other Anticancer Agents in Participants With HER2 Positive Breast Cancer That Has Spread and Cannot Be Surgically Removed (MK-1022-009)",
-      "url": "https://clinicaltrials.gov/study/NCT06686394",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06686394",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 81,
           "type": "ESTIMATED"
         }
       }
@@ -165937,21 +166393,6 @@
         }
       }
     },
-    "NCT07125950": {
-      "nct_id": "NCT07125950",
-      "title": "SHR2554 Combined With Endocrine Therapy in Advanced Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT07125950",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07125950",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Advanced Breast Cancer"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 60,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT07127003": {
       "nct_id": "NCT07127003",
       "title": "ILR to Prevent BRCL_MCC 23608",
@@ -166560,21 +167001,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 74,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT07217288": {
-      "nct_id": "NCT07217288",
-      "title": "Complete Decongestive Therapy Versus Non-pneumatic Compression Therapy in Post Mastectomy Lymphedema",
-      "url": "https://clinicaltrials.gov/study/NCT07217288",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07217288",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Cancer Lymphedema"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 52,
           "type": "ESTIMATED"
         }
       }
@@ -167367,24 +167793,6 @@
         }
       }
     },
-    "NCT07349459": {
-      "nct_id": "NCT07349459",
-      "title": "Cardioprotective Effect of Melatonin Versus Vitamin D in Breast Cancer Patients Receiving Doxorubicin",
-      "url": "https://clinicaltrials.gov/study/NCT07349459",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07349459",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Melatonin",
-          "Breast Cancer Patients Diagnosed",
-          "Vitamin D Concentration",
-          "Doxorubicin"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 90,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT07357207": {
       "nct_id": "NCT07357207",
       "title": "Video-immunotherapy: a New Approach in Breast Cancer Treatment",
@@ -168146,6 +168554,21 @@
         }
       }
     },
+    "NCT07455955": {
+      "nct_id": "NCT07455955",
+      "title": "Personalized Antiemetic Regimen According to Patients' Pharmacogenetic Profile",
+      "url": "https://clinicaltrials.gov/study/NCT07455955",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07455955",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 60,
+          "type": "ESTIMATED"
+        }
+      }
+    },
     "NCT07459062": {
       "nct_id": "NCT07459062",
       "title": "Spectral Cancer Tissue Recognition - I",
@@ -168663,21 +169086,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 80,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT07519200": {
-      "nct_id": "NCT07519200",
-      "title": "Sexual Health and Rehabilitation for Women With Metastatic Breast Cancer (SHARE-MC): An Educational Intervention",
-      "url": "https://clinicaltrials.gov/study/NCT07519200",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07519200",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 96,
           "type": "ESTIMATED"
         }
       }
@@ -170773,7 +171181,7 @@
     },
     "NCT07843212": {
       "nct_id": "NCT07843212",
-      "title": "EFFECTS OF SPSIP BLOCK ON PERIOPERAT\u0130VE INFLAMMATION AND TLR4 IN BREAST CANCER SURGERY",
+      "title": "Effects of SPSIP Block on Perioperative Inflammation and TLR4 in Breast Cancer Surgery",
       "url": "https://clinicaltrials.gov/study/NCT07843212",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07843212",
@@ -170830,6 +171238,277 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 65,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07857486": {
+      "nct_id": "NCT07857486",
+      "title": "Reduction of Neoadjuvant Treatment in Early Triple-Negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07857486",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07857486",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 84,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07859046": {
+      "nct_id": "NCT07859046",
+      "title": "18F-FES PET/CT in the Treatment Planning, and Response Assessment of ER-Positive Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07859046",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859046",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 100,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07861139": {
+      "nct_id": "NCT07861139",
+      "title": "Comparative Study of QL1209 and Perjeta\u00ae in Healthy Male Participants",
+      "url": "https://clinicaltrials.gov/study/NCT07861139",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07861139",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 80,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07862426": {
+      "nct_id": "NCT07862426",
+      "title": "Incentive Spirometry With and Without Transcutaneous Electric Diaphragmatic Stimulation in Post-mastectomy Patients",
+      "url": "https://clinicaltrials.gov/study/NCT07862426",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07862426",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 58,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07864792": {
+      "nct_id": "NCT07864792",
+      "title": "Transcranial Direct Current Stimulation to Improve Gait for Breast Cancer Survivor's Who Received Taxene and/or Platinum Chemotherapy",
+      "url": "https://clinicaltrials.gov/study/NCT07864792",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07864792",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Anatomic Stage I Breast Cancer AJCC v8",
+          "Anatomic Stage II Breast Cancer AJCC v8",
+          "Anatomic Stage III Breast Cancer AJCC v8",
+          "Anatomic Stage IV Breast Cancer AJCC v8"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 60,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07865884": {
+      "nct_id": "NCT07865884",
+      "title": "Tissue Validation of Mammographic Breast Arterial Calcification in Mastectomy Specimens",
+      "url": "https://clinicaltrials.gov/study/NCT07865884",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07865884",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Vascular Calcification",
+          "Atherosclerosis"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 100,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07867925": {
+      "nct_id": "NCT07867925",
+      "title": "Predicting Endocrine Resistance Using Molecular Imaging and Liquid Biopsy in Metastatic Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07867925",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07867925",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 100,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07872332": {
+      "nct_id": "NCT07872332",
+      "title": "FDG PET/CT Radiomics for True Oligometastatic Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07872332",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07872332",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Oligometastatic Breast Carcinoma",
+          "Radiomics"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 100,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07874880": {
+      "nct_id": "NCT07874880",
+      "title": "MTX-531-001 Phase 1 Study in Advanced Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07874880",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07874880",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Squamous Cell Carcinoma of Head and Neck",
+          "Endometrial Neoplasms",
+          "Colorectal Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 71,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07876349": {
+      "nct_id": "NCT07876349",
+      "title": "EHR Intervention to Increase HBOC Genetic Testing",
+      "url": "https://clinicaltrials.gov/study/NCT07876349",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07876349",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Ovarian Neoplasms",
+          "Neoplastic Syndromes, Hereditary"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 55,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07877740": {
+      "nct_id": "NCT07877740",
+      "title": "Feasibility of a Standardized Fascial Plane Block Protocol for Breast Cancer Surgery",
+      "url": "https://clinicaltrials.gov/study/NCT07877740",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07877740",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Cancer Surgery",
+          "Locoregional Anaesthesia",
+          "Hypnosis",
+          "Fascial Plane Block"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 65,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07881237": {
+      "nct_id": "NCT07881237",
+      "title": "Effect of Serratus and Pectoralis II Plane Block Versus Pectoralis II Alone on Acute Postoperative Pain After Mastectomy",
+      "url": "https://clinicaltrials.gov/study/NCT07881237",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07881237",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Pain, Postoperative"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 80,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07882147": {
+      "nct_id": "NCT07882147",
+      "title": "Diagnostic Accuracy and Utility of ZTE Added to Routine MRI",
+      "url": "https://clinicaltrials.gov/study/NCT07882147",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07882147",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 100,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07883109": {
+      "nct_id": "NCT07883109",
+      "title": "Podcast-Based Psychosocial Support for Women Newly Diagnosed With Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07883109",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07883109",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 80,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07885683": {
+      "nct_id": "NCT07885683",
+      "title": "MagSense\u00ae Human Epidermal Growth Factor Receptor 2 (HER2) Imaging Agent (MSH2IA)",
+      "url": "https://clinicaltrials.gov/study/NCT07885683",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07885683",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "HER2-positive Breast Cancer"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 70,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07889115": {
+      "nct_id": "NCT07889115",
+      "title": "Evaluation of the Effect of Amantadine in the Prevention of Paclitaxel-Induced Peripheral Neuropathy in Breast Cancer Patients",
+      "url": "https://clinicaltrials.gov/study/NCT07889115",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07889115",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Peripheral Nervous System Diseases"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 80,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07890766": {
+      "nct_id": "NCT07890766",
+      "title": "Management of Breast Fibroadenoma: Comparing Observation, Microwave Ablation, and Surgical Excision",
+      "url": "https://clinicaltrials.gov/study/NCT07890766",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07890766",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Fibroadenoma",
+          "Cystic Fibrosis"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 60,
           "type": "ESTIMATED"
         }
       }
@@ -187444,6 +188123,21 @@
         }
       }
     },
+    "NCT03629509": {
+      "nct_id": "NCT03629509",
+      "title": "Implementation of the Begin Exploring Fertility Options, Risks and Expectations (BEFORE) Decision Aid",
+      "url": "https://clinicaltrials.gov/study/NCT03629509",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT03629509",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 116,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT03639948": {
       "nct_id": "NCT03639948",
       "title": "Neoadjuvant Phase II Study of Pembrolizumab And Carboplatin Plus Docetaxel in Triple Negative Breast Cancer",
@@ -188036,6 +188730,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 112,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT03824145": {
+      "nct_id": "NCT03824145",
+      "title": "Every Day Counts: A Lifestyle Program for Women With Metastatic Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT03824145",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT03824145",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 180,
           "type": "ACTUAL"
         }
       }
@@ -191935,6 +192644,21 @@
         }
       }
     },
+    "NCT05406635": {
+      "nct_id": "NCT05406635",
+      "title": "Imaging Versus Cardiac Biomarker Monitored HER2 Directed Therapy in Patients With Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT05406635",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05406635",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Cardiotoxicity"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 191,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT05408676": {
       "nct_id": "NCT05408676",
       "title": "Comparison of Dexamethasone Alone vs in Combination With Pericardium 6 (P6) Electrical Stimulation or Granisetron in the Prevention of Postoperative Nausea and Vomiting in Patients Undergoing Breast Cancer Surgery",
@@ -193469,6 +194193,22 @@
         }
       }
     },
+    "NCT06255808": {
+      "nct_id": "NCT06255808",
+      "title": "Development of Assist Tool for Breast Examination Using the Principle of Ultrasonic Sensor",
+      "url": "https://clinicaltrials.gov/study/NCT06255808",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06255808",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Cystic Fibrosis"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 200,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT06257264": {
       "nct_id": "NCT06257264",
       "title": "A Study to Examine the Safety of Different Doses of BG-68501 Given to Participants With Advanced-Stage Tumors",
@@ -193793,6 +194533,22 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 160,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT06548646": {
+      "nct_id": "NCT06548646",
+      "title": "Ultrasound-guided Thoracic Interfascial Plane Nerve Block Versus Erector Spinae Plane Block for Pain Control After Modified Radical Mastectomy",
+      "url": "https://clinicaltrials.gov/study/NCT06548646",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06548646",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Pain, Postoperative"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 200,
           "type": "ACTUAL"
         }
       }
@@ -194408,7 +195164,7 @@
           "Carcinoma, Medullary"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 118,
+          "count": 173,
           "type": "ACTUAL"
         }
       }
@@ -194598,6 +195354,23 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 102,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07547774": {
+      "nct_id": "NCT07547774",
+      "title": "Preoperative Sleep Quality and Postoperative Outcomes in Breast Surgery",
+      "url": "https://clinicaltrials.gov/study/NCT07547774",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07547774",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Pain, Postoperative",
+          "Inflammation"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 128,
           "type": "ACTUAL"
         }
       }
@@ -194836,6 +195609,52 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 105,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07864909": {
+      "nct_id": "NCT07864909",
+      "title": "Physical Activity Education and Quality of Life Study in Breast Cancer Chemotherapy Patients",
+      "url": "https://clinicaltrials.gov/study/NCT07864909",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07864909",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 115,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07876375": {
+      "nct_id": "NCT07876375",
+      "title": "UPPER EXTREMITY FUNCTION AND LYMPHEDEMA IN BREAST CANCER SURVIVORS",
+      "url": "https://clinicaltrials.gov/study/NCT07876375",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07876375",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 175,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT07878598": {
+      "nct_id": "NCT07878598",
+      "title": "Efficacy of Complete Decongestive Therapy for Limb Lymphedema: Response Profile and Predictive Modeling",
+      "url": "https://clinicaltrials.gov/study/NCT07878598",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07878598",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Lymphedema",
+          "Breast Cancer Lymphedema"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 150,
           "type": "ACTUAL"
         }
       }
@@ -199618,21 +200437,6 @@
         }
       }
     },
-    "NCT03824145": {
-      "nct_id": "NCT03824145",
-      "title": "Every Day Counts: A Lifestyle Program for Women With Metastatic Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT03824145",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT03824145",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 176,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT03831308": {
       "nct_id": "NCT03831308",
       "title": "Evaluating and Following Breast Cancer Patients in a Better Way",
@@ -202673,7 +203477,7 @@
           "Turcot syndrome"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 115,
+          "count": 160,
           "type": "ESTIMATED"
         }
       }
@@ -204133,21 +204937,6 @@
         }
       }
     },
-    "NCT05625087": {
-      "nct_id": "NCT05625087",
-      "title": "Detection of Tumor DNA in the Blood of Patients Receiving Standard Therapy for Hormone Receptor-positive (HR+) Non-HER2 Expressing (HER2-) Metastatic Breast Cancer as a Tool to Select Those Who May Benefit From the Next Course of Fulvestrant in Combination With Alpelisib or Ribociclib",
-      "url": "https://clinicaltrials.gov/study/NCT05625087",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05625087",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 162,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT05628870": {
       "nct_id": "NCT05628870",
       "title": "A Trial of HRS-1358 Tablets in Metastatic or Local Advanced Breast Cancer",
@@ -204658,7 +205447,7 @@
     },
     "NCT05774678": {
       "nct_id": "NCT05774678",
-      "title": "Trial Of PreoperAtive Radiation (TOPAz): A Randomized Trial Comparing Hypofractionated Versus Conventionally Fractionated Preoperative Radiation Followed by Mastectomy With Immediate Autologous Breast Reconstruction With Integrated Nanomechanical Biomarker Evaluation",
+      "title": "Trial Of PreoperAtive Radiation (TOPAz): A Randomized Trial Comparing Hypofractionated Versus Conventionally Fractionated Preoperative Radiation Followed by Mastectomy With Immediate Autologous Breast Reconstruction With Integrated Tissue Nanomechanical Phenotype Evaluation",
       "url": "https://clinicaltrials.gov/study/NCT05774678",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT05774678",
@@ -205458,6 +206247,21 @@
         }
       }
     },
+    "NCT05977036": {
+      "nct_id": "NCT05977036",
+      "title": "BettER: Biomarker Driven Early Therapeutic Selection in Patients With HR+ HER2- Metastatic or Unresectable Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT05977036",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05977036",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 145,
+          "type": "ESTIMATED"
+        }
+      }
+    },
     "NCT05978648": {
       "nct_id": "NCT05978648",
       "title": "Trilaciclib in Patients With Early-Stage HR-negative Breast Cancer Receiving Adjuvant Chemotherapy",
@@ -206115,6 +206919,21 @@
         }
       }
     },
+    "NCT06135714": {
+      "nct_id": "NCT06135714",
+      "title": "Metastasis-directed Therapy for Oligometastases of Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06135714",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06135714",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 146,
+          "type": "ESTIMATED"
+        }
+      }
+    },
     "NCT06143553": {
       "nct_id": "NCT06143553",
       "title": "Efficacy and Safety of Paclitaxel Polymeric Micelles for Injection in the Treatment of Metastatic Breast Cancer",
@@ -206641,22 +207460,6 @@
         }
       }
     },
-    "NCT06255808": {
-      "nct_id": "NCT06255808",
-      "title": "Development of Assist Tool for Breast Examination Using the Principle of Ultrasonic Sensor",
-      "url": "https://clinicaltrials.gov/study/NCT06255808",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06255808",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Cystic Fibrosis"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 200,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06259162": {
       "nct_id": "NCT06259162",
       "title": "LAG3 Expression in Triple Negative Breast Cancer",
@@ -207057,6 +207860,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 120,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT06361940": {
+      "nct_id": "NCT06361940",
+      "title": "Molecular Analyses to Predict Pathways of Endocrine Resistance Following Short Term Neoadjuvant Endocrine Treatment in Patients With Hormone Receptor-Positive HER2-negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06361940",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06361940",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 185,
           "type": "ESTIMATED"
         }
       }
@@ -208384,6 +209202,21 @@
         }
       }
     },
+    "NCT06686394": {
+      "nct_id": "NCT06686394",
+      "title": "Study of Patritumab Deruxtecan With Other Anticancer Agents in Participants With HER2 Positive Breast Cancer That Has Spread and Cannot Be Surgically Removed (MK-1022-009)",
+      "url": "https://clinicaltrials.gov/study/NCT06686394",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06686394",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 181,
+          "type": "ESTIMATED"
+        }
+      }
+    },
     "NCT06694519": {
       "nct_id": "NCT06694519",
       "title": "Radiofrequency and Exercise-based Rehabilitation on Symptoms Associated With Pelvic Floor Dysfunctions in Breast Cancer",
@@ -209157,22 +209990,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 177,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT06807164": {
-      "nct_id": "NCT06807164",
-      "title": "Serratus Plane Block (SPB) Versus Capsa\u00efcine Versus Botox-A for Chronic Neuropathic Pain in Post-mastectomy Syndrome",
-      "url": "https://clinicaltrials.gov/study/NCT06807164",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06807164",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Agnosia"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 123,
           "type": "ESTIMATED"
         }
       }
@@ -212695,21 +213512,6 @@
         }
       }
     },
-    "NCT07455955": {
-      "nct_id": "NCT07455955",
-      "title": "Personalized Antiemetic Regimen According to Patients' Pharmacogenetic Profile",
-      "url": "https://clinicaltrials.gov/study/NCT07455955",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07455955",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 200,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT07464457": {
       "nct_id": "NCT07464457",
       "title": "Effects of Neoadjuvant Prehabilitation on Post-Interventional Physical and Psychological Outcomes in Oncology Patients With Solid Tumors",
@@ -213093,23 +213895,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 162,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT07547774": {
-      "nct_id": "NCT07547774",
-      "title": "Preoperative Sleep Quality and Postoperative Outcomes in Breast Surgery",
-      "url": "https://clinicaltrials.gov/study/NCT07547774",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT07547774",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Pain, Postoperative",
-          "Inflammation"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 150,
           "type": "ESTIMATED"
         }
       }
@@ -214627,6 +215412,221 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 150,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07859319": {
+      "nct_id": "NCT07859319",
+      "title": "Evaluation of the Efficacy and Acceptability of a Phytotherapy Combining Devil's Claw, Blackcurrant and Meadowsweet for the Management of Aromatase Inhibitor-induced Arthralgia in Patients Treated for Localized Breast Cancer in the Adjuvant Setting",
+      "url": "https://clinicaltrials.gov/study/NCT07859319",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07859319",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Arthralgia",
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 105,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07860866": {
+      "nct_id": "NCT07860866",
+      "title": "Blood Biomarkers for Breast Cancer Treatment Response",
+      "url": "https://clinicaltrials.gov/study/NCT07860866",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07860866",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Neoplasm Metastasis"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 200,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07861932": {
+      "nct_id": "NCT07861932",
+      "title": "A Phase 1/2a Study of K-1728 in Advanced Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07861932",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07861932",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 110,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07866430": {
+      "nct_id": "NCT07866430",
+      "title": "De-EscaLaTion of Aromatase Inhibitor Therapy: A Randomized Phase II Study of De-escalated Letrozole in Hormone Receptor-Positive Early Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07866430",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07866430",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Brest Cancer ER+ and HER2 Negative"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 144,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07867262": {
+      "nct_id": "NCT07867262",
+      "title": "A Study to Evaluate the Effects of GDC-4198 in Combination With Letrozole, Fulvestrant, or Giredestrant in Participants With Locally Advanced or Metastatic Hormone Receptor-Positive, HER2-Negatve Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07867262",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07867262",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 165,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07876557": {
+      "nct_id": "NCT07876557",
+      "title": "A Clinical Study to Evaluate the Efficacy and Safety of JS212 Monotherapy or Combination Therapy in Recurrent or Metastatic Triple-negative Breast Cancer(TNBC)",
+      "url": "https://clinicaltrials.gov/study/NCT07876557",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07876557",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 184,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07877376": {
+      "nct_id": "NCT07877376",
+      "title": "Impact of Cognitive Impairment on Chronic Pain in Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07877376",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07877376",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Chronic Pain",
+          "Cognitive Dysfunction"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 182,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07880600": {
+      "nct_id": "NCT07880600",
+      "title": "Pre-Treatment Breast DCE-MRI AI Model to Predict Neoadjuvant Chemotherapy Benefit in Locally Advanced Triple-Negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07880600",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07880600",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 120,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07884721": {
+      "nct_id": "NCT07884721",
+      "title": "Fasten Onco Digital Therapy During Neoadjuvant Treatment for Triple-Negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07884721",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07884721",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 144,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07887620": {
+      "nct_id": "NCT07887620",
+      "title": "Chatbot Utilization for Pedigree Creation and Cancer Risk Assessment in Cancer Genetic Counseling",
+      "url": "https://clinicaltrials.gov/study/NCT07887620",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07887620",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Cancer, Familial"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 129,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07888556": {
+      "nct_id": "NCT07888556",
+      "title": "Exploring Curative Model for Advanced Breast Cancer: a Single-center, Prospective Phase II Clinical Study",
+      "url": "https://clinicaltrials.gov/study/NCT07888556",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07888556",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Advanced Breast Cancer"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 147,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07892508": {
+      "nct_id": "NCT07892508",
+      "title": "Adding Preoperative Radiotherapy Based on Early Treatment Response in Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07892508",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07892508",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Invasive Breast Cancer"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 200,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07893327": {
+      "nct_id": "NCT07893327",
+      "title": "Evaluation of the Effect of Regular Physical Exercise in Breast Cancer.",
+      "url": "https://clinicaltrials.gov/study/NCT07893327",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07893327",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Motor Activity"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 150,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07895511": {
+      "nct_id": "NCT07895511",
+      "title": "A Study of Skipping Radiation Therapy in People With Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07895511",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07895511",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 136,
           "type": "ESTIMATED"
         }
       }
@@ -225787,6 +226787,21 @@
         }
       }
     },
+    "NCT02798796": {
+      "nct_id": "NCT02798796",
+      "title": "Brazilian Randomized Study - Impact of MRI for Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT02798796",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT02798796",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 446,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT02800317": {
       "nct_id": "NCT02800317",
       "title": "RISAS Procedure in Node Positive Breast Cancer Following NAC",
@@ -229640,6 +230655,21 @@
         }
       }
     },
+    "NCT04292821": {
+      "nct_id": "NCT04292821",
+      "title": "BIOPSY SCANNER LLTECH\u00a9 Technology for Diagnosis of Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT04292821",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT04292821",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 217,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT04304924": {
       "nct_id": "NCT04304924",
       "title": "Motivating to Exercise and Diet, and Educating to Healthy Behaviors After Breast Cancer",
@@ -230355,25 +231385,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 240,
-          "type": "ACTUAL"
-        }
-      }
-    },
-    "NCT04557449": {
-      "nct_id": "NCT04557449",
-      "title": "Study to Test the Safety and Tolerability of PF-07220060 in Participants With Advance Solid Tumors",
-      "url": "https://clinicaltrials.gov/study/NCT04557449",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT04557449",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Liposarcoma",
-          "Prostatic Neoplasms",
-          "Breast Neoplasms",
-          "Adenocarcinoma of Lung",
-          "Colorectal Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 362,
           "type": "ACTUAL"
         }
       }
@@ -232625,6 +233636,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 228,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT05925257": {
+      "nct_id": "NCT05925257",
+      "title": "Digital Health Intervention to Improve Health Care and Outcomes for Breast Cancer Patients",
+      "url": "https://clinicaltrials.gov/study/NCT05925257",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05925257",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 410,
           "type": "ACTUAL"
         }
       }
@@ -237037,21 +238063,6 @@
         }
       }
     },
-    "NCT02798796": {
-      "nct_id": "NCT02798796",
-      "title": "Brazilian Randomized Study - Impact of MRI for Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT02798796",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT02798796",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 372,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT02806258": {
       "nct_id": "NCT02806258",
       "title": "Comparing Sequential Neoadjuvant Treatment Including Chemotherapy and Accelerated Radiation Focused to the Tumor Bed vs Neoadjuvant Chemotherapy Alone",
@@ -238059,21 +239070,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 366,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT03629509": {
-      "nct_id": "NCT03629509",
-      "title": "BEFORE Decision Aid Implementation Study",
-      "url": "https://clinicaltrials.gov/study/NCT03629509",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT03629509",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 224,
           "type": "ESTIMATED"
         }
       }
@@ -239377,21 +240373,6 @@
         }
       }
     },
-    "NCT04292821": {
-      "nct_id": "NCT04292821",
-      "title": "BIOPSY SCANNER LLTECH\u00a9 Technology for Diagnosis of Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT04292821",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT04292821",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 204,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT04296370": {
       "nct_id": "NCT04296370",
       "title": "A Study of Fluzoparib\u00b1Apatinib Versus Chemotherapy Treatment of Physician's Choice in HER2-negative Metastatic Breast Cancer Patients With Germline BRCA Mutation",
@@ -240018,6 +240999,25 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 304,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT04557449": {
+      "nct_id": "NCT04557449",
+      "title": "Study to Test the Safety and Tolerability of PF-07220060 in Participants With Advance Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT04557449",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT04557449",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Liposarcoma",
+          "Prostatic Neoplasms",
+          "Carcinoma, Non-Small-Cell Lung",
+          "Colorectal Neoplasms",
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 430,
           "type": "ESTIMATED"
         }
       }
@@ -242332,21 +243332,6 @@
         }
       }
     },
-    "NCT05406635": {
-      "nct_id": "NCT05406635",
-      "title": "Imaging Versus Cardiac Biomarker Monitored HER2 Directed Therapy in Patients With Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT05406635",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05406635",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Cardiotoxicity"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 220,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT05417048": {
       "nct_id": "NCT05417048",
       "title": "Clinical Study of Glycosylated Extracellular Vesicles for Early Diagnosis of Breast Cancer",
@@ -244099,21 +245084,6 @@
         }
       }
     },
-    "NCT05925257": {
-      "nct_id": "NCT05925257",
-      "title": "Digital Health Intervention to Improve Health Care and Outcomes for Breast Cancer Patients",
-      "url": "https://clinicaltrials.gov/study/NCT05925257",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05925257",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 410,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT05926024": {
       "nct_id": "NCT05926024",
       "title": "Long-Term Follow-Up in Women With Early Breast Cancer Three Years of More Post Primary Treatment",
@@ -245043,21 +246013,6 @@
         }
       }
     },
-    "NCT06135714": {
-      "nct_id": "NCT06135714",
-      "title": "Metastasis-directed Therapy for Oligometastases of Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT06135714",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06135714",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 340,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06144164": {
       "nct_id": "NCT06144164",
       "title": "A Study of a Comprehensive Prevention Program to Reduce Lymphedema After Axillary Lymph Node Dissection in People With Breast Cancer",
@@ -245295,10 +246250,15 @@
           "Prostatic Neoplasms",
           "Rectal Neoplasms",
           "Kidney Neoplasms",
-          "Thyroid Neoplasms"
+          "Thyroid Neoplasms",
+          "Carcinoma, Transitional Cell",
+          "Cholangiocarcinoma",
+          "Mesothelioma",
+          "Gallbladder Neoplasms",
+          "Ovarian Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 285,
+          "count": 330,
           "type": "ESTIMATED"
         }
       }
@@ -246186,7 +247146,7 @@
           "Ureteral Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 420,
+          "count": 460,
           "type": "ESTIMATED"
         }
       }
@@ -247609,6 +248569,27 @@
         }
       }
     },
+    "NCT06840886": {
+      "nct_id": "NCT06840886",
+      "title": "A Study of PHST001 in Advanced Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT06840886",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06840886",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Ovarian Neoplasms",
+          "Endometrial Neoplasms",
+          "Cholangiocarcinoma",
+          "Central Nervous System Neoplasms",
+          "Breast Neoplasms",
+          "Fallopian Tube Neoplasms",
+          "Carcinosarcoma"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 426,
+          "type": "ESTIMATED"
+        }
+      }
+    },
     "NCT06843083": {
       "nct_id": "NCT06843083",
       "title": "Contrast Enhanced Mammography or Breast Magnetic Resonance: Which Choice for Optimal Diagnostic Performance?",
@@ -248317,7 +249298,7 @@
           "Breast Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 411,
+          "count": 430,
           "type": "ESTIMATED"
         }
       }
@@ -251321,7 +252302,7 @@
           "Breast Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 306,
+          "count": 300,
           "type": "ESTIMATED"
         }
       }
@@ -251966,6 +252947,134 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 358,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07867470": {
+      "nct_id": "NCT07867470",
+      "title": "TROPION Breast Respond in 1L TNBC",
+      "url": "https://clinicaltrials.gov/study/NCT07867470",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07867470",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 400,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07869186": {
+      "nct_id": "NCT07869186",
+      "title": "Dermatological Effects and Quality of Life in Oncology Patients",
+      "url": "https://clinicaltrials.gov/study/NCT07869186",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07869186",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Ovarian Neoplasms",
+          "Carcinoma, Non-Small-Cell Lung",
+          "Melanoma"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 300,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07870148": {
+      "nct_id": "NCT07870148",
+      "title": "Cross Immune Response Between Breast Carcinoma and Thyroid Autoimmunity: Impact on Prognosis and Treatment",
+      "url": "https://clinicaltrials.gov/study/NCT07870148",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07870148",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 496,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07884487": {
+      "nct_id": "NCT07884487",
+      "title": "Surgical Margin Assessment Using Intra-operative High-resolution PET/CT in Patients With Cancers Referred to Surgical Resection, an Exploratory Pilot Study",
+      "url": "https://clinicaltrials.gov/study/NCT07884487",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07884487",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Head and Neck Neoplasms",
+          "Lung Neoplasms",
+          "Sarcoma"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 250,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07888881": {
+      "nct_id": "NCT07888881",
+      "title": "An Overview of Vaccination Coverage Among Patients Receiving Treatment for Breast Cancer at the ICO: Identifying Factors Associated With Vaccination Uptake and Improved Prevention",
+      "url": "https://clinicaltrials.gov/study/NCT07888881",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07888881",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 312,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07892274": {
+      "nct_id": "NCT07892274",
+      "title": "Trastuzumab Rezetecan Followed by Pyrotinib, Fulvestrant, and Dalpiciclib in HR-Positive, HER2-Positive Advanced Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07892274",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07892274",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 226,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07894133": {
+      "nct_id": "NCT07894133",
+      "title": "Gait Parameters in Breast Cancer Receiving Chemotherapy Patients",
+      "url": "https://clinicaltrials.gov/study/NCT07894133",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07894133",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 360,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07894874": {
+      "nct_id": "NCT07894874",
+      "title": "A Study to Evaluate YF550 in Participants With Locally Advanced or Metastatic Solid Tumors.",
+      "url": "https://clinicaltrials.gov/study/NCT07894874",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07894874",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Ovarian Neoplasms",
+          "Carcinoma, Non-Small-Cell Lung",
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 204,
           "type": "ESTIMATED"
         }
       }
@@ -258596,6 +259705,22 @@
         }
       }
     },
+    "NCT05301114": {
+      "nct_id": "NCT05301114",
+      "title": "Social Risk Factors and Discrimination in Cancer Survivorship",
+      "url": "https://clinicaltrials.gov/study/NCT05301114",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05301114",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Prostatic Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 506,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT05306600": {
       "nct_id": "NCT05306600",
       "title": "Onco-Genomas Brasil: Mapping Breast and Prostate Cancer in the Brazilian Public Health System",
@@ -259117,6 +260242,21 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 600,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT06279364": {
+      "nct_id": "NCT06279364",
+      "title": "A Study of SKB264 Versus Investigator's Choice Chemotherapy in Patients With Unresectable Recurrent or Metastatic Triple-Negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06279364",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT06279364",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 537,
           "type": "ACTUAL"
         }
       }
@@ -263474,11 +264614,12 @@
           "Mesothelioma",
           "Triple Negative Breast Neoplasms",
           "Uterine Neoplasms",
+          "Uterine Cervical Neoplasms",
           "Ovarian Neoplasms",
           "Breast Neoplasms"
         ],
         "protocolSection.designModule.enrollmentInfo": {
-          "count": 884,
+          "count": 952,
           "type": "ESTIMATED"
         }
       }
@@ -264396,22 +265537,6 @@
         }
       }
     },
-    "NCT06188520": {
-      "nct_id": "NCT06188520",
-      "title": "A First-in-human Dose Escalation and Expansion Study to Evaluate the Safety, and Tolerability of AZD8421 Alone or in Combination in Participants With Selected Advanced or Metastatic Solid Tumors",
-      "url": "https://clinicaltrials.gov/study/NCT06188520",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06188520",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "ER+ HER2- Advanced Breast Cancer",
-          "High-grade Serous Ovarian Cancer (HGSOC)"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 564,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT06192446": {
       "nct_id": "NCT06192446",
       "title": "Factors Influencing Adherence to Adjuvant Endocrine Therapy",
@@ -264486,21 +265611,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 800,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT06279364": {
-      "nct_id": "NCT06279364",
-      "title": "A Study of SKB264 Versus Investigator's Choice Chemotherapy in Patients With Unresectable Recurrent or Metastatic Triple-Negative Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT06279364",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT06279364",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Triple Negative Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 524,
           "type": "ESTIMATED"
         }
       }
@@ -264948,7 +266058,7 @@
     },
     "NCT06555068": {
       "nct_id": "NCT06555068",
-      "title": "A Trial of HRS-6209 in Combination With Fulvestrant, Letrozole, HRS-8080, or HRS-1358 in Breast Cancer Patients",
+      "title": "A Trial of HRS-6209 in Combination With Other Antitumor Therapies in Breast Cancer Patients or HRS-9813 as Monotherapy in Patients With Advanced Solid Tumors",
       "url": "https://clinicaltrials.gov/study/NCT06555068",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT06555068",
@@ -267009,6 +268119,97 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 534,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07858825": {
+      "nct_id": "NCT07858825",
+      "title": "Design and Pilot Implementation of a Chatbot to Support Breast Cancer Screening Among Black Women",
+      "url": "https://clinicaltrials.gov/study/NCT07858825",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07858825",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 873,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07868159": {
+      "nct_id": "NCT07868159",
+      "title": "Plant-derived Nutrients in the Prevention and Prognosis of Breast Cancer in Women.",
+      "url": "https://clinicaltrials.gov/study/NCT07868159",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07868159",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 639,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07869628": {
+      "nct_id": "NCT07869628",
+      "title": "A Multicenter, Randomized, Controlled Phase III Clinical Trial on Adjuvant Intensified Therapy for Patients With Residual Disease After Neoadjuvant Treatment for Triple-negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07869628",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07869628",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Newly Diagnosed Triple-negative Breast Cancer"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 852,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07879911": {
+      "nct_id": "NCT07879911",
+      "title": "A Study of SYS6043 Versus Investigator's Choice Chemotherapy as First-Line Treatment in Patients With Unresectable Locally Recurrent or Metastatic Triple-Negative Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07879911",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07879911",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 550,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07881679": {
+      "nct_id": "NCT07881679",
+      "title": "Breast MRI for Early Detection of Breast Cancer in Thuringia",
+      "url": "https://clinicaltrials.gov/study/NCT07881679",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07881679",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 750,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07884201": {
+      "nct_id": "NCT07884201",
+      "title": "Thymalfasin Combined With Chemotherapy and Immunotherapy in TNBC Neoadjuvant Treatment",
+      "url": "https://clinicaltrials.gov/study/NCT07884201",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07884201",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Triple Negative Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 572,
           "type": "ESTIMATED"
         }
       }
@@ -272881,6 +274082,21 @@
         }
       }
     },
+    "NCT04654208": {
+      "nct_id": "NCT04654208",
+      "title": "Swedish Ibrance Registries Insights (SIRI)",
+      "url": "https://clinicaltrials.gov/study/NCT04654208",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT04654208",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 1500,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT04711252": {
       "nct_id": "NCT04711252",
       "title": "A Comparative Study of AZD9833 Plus Palbociclib Versus Anastrozole Plus Palbociclib in Patients With ER-Positive HER2 Negative Breast Cancer Who Have Not Received Any Systemic Treatment for Advanced Disease",
@@ -273254,6 +274470,28 @@
         }
       }
     },
+    "NCT05225428": {
+      "nct_id": "NCT05225428",
+      "title": "Video Education With Result Dependent dIsclosure",
+      "url": "https://clinicaltrials.gov/study/NCT05225428",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05225428",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Ovarian Neoplasms",
+          "Pancreatic Neoplasms",
+          "Prostatic Neoplasms",
+          "Colorectal Neoplasms",
+          "Kidney Neoplasms",
+          "Melanoma",
+          "Sarcoma"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 1334,
+          "type": "ACTUAL"
+        }
+      }
+    },
     "NCT05361655": {
       "nct_id": "NCT05361655",
       "title": "Real-World Effectiveness of Palbociclib in Combination With an Aromatase Inhibitor",
@@ -273509,6 +274747,22 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 4173,
+          "type": "ACTUAL"
+        }
+      }
+    },
+    "NCT05827081": {
+      "nct_id": "NCT05827081",
+      "title": "Phase IIIb Study of Ribociclib + ET in Early Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT05827081",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT05827081",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms",
+          "Breast Neoplasms, Male"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 1464,
           "type": "ACTUAL"
         }
       }
@@ -277191,21 +278445,6 @@
         }
       }
     },
-    "NCT04654208": {
-      "nct_id": "NCT04654208",
-      "title": "Swedish Ibrance Registries Insights (SIRI)",
-      "url": "https://clinicaltrials.gov/study/NCT04654208",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT04654208",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 1500,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT04657341": {
       "nct_id": "NCT04657341",
       "title": "Sonazoid Contrast-enhanced Ultrasound in Assessing Effectiveness of Neoadjuvant Chemotherapy in Breast Cancer Patients.",
@@ -277758,28 +278997,6 @@
         }
       }
     },
-    "NCT05225428": {
-      "nct_id": "NCT05225428",
-      "title": "Video Education With Result Dependent dIsclosure",
-      "url": "https://clinicaltrials.gov/study/NCT05225428",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05225428",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Ovarian Neoplasms",
-          "Pancreatic Neoplasms",
-          "Prostatic Neoplasms",
-          "Colorectal Neoplasms",
-          "Kidney Neoplasms",
-          "Melanoma",
-          "Sarcoma"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 1020,
-          "type": "ESTIMATED"
-        }
-      }
-    },
     "NCT05232916": {
       "nct_id": "NCT05232916",
       "title": "Phase 3 Study to Evaluate the Efficacy and Safety of HER2/Neu Peptide GLSI-100 (GP2 + GM-CSF) in HER2/Neu Positive Subjects",
@@ -277916,22 +279133,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 2996,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT05301114": {
-      "nct_id": "NCT05301114",
-      "title": "Social Risk Factors and Discrimination in Cancer Survivorship",
-      "url": "https://clinicaltrials.gov/study/NCT05301114",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05301114",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Prostatic Neoplasms"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 1116,
           "type": "ESTIMATED"
         }
       }
@@ -278480,22 +279681,6 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 1236,
-          "type": "ESTIMATED"
-        }
-      }
-    },
-    "NCT05827081": {
-      "nct_id": "NCT05827081",
-      "title": "Phase IIIb Study of Ribociclib + ET in Early Breast Cancer",
-      "url": "https://clinicaltrials.gov/study/NCT05827081",
-      "fields": {
-        "protocolSection.identificationModule.nctId": "NCT05827081",
-        "derivedSection.conditionBrowseModule.meshes.term": [
-          "Breast Neoplasms",
-          "Breast Neoplasms, Male"
-        ],
-        "protocolSection.designModule.enrollmentInfo": {
-          "count": 1400,
           "type": "ESTIMATED"
         }
       }
@@ -281422,7 +282607,7 @@
     },
     "NCT07841704": {
       "nct_id": "NCT07841704",
-      "title": "NAUTILUS-04: No Axillary Surgical Treatment in Low-Risk Clinically Node-Negative Breast Cancer Without Whole-Breast Radiotherapy - A Prospective, Randomized, Phase III, Non-inferiority Clinical Trial",
+      "title": "NAUTILUS-04: No Axillary Surgical Treatment in Low-Risk Clinically Node-Negative Breast Cancer Without Whole-Breast Radiotherapy",
       "url": "https://clinicaltrials.gov/study/NCT07841704",
       "fields": {
         "protocolSection.identificationModule.nctId": "NCT07841704",
@@ -281431,6 +282616,100 @@
         ],
         "protocolSection.designModule.enrollmentInfo": {
           "count": 1520,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07875244": {
+      "nct_id": "NCT07875244",
+      "title": "MAMMI-BB PET for Monitoring Response to Neoadjuvant Therapy in Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07875244",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07875244",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 1024,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07878377": {
+      "nct_id": "NCT07878377",
+      "title": "Screening and the Future of Enhanced MRI for Early Breast Cancer Detection",
+      "url": "https://clinicaltrials.gov/study/NCT07878377",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07878377",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 2628,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07880106": {
+      "nct_id": "NCT07880106",
+      "title": "Multimodal Liquid-Biopsy Omics Biomarkers of Treatment Response in Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07880106",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07880106",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Carcinoma, Non-Small-Cell Lung",
+          "Colorectal Neoplasms",
+          "Stomach Neoplasms",
+          "Carcinoma, Hepatocellular",
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 2000,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07882420": {
+      "nct_id": "NCT07882420",
+      "title": "Role of Artificial Intelligence in Breast Cancer Screening Via Mammography",
+      "url": "https://clinicaltrials.gov/study/NCT07882420",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07882420",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 1222,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07890597": {
+      "nct_id": "NCT07890597",
+      "title": "A Study of a Medicine Called Atirmociclib in Combination With Giredestrant in Adult Participants With ER-positive, HER2-negative Early-stage Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07890597",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07890597",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 3800,
+          "type": "ESTIMATED"
+        }
+      }
+    },
+    "NCT07894328": {
+      "nct_id": "NCT07894328",
+      "title": "A Phase III Clinical Study of HRS-6209 Plus Letrozole as First-line Therapy in Patients With Advanced or Metastatic Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07894328",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07894328",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 1050,
           "type": "ESTIMATED"
         }
       }
@@ -286996,6 +288275,21 @@
         }
       }
     },
+    "NCT07879937": {
+      "nct_id": "NCT07879937",
+      "title": "Artificial Intelligence Integration in Breast Cancer Screening: The ANIHTA Study",
+      "url": "https://clinicaltrials.gov/study/NCT07879937",
+      "fields": {
+        "protocolSection.identificationModule.nctId": "NCT07879937",
+        "derivedSection.conditionBrowseModule.meshes.term": [
+          "Breast Neoplasms"
+        ],
+        "protocolSection.designModule.enrollmentInfo": {
+          "count": 200075,
+          "type": "ESTIMATED"
+        }
+      }
+    },
     "NCT00190593": {
       "nct_id": "NCT00190593",
       "title": "Raloxifene Use for The Heart",
@@ -291529,11 +292823,11 @@
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:10:34.946841Z",
-    "search_matches": 16873,
-    "cohort_size": 16873,
-    "api_requests": 19
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:52:08.165526Z",
+    "search_matches": 16950,
+    "cohort_size": 16950,
+    "api_requests": 18
   },
   "verification": {
     "passed": true,
@@ -291573,15 +292867,14 @@
     ]
   },
   "warnings": [],
-  "run_id": "run_91970cd501b04816a6d2210c7e77e639",
+  "run_id": "run_ecdc6c0a1811420d80a996d3bbdc8120",
   "relation": "new",
   "additional_answers": [],
-  "model_calls": 3,
+  "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 3586.7,
-    "retrieve": 19586.2,
-    "analyze": 7.9,
-    "verify": 56.4
+    "plan": 2125.3,
+    "retrieve": 15168.5,
+    "analyze": 76.8
   }
 }

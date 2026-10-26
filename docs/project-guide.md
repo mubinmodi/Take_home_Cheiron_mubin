@@ -48,7 +48,7 @@ What each step does, with the melanoma question as the example:
 3. **Plan.** The model returns a Query Plan: operation `aggregate`, group by `country`, Filters `conditions: ["melanoma"]` and `statuses: ["RECRUITING"]`.
 4. **Gate.** `validate.check_plan` merges any structured fields the caller sent (`AppliedFilters.merge` in `filters.py`) and checks the plan against the **Capability Catalog** in `catalog.py` (known operations, Dimensions, countries). A plan with fixable errors goes back to the model once, with the errors.
 5. **Conflicts.** Had the caller also sent `country: "France"`, the question and the field would disagree. `conflicts.resolve` would then return a **Clarification** offering both values, rather than picking one. Here there is nothing to resolve.
-6. **Retrieve.** `cohort.fetch_cohort` turns the Filters into API parameters (`AppliedFilters.api_params`) and fetches **every** page: 480 trials. Above 20,000 trials it stops with `scope_required` rather than counting a sample.
+6. **Retrieve.** `cohort.fetch_cohort` turns the Filters into API parameters (`AppliedFilters.api_params`) and fetches **every** page: 485 trials. Above 20,000 trials it stops with `scope_required` rather than counting a sample.
 7. **Answer.** `answer.answer` does the analysis in one place:
    - `analyze.breakdown` counts the distinct trials in each country;
    - `spec_builder.breakdown_spec` builds the bar chart (the top 10 countries, then "Other");

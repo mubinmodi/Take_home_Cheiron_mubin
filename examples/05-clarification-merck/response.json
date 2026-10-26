@@ -44,9 +44,9 @@
     "question": "'Merck' matches more than one lead sponsor. Which one do you mean?",
     "options": [
       {
-        "label": "Merck Sharp & Dohme LLC (2151 trials)",
+        "label": "Merck Sharp & Dohme LLC (2160 trials)",
         "value": "Merck Sharp & Dohme LLC",
-        "trial_count": 2151
+        "trial_count": 2160
       },
       {
         "label": "Merck KGaA, Darmstadt, Germany (275 trials)",
@@ -54,12 +54,12 @@
         "trial_count": 275
       },
       {
-        "label": "All of these (2426 trials)",
+        "label": "All of these (2435 trials)",
         "value": [
           "Merck Sharp & Dohme LLC",
           "Merck KGaA, Darmstadt, Germany"
         ],
-        "trial_count": 2426
+        "trial_count": 2435
       }
     ],
     "multi_select": false,
@@ -68,20 +68,20 @@
   "suggestions": [],
   "source": {
     "api_version": "2.0.5",
-    "data_timestamp": "2026-10-02T09:00:04",
-    "retrieved_at": "2026-10-04T16:10:29.025615Z",
-    "search_matches": 2750,
-    "cohort_size": 2750,
+    "data_timestamp": "2026-10-26T09:00:04",
+    "retrieved_at": "2026-10-26T23:52:03.793119Z",
+    "search_matches": 2759,
+    "cohort_size": 2759,
     "api_requests": 3
   },
   "warnings": [],
-  "run_id": "run_0a94d38eb24e4c27a62c35752d69ab95",
+  "run_id": "run_1be2e1277d864e8f8ed2d380931e91a8",
   "relation": "new",
   "additional_answers": [],
   "model_calls": 2,
   "planner_model": "gpt-5.4-mini-2026-03-17",
   "timings_ms": {
-    "plan": 2124.8,
-    "retrieve": 2330.8
+    "plan": 2227.0,
+    "retrieve": 2244.5
   }
 }

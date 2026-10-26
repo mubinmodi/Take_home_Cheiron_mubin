@@ -4,7 +4,7 @@ A backend service that answers natural-language questions about clinical trials 
 
 ```
 POST /v1/query  {"query": "How has the number of trials for this drug changed over time?", "drug_name": "Pembrolizumab"}
-→ time_series of trials per start year · 2,620 cited trials · verified · chart at /v1/runs/{id}/chart.png
+→ time_series of trials per start year · 2,638 cited trials · verified · chart at /v1/runs/{id}/chart.png
 ```
 
 ## The task, as I understood it
@@ -296,15 +296,15 @@ Every Outcome returns HTTP 200 with the outcome in the body; HTTP error codes ar
 {
   "type": "bar_chart",
   "title": "Trials by country: melanoma; recruiting",
-  "subtitle": "480 trials",
+  "subtitle": "485 trials",
   "encoding": {
     "x": {"field": "country", "type": "nominal", "title": "Country"},
     "y": {"field": "trial_count", "type": "quantitative", "title": "Trials"},
     "tooltip": [...]
   },
-  "data": [{"country": "United States", "trial_count": 246, "trial_ids": ["NCT…", "…"]}, "…"],
+  "data": [{"country": "United States", "trial_count": 248, "trial_ids": ["NCT…", "…"]}, "…"],
   "metadata": {"units": "trials", "sort": "data_order", "category_order": ["United States", "…", "Other"],
-               "top_n": 10, "other_bucket": true, "multi_valued": true, "cohort_size": 480}
+               "top_n": 10, "other_bucket": true, "multi_valued": true, "cohort_size": 485}
 }
 ```
 
@@ -333,27 +333,27 @@ One real Datum of each type (`trial_ids` shortened). The numbers in brackets nam
 // single_value
 {"label": "Trials", "trial_count": 50, "trial_ids": ["NCT02122861", "…"]}
 // bar_chart (02)
-{"country": "United States", "trial_count": 246, "trial_ids": ["NCT00001823", "…"]}
+{"country": "United States", "trial_count": 248, "trial_ids": ["NCT00001823", "…"]}
 // time_series (01); a crossed chart carries the series field, e.g. "phase", in place of estimated_count
 {"start_year": "2008", "trial_count": 1, "estimated_count": 0, "trial_ids": ["NCT04898751"]}
 // grouped_bar_chart (03)
 {"phase": "Early Phase 1", "group": "semaglutide only", "trial_count": 5, "trial_ids": ["NCT05249881", "…"]}
 // histogram (06)
-{"enrollment_bin": "0", "enrollment_type": "Actual", "trial_count": 522, "trial_ids": ["NCT00003455", "…"]}
+{"enrollment_bin": "0", "enrollment_type": "Actual", "trial_count": 523, "trial_ids": ["NCT00003455", "…"]}
 // table: columns nct_id, title, status, phase, start_date, lead_sponsor, enrollment
 {"nct_id": "NCT05913388", "title": "GB1211 and Pembrolizumab …", "status": "ACTIVE_NOT_RECRUITING", "phase": "Phase 2",
  "start_date": "2024-02-29", "lead_sponsor": "Providence Health & Services", "enrollment": 12, "trial_ids": ["NCT05913388"]}
 // timeline (07)
-{"trial": "NCT05899608 · Clinical Study of Ivonescimab …", "nct_id": "NCT05899608", "start": "2023-10-26",
- "end": "2028-12-31", "dates": "Includes estimated dates", "status": "RECRUITING", "trial_ids": ["NCT05899608"]}
+{"trial": "NCT05920356 · A Study Evaluating Sotorasib Platinum Doublet Comb", "nct_id": "NCT05920356", "start": "2023-11-16",
+ "end": "2027-06-30", "dates": "Includes estimated dates", "status": "RECRUITING", "trial_ids": ["NCT05920356"]}
 // scatter_plot (08)
 {"nct_id": "NCT00696657", "title": "A Randomised Controlled Clinical Trial …", "duration_months": 8.1, "enrollment": 415,
  "values": "Actual values", "trial_ids": ["NCT00696657"]}
 // network_graph (04): data is {"nodes": [...], "edges": [...]}
 {"id": "sponsor:National Cancer Institute (NCI)", "label": "National Cancer Institute (NCI)", "kind": "sponsor",
- "trial_count": 128, "trial_ids": ["NCT00004028", "…"]}
+ "trial_count": 127, "trial_ids": ["NCT00004028", "…"]}
 {"source": "sponsor:National Cancer Institute (NCI)", "target": "drug:temozolomide", "kind": "sponsors_trials_of",
- "trial_count": 31, "trial_ids": ["NCT00039494", "…"]}
+ "trial_count": 30, "trial_ids": ["NCT00039494", "…"]}
 ```
 
 The encoding names these fields, e.g. a timeline's `{"x": {"field": "start"}, "x2": {"field": "end"}, "y": {"field": "trial"}, "color": {"field": "dates"}}`. A renderer reads `encoding` and `data` and needs nothing else.
@@ -388,15 +388,15 @@ For the "China" bar of example 02, `evidence["NCT03340506"]` is:
 
 | Example | Outcome |
 |---|---|
-| The assignment's own request ("this drug" + `drug_name: Pembrolizumab`) | `time_series`, 2,620 cited trials |
-| "Which countries have the most recruiting trials for melanoma?" | `bar_chart`, 480 |
-| "Compare phases for trials involving semaglutide vs tirzepatide" | `grouped_bar_chart`, 824 |
-| "Show a network of sponsors and drugs for glioblastoma trials" | `network_graph`: 975 trials cited by the 52 links shown (of 2,269 matching trials, 1,736 with a drug and a lead sponsor) |
-| "What phases are Merck's trials in?" | `clarification_required`: Merck Sharp & Dohme (2,151) / Merck KGaA (275) / All of these (2,426) |
-| "What is the enrollment distribution of breast cancer trials?" | `histogram`, 16,873 |
+| The assignment's own request ("this drug" + `drug_name: Pembrolizumab`) | `time_series`, 2,638 cited trials |
+| "Which countries have the most recruiting trials for melanoma?" | `bar_chart`, 485 |
+| "Compare phases for trials involving semaglutide vs tirzepatide" | `grouped_bar_chart`, 849 |
+| "Show a network of sponsors and drugs for glioblastoma trials" | `network_graph`: 978 trials cited by the 52 links shown (of 2,278 matching trials, 1,742 with a drug and a lead sponsor) |
+| "What phases are Merck's trials in?" | `clarification_required`: Merck Sharp & Dohme (2,160) / Merck KGaA (275) / All of these (2,435) |
+| "What is the enrollment distribution of breast cancer trials?" | `histogram`, 16,950 |
 | "Show a timeline of recruiting phase 3 Keytruda trials in Germany" | `timeline`, the 50 most recently started of 55 |
-| "Plot enrollment against duration for completed semaglutide trials" | `scatter_plot`, 309 |
-| "Which drugs are most often combined with pembrolizumab?" | `network_graph` (drug ↔ drug, same arm): 1,776 trials cited by the 60 links shown (of 1,804 with a same-arm combination) |
+| "Plot enrollment against duration for completed semaglutide trials" | `scatter_plot`, 313 |
+| "Which drugs are most often combined with pembrolizumab?" | `network_graph` (drug ↔ drug, same arm): 1,788 trials cited by the 60 links shown (of 1,817 with a same-arm combination) |
 
 Regenerate with `uv run python -m examples.generate`.
 
@@ -423,13 +423,13 @@ Also supported: the enrollment `histogram` (actual vs estimated), enrollment vs 
 Example 02, "Which countries have the most recruiting trials for melanoma?":
 
 1. **Plan.** The model returns a typed plan: `aggregate` by `country`, filters `conditions: ["melanoma"]` and `statuses: ["RECRUITING"]`. It produces no numbers and no trial IDs.
-2. **Retrieve.** Code compiles the filters into one ClinicalTrials.gov request, `GET /api/v2/studies?query.cond=(melanoma)&filter.overallStatus=RECRUITING&fields=…&pageSize=1000&countTotal=true`. It reports 480 matches and fetches all of them, so the cohort is complete; 480 trials remain after the match checks.
+2. **Retrieve.** Code compiles the filters into one ClinicalTrials.gov request, `GET /api/v2/studies?query.cond=(melanoma)&filter.overallStatus=RECRUITING&fields=…&pageSize=1000&countTotal=true`. It reports 485 matches and fetches all of them, so the cohort is complete; 485 trials remain after the match checks.
 3. **Count.** Each trial is placed under every country where it has a current site, once per country. China gets 59 distinct trials.
 4. **Datum.** `{"country": "China", "trial_count": 59, "trial_ids": ["NCT03340506", …]}`. `trial_count` always equals the number of `trial_ids`.
 5. **Citation.** `evidence["NCT03340506"]` ("Dabrafenib and/or Trametinib Rollover Study") holds the source values behind it: `overallStatus = "RECRUITING"` (the status filter), `locations.country` including `"China"` (its bar), and condition MeSH terms including `"Melanoma"` (the condition search). In the web page, clicking the China bar lists all 59 trials with these values.
 6. **Verify.** Before answering, the verifier recounts the bar from its citations, re-derives "China" and every quoted citation value from each cited trial's own record, and checks every cited trial meets both filters. All nine checks passed (`verification` in the response).
 
-**A limitation, made visible:** example 05, "What phases are Merck's trials in?". Two different lead sponsors match "Merck". Rather than pick one, the service asks, offering options built from the data: Merck Sharp & Dohme (2,151 trials), Merck KGaA (275) or both.
+**A limitation, made visible:** example 05, "What phases are Merck's trials in?". Two different lead sponsors match "Merck". Rather than pick one, the service asks, offering options built from the data: Merck Sharp & Dohme (2,160 trials), Merck KGaA (275) or both.
 
 ---
 
