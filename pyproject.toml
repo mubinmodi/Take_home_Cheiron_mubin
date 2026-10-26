@@ -17,6 +17,7 @@ dependencies = [
     "pydantic>=2.13.5",
     "pydantic-ai-slim[anthropic,google,openai]>=2.54.0",
     "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2",
     "redis>=5.2",
     "sqlalchemy[asyncio]>=2.0.40",
     "uvicorn[standard]>=0.54.0",

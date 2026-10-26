@@ -33,7 +33,7 @@ The example questions in the assignment are examples, not the full list. Any que
 - **Questions about one study:** the cohort is one NCT ID (or a few). This is a filter, not a new operation; e.g. "countries for NCT…" is `aggregate` over that study's sites.
 - **Follow-ups and corrections:** "now only Phase 3", "I meant lead sponsors". See section 5, *Input and clarification*.
 
-**Networks** use entities that ClinicalTrials.gov contains: drugs, sponsors, conditions (later: investigators, sites). Gene networks are not possible; the source has no gene data. The visual model follows the author's reference (an interactive gene-network viewer, not shipped): node colour by entity type, edge colour by edge type with a legend, a minimum-weight threshold (minimum shared trials), and clicking a node or edge shows the trials behind it (the citations).
+**Networks** use entities that ClinicalTrials.gov contains: drugs, sponsors, conditions (later: investigators, sites). *Built (2026-10-04):* two kinds, sponsor ↔ drug and drug ↔ drug; no condition network was built. Gene networks are not possible; the source has no gene data. The visual model follows the author's reference (an interactive gene-network viewer, not shipped): node colour by entity type, edge colour by edge type with a legend, a minimum-weight threshold (minimum shared trials), and clicking a node or edge shows the trials behind it (the citations).
 
 Out of scope: medical conclusions, free-form API queries, generated SQL or Python, other data sources, gene or molecular data.
 
@@ -53,14 +53,14 @@ Rules decided from the API spike ([api-data-guide.md](research/api-data-guide.md
 - **Condition match:** trust the API's `query.cond` search; no match check. This asymmetry is deliberate: "trials of drug X" means the trial gives drug X, while "trials for condition Y" is fuzzier (a solid-tumour basket trial that includes lung cancer arguably is a lung cancer trial).
 - **Drug classes** ("PD-1 inhibitors"): no class list exists in the source, so the service asks. Code runs the text search for the class name, counts the drugs most often found in the matches, and offers them as a multi-select clarification labelled "drugs most often found in trials mentioning …" (not a verified class membership).
 - **"Drug"** means intervention types `DRUG`, `BIOLOGICAL` and `COMBINATION_PRODUCT`. Pembrolizumab is recorded as `BIOLOGICAL` in about a third of its trials.
-- **Drug identity** is the intervention MeSH term; when it is missing, a cleaned raw name (lower case, dose and ® removed), marked as unresolved. Condition grouping uses condition MeSH terms, not raw text.
+- **Drug identity** is the intervention MeSH term; when it is missing, a cleaned raw name (lower case, dose and ® removed). Condition grouping uses condition MeSH terms, falling back to the raw condition text when a trial has none. *Built (2026-10-04):* the fallback name is not marked as unresolved — the citation quotes whichever source field was used, which tells the reader the same thing.
 - **Countries:** current site locations only; this matches the API's `LocationCountry` filter. Sites moved to `removedCountries` are read but not counted (planned: reporting them in `assumptions[]`; not built).
-- **Drug ↔ drug networks:** an edge means "given in the same arm" (arm-to-intervention links exist for 98% of studies). Drugs only co-listed in different arms do not form a combination edge. Supplements (`DIETARY_SUPPLEMENT`), saline and placebo are left out of drug networks.
-- **Network size:** top 15 lead sponsors and top 25 drugs by trial count; edges need at least 2 supporting trials. All cut-offs are reported in `assumptions[]`.
+- **Drug ↔ drug networks:** an edge means "given in the same arm" (arm-to-intervention links exist for 98% of studies). Drugs only co-listed in different arms do not form a combination edge. Supplements (`DIETARY_SUPPLEMENT`), saline and placebo are left out of drug networks. *Built (2026-10-04):* two drugs in one arm are also not an edge when the arm's description offers them as alternatives ("cisplatin or carboplatin"); those arms are counted and reported in `assumptions[]`.
+- **Network size:** top 15 lead sponsors and top 25 drugs by trial count; edges need at least 2 supporting trials, and at most 60 edges are drawn. All cut-offs are reported in `assumptions[]`.
 - **Dates:** month-only dates (8%) count in their year; `ESTIMATED` dates are labelled; future start years stay visible.
 - **Enrollment:** `ESTIMATED` values (43%) are labelled or shown separately in histograms.
 
-The **capability catalog** is one versioned file. It feeds the planner prompt, the plan validator, the README and the tests. It also holds the domain ambiguity taxonomy (date meaning, sponsor role, drug identity, combination vs co-listing, missing comparison entity) with a default-or-ask decision for each.
+The **capability catalog** is one versioned file. It feeds the planner prompt, the plan validator, the README and the tests. It was also to hold the domain ambiguity taxonomy (date meaning, sponsor role, drug identity, combination vs co-listing, missing comparison entity) with a default-or-ask decision for each. *Built (2026-10-04):* the catalog holds the dimensions, enums and counting constants; the five ambiguity decisions are each made where they apply — the date and sponsor defaults in the planner prompt, the clarification reasons in the plan model, drug identity during retrieval, and combination versus co-listing in the network code. Gathering them into the catalog is open as problem-log ticket 29.
 
 ## 4. Data: source contract
 
@@ -87,19 +87,21 @@ request → validate input → load earlier run (follow-ups) → split into part
               ambiguous / unsupported / no data → explicit outcome (clarification options built by code, or reason)
 ```
 
-*Updated 2026-10-04 to match the build:* there is no separate dry-plan compile step (filters become API parameters during retrieval, in `cohort.build_params`); a split step (one model call; the code splitter is its fallback) separates multi-part messages before planning (all parts are planned and gated, then each is answered in turn); and code asks two clarifications of its own, when a structured field contradicts the question and when a sponsor name matches several lead sponsors.
+*Updated 2026-10-04 to match the build:* there is no separate dry-plan compile step (filters become API parameters during retrieval, in `cohort.build_params`); a split step (one model call; the code splitter is its fallback) separates multi-part messages before planning (all parts are planned and gated, then each is answered in turn); and code asks two clarifications of its own, when a structured field contradicts the question and when a sponsor name matches several lead sponsors. The sponsor check runs on the ordinary retrieval path only: a comparison whose side is a sponsor name is counted without it, so "Merck vs Pfizer" merges both Mercks (problem-log ticket 22).
 
 - The model never sees trial records, only the question and the catalog, so trial text can't inject instructions.
 - The model never calls tools. The pipeline calls typed functions with structured errors (`{code, message, retryable}`).
-- `clarification_required` returns machine-readable multiple-choice options. When a sensible default exists, the system proceeds and records it in `assumptions[]`.
+- `clarification_required` returns machine-readable multiple-choice options wherever the options can be counted from the data. When a sensible default exists, the system proceeds and records it in `assumptions[]`.
 
 ### Input and clarification
 
-- **The question drives the filters.** The user can send only `query`. The model extracts the filters (drug, condition, phase, sponsor and role, country, status, years, NCT IDs, comparison groups) into the `QueryPlan`; code validates them against the catalog and enums and applies them.
+- **The question drives the filters.** The user can send only `query`. The model extracts the filters (drug, condition, keyword, phase, status, study type, sponsor and role, country, years, NCT IDs, comparison groups) into the `QueryPlan`; code validates them against the catalog and enums and applies them. *Built (2026-10-04):* `keywords` is free text for a topic that is neither a drug nor a condition, and `study_types` selects interventional, observational or expanded access; both were added after this list was first written.
 - **Structured fields are optional.** They pin a filter without relying on extraction, resolve references such as "this drug", and carry clarification answers back. Unknown fields are rejected. Each field accepts one value or a list, so comparisons and multi-value answers fit. Every applied filter is echoed in the response.
 - **Ask only when unclear**, like a multiple-choice pop-up. `clarification_required` holds one `field`, a short `question` and two or more `options` (`label` for display, `value` to send back). Ask when no sensible default exists: a reference with nothing to resolve it ("this drug" with no drug), a comparison with missing groups, or a name that matches different entities (e.g. "Merck": Merck Sharp & Dohme vs Merck KGaA). **Code builds the options from the data** (e.g. the distinct lead sponsors matching "Merck", with trial counts); the model only marks which filter is ambiguous and never writes option values. A clarification may allow several choices (drug classes). Do not ask when a default exists: year = start year, sponsor = lead sponsor, brand names resolved by the API's synonym search. Defaults go into `assumptions[]`.
-- **Conflict:** if a structured field and the question text name different values for the same filter, return `clarification_required`; never pick one silently.
-- **Follow-ups, corrections and clarification answers** send `previous_run_id`. The service loads the earlier `QueryPlan` from that run's bundle, and the model gets the new message plus the old plan and writes a corrected plan. This is still one model step and needs no chat memory: the client holds the conversation, and the response can show what changed between the two plans. The model decides whether the new message refines the earlier plan or starts a new question, and the response reports which.
+
+  *Built (2026-10-04):* three of the five are as designed — a drug class, an ambiguous sponsor name and a conflict all get options code counts from the data, and the model writes none of them. The other two have nothing countable to offer: a reference with nothing to resolve it ("this drug" with no drug) and a comparison with no sides named carry the model's own one-line question and take a free-text answer. The option-building rule holds wherever there are options; it is the question text, not the options, that the model writes in those two cases.
+- **Conflict:** if a structured field and the question text name different values for the same filter, return `clarification_required`; never pick one silently. *Built (2026-10-04, after the first review):* code detects the conflict and builds the two options, rather than relying on the model to flag it. Two cases are deliberately not conflicts: a brand name and its generic, which resolve to the same drug, and a filter the previous run already asked about, so answering ends the question instead of asking it again.
+- **Follow-ups, corrections and clarification answers** send `previous_run_id`. The service loads the earlier `QueryPlan` from that run's **run record** (full run bundles were never built), and the model gets the new message plus the old plan and writes a corrected plan. It needs no chat memory: the client holds the conversation, and the response can show what changed between the two plans. The model decides whether the new message refines the earlier plan or starts a new question, and the response reports which. *Built (2026-10-04):* a follow-up costs a split call before its planning call, like any other message, so it is two model steps rather than one.
 
 ### Response format
 
@@ -113,11 +115,15 @@ request → validate input → load earlier run (follow-ups) → split into part
 
 | Endpoint | Returns |
 |---|---|
-| `POST /v1/query` | Outcome, visualization specification, evidence, assumptions, `run_id`, `chart_url` |
+| `POST /v1/query` | Outcome, visualization specification, evidence, assumptions, `suggestions`, `run_id`, `chart_url` |
 | `GET /v1/runs/{run_id}` | The saved run record: request, plan and response (full run bundles for replay are not built) |
 | `GET /v1/runs/{run_id}/chart.png` and `.svg` | The rendered image, from the saved specification |
+| `GET /v1/runs/{run_id}/vega-lite.json` | The same specification translated to Vega-Lite, which the web page draws and clicks through to citations |
 | `GET /v1/schema` | Request and response JSON Schemas |
 | `GET /health` | Service status |
+| `GET /` | The web page |
+
+**Suggestions** (added 2026-10-04, not in the original design). An outcome that is not an answer says what to do next instead of stopping: a `no_data` answer offers the corrections that would find trials, each one the same question with a single filter dropped and the result counted live, and names a drug no trial lists at all as a likely misspelling; an `unsupported_query` answer offers up to three related questions the registry could answer, written by the planner. A filter the user pinned with a structured field is reported but not offered, since only they can remove it.
 
 Local build (decided 2026-10-03): each Run is saved as a small **run record** (request, Query Plan, response) in one JSON file, enough for Follow-ups and `chart_url`. Full run bundles with raw API responses (replay) are deferred. Postgres and object storage only in the hosted version.
 
@@ -133,7 +139,7 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 
 ### Verifier (gate before every response)
 
-*Built (2026-10-04):* the checks in `verify.py` are listed in README §2. Of the design below, the JSON Schema validation, label-length limits and the `countTotal` count check were not built; the count rules were instead verified once against `countTotal` during the API spike (section 1).
+*Built (2026-10-04):* the checks in `verify.py` are listed in README §2. Of the design below, four were not built: the JSON Schema validation, the label-length limit, the readability cap on how many categories a chart may show, and the `countTotal` count check. The count rules were instead verified once against `countTotal` during the API spike (section 1), and top-N keeps category counts down at the counting stage rather than at the gate.
 
 - **Validity:** the spec validates against our own published visualization JSON Schema, and every encoded field exists in `data`.
 - **Legality:** the chart answers the validated plan (dimension, measure, filters, chart type, sort).
@@ -143,7 +149,7 @@ Each run ends in exactly one outcome: `success`, `no_data` (only after complete 
 
 ### LLM ops
 
-- **Trace:** one trace per run, with spans per stage, plus a run record (request, plan, response). A full run bundle with the raw API responses, replayable with no model or API calls, was designed but not built.
+- **Trace:** one trace per run, with spans per stage, plus a run record (request, plan, response). A full run bundle with the raw API responses, replayable with no model or API calls, was designed but not built. *Built (2026-10-04):* the spans exist, but exporting them is off unless `OTEL_EXPORTER` is set to `otlp` or `console`, and the AWS task does not set it — so the deployed service records no traces (problem-log ticket 10).
 - **Evaluate:** binary pass/fail per stage. Process: was the plan right? Outcome: do the numbers match hand-checked fixtures?
 - **Diagnose:** a wrong plan means changing the prompt or catalog. A right plan with wrong numbers is a bug; fix the code.
 - **Release check:** the eval suite reruns on every prompt, model, schema or catalog change.

@@ -25,7 +25,7 @@ What makes it hard:
 - it chooses the chart type from the plan;
 - it builds the specification with citations.
 
-A **verifier** then re-derives every count and cited value from the trial records before any answer is returned. When there is no sensible default the service asks a multiple-choice question built from the data; otherwise it states its default in the answer's assumptions. Every run ends in one explicit outcome, such as `success`, `clarification_required` or `no_data`, and the model never sees trial records.
+A **verifier** then re-derives every count and cited value from the trial records before any answer is returned. When there is no sensible default the service asks rather than guesses: a multiple-choice question whose options code counts from the data wherever they can be counted (which Merck, which drugs in a class, which of two conflicting values), and a short question with a free-text answer where they cannot. Otherwise it states its default in the answer's assumptions. Every run ends in one explicit outcome, such as `success`, `clarification_required` or `no_data`, and the model never sees trial records.
 
 **What I built:**
 - nine answer types:
@@ -155,7 +155,7 @@ BUILD SPEC  and the evidence
 VERIFY    re-derive every count and cited value from the trial records                     code
 
 Exits (each part ends in exactly one outcome):
-  PLAN      unsupported_query · clarification_required (options built by code from data)
+  PLAN      unsupported_query · clarification_required (drug class: options from data; else free text)
   GATE      unsupported_query · clarification_required when a field contradicts the question
   RETRIEVE  scope_required (over 20,000 trials) · no_data · clarification_required ("which Merck?")
   COUNT     no_data (nothing to plot, e.g. no trial reports a start date)
@@ -173,7 +173,7 @@ Exits (each part ends in exactly one outcome):
   - chooses the chart type deterministically from the plan
   - builds the spec and evidence
   - verifies
-- **When the answer is a chart** (the assignment asks both to judge whether a visualization fits and for a visualization as the answer). Every successful analytical answer is a visualization specification; a single number is a `single_value` and a list of trials a `table`, so a renderer handles every answer the same way. Code picks the type from the plan: counts over start years → `time_series`; a breakdown → `bar_chart`; a comparison or a crossed breakdown → `grouped_bar_chart`; enrollment distribution → `histogram`; trial by trial → `table`, `timeline` or `scatter_plot`; relationships → `network_graph`. Outcomes that are not answers (clarification, unsupported, no data, scope required, errors) carry no visualization; they say why and what to do next. A `no_data` answer states how the question was read and, in `suggestions`, offers the corrections that find trials, each counted live with that one filter removed. An `unsupported_query` answer offers up to three related questions, written by the planner, that the registry could answer.
+- **When the answer is a chart** (the assignment asks both to judge whether a visualization fits and for a visualization as the answer). Every successful analytical answer is a visualization specification; a single number is a `single_value` and a list of trials a `table`, so a renderer handles every answer the same way. Code picks the type from the plan: no grouping → `single_value`; counts over start years → `time_series`, a crossed breakdown over years included; any other breakdown → `bar_chart`, or `grouped_bar_chart` once a second dimension crosses it; a comparison → `grouped_bar_chart`, or `bar_chart` when its sides are counted whole; enrollment distribution → `histogram`; trial by trial → `table`, `timeline` or `scatter_plot`; relationships → `network_graph`. Outcomes that are not answers (clarification, unsupported, no data, scope required, errors) carry no visualization; they say why and what to do next. A `no_data` answer states how the question was read and, in `suggestions`, offers the corrections that find trials, each counted live with that one filter removed. An `unsupported_query` answer offers up to three related questions, written by the planner, that the registry could answer.
 - **Bounded:** one split call (two if the primary model fails), then at most 3 planning calls per run, shared by the parts (plan, one repair with the validator's errors, one provider fallback on provider errors only: HTTP errors, timeouts, network). A single question usually takes 2 calls. Every attempt counts, a failed one included, and a model that failed is not tried again in the same run. The SDK's own single retry of a request is not counted. Every run ends in exactly one **outcome**: `success`, `no_data`, `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error`, `internal_error`.
 - **Verifier**, a gate before every successful response. It checks that:
   - the chart answers the plan: its type, grouped by the plan's dimensions
@@ -212,9 +212,10 @@ Code map (`src/clinical_trials_viz/`):
 | `runs.py`, `idempotency.py` | Run records (files, or Postgres when hosted) and Idempotency-Keys |
 | `shared_state.py`, `access.py`, `breaker.py` | Hosted mode: Redis-backed shared state, API keys and limits, circuit breakers |
 | `config.py`, `telemetry.py` | Settings; logging and OpenTelemetry |
+| `models/` | The typed contract: `request.py` and `response.py` (§3 and §4), `plan.py` (the Query Plan the model fills in) and `spec.py` (the visualization specification, published as JSON Schema) |
 | `api.py`, `cli.py`, `web/index.html` | HTTP API, command line, web page |
 
-**Extending.** Adding a dimension (say, primary purpose) touches three places: an entry in `catalog.py` (label, the description the planner prompt shows, the source field to cite, and whether it is multi-valued, ordered or long-tailed); one case in `ctgov/trial.py` that reads the value and its citation from a trial record (plus the API field in `TRIAL_FIELDS`); and a fixture test with an eval question. Counting (`analyze.py`), chart choice and spec building (`spec_builder.py`), the verifier and the plan gate all work from the catalog, so they need no change. A new chart type touches `spec_builder.py` (its data shape), `render.py` (its Vega-Lite) and `verify.py` (its checks).
+**Extending.** Adding a dimension (say, primary purpose) touches three places: an entry in `catalog.py` (label, the description the planner prompt shows, the source field to cite, and whether it is multi-valued, ordered, long-tailed or a time axis); one case in `ctgov/trial.py` that reads the value and its citation from a trial record (plus the API field in `TRIAL_FIELDS`); and a fixture test with an eval question. Counting (`analyze.py`), chart choice and spec building (`spec_builder.py`), the verifier and the plan gate all work from the catalog, so they need no change. A new chart type is a wider change: a member of `VisualizationType` in `models/spec.py`, a branch in `spec_builder.chart_type_for` so the plan reaches it, its data shape in `spec_builder.py`, its Vega-Lite in `render.py`, its checks in `verify.py`, and three points in `answer.py` — building it, deciding when it has nothing to draw, and which source fields its citations must carry.
 
 Design notes: [`docs/harness-design.md`](docs/harness-design.md). API findings: [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md). Glossary: [`CONTEXT.md`](CONTEXT.md).
 
@@ -315,8 +316,8 @@ Each type, its data and its channels:
 | `type` | `data` | Channels |
 |---|---|---|
 | `single_value` | `[{label, trial_count, trial_ids}]` | `value` |
-| `bar_chart` | one row per category | `x` category, `y` count; `metadata.top_n`, `other_bucket`, `multi_valued` (a trial can fall in several categories) |
-| `time_series` | one row per start year, no gaps, plus `estimated_count`; for a crossed chart one row per year × series value | `x` year (`time_granularity: "year"`), `y` count, optional `color` = series (one line each). A `Not reported` row holds undated trials and is not plotted on the axis. |
+| `bar_chart` | one row per category — or, for a comparison counted whole rather than broken down, one row per side keyed `group` (`"A only"`, `"B only"`, `"Both"`), ordered by `metadata.category_order` | `x` category or `group`, `y` count; `metadata.top_n`, `other_bucket`, `multi_valued` (a trial can fall in several categories) |
+| `time_series` | one row per start year, no gaps, plus `estimated_count`; for a crossed chart one row per year × series value, carrying the series field in place of `estimated_count` | `x` year (`time_granularity: "year"`), `y` count, optional `color` = series (one line each). A `Not reported` row holds undated trials and is not plotted on the axis. |
 | `grouped_bar_chart` | one row per category × comparison group (`"A only"`, `"B only"`, `"Both"`/`"More than one"`), or × series value for a crossed chart | `x`, `y`, `color` = group or series (`metadata.series_order`) |
 | `histogram` | one row per enrollment bin × enrollment type (Actual / Estimated / Type not reported) | `x` bin (ordinal), `y` count, `color` type; `metadata.bins = [{label, min, max}]` |
 | `table` | one row per trial (≤ 100; `metadata.total_rows` = all) | `columns` |
@@ -331,7 +332,7 @@ One real Datum of each type (`trial_ids` shortened). The numbers in brackets nam
 {"label": "Trials", "trial_count": 50, "trial_ids": ["NCT02122861", "…"]}
 // bar_chart (02)
 {"country": "United States", "trial_count": 246, "trial_ids": ["NCT00001823", "…"]}
-// time_series (01); a crossed chart adds the series field, e.g. "phase"
+// time_series (01); a crossed chart carries the series field, e.g. "phase", in place of estimated_count
 {"start_year": "2008", "trial_count": 1, "estimated_count": 0, "trial_ids": ["NCT04898751"]}
 // grouped_bar_chart (03)
 {"phase": "Early Phase 1", "group": "semaglutide only", "trial_count": 5, "trial_ids": ["NCT05249881", "…"]}
@@ -456,13 +457,13 @@ Every failure ends in one Outcome with a structured `error` (`code`, `message`, 
 | Failure point | What happens | Outcome · `error.code` |
 |---|---|---|
 | **Primary planning model fails** (5xx, 429, timeout, network, bad key) | The fallback model plans instead; the answer carries a warning naming the failure ("gpt-5.4-mini: HTTP 401") and `planner_model` names the model that answered | `success` + warning |
-| **Every model fails**, retryably | Stopped; nothing is fetched from ClinicalTrials.gov | `upstream_error` · `planner_unavailable` (retryable) |
+| **Every model fails**, retryably | Stopped before any trial is fetched (the list of country names, cached for the life of the process, is read first) | `upstream_error` · `planner_unavailable` (retryable) |
 | **Every model rejects the request** (401/403/404: bad key or model name) | Stopped with a configuration hint | `upstream_error` · `planner_rejected` (not retryable) |
 | **A model hangs** | Each attempt is limited to `PLANNER_TIMEOUT_SECONDS` (20 s, one quick retry, instead of the SDKs' 600 s with two retries); the whole step to `PLANNER_DEADLINE_SECONDS` (60 s) | `upstream_error` · `planner_timeout` (retryable) |
 | **The model returns no usable plan** (text instead of a plan, after one retry) | Stopped; not sent to the fallback, which is for provider failures only | `internal_error` · `planner_invalid_output` (retryable) |
 | **No model configured** | The service still starts; every question explains which key is missing | `internal_error` · `planner_not_configured` |
 | **ClinicalTrials.gov** fails | Retries with backoff (honouring `Retry-After`), then stops with the reason | `upstream_error` · `source_unavailable` / `source_rate_limited` / `source_rejected` / `source_invalid_response` |
-| **Over 20,000 matching trials** | Stopped before fetching; the message gives the count and asks to narrow the question | `scope_required` · `scope_too_large` |
+| **Over 20,000 matching trials** | Stopped after the first page, which reports the total; the message gives that count and asks to narrow the question | `scope_required` · `scope_too_large` |
 | **No trial matches** | Says how the question was read; offers the corrections that find trials, each counted live with one filter removed. A drug name that no trial lists at all gets a spelling hint | `no_data` + `suggestions` |
 | **Nothing to plot** (no trial reports a start date for a trend, the dates for a timeline, or enrollment for a scatter) | Stopped after full retrieval, naming the missing field | `no_data` |
 | **The registry cannot answer the question** (efficacy, advice) | Says why, and offers up to three related questions it can answer | `unsupported_query` + `suggestions` |
@@ -496,9 +497,11 @@ HTTP-level errors (unknown run, idempotency conflicts, image failures, anything 
 ## 9. How correctness was validated
 
 - **API spike before design.** Every filter was checked against the live API, and local counts reproduce the API's own totals exactly, in the 2,968-trial pembrolizumab search: start year 2020 = 263, Phase 3 = 367, Germany = 326, recruiting = 712. Findings and data-quality measurements are in [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md).
-- **213 offline tests**, most of them through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
+- **262 offline tests**, most of them through the HTTP API, with a scripted planner and ClinicalTrials.gov mocked by real records saved from the API. They cover:
   - every chart type, clarifications, follow-ups, repair
   - `scope_required`, `no_data`, upstream errors, rate-limit retries
+  - the Filter module (29 tests): 17 filter combinations compiled to API parameters, 850 local checks on saved trials, and 10 merges of plan filters with structured fields, each pinned to behaviour recorded before the module existed
+  - answering (14 tests) across the module's own interface, and the model-call ledger (5 tests)
   - every failure point in §7 (26 tests): fallback to the second model with a warning, every model failing or rejecting, a hanging model, a model returning text instead of a plan, ClinicalTrials.gov errors by status, a chart that cannot compile or draw, an unsaved run record, and a bug confined to one part of a multi-part Question
   - the hosted mode (36 tests, with an in-memory Redis and SQLite in place of Postgres): settings that refuse to start or leak secrets, run history shared through SQL, one request budget and page cache across two instances, Idempotency-Keys across instances, a Redis outage, API keys and hourly limits (per user, and Idempotency-Keys scoped per user), open access, circuit breakers opening and closing, the run deadline keeping finished parts and covering a slow run store
   - counting rules (multi-phase, distinct trials per country, no year gaps, top-N + Other with "Not reported" kept separate, missing values as their own state, the drug filter keeping only drug-type interventions), with property tests showing input order and duplicates do not change counts

@@ -28,7 +28,7 @@ Not needed: vector database, run checkpointer, Kubernetes, separate API gateway.
 ## Python packages
 
 What the project uses (`pyproject.toml`):
-- **Core:** `fastapi`, `uvicorn`, `pydantic` v2, `pydantic-settings`, `httpx` (async).
+- **Core:** `fastapi`, `uvicorn`, `pydantic` v2, `pydantic-settings`, `python-dotenv`, `httpx` (async).
 - **Model layer:** `pydantic-ai-slim[openai,anthropic,google]` with `FallbackModel` (OpenAI primary, Anthropic fallback; Gemini wired in but never run), tool-based output mode.
 - **Charts:** our own visualization schema (pydantic models exported as JSON Schema); `vl-convert-python` renders Vega-Lite to PNG/SVG; counting is plain Python.
 - **Storage and cache (hosted):** `redis` (asyncio), `sqlalchemy` 2.x with `asyncpg`.
@@ -49,16 +49,16 @@ Planned at first but not used: `tenacity` (the client's own retry), `alembic` (o
 
 ## What was built (2026-10-04)
 
-One codebase; `DEPLOYMENT=hosted` switches on the hosted dependencies and refuses to start without them.
+One codebase; `DEPLOYMENT=hosted` switches on the hosted dependencies and refuses to start without them. The container image sets it already (`Dockerfile`), so anything run from that image needs `REDIS_URL` and `DATABASE_URL` — locally, run the code directly and all of this stays off.
 
 | Decision above | Built as | Where |
 |---|---|---|
 | API container | Two-stage uv image (ARM64), non-root, fonts for chart text, one worker. ECS Express Mode service: Fargate tasks with 0.5 vCPU and 1 GB, 1–2 tasks, HTTPS load balancer and auto scaling it manages, rolling updates with automatic rollback | `Dockerfile`, `deploy/aws/` |
-| Redis: cache + shared rate limiter | ElastiCache Serverless (Valkey 9, TLS). GCRA token bucket in one Lua script (all instances share the 40/min budget), compressed page cache keyed by data timestamp, plus Idempotency-Keys and per-user counts. Degrades per instance if Redis fails | `shared_state.py` |
-| Postgres: run history | RDS for PostgreSQL 18 (db.t4g.micro, not public). `runs` table (run ID, time, user, outcome, model calls, planner model, latency, question, full record as JSONB) via SQLAlchemy async + asyncpg; created on startup | `runs.py` |
+| Redis: cache + shared rate limiter | ElastiCache Serverless (Valkey, TLS; deployed on 9, though the create call pins no version). GCRA token bucket in one Lua script (all instances share the 40/min budget), compressed page cache keyed by data timestamp, plus Idempotency-Keys and per-user counts. Degrades per instance if Redis fails | `shared_state.py` |
+| Postgres: run history | RDS for PostgreSQL (db.t4g.micro, not public; deployed on 18, though the create call pins no version). `runs` table (run ID, time, user, outcome, model calls, planner model, latency, question, full record as JSONB) via SQLAlchemy async + asyncpg; created on startup | `runs.py` |
 | Run bundles / R2 | Still deferred | — |
 | Secrets | Secrets Manager; ECS reads them into environment variables when a task starts (the task execution role may read only `clinical-trials-viz/*`) | `deploy/aws/lib.sh` |
-| Tracing | OpenTelemetry spans, exported over OTLP when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. Not yet connected on AWS: X-Ray's OTLP endpoint needs SigV4 signing, so it needs a collector next to the app | `telemetry.py` |
+| Tracing | OpenTelemetry spans, exported when `OTEL_EXPORTER` is `otlp` (endpoint from the standard `OTEL_EXPORTER_OTLP_ENDPOINT`) or `console`. It defaults to `none`, and the AWS task does not set it, so **the deployed service emits no spans**: setting the endpoint alone changes nothing. Connecting X-Ray needs a collector next to the app, because its OTLP endpoint wants SigV4 signing | `telemetry.py` |
 | 1. Cache key with data timestamp | Kept (`page_key`) | `ctgov/client.py` |
 | 2. Per-run page cap | Kept (`MAX_PAGES=20`) | `config.py` |
 | 3. Circuit breakers | One for ClinicalTrials.gov, one per planner model; an open model is skipped so the fallback answers at once | `breaker.py` |
@@ -75,55 +75,38 @@ Done step by step with the user, who ran each command. Account: "Idea Incubator"
 - **Sign-in:** IAM Identity Center is unavailable. The CLI signs in with `aws login --profile incubator` (an assumed role, `AccountFullAccessRole`, about 12-hour sessions).
 - **Cost:** the free plan never charges a card. The account closes when its credits ($100–200) run out or after 6 months.
 
-### One-time setup
+### Setup and deployment
 
-`deploy/aws/deploy.sh` does all of this, and the deployment after it, in one command (`DRY_RUN=1` first to see what it would change). It is safe to run again: each step checks what exists and skips it. The commands below are what it runs.
-
-All commands run with `--profile incubator` and region us-east-2 (`aws configure set region us-east-2 --profile incubator`).
+`deploy/aws/deploy.sh` is the one supported path. It sets up whatever is missing, builds and pushes the image, creates the service or rolls the new image out, waits until the service answers, and runs the smoke test. Every step checks what already exists and skips it, so it is safe to run again. A first deployment takes about 15 minutes, mostly waiting for the database.
 
 ```bash
-# 1. Image registry, and the image (ARM64: Graviton, and native on Apple Silicon)
-aws ecr create-repository --repository-name clinical-trials-viz --image-scanning-configuration scanOnPush=true
-aws ecr get-login-password | docker login --username AWS --password-stdin ACCOUNT.dkr.ecr.us-east-2.amazonaws.com
-docker build --platform linux/arm64 -t ACCOUNT.dkr.ecr.us-east-2.amazonaws.com/clinical-trials-viz:v1 .
-docker push ACCOUNT.dkr.ecr.us-east-2.amazonaws.com/clinical-trials-viz:v1
-
-# 2. Roles: one for ECS to start tasks (pull the image, write logs, read this app's secrets), one for Express Mode
-aws iam create-role --role-name ecsTaskExecutionRole --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ecs-tasks.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
-aws iam attach-role-policy --role-name ecsTaskExecutionRole --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-aws iam put-role-policy --role-name ecsTaskExecutionRole --policy-name read-clinical-trials-viz-secrets --policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":"secretsmanager:GetSecretValue","Resource":"arn:aws:secretsmanager:us-east-2:*:secret:clinical-trials-viz/*"}]}'
-aws iam create-role --role-name ecsInfrastructureRoleForExpressServices --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Sid":"AllowAccessInfrastructureForECSExpressServices","Effect":"Allow","Principal":{"Service":"ecs.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
-aws iam attach-role-policy --role-name ecsInfrastructureRoleForExpressServices --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSInfrastructureRoleforExpressGatewayServices
-aws iam create-service-linked-role --aws-service-name ecs.amazonaws.com
-# Create these two as well before the first service (see "First deployment" below)
-aws iam create-service-linked-role --aws-service-name elasticloadbalancing.amazonaws.com
-aws iam create-service-linked-role --aws-service-name ecs.application-autoscaling.amazonaws.com
-
-# 3. Database and cache in the default VPC, behind a security group that starts with no inbound rules
-aws ec2 create-security-group --group-name clinical-trials-viz-data --description "Postgres and Valkey for clinical-trials-viz" --vpc-id DEFAULT_VPC_ID
-aws secretsmanager create-secret --name clinical-trials-viz/db-password --secret-string "$(openssl rand -hex 24)"
-aws rds create-db-instance --db-instance-identifier clinical-trials-viz --engine postgres --db-instance-class db.t4g.micro --allocated-storage 20 --storage-type gp3 --db-name trials --master-username trials --master-user-password "$(aws secretsmanager get-secret-value --secret-id clinical-trials-viz/db-password --query SecretString --output text)" --vpc-security-group-ids DATA_SG_ID --no-publicly-accessible --backup-retention-period 1
-aws elasticache create-serverless-cache --serverless-cache-name clinical-trials-viz --engine valkey --security-group-ids DATA_SG_ID --subnet-ids DEFAULT_SUBNET_IDS --cache-usage-limits 'DataStorage={Maximum=1,Unit=GB},ECPUPerSecond={Maximum=1000}'
-
-# 4. Secrets (values never printed): model keys from .env, a generated API key, the two connection strings
-aws secretsmanager create-secret --name clinical-trials-viz/OPENAI_API_KEY --secret-string "$(grep '^OPENAI_API_KEY=' .env | cut -d= -f2-)"
-aws secretsmanager create-secret --name clinical-trials-viz/ANTHROPIC_API_KEY --secret-string "$(grep '^ANTHROPIC_API_KEY=' .env | cut -d= -f2-)"
-aws secretsmanager create-secret --name clinical-trials-viz/API_KEYS --secret-string "mubin:$(openssl rand -hex 20)"
-aws secretsmanager create-secret --name clinical-trials-viz/DATABASE_URL --secret-string "postgresql+asyncpg://trials:DB_PASSWORD@RDS_ENDPOINT:5432/trials?ssl=require"
-aws secretsmanager create-secret --name clinical-trials-viz/REDIS_URL --secret-string "rediss://CACHE_ENDPOINT:6379/0"
-
-# 5. The service; it then opens the database and cache to its own security group and waits until it answers
-deploy/aws/create-service.sh
-deploy/smoke-test.sh https://SERVICE_ENDPOINT
+DRY_RUN=1 deploy/aws/deploy.sh                     # read-only: list what it would create or change
+deploy/aws/deploy.sh                               # set up what is missing, then ship the current code
+SET_ENV="OPEN_ACCESS=true" deploy/aws/deploy.sh    # also add or change settings on the service
+TAG=v7 deploy/aws/deploy.sh                        # image tag (default: the current git commit)
+UPDATE_MODEL_KEYS=1 deploy/aws/deploy.sh           # replace the stored model keys with those in .env
 ```
 
-New code goes out with `TAG=vN deploy/aws/update-service.sh`: build, push, and a rolling update that changes only the image (rolled back automatically if the new tasks fail their health checks). Live as of 2026-10-04: v6 (v2 startup fix, v3 threaded web page, v4 tolerant key check, v5 light and dark themes, v6 the first review's fixes and open access for the review).
+It needs the AWS CLI signed in (`aws login --profile incubator`), Docker running, and `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` in `.env`. Everything runs in us-east-2.
+
+| Step | What it creates |
+|---|---|
+| 1. Image registry | The ECR repository, scanning images on push |
+| 2. Roles | `ecsTaskExecutionRole` (pull the image, write logs, read only this app's secrets), `ecsInfrastructureRoleForExpressServices`, and the service-linked roles for ECS, load balancing and auto scaling — these three first, because the first deployment failed without them (see below) |
+| 3. Database and cache | A security group with no inbound rules in the default VPC; RDS for PostgreSQL (db.t4g.micro, 20 GB gp3, not public, one day of backups) and ElastiCache Serverless Valkey (1 GB, 1000 ECPU). Neither call pins an engine version, so a fresh setup gets whatever AWS defaults to that day. It waits out a database or cache still being deleted from a previous teardown |
+| 4. Secrets | The two model keys from `.env`, a generated `API_KEYS` (`admin:<random>`, left alone if it already exists) and the two connection strings. **Values reach AWS through owner-only temporary files (`file://`), never as command-line arguments**, so they stay out of the shell history and the process list |
+| 5. Image and service | Builds for ARM64 (Graviton, and native on Apple Silicon), pushes, then creates the Express Mode service or rolls the image out to the existing one, opens the database and cache to the service's own security group, and fails if the rollout stalls instead of reporting success |
+| 6. Smoke test | `deploy/smoke-test.sh` against the live address, using the stored API key |
+
+**Settings on the service.** The task always gets `DEPLOYMENT=hosted`, `RUN_DEADLINE_SECONDS=30`, `USER_QUERIES_PER_HOUR=30` and `LOG_LEVEL=INFO` (`deploy/aws/lib.sh`), plus the secrets above as environment variables of the same name. Anything else is set with `SET_ENV`, which merges into what the service already has and applies whether the service is being created or updated. `SET_ENV="OPEN_ACCESS=true"` is what puts the review demo in its current state; without it the service requires an API key.
+
+For an image-only rollout, `TAG=vN deploy/aws/update-service.sh` still works: build, push, and a rolling update that changes nothing but the image, rolled back automatically if the new tasks fail their health checks. The `v1`–`v6` series came from those manual rollouts (v2 startup fix, v3 threaded web page, v4 tolerant key check, v5 light and dark themes, v6 the first review's fixes and open access); `deploy.sh` now tags with the current git commit instead, so the running tag is a commit SHA.
 
 ### First deployment: what went wrong and the fixes
 
 1. **Express Mode's first attempt was rolled back** ("the infrastructure role doesn't have enough permission"). CloudTrail showed `CreateLoadBalancer` refused in the same second the load-balancing service-linked role was created. Auto scaling failed the same way. The account had never used either service. A retry succeeded once the roles existed; setup step 2 now creates them first.
 2. **Every task took a minute to start, failed its health checks and was replaced,** so the first deployment never shifted traffic and the address answered 503. At startup the app created its table in Postgres before serving, and the database's security group did not yet admit the service (asyncpg waits 60 s by default). Fixed in v2: the table is created in the background, Postgres connections give up after 5 s and Redis after 2 s, and `create-service.sh` opens the security group itself.
-3. Web page requests were refused (401) when the key was pasted as the stored `mubin:...` value, or from a notes app that capitalized it or added quotes or invisible characters. The service now accepts the key with or without its name and ignores case, quotes and invisible characters (v4); a key that differs in any real character is still refused.
+3. Web page requests were refused (401) when the key was pasted as the whole stored `name:key` value, or from a notes app that capitalized it or added quotes or invisible characters. The service now accepts the key with or without its name and ignores case, quotes and invisible characters (v4); a key that differs in any real character is still refused.
 
 Verified live: `/health`, a question (melanoma trials by country), a follow-up refined from the Postgres run history ("only phase 3"), and a chart image over HTTPS.
 
@@ -131,13 +114,21 @@ Verified live: `/health`, a question (melanoma trials by country), a follow-up r
 
 Running costs are roughly $50–60 a month, paid from the free plan's credits: the load balancer (~$16 + usage), one Fargate task with 0.5 vCPU and 1 GB on ARM (~$15), RDS db.t4g.micro with 20 GB (~$14), ElastiCache Serverless at its minimum (~$6), and Secrets Manager (6 secrets, ~$2.40). Every question also costs 2–5 model calls (one split call, two if the primary model fails, then up to three planning calls), which the per-user limit caps.
 
-To delete everything, run `deploy/aws/teardown.sh` (`DRY_RUN=1` first to see what it would delete). It asks you to type the service name, deletes in the order below, waits for each step and skips what is already gone. The commands it runs, in this order:
+To delete everything, run `deploy/aws/teardown.sh` (`DRY_RUN=1` first to list what would go). It asks you to type the service name, then works through seven steps, waiting for each and skipping what is already gone:
 
 ```bash
-aws ecs delete-express-gateway-service --service-arn arn:aws:ecs:us-east-2:ACCOUNT:service/default/clinical-trials-viz
-aws elasticache delete-serverless-cache --serverless-cache-name clinical-trials-viz
-aws rds delete-db-instance --db-instance-identifier clinical-trials-viz --skip-final-snapshot
-aws ecr delete-repository --repository-name clinical-trials-viz --force
-for s in OPENAI_API_KEY ANTHROPIC_API_KEY API_KEYS DATABASE_URL REDIS_URL db-password; do aws secretsmanager delete-secret --secret-id clinical-trials-viz/$s --force-delete-without-recovery; done
-aws ec2 delete-security-group --group-name clinical-trials-viz-data   # after the database and cache are gone
+DRY_RUN=1 deploy/aws/teardown.sh     # read-only: list what it would delete
+deploy/aws/teardown.sh               # asks you to type the service name, then deletes
 ```
+
+1. The service, its load balancer and its tasks — after revoking the data security group's inbound rule, so nothing holds the group open.
+2. The cache.
+3. The database, with no final snapshot and without keeping its automated backups. **The run history goes with it.**
+4. The security group, now that nothing uses it.
+5. The ECR repository and its images, the six secrets, the log groups, and every task definition Express Mode registered (one revision per rollout).
+6. The two IAM roles.
+7. The empty `default` ECS cluster.
+
+Service-linked roles are kept: the account shares them, they cost nothing, and AWS manages them. Nothing here can be undone — `deploy/aws/deploy.sh` can build it all again, but under a new address.
+
+Deleting by hand instead is the way to leave resources billing: the log groups, task definitions, roles and cluster are all easy to forget, and the security group cannot go until the database and cache have finished deleting.
