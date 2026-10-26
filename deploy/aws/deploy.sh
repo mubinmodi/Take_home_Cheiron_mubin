@@ -17,9 +17,7 @@ cd "$(dirname "$0")/../.."
 export AWS_PROFILE=${AWS_PROFILE:-incubator} AWS_REGION=${AWS_REGION:-us-east-2}
 DRY_RUN=${DRY_RUN:-}
 
-step() { printf '\n==> %s\n' "$*"; }
-ok() { printf '    ok: %s\n' "$*"; }
-fail() { printf '\nStopped: %s\n' "$*" >&2; exit 1; }
+source deploy/aws/lib.sh  # step, ok, fail, found; checks the AWS sign-in; NAME, ACCOUNT, REGISTRY, ...
 change() {  # change DESCRIPTION COMMAND...: run a command that changes AWS, or only name it in a dry run
   local what=$1
   shift
@@ -30,14 +28,12 @@ change() {  # change DESCRIPTION COMMAND...: run a command that changes AWS, or 
     "$@" >/dev/null
   fi
 }
-found() { "$@" >/dev/null 2>&1; }  # a read-only check: does this resource exist?
 env_value() { grep -E "^$1=" .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"'"'"; }
 
 # --- 0. Before changing anything ----------------------------------------------------------------------
 step "0/6 Checks"
-for tool in aws python3 curl openssl; do command -v "$tool" >/dev/null || fail "$tool is not installed"; done
-found aws sts get-caller-identity || fail "not signed in to AWS. Run: aws login --profile $AWS_PROFILE"
-ok "signed in to AWS ($AWS_PROFILE, $AWS_REGION)"
+for tool in python3 curl openssl; do command -v "$tool" >/dev/null || fail "$tool is not installed"; done
+ok "signed in to AWS ($AWS_PROFILE, $AWS_REGION, account $ACCOUNT)"
 if [ -z "$DRY_RUN" ]; then
   command -v docker >/dev/null || fail "Docker is not installed"
   found docker info || fail "Docker is not running: start Docker Desktop"
@@ -47,7 +43,15 @@ for key in OPENAI_API_KEY ANTHROPIC_API_KEY; do
   [ -n "$(env_value "$key")" ] || fail "$key is missing from .env (copy .env.example and fill it in)"
 done
 ok "model keys found in .env"
-source deploy/aws/lib.sh  # NAME, ACCOUNT, REGISTRY, SERVICE_ARN, container_json, with_settings, ...
+SECRET_DIR=$(mktemp -d)  # secret values go to AWS through owner-only files, never on a command line
+chmod 700 "$SECRET_DIR"
+trap 'rm -rf "$SECRET_DIR"' EXIT
+as_file() {  # as_file VALUE: a file:// reference to VALUE, for an AWS CLI parameter
+  local file
+  file=$(mktemp "$SECRET_DIR/value.XXXXXX")
+  printf '%s' "$1" >"$file"
+  echo "file://$file"
+}
 TAG=${TAG:-$(git rev-parse --short HEAD)}
 [ -z "$(git status --porcelain -- src pyproject.toml uv.lock Dockerfile)" ] \
   || printf '    note: uncommitted changes in the code will be shipped; the tag %s names the last commit\n' "$TAG"
@@ -103,14 +107,10 @@ done
 
 # --- 3. Database and cache ----------------------------------------------------------------------------
 step "3/6 Database and cache (default VPC)"
-VPC=$(aws ec2 describe-vpcs --filters Name=is-default,Values=true --query 'Vpcs[0].VpcId' --output text)
+VPC=$(default_vpc)
 [ "$VPC" != None ] || fail "this region has no default VPC"
 SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC" Name=default-for-az,Values=true \
   --query 'Subnets[].SubnetId' --output text)
-data_group() {
-  aws ec2 describe-security-groups --filters "Name=group-name,Values=$NAME-data" "Name=vpc-id,Values=$VPC" \
-    --query 'SecurityGroups[0].GroupId' --output text
-}
 DATA_SG=$(data_group)
 if [ "$DATA_SG" != None ]; then
   ok "security group $NAME-data ($DATA_SG)"
@@ -127,11 +127,22 @@ if secret_exists db-password; then
   ok "database password secret"
 else
   change "generate the database password (stored as $NAME/db-password)" \
-    aws secretsmanager create-secret --name "$NAME/db-password" --secret-string "$(openssl rand -hex 24)"
+    aws secretsmanager create-secret --name "$NAME/db-password" --secret-string "$(as_file "$(openssl rand -hex 24)")"
 fi
 
-if found aws rds describe-db-instances --db-instance-identifier "$NAME"; then
-  ok "RDS PostgreSQL $NAME"
+rds_status=$(aws rds describe-db-instances --db-instance-identifier "$NAME" \
+  --query 'DBInstances[0].DBInstanceStatus' --output text 2>/dev/null || echo missing)
+if [ "$rds_status" = deleting ]; then  # e.g. right after a teardown: wait, then create a new one
+  if [ -n "$DRY_RUN" ]; then
+    printf '    would: wait for the old database to finish deleting\n'
+  else
+    echo "    the old database is still being deleted; waiting (several minutes)..."
+    aws rds wait db-instance-deleted --db-instance-identifier "$NAME"
+  fi
+  rds_status=missing
+fi
+if [ "$rds_status" != missing ]; then
+  ok "RDS PostgreSQL $NAME ($rds_status)"
 else
   if [ -n "$DRY_RUN" ]; then
     printf '    would: create RDS PostgreSQL %s (db.t4g.micro, 20 GB, not public)\n' "$NAME"
@@ -139,13 +150,26 @@ else
     change "create RDS PostgreSQL $NAME (db.t4g.micro, 20 GB, not public)" aws rds create-db-instance \
       --db-instance-identifier "$NAME" --engine postgres --db-instance-class db.t4g.micro \
       --allocated-storage 20 --storage-type gp3 --db-name trials --master-username trials \
-      --master-user-password "$(secret_value db-password)" --vpc-security-group-ids "$DATA_SG" \
+      --master-user-password "$(as_file "$(secret_value db-password)")" --vpc-security-group-ids "$DATA_SG" \
       --no-publicly-accessible --backup-retention-period 1
   fi
 fi
 
-if found aws elasticache describe-serverless-caches --serverless-cache-name "$NAME"; then
-  ok "ElastiCache Serverless (Valkey) $NAME"
+cache_status() {
+  aws elasticache describe-serverless-caches --serverless-cache-name "$NAME" \
+    --query 'ServerlessCaches[0].Status' --output text 2>/dev/null || echo missing
+}
+if [ "$(cache_status)" = deleting ]; then
+  if [ -n "$DRY_RUN" ]; then
+    printf '    would: wait for the old cache to finish deleting\n'
+  else
+    echo "    the old cache is still being deleted; waiting..."
+    for _ in $(seq 1 60); do [ "$(cache_status)" = deleting ] || break; sleep 10; done
+  fi
+fi
+cache_now=$(cache_status)
+if [ "$cache_now" != missing ] && [ "$cache_now" != deleting ]; then
+  ok "ElastiCache Serverless (Valkey) $NAME ($cache_now)"
 else
   # shellcheck disable=SC2086  # the subnet IDs are separate arguments
   change "create ElastiCache Serverless (Valkey) $NAME" aws elasticache create-serverless-cache \
@@ -172,12 +196,13 @@ step "4/6 Secrets (values never printed)"
 put_secret() {  # put_secret NAME VALUE: create it if missing; replace it only when REPLACE=1
   if secret_exists "$1"; then
     if [ -n "${REPLACE:-}" ]; then
-      change "replace the secret $NAME/$1" aws secretsmanager put-secret-value --secret-id "$NAME/$1" --secret-string "$2"
+      change "replace the secret $NAME/$1" aws secretsmanager put-secret-value --secret-id "$NAME/$1" \
+        --secret-string "$(as_file "$2")"
     else
       ok "secret $NAME/$1"
     fi
   else
-    change "create the secret $NAME/$1" aws secretsmanager create-secret --name "$NAME/$1" --secret-string "$2"
+    change "create the secret $NAME/$1" aws secretsmanager create-secret --name "$NAME/$1" --secret-string "$(as_file "$2")"
   fi
 }
 REPLACE=${UPDATE_MODEL_KEYS:-} put_secret OPENAI_API_KEY "$(env_value OPENAI_API_KEY)"
@@ -216,17 +241,12 @@ fi
 if [ "$STATUS" = ACTIVE ]; then
   TAG=$TAG deploy/aws/update-service.sh  # builds, pushes, swaps the image, keeps the settings, waits
 else
-  IMAGE="$REGISTRY/$NAME:$TAG"
-  aws ecr get-login-password | docker login --username AWS --password-stdin "$REGISTRY" >/dev/null
-  docker build --platform linux/arm64 -t "$IMAGE" .
-  docker push "$IMAGE"
+  push_image "$REGISTRY/$NAME:$TAG"
   TAG=$TAG deploy/aws/create-service.sh  # creates the service, opens the data firewall, waits
 fi
 
 # --- 6. Smoke test ------------------------------------------------------------------------------------
 step "6/6 Smoke test"
-endpoint=$(aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" \
-  --query 'service.activeConfigurations[0].ingressPaths[0].endpoint' --output text)
-case $endpoint in http*) url=$endpoint ;; *) url="https://$endpoint" ;; esac
+url=$(service_url)
 API_KEY=$(secret_value API_KEYS | cut -d, -f1 | cut -d: -f2-) deploy/smoke-test.sh "$url"
 step "Deployed: $url"

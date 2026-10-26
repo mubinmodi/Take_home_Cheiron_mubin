@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Delete the whole AWS deployment (docs/hosted-deployment.md, "Costs and teardown"): the service and its
 # load balancer, the cache, the database (no final snapshot) and its run history, the images, the secrets,
-# the security group, the log groups and the two roles. This cannot be undone; deploy/aws/deploy.sh can
+# the security group, the task definitions, the log groups, the two roles and the empty "default" ECS
+# cluster (the account is used only for this project). This cannot be undone; deploy/aws/deploy.sh can
 # set everything up again later, under a new address. Safe to run again: what is already gone is skipped.
 # AWS's service-linked roles are kept: they are shared by the account, free, and AWS manages them.
 #
@@ -12,10 +13,7 @@ cd "$(dirname "$0")/../.."
 export AWS_PROFILE=${AWS_PROFILE:-incubator} AWS_REGION=${AWS_REGION:-us-east-2}
 DRY_RUN=${DRY_RUN:-}
 
-step() { printf '\n==> %s\n' "$*"; }
-ok() { printf '    ok: %s\n' "$*"; }
-fail() { printf '\nStopped: %s\n' "$*" >&2; exit 1; }
-found() { "$@" >/dev/null 2>&1; }
+source deploy/aws/lib.sh  # step, ok, fail, found; checks the AWS sign-in; NAME, ACCOUNT, SERVICE_ARN, ...
 remove() {  # remove DESCRIPTION COMMAND...: delete something, or only name it in a dry run
   local what=$1
   shift
@@ -44,11 +42,8 @@ wait_gone() {  # wait_gone DESCRIPTION COMMAND...: poll until the read command f
 }
 
 step "Checks"
-command -v aws >/dev/null || fail "the AWS CLI is not installed"
-found aws sts get-caller-identity || fail "not signed in to AWS. Run: aws login --profile $AWS_PROFILE"
-source deploy/aws/lib.sh  # NAME, ACCOUNT, REGISTRY, SERVICE_ARN
 ok "signed in to AWS ($AWS_PROFILE, $AWS_REGION, account $ACCOUNT)"
-if [ -z "$DRY_RUN" ] && [ "${CONFIRM:-}" != "$NAME" ]; then
+if [ -z "$DRY_RUN" ]; then
   printf '\nThis permanently deletes %s from account %s in %s, including its database.\n' "$NAME" "$ACCOUNT" "$AWS_REGION"
   read -rp "Type the service name ($NAME) to continue: " answer
   [ "$answer" = "$NAME" ] || fail "nothing was deleted"
@@ -61,8 +56,7 @@ service_there() {
     --query 'service.status.statusCode' --output text 2>/dev/null) || return 1
   [ "$status" != INACTIVE ] && [ "$status" != None ]
 }
-DATA_SG=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=$NAME-data" \
-  --query 'SecurityGroups[0].GroupId' --output text)
+DATA_SG=$(data_group)
 if service_there; then
   # The database firewall names the service's security group; drop those rules first, so the
   # service's group can be deleted along with it.
@@ -112,7 +106,7 @@ if found aws ecr describe-repositories --repository-names "$NAME"; then
 else
   ok "no image repository"
 fi
-for secret in OPENAI_API_KEY ANTHROPIC_API_KEY API_KEYS DATABASE_URL REDIS_URL db-password; do
+for secret in $ALL_SECRETS; do
   if found aws secretsmanager describe-secret --secret-id "$NAME/$secret"; then
     remove "the secret $NAME/$secret" aws secretsmanager delete-secret --secret-id "$NAME/$secret" \
       --force-delete-without-recovery
@@ -124,6 +118,19 @@ for group in $(aws logs describe-log-groups --query "logGroups[?contains(logGrou
   [ "$group" = None ] || remove "the log group $group" aws logs delete-log-group --log-group-name "$group"
 done
 ok "log groups done"
+# Express Mode registers a task definition revision per rollout; deregister them, then delete them.
+for arn in $(aws ecs list-task-definitions --status ACTIVE \
+  --query "taskDefinitionArns[?contains(@, '$NAME')]" --output text); do
+  [ "$arn" = None ] || remove "the task definition ${arn##*/}" aws ecs deregister-task-definition --task-definition "$arn"
+done
+if [ -z "$DRY_RUN" ]; then
+  inactive=$(aws ecs list-task-definitions --status INACTIVE \
+    --query "taskDefinitionArns[?contains(@, '$NAME')]" --output text)
+  # shellcheck disable=SC2086  # delete-task-definitions takes at most 10 at a time
+  [ -z "$inactive" ] || [ "$inactive" = None ] || printf '%s\n' $inactive | xargs -n 10 \
+    aws ecs delete-task-definitions --query 'failures[].reason' --output text --task-definitions >/dev/null
+fi
+ok "task definitions done"
 
 step "6/7 Roles"
 delete_role() {  # delete_role NAME: detach its managed policies, drop its inline ones, delete it
