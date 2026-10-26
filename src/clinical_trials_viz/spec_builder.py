@@ -55,11 +55,9 @@ def chart_type_for(plan: AnswerPlan) -> VisualizationType:
         return VisualizationType.SINGLE_VALUE
     if plan.series_by is not None:
         return (
-            VisualizationType.TIME_SERIES
-            if plan.group_by is Dimension.START_YEAR
-            else VisualizationType.GROUPED_BAR_CHART
+            VisualizationType.TIME_SERIES if DIMENSIONS[plan.group_by].temporal else VisualizationType.GROUPED_BAR_CHART
         )
-    if plan.group_by is Dimension.START_YEAR:
+    if plan.group_by is not None and DIMENSIONS[plan.group_by].temporal:
         return VisualizationType.TIME_SERIES
     return VisualizationType.BAR_CHART
 
@@ -83,7 +81,7 @@ def single_value_spec(trials: list[Trial], filters: AppliedFilters) -> Visualiza
 def breakdown_spec(result: Breakdown, filters: AppliedFilters, cohort_size: int) -> VisualizationSpec:
     dim = result.dimension
     info = DIMENSIONS[dim]
-    time_series = dim is Dimension.START_YEAR
+    time_series = DIMENSIONS[dim].temporal
     data: list[dict[str, Any]] = []
     for bucket in result.buckets:
         datum: dict[str, Any] = {dim.value: bucket.label, "trial_count": bucket.count, "trial_ids": bucket.trial_ids}
@@ -113,7 +111,7 @@ def breakdown_spec(result: Breakdown, filters: AppliedFilters, cohort_size: int)
 def cross_spec(cross: CrossBreakdown, filters: AppliedFilters, cohort_size: int) -> VisualizationSpec:
     """One chart of two Dimensions: the axis and a coloured series ('phases per year')."""
     dim, series = cross.dimension, cross.series
-    time_series = dim is Dimension.START_YEAR
+    time_series = DIMENSIONS[dim].temporal
     data = [{dim.value: x, series.value: s, "trial_count": len(ids), "trial_ids": ids} for x, s, ids in cross.cells]
     # Colours must be distinct categories even for an ordered dimension (a sequential ramp is unreadable);
     # the order is kept by metadata.series_order.

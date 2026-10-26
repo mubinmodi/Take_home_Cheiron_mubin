@@ -7,8 +7,9 @@ Rules here are decided in docs/harness-design.md sections 2-3.
 from dataclasses import dataclass
 from enum import StrEnum
 
-# Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS).
-CATALOG_VERSION = "2026-10-04.1"
+# Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS);
+# 2026-10-26.1 marked the time axis (DimensionInfo.temporal).
+CATALOG_VERSION = "2026-10-26.1"
 
 
 class Phase(StrEnum):
@@ -76,6 +77,7 @@ class DimensionInfo:
     multi_valued: bool  # one Trial can fall into several buckets
     ordered: bool  # buckets have a natural order (years, phases); otherwise sorted by count
     top_n: bool  # long-tailed: keep the top N buckets and fold the rest into "Other"
+    temporal: bool = False  # a time axis: years in order, no silent gaps, drawn as a time series
 
 
 DIMENSIONS: dict[Dimension, DimensionInfo] = {
@@ -86,6 +88,7 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         False,
         True,
         False,
+        temporal=True,
     ),
     Dimension.PHASE: DimensionInfo(
         "Phase",

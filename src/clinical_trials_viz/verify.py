@@ -1,7 +1,7 @@
 """The verifier: a gate before every successful response. Failing checks block the answer."""
 
 from clinical_trials_viz.analyze import enrollment_bin, enrollment_type
-from clinical_trials_viz.catalog import NOT_REPORTED, OTHER_BUCKET, Dimension, study_url
+from clinical_trials_viz.catalog import DIMENSIONS, NOT_REPORTED, OTHER_BUCKET, Dimension, study_url
 from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
@@ -188,7 +188,7 @@ def verify(
     ])  # fmt: skip
 
     # Readability: no silent gaps in a time series.
-    if spec.type is VisualizationType.TIME_SERIES and dimension is Dimension.START_YEAR:
+    if spec.type is VisualizationType.TIME_SERIES and dimension is not None and DIMENSIONS[dimension].temporal:
         years = sorted({int(d[dimension.value]) for d in spec.rows() if d[dimension.value] != NOT_REPORTED})
         check("no_time_gaps", [] if not years or years == list(range(years[0], years[-1] + 1)) else ["missing years"])
 

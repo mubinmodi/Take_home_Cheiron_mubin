@@ -41,7 +41,7 @@ class Breakdown:
 
 def _sort_key(dimension: Dimension, bucket: Bucket) -> tuple:
     not_reported = bucket.label in (NOT_REPORTED, OTHER_BUCKET)
-    if dimension is Dimension.START_YEAR:
+    if DIMENSIONS[dimension].temporal:
         return (not_reported, int(bucket.label) if not not_reported else 0)
     if dimension is Dimension.PHASE:
         order = _PHASE_ORDER.index(bucket.label) if bucket.label in _PHASE_ORDER else len(_PHASE_ORDER)
@@ -65,7 +65,7 @@ def breakdown(trials: list[Trial], dimension: Dimension, top_n: int | None) -> B
     buckets = group(trials, dimension)
     result = Breakdown(dimension, [])
 
-    if dimension is Dimension.START_YEAR:
+    if info.temporal:
         years = [int(label) for label in buckets if label != NOT_REPORTED]
         if years:  # no silent gaps: years with no trials appear as zero
             for year in range(min(years), max(years) + 1):

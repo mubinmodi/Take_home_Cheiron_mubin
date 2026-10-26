@@ -163,3 +163,10 @@ def test_arm_alternatives_are_not_combinations():
     for text in (long_gap, either, regimens):
         assert are_alternatives(text, {"cisplatin"}, {"carboplatin"})
     assert not are_alternatives(regimens, {"paclitaxel"}, {"cisplatin"})  # given together within a regimen
+
+
+def test_only_the_start_year_is_a_time_axis():
+    """Time-axis behaviour (year order, gap filling, the time series, the gap check) keys off this flag."""
+    from clinical_trials_viz.catalog import DIMENSIONS
+
+    assert [d for d, info in DIMENSIONS.items() if info.temporal] == [Dimension.START_YEAR]
