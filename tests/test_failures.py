@@ -12,9 +12,10 @@ from pydantic_ai import ModelAPIError, ModelHTTPError
 from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCallPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
+from clinical_trials_viz import answer as answer_module
 from clinical_trials_viz import api as api_module
-from clinical_trials_viz import pipeline as pipeline_module
 from clinical_trials_viz import render as render_module
+from clinical_trials_viz.answer import Unverified
 from clinical_trials_viz.catalog import Dimension
 from clinical_trials_viz.ctgov import client as ctgov_client
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
@@ -206,10 +207,14 @@ async def test_a_failed_repair_still_counts_the_first_plan(make_client):
 
 
 async def test_a_bug_in_one_part_is_isolated_and_logged_with_the_run_id(make_client, monkeypatch, caplog):
-    def broken(*args, **kwargs):
-        raise RuntimeError("histogram bug")
+    real = answer_module.answer
 
-    monkeypatch.setattr(pipeline_module, "histogram_spec", broken)
+    def broken(plan, *args, **kwargs):  # a bug while answering the histogram part only
+        if plan.operation is Operation.BIN:
+            raise RuntimeError("histogram bug")
+        return real(plan, *args, **kwargs)
+
+    monkeypatch.setattr(answer_module, "answer", broken)
     body = await ask(make_client, ScriptedPlanner(TREND, HISTOGRAM), query=TWO_PARTS)
     assert body["outcome"] == "success"
     second = body["additional_answers"][0]
@@ -220,9 +225,10 @@ async def test_a_bug_in_one_part_is_isolated_and_logged_with_the_run_id(make_cli
 
 async def test_a_failed_verification_withholds_the_answer_with_its_checks(make_client, monkeypatch):
     def failed(*args, **kwargs):
-        return Verification(passed=False, checks=[VerificationCheck(name="counts_match_citations", passed=False)])
+        checks = [VerificationCheck(name="counts_match_citations", passed=False)]
+        return Unverified(Verification(passed=False, checks=checks))
 
-    monkeypatch.setattr(pipeline_module, "verify", failed)
+    monkeypatch.setattr(answer_module, "answer", failed)
     body = await ask(make_client, ScriptedPlanner(TREND), query="Keytruda trials per year")
     assert body["outcome"] == "internal_error" and "visualization" not in body
     assert body["error"]["code"] == "verification_failed"

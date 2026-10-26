@@ -197,6 +197,7 @@ Code map (`src/clinical_trials_viz/`):
 | `ledger.py` | The Run's model-call ledger: every attempt recorded once, the call caps enforced |
 | `validate.py` | Merge structured fields; semantic gate |
 | `cohort.py` | Compile filters, retrieve, drug match check |
+| `answer.py` | From a Query Plan and its Cohort to a verified answer: counting, the spec, the Evidence each chart relies on, verification, and "nothing to draw" |
 | `analyze.py`, `network.py` | All counting |
 | `spec_builder.py` | Specification and evidence |
 | `verify.py` | The gate |
