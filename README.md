@@ -52,6 +52,8 @@ A **verifier** then re-derives every count and cited value from the trial record
 - **Not needed for this task:** conversation memory beyond the previous answer, an MCP server, a graph database.
 - **Not in the data, or left for later (§8):** investigator and site networks, maps, and efficacy questions, which the registry cannot answer.
 
+**New to the project?** [`docs/project-guide.md`](docs/project-guide.md) is a short guided tour: one question followed through the code, what each module is for, and where to make common changes.
+
 **Where to read more:**
 - §1: running it
 - §2: the system design

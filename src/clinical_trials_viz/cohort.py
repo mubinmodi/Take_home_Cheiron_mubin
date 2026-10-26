@@ -1,4 +1,5 @@
-"""Turn applied Filters into API requests and a Cohort: complete retrieval plus match checks."""
+"""Retrieve a Cohort: every page the applied Filters select (filters.py builds the API parameters), plus
+the drug match check."""
 
 from collections import Counter
 from dataclasses import dataclass, field

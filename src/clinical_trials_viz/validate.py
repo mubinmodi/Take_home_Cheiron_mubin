@@ -1,4 +1,4 @@
-"""Semantic gate: merge the plan with structured fields and check it against the catalog."""
+"""Semantic gate: check a Query Plan, merged with the structured fields (filters.py), against the catalog."""
 
 import re
 from dataclasses import dataclass, field

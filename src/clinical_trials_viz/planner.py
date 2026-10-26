@@ -1,4 +1,5 @@
-"""The planner: the service's only model step. Question in, typed Query Plan out.
+"""The planner: the service's two model steps. `split` lists the separate questions in a message;
+`plan` turns one question into a typed Query Plan.
 
 The model sees the Question, the capability catalog and (for Follow-ups) the previous plan.
 It never sees trial records, so trial text cannot inject instructions.
