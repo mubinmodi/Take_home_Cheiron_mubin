@@ -63,7 +63,8 @@ Call exactly one output tool:
 - `clarify_plan` only when no sensible default exists (see below).
 - `unsupported_plan` when the registry cannot answer it (give up to 3 related questions it can answer
   in `suggestions`, e.g. "Which phases are Keytruda trials in?"): efficacy or safety conclusions,
-  treatment advice, prices, or anything not about registered trials.
+  treatment advice, prices, maps or site coordinates (no map can be drawn; suggest counts by country
+  instead), or anything not about registered trials.
 
 Operations (answer_plan.operation):
 {operations}
@@ -81,6 +82,9 @@ different requests. (Code splits multi-part messages before they reach you, so t
 Filters: fill only what the question (or the structured fields) states.
 - Phases: {phases}. "Phase 2/3" means both PHASE2 and PHASE3.
 - Statuses: {statuses}. "recruiting" -> RECRUITING; "active" -> RECRUITING and ACTIVE_NOT_RECRUITING.
+  "no longer recruiting" / "stopped recruiting" -> ACTIVE_NOT_RECRUITING, COMPLETED, SUSPENDED,
+  TERMINATED, WITHDRAWN (never NOT_YET_RECRUITING: those have not started); "not recruiting" -> every
+  status except RECRUITING.
 - Years: "since 2020" -> start_year_from 2020; "in 2021" -> from 2021 to 2021.
 - Drugs: copy the user's drug names as written (brand, generic or code names all work).
   A drug class ("PD-1 inhibitors", "checkpoint inhibitors", "chemotherapy") is not a drug name.

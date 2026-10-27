@@ -10,7 +10,7 @@
 | ID | Status | Evidence | Limitation |
 |---|---|---|---|
 | CTX-03 | verified | Runs locally (`uv run clinical-trials-viz serve`) and on AWS; nine real runs in `examples/` | — |
-| FUN-01 | verified | One typed plan per question (`planner.py`); planner eval on 46 questions: gpt-5.4-mini 46/46 (`evals/results/`); claude-haiku-4-5 40/42 on the earlier 42-question set; 2026-10-27: gpt-5.4-mini 65/66 and 64/66 on 66 cases (17 adversarial) and 12/12 held out | Residual planner variance on one comparison (README §8) |
+| FUN-01 | verified | One typed plan per question (`planner.py`); planner eval on 46 questions: gpt-5.4-mini 46/46 (`evals/results/`); claude-haiku-4-5 40/42 on the earlier 42-question set; 2026-10-27: gpt-5.4-mini 66/66 on 66 cases (17 adversarial) after covering two adversarial misses in the prompt, 11/12 held out (a drug-class question that passed 5 of 5 reruns) | Residual planner variance on one comparison (README §8) |
 | FUN-02 | verified | Filters compiled to API parameters (`cohort.py`), every page fetched (`ctgov/client.py`); each response's `source` records API version, data timestamp, matches, cohort size and requests | Updated 2026-10-27: raw API pages are kept as run bundles locally and `clinical-trials-viz replay RUN_ID` re-answers a run offline (not when hosted) |
 | FUN-03 | verified | README §2 (how code picks the chart); the chart type is chosen by code (`spec_builder.py`) | — |
 | FUN-04 | verified | The verifier checks the chart answers the plan (type and grouping), recounts every datum and re-derives every citation value (`verify.py`); `examples/` | — |
@@ -48,7 +48,7 @@
 | SD-01 | API spike before design (`docs/research/api-data-guide.md`); decisions with reasons (`docs/harness-design.md`, README §6) | — |
 | SD-02 | Clear module contracts (module map in `docs/project-guide.md` §4); extension walkthrough (`docs/project-guide.md` §6) | Updated 2026-10-27: shown as a worked change, the age group (commit d151a25, `tests/test_age_group.py`) |
 | SD-03 | Complete paging or `scope_required`, never sampling; retries honouring `Retry-After`; missing values as "Not reported"; multi-valued fields counted once per trial per bucket; tests for each | Updated 2026-10-27: run bundles and `replay` give exact offline replay (local only) |
-| AI-01 | The model never outputs numbers, IDs or citations; every answer is verified; eval questions are not in the prompt | Updated 2026-10-27: 17 adversarial cases and a 12-case held-out set; one adversarial miss (a map by latitude and longitude was planned instead of refused) |
+| AI-01 | The model never outputs numbers, IDs or citations; every answer is verified; eval questions are not in the prompt | Updated 2026-10-27: 17 adversarial cases and a 12-case held-out set; two adversarial misses found and covered in the prompt (a site map; "no longer recruiting") |
 | AI-02 | Semantic gate (`validate.py`) with one repair (`planning.py`); tamper tests prove the verifier rejects wrong counts, wrong grouping and altered citations | — |
 | AI-03 | One typed plan; clarifications built from data; bounded outcomes; `model_calls` and `timings_ms` on every response | The plan is the only planning trace |
 | CODE-01 | Focused modules, module map in `docs/project-guide.md`, ruff and pyright clean | — |

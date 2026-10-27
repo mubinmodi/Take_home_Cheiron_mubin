@@ -49,12 +49,10 @@ PASS  adv-typo-02      phase breakdown of melonoma trials
 PASS  adv-brand-01     Compare Opdivo and Keytruda trials by phase
 PASS  adv-brand-02     Which countries have the most recruiting Keytruda (pembrolizumab) trials?
 PASS  adv-neg-01       How many lung cancer trials are not recruiting?
-FAIL  adv-neg-02       Show the phases of asthma trials that are no longer recruiting
-        filters.statuses: expected {'excludes': ['RECRUITING', 'NOT_YET_RECRUITING']}, got ['ACTIVE_NOT_RECRUITING', 'COMPLETED', 'ENROLLING_BY_INVITATION', 'NOT_YET_RECRUITING', 'SUSPENDED', 'TERMINATED', 'WITHDRAWN', 'AVAILABLE', 'NO_LONGER_AVAILABLE', 'TEMPORARILY_NOT_AVAILABLE', 'APPROVED_FOR_MARKETING', 'WITHHELD', 'UNKNOWN']
+PASS  adv-neg-02       Show the phases of asthma trials that are no longer recruiting
 PASS  adv-unsup-01     What is the 5-year overall survival rate in phase 3 pancreatic cancer trials?
 PASS  adv-unsup-02     What are the most common side effects reported in semaglutide trials?
-FAIL  adv-unsup-03     Plot every recruiting ALS trial site on a map by latitude and longitude
-        kind: expected 'unsupported', got 'answer'
+PASS  adv-unsup-03     Plot every recruiting ALS trial site on a map by latitude and longitude
 PASS  adv-unsup-04     Rank the melanoma drugs by response rate in a bar chart
 PASS  adv-conflict-01  Show phase 2 melanoma trials by country
 PASS  adv-conflict-02  How many recruiting asthma trials are in Canada?
@@ -67,8 +65,8 @@ PASS  net-04           Which principal investigators run trials of which drugs i
 PASS  net-05           Show a network of hospitals and the drugs they test in pancreatic cancer trials
 PASS  age-01           How are asthma trials split by age group?
 
-64/66 plans correct (97%) using openai:gpt-5.4-mini
-  adversarial     15/17
+66/66 plans correct (100%) using openai:gpt-5.4-mini
+  adversarial     17/17
   clarification   4/4
   comparison      5/5
   distribution    8/8
