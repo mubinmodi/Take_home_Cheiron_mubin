@@ -74,11 +74,13 @@ class RunNotFound(Exception):
 class _Run:
     """Mutable state of one Run."""
 
-    def __init__(self, request: QueryRequest, previous_request: QueryRequest | None, base_url: str):
+    def __init__(
+        self, request: QueryRequest, previous_request: QueryRequest | None, base_url: str, run_id: str | None = None
+    ):
         self.request = request
         self.base_url = base_url  # of chart_url links
         self.previous_request = previous_request  # for Follow-ups: carried over when the plan refines
-        self.response = QueryResponse(run_id=new_run_id(), outcome=Outcome.INTERNAL_ERROR)
+        self.response = QueryResponse(run_id=run_id or new_run_id(), outcome=Outcome.INTERNAL_ERROR)
         self.timings: dict[str, float] = {}
         self.stage_name = "plan"  # the stage under way, reported if the run deadline passes
         self.parts: Sequence[AnswerPlan | ClarifyPlan | UnsupportedPlan] = ()  # the Question's parts, once planned
@@ -115,6 +117,7 @@ class Pipeline:
         public_base_url: str | None = None,
         run_deadline: float | None = None,
         bundles: BundleStore | None = None,
+        background_deadline: float | None = None,
     ):
         self.client = client
         self.planner = planner
@@ -122,6 +125,7 @@ class Pipeline:
         self.bundles = bundles  # raw API responses per Run, for exact replay; None: not kept
         self.public_base_url = public_base_url
         self.run_deadline = run_deadline  # seconds for a whole Run; None: no limit
+        self.background_deadline = background_deadline  # the same for a background Run (POST /v1/runs)
         self._countries: set[str] | None = None
 
     async def known_countries(self) -> set[str]:
@@ -133,19 +137,26 @@ class Pipeline:
         return self._countries
 
     async def run(
-        self, request: QueryRequest, *, base_url: str | None = None, user: str | None = None
+        self,
+        request: QueryRequest,
+        *,
+        base_url: str | None = None,
+        user: str | None = None,
+        run_id: str | None = None,
+        background: bool = False,
     ) -> QueryResponse:
         """Answer one request. `base_url` is the address it arrived on, for chart links when the
-        settings give no public address; `user` is recorded in the run history."""
+        settings give no public address; `user` is recorded in the run history. A background Run has
+        its ID given in advance and its own, longer deadline."""
         links = (self.public_base_url or base_url or DEFAULT_BASE_URL).rstrip("/")
-        run = _Run(request, None, links)
+        run = _Run(request, None, links, run_id)
         with (
             tracer.start_as_current_span("run") as span,
             count_requests() as requests,
             record_responses() as responses,
         ):
             span.set_attribute("run.id", run.response.run_id)
-            deadline = asyncio.timeout(self.run_deadline)
+            deadline = asyncio.timeout(self.background_deadline if background else self.run_deadline)
             with run_ledger() as ledger:  # every model call of the Run, kept even when planning fails
                 try:
                     async with deadline:

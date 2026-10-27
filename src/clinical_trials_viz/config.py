@@ -42,6 +42,7 @@ MODEL_TIERS: dict[str, dict[str, str]] = {
 # must finish within the platform's deadline.
 HOSTED_QUERIES_PER_HOUR = 30
 HOSTED_RUN_DEADLINE_SECONDS = 30.0
+HOSTED_BACKGROUND_DEADLINE_SECONDS = 600.0
 MIN_API_KEY_LENGTH = 16
 
 
@@ -85,6 +86,7 @@ class Settings(BaseSettings):
     # name their users when sent; a wrong one is treated as a guest.
     open_access: bool = False
     run_deadline_seconds: float | None = None  # a whole Run: planning, retrieval and every part
+    background_run_deadline_seconds: float | None = None  # the same for POST /v1/runs, polled for its answer
     breaker_failures: int = 5  # outage-type failures in a row that open a circuit breaker
     breaker_cooldown_seconds: float = 30.0  # how long an open breaker fails fast before one trial call
 
@@ -102,6 +104,9 @@ class Settings(BaseSettings):
             if "bundles_dir" not in self.model_fields_set:
                 self.bundles_dir = None
             self.run_deadline_seconds = self.run_deadline_seconds or HOSTED_RUN_DEADLINE_SECONDS
+            self.background_run_deadline_seconds = (
+                self.background_run_deadline_seconds or HOSTED_BACKGROUND_DEADLINE_SECONDS
+            )
         if self.open_access:  # no hourly limit, even when USER_QUERIES_PER_HOUR is set
             self.user_queries_per_hour = None
         self.api_users()  # reject a malformed API_KEYS at startup

@@ -18,6 +18,7 @@ from clinical_trials_viz.breaker import CircuitBreaker
 from clinical_trials_viz.config import Settings, get_settings
 from clinical_trials_viz.ctgov.client import CtGovClient, MemoryPageCache, RateLimiter
 from clinical_trials_viz.idempotency import MAX_KEY_LENGTH, FileIdempotencyStore, KeyInProgress, KeyReused, KeyStore
+from clinical_trials_viz.jobs import JobStore, MemoryJobStore, RedisJobStore
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import QueryResponse
 from clinical_trials_viz.models.spec import VisualizationSpec
@@ -25,7 +26,7 @@ from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
 from clinical_trials_viz.render import ImageCache, NotRenderable, render, to_vega_lite
 from clinical_trials_viz.replay import BundleStore
-from clinical_trials_viz.runs import RunRecord, StoreUnavailable, run_store
+from clinical_trials_viz.runs import RunRecord, StoreUnavailable, new_run_id, run_store
 from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisPageCache, RedisRateLimiter, RedisUserLimiter
 from clinical_trials_viz.telemetry import configure_logging, setup_tracing
 
@@ -90,7 +91,10 @@ def create_app(
             settings.public_base_url,
             settings.run_deadline_seconds,
             BundleStore(settings.bundles_dir) if settings.bundles_dir else None,
+            settings.background_run_deadline_seconds,
         )
+        app.state.jobs = RedisJobStore(shared) if shared else MemoryJobStore()
+        app.state.background = set()  # running background Runs, kept referenced until they finish
         app.state.idempotency = (
             RedisIdempotencyStore(shared) if shared else FileIdempotencyStore(settings.runs_dir / "idempotency")
         )
@@ -134,6 +138,27 @@ def create_app(
         detail = {"code": "internal", "message": "Unexpected error; see the server log.", "retryable": False}
         return JSONResponse(status_code=500, content={"detail": detail})
 
+    def admit_user(api_key: str | None) -> str | None:
+        """The user an API key names; 401 when keys are required and this one is missing or wrong."""
+        user = identify(api_key, users)
+        if users and user is None and not settings.open_access:
+            raise http_error(401, "unauthorized", "Send a valid API key in the X-API-Key header.")
+        return user
+
+    async def spend_question(user: str | None) -> None:
+        """Count one question against the user's hourly limit; 429 when it is used up."""
+        limiter: UserLimiter | None = app.state.user_limiter
+        if limiter is not None and (wait := await limiter.spend(user or "anonymous")) is not None:
+            minutes = max(1, round(wait / 60))
+            raise http_error(
+                429,
+                "rate_limited",
+                f"You have asked {settings.user_queries_per_hour} questions this hour; try again in about "
+                f"{minutes} minute{'s' if minutes != 1 else ''}.",
+                True,
+                {"Retry-After": str(int(wait) + 1)},
+            )
+
     @app.post("/v1/query", response_model=QueryResponse, response_model_exclude_none=True)
     async def query(
         request: QueryRequest,
@@ -153,9 +178,7 @@ def create_app(
             Header(alias="X-API-Key", description="Required when the service is configured with API keys (hosted)."),
         ] = None,
     ) -> QueryResponse:
-        user = identify(api_key, users)
-        if users and user is None and not settings.open_access:
-            raise http_error(401, "unauthorized", "Send a valid API key in the X-API-Key header.")
+        user = admit_user(api_key)
         keys: KeyStore = app.state.idempotency
         if idempotency_key:  # scoped per user, so one user's key never replays another user's run
             idempotency_key = f"{user or 'anonymous'}:{idempotency_key}"
@@ -175,19 +198,12 @@ def create_app(
             if replay is not None and (record := await pipeline().runs.load(replay)) is not None:
                 response.headers["Idempotent-Replayed"] = "true"
                 return record.response  # a replay is free: it does not count against the user's limit
-        limiter: UserLimiter | None = app.state.user_limiter
-        if limiter is not None and (wait := await limiter.spend(user or "anonymous")) is not None:
+        try:
+            await spend_question(user)
+        except HTTPException:
             if idempotency_key:
                 await keys.abandon(idempotency_key)
-            minutes = max(1, round(wait / 60))
-            raise http_error(
-                429,
-                "rate_limited",
-                f"You have asked {settings.user_queries_per_hour} questions this hour; try again in about "
-                f"{minutes} minute{'s' if minutes != 1 else ''}.",
-                True,
-                {"Retry-After": str(int(wait) + 1)},
-            )
+            raise
         try:
             result = await pipeline().run(request, base_url=str(http_request.base_url), user=user)
         except RunNotFound as exc:
@@ -201,6 +217,57 @@ def create_app(
         if idempotency_key:
             await keys.finish(idempotency_key, request, result.run_id)
         return result
+
+    @app.post("/v1/runs", status_code=202)
+    async def start_run(
+        request: QueryRequest,
+        http_request: Request,
+        api_key: Annotated[
+            str | None,
+            Header(alias="X-API-Key", description="Required when the service is configured with API keys (hosted)."),
+        ] = None,
+    ) -> dict[str, str]:
+        """Answer a question in the background, for questions that may take longer than a request should
+        wait. Returns at once; poll `status_url` until the status is `done` (its `response` is the same as
+        POST /v1/query would return) or `failed`."""
+        user = admit_user(api_key)
+        if request.previous_run_id and await pipeline().runs.load(request.previous_run_id) is None:
+            raise http_error(404, "run_not_found", f"previous_run_id {request.previous_run_id} not found")
+        await spend_question(user)
+        run_id = new_run_id()
+        jobs: JobStore = app.state.jobs
+        await jobs.start(run_id)
+        base_url = str(http_request.base_url)
+
+        async def work() -> None:
+            try:
+                await pipeline().run(request, base_url=base_url, user=user, run_id=run_id, background=True)
+            except Exception as exc:  # a Run ends in an Outcome; only a failure to start or save lands here
+                log.error("background run %s failed", run_id, exc_info=exc)
+                await jobs.fail(run_id, {"code": "internal", "message": "The run failed; see the server log.",
+                                         "retryable": True})  # fmt: skip
+                return
+            if await pipeline().runs.load(run_id) is None:  # answered, but the record could not be saved
+                await jobs.fail(run_id, {"code": "store_unavailable", "message": "The answer could not be saved.",
+                                         "retryable": True})  # fmt: skip
+                return
+            await jobs.finish(run_id)
+
+        task = asyncio.create_task(work())
+        app.state.background.add(task)
+        task.add_done_callback(app.state.background.discard)
+        return {"run_id": run_id, "status": "running", "status_url": f"/v1/runs/{run_id}/status"}
+
+    @app.get("/v1/runs/{run_id}/status", response_model_exclude_none=True)
+    async def run_status(run_id: str) -> dict[str, Any]:
+        """A background Run: `running`, `failed` (with `error`), or `done` (with `response`)."""
+        if (record := await pipeline().runs.load(run_id)) is not None:
+            response = record.response.model_dump(mode="json", exclude_none=True)
+            return {"run_id": run_id, "status": "done", "response": response}
+        jobs: JobStore = app.state.jobs
+        if (state := await jobs.get(run_id)) is not None:
+            return {"run_id": run_id, **state}
+        raise http_error(404, "run_not_found", "run not found")
 
     @app.get("/v1/runs/{run_id}", response_model=RunRecord, response_model_exclude_none=True)
     async def get_run(run_id: str) -> RunRecord:
