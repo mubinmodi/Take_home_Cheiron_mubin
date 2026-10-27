@@ -14,8 +14,9 @@ if TYPE_CHECKING:
 
 # Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS);
 # 2026-10-26.1 marked the time axis (DimensionInfo.temporal); 2026-10-26.2 sponsor ambiguity at 5%;
-# 2026-10-27.1 each Dimension carries its own readers (DimensionInfo.values, .evidence); 2026-10-27.2 age group.
-CATALOG_VERSION = "2026-10-27.2"
+# 2026-10-27.1 each Dimension carries its own readers (DimensionInfo.values, .evidence); 2026-10-27.2 age group;
+# 2026-10-27.3 operations, views, networks and clarification reasons, with the prompt's guidance for each.
+CATALOG_VERSION = "2026-10-27.3"
 
 
 class Phase(StrEnum):
@@ -58,6 +59,68 @@ class StudyType(StrEnum):
     INTERVENTIONAL = "INTERVENTIONAL"
     OBSERVATIONAL = "OBSERVATIONAL"
     EXPANDED_ACCESS = "EXPANDED_ACCESS"
+
+
+class Operation(StrEnum):
+    AGGREGATE = "aggregate"  # count trials, optionally grouped by one dimension
+    COMPARE = "compare"  # aggregate across 2-5 comparison sides
+    PER_TRIAL = "per_trial"  # one row per trial (list / table)
+    BIN = "bin"  # histogram of a numeric field
+    RELATE = "relate"  # network of related entities
+
+
+class PerTrialView(StrEnum):
+    TABLE = "table"  # "list the trials"
+    TIMELINE = "timeline"  # "timeline", "when did they run", "durations"
+    SCATTER = "scatter"  # "enrollment against duration", "plot size vs length"
+
+
+class NetworkKind(StrEnum):
+    SPONSOR_DRUG = "sponsor_drug"  # lead sponsors linked to the drugs their trials give
+    DRUG_DRUG = "drug_drug"  # drugs given together in the same trial arm
+
+
+class ClarificationReason(StrEnum):
+    """What the model may ask about. Sponsor ambiguity and field conflicts are found by code (clarify.py, conflicts.py)."""
+
+    MISSING_REFERENCE = "missing_reference"  # "this drug" with nothing to resolve it
+    DRUG_CLASS = "drug_class"  # a class such as "PD-1 inhibitors" instead of named drugs
+    MISSING_COMPARISON = "missing_comparison"  # "compare these" with sides not named
+
+
+# When the planner should choose each operation, view, network and clarification. The planner prompt is
+# generated from these, so a capability is described once.
+VIEW_GUIDE: dict[PerTrialView, str] = {
+    PerTrialView.TABLE: '"list", "which trials", "show the studies"',
+    PerTrialView.TIMELINE: '"timeline", "when did they run", "how long do they last", "Gantt"',
+    PerTrialView.SCATTER: '"enrollment against duration", "plot trial size vs length", "scatter"',
+}
+
+NETWORK_GUIDE: dict[NetworkKind, str] = {
+    NetworkKind.SPONSOR_DRUG: '"network of sponsors and drugs", "which companies develop which drugs"',
+    NetworkKind.DRUG_DRUG: '"which drugs are combined / co-occur / given together"',
+}
+
+OPERATION_GUIDE: dict[Operation, str] = {
+    Operation.AGGREGATE: 'count trials. `group_by` null for a single total ("how many…"); otherwise the\n'
+    '  dimension to count by ("per year" -> start_year, "by phase" -> phase, "which countries" -> country).',
+    Operation.COMPARE: 'the same count for 2-5 sides ("Drug A vs Drug B", "condition X vs Y"). Put each side\n'
+    "  in `compare_sides` (one of drug, condition, sponsor per side); shared filters go in `filters`.",
+    Operation.PER_TRIAL: "individual trials. `view`: "
+    + ";\n  ".join(f"`{view.value}` for {guide}" for view, guide in VIEW_GUIDE.items())
+    + ".",
+    Operation.RELATE: "a network of entities that share trials. Set `network`:\n  "
+    + ";\n  ".join(f"`{kind.value}` for {guide}" for kind, guide in NETWORK_GUIDE.items())
+    + ". group_by stays null.",
+    Operation.BIN: 'an enrollment histogram ("distribution of trial sizes", "how many participants do trials\n'
+    '  enroll"). group_by stays null.',
+}
+
+CLARIFICATION_GUIDE: dict[ClarificationReason, str] = {
+    ClarificationReason.MISSING_REFERENCE: '"this drug" / "that condition" with no structured field to resolve it.',
+    ClarificationReason.DRUG_CLASS: "the user names a drug class instead of drugs. Set `term` to the class name.",
+    ClarificationReason.MISSING_COMPARISON: '"compare these" without naming the sides.',
+}
 
 
 class Dimension(StrEnum):

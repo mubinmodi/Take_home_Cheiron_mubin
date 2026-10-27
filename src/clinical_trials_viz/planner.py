@@ -34,7 +34,14 @@ from pydantic_ai.providers.anthropic import AnthropicProvider
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from clinical_trials_viz.breaker import CircuitBreaker, CircuitOpen
-from clinical_trials_viz.catalog import CATALOG_VERSION, DIMENSIONS, PHASE_LABELS, OverallStatus
+from clinical_trials_viz.catalog import (
+    CATALOG_VERSION,
+    CLARIFICATION_GUIDE,
+    DIMENSIONS,
+    OPERATION_GUIDE,
+    PHASE_LABELS,
+    OverallStatus,
+)
 from clinical_trials_viz.ledger import Step, current_ledger, run_ledger
 from clinical_trials_viz.models.plan import AnswerPlan, ClarifyPlan, QueryPlan, UnsupportedPlan
 
@@ -43,6 +50,8 @@ def _instructions() -> str:
     dimensions = "\n".join(f"- `{d.value}`: {info.description}" for d, info in DIMENSIONS.items())
     phases = ", ".join(f"{k} ({v})" for k, v in PHASE_LABELS.items())
     statuses = ", ".join(s.value for s in OverallStatus)
+    operations = "\n".join(f"- `{op.value}`: {guide}" for op, guide in OPERATION_GUIDE.items())
+    clarifications = "\n".join(f"- `{reason.value}`: {guide}" for reason, guide in CLARIFICATION_GUIDE.items())
     return f"""\
 You turn a question about clinical trials into a typed plan. Code then retrieves the trials from
 ClinicalTrials.gov, counts them and draws the chart. You never produce numbers, trial IDs or
@@ -57,18 +66,7 @@ Call exactly one output tool:
   treatment advice, prices, or anything not about registered trials.
 
 Operations (answer_plan.operation):
-- `aggregate`: count trials. `group_by` null for a single total ("how many…"); otherwise the
-  dimension to count by ("per year" -> start_year, "by phase" -> phase, "which countries" -> country).
-- `compare`: the same count for 2-5 sides ("Drug A vs Drug B", "condition X vs Y"). Put each side
-  in `compare_sides` (one of drug, condition, sponsor per side); shared filters go in `filters`.
-- `per_trial`: individual trials. `view`: `table` for "list", "which trials", "show the studies";
-  `timeline` for "timeline", "when did they run", "how long do they last", "Gantt";
-  `scatter` for "enrollment against duration", "plot trial size vs length", "scatter".
-- `relate`: a network of entities that share trials. Set `network`:
-  `sponsor_drug` for "network of sponsors and drugs", "which companies develop which drugs";
-  `drug_drug` for "which drugs are combined / co-occur / given together". group_by stays null.
-- `bin`: an enrollment histogram ("distribution of trial sizes", "how many participants do trials
-  enroll"). group_by stays null.
+{operations}
 
 Dimensions for group_by (and series_by):
 {dimensions}
@@ -98,9 +96,7 @@ Defaults: never ask about these; just use them:
   "trials" includes all study types unless the user restricts them.
 
 Clarify only for:
-- `missing_reference`: "this drug" / "that condition" with no structured field to resolve it.
-- `drug_class`: the user names a drug class instead of drugs. Set `term` to the class name.
-- `missing_comparison`: "compare these" without naming the sides.
+{clarifications}
 
 Structured fields resolve references like "this drug". When the question itself names a value,
 put the question's value in the filter even if a structured field differs; never ask about that,

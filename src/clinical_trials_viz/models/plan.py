@@ -4,31 +4,22 @@ The model fills exactly one of three shapes: an answer plan, a request to clarif
 or a refusal. It never writes numbers, NCT IDs or citations; code does.
 """
 
-from enum import StrEnum
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from clinical_trials_viz.catalog import Dimension, OverallStatus, Phase, StudyType
+from clinical_trials_viz.catalog import (
+    ClarificationReason,
+    Dimension,
+    NetworkKind,
+    Operation,
+    OverallStatus,
+    PerTrialView,
+    Phase,
+    StudyType,
+)
 
-
-class Operation(StrEnum):
-    AGGREGATE = "aggregate"  # count trials, optionally grouped by one dimension
-    COMPARE = "compare"  # aggregate across 2-5 comparison sides
-    PER_TRIAL = "per_trial"  # one row per trial (list / table)
-    BIN = "bin"  # histogram of a numeric field
-    RELATE = "relate"  # network of related entities
-
-
-class NetworkKind(StrEnum):
-    SPONSOR_DRUG = "sponsor_drug"  # lead sponsors linked to the drugs their trials give
-    DRUG_DRUG = "drug_drug"  # drugs given together in the same trial arm
-
-
-class PerTrialView(StrEnum):
-    TABLE = "table"  # "list the trials"
-    TIMELINE = "timeline"  # "timeline", "when did they run", "durations"
-    SCATTER = "scatter"  # "enrollment against duration", "plot size vs length"
+__all__ = ["ClarificationReason", "NetworkKind", "Operation", "PerTrialView"]  # defined in the catalog
 
 
 class Filters(BaseModel):
@@ -104,12 +95,6 @@ class AnswerPlan(BaseModel):
     )
     view: PerTrialView | None = Field(default=None, description="per_trial only: table (default), timeline or scatter.")
     network: NetworkKind | None = Field(default=None, description="relate only: which entities the network links.")
-
-
-class ClarificationReason(StrEnum):
-    MISSING_REFERENCE = "missing_reference"  # "this drug" with nothing to resolve it
-    DRUG_CLASS = "drug_class"  # a class such as "PD-1 inhibitors" instead of named drugs
-    MISSING_COMPARISON = "missing_comparison"  # "compare these" with sides not named
 
 
 class ClarifyPlan(BaseModel):
