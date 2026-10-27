@@ -1,9 +1,21 @@
 """Score the configured planner against evals/questions.json.
 
-    uv run python -m evals.run            # all cases
-    uv run python -m evals.run cmp-01     # selected cases
+    uv run python -m evals.run                    # all cases in questions.json
+    uv run python -m evals.run cmp-01             # selected cases
+    uv run python -m evals.run --heldout          # the held-out set (evals/heldout.json) instead
 
 Needs a model API key (see .env.example). Only the planner is called; no trial data is fetched.
+
+questions.json is the working set: the appendix questions plus adversarial cases (misspellings, brand
+vs generic names, negations, unsupported questions that sound supported, conflicting structured
+fields, multi-part questions with an unsupported part, vague references). heldout.json holds fresh
+phrasings of every question family and is never scored by default. Score it only at the end, after
+prompt and catalog work is finished; its failures must not inform prompt changes, and its questions
+are never copied into the prompt (a case seen while tuning is no longer held out: replace it).
+
+An expected filter is a value, or {"one_of": [...]} (any listed value is right, e.g. a misspelled drug
+copied as written or corrected), or {"excludes": [...]} (a non-empty list holding none of these, e.g.
+"not recruiting"). A part of a multi-part expectation is an answer unless it sets `kind`.
 """
 
 import asyncio
@@ -20,10 +32,11 @@ from clinical_trials_viz.planner import Planner, UnconfiguredPlanner, build_plan
 from clinical_trials_viz.planning import plan_question
 
 QUESTIONS = Path(__file__).with_name("questions.json")
+HELDOUT = Path(__file__).with_name("heldout.json")
 
 
-def load_cases() -> list[dict[str, Any]]:
-    return json.loads(QUESTIONS.read_text())["cases"]
+def load_cases(path: Path = QUESTIONS) -> list[dict[str, Any]]:
+    return json.loads(path.read_text())["cases"]
 
 
 def _norm(value: Any) -> Any:
@@ -52,7 +65,7 @@ def mismatches(plan: QueryPlan | AnswerPlan, expect: dict[str, Any]) -> list[str
         if key == "filters":
             for fkey, fwant in want.items():
                 got = actual.get("filters", {}).get(fkey)
-                if _as_set(got) != _as_set(fwant):
+                if not _filter_matches(got, fwant):
                     problems.append(f"filters.{fkey}: expected {fwant!r}, got {got!r}")
         elif key == "compare_sides":
             got = [_norm(s) for s in actual.get("compare_sides", [])]
@@ -61,6 +74,14 @@ def mismatches(plan: QueryPlan | AnswerPlan, expect: dict[str, Any]) -> list[str
         elif _norm(actual.get(key)) != _norm(want):
             problems.append(f"{key}: expected {want!r}, got {actual.get(key)!r}")
     return problems
+
+
+def _filter_matches(got: Any, want: Any) -> bool:
+    if isinstance(want, dict) and "one_of" in want:
+        return any(_as_set(got) == _as_set(option) for option in want["one_of"])
+    if isinstance(want, dict) and "excludes" in want:
+        return bool(got) and not _as_set(got) & _as_set(want["excludes"])
+    return _as_set(got) == _as_set(want)
 
 
 def _as_set(value: Any) -> Any:
@@ -73,13 +94,15 @@ async def plan_like_the_service(planner: Planner, request: QueryRequest) -> Quer
     return (await plan_question(planner, request, None, None, set())).plan
 
 
-async def main(selected: list[str]) -> int:
+async def main(args: list[str]) -> int:
+    heldout = "--heldout" in args
+    selected = [a for a in args if a != "--heldout"]
     settings = get_settings()
     planner = build_planner(settings.planner_primary, settings.planner_fallback)
     if isinstance(planner, UnconfiguredPlanner):
         print(planner.reason)
         return 2
-    cases = [c for c in load_cases() if not selected or c["id"] in selected]
+    cases = [c for c in load_cases(HELDOUT if heldout else QUESTIONS) if not selected or c["id"] in selected]
     by_family: dict[str, list[bool]] = defaultdict(list)
     for case in cases:
         request = QueryRequest(query=case["question"], **case.get("fields", {}))
@@ -93,7 +116,8 @@ async def main(selected: list[str]) -> int:
         for p in problems:
             print(f"        {p}")
     passed = sum(sum(v) for v in by_family.values())
-    print(f"\n{passed}/{len(cases)} plans correct ({passed / len(cases):.0%}) using {settings.planner_primary}")
+    label = "held-out " if heldout else ""
+    print(f"\n{passed}/{len(cases)} {label}plans correct ({passed / len(cases):.0%}) using {settings.planner_primary}")
     for family, results in sorted(by_family.items()):
         print(f"  {family:<15} {sum(results)}/{len(results)}")
     return 0 if passed == len(cases) else 1

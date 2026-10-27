@@ -1,6 +1,6 @@
 {
-  "description": "Planner eval set modelled on the assignment's appendix of example questions. Each case lists the question, optional structured fields, and the expected plan. Only the keys listed under `expect` are checked; drug, condition, sponsor and country names compare case-insensitively.",
-  "version": "2026-10-04.2",
+  "description": "Planner eval set modelled on the assignment's appendix of example questions, plus adversarial cases (family 'adversarial': misspellings, brand vs generic names, negations, unsupported questions that sound supported, conflicting structured fields, multi-part questions with an unsupported part, vague references). Each case lists the question, optional structured fields, and the expected plan. Only the keys listed under `expect` are checked; drug, condition, sponsor and country names compare case-insensitively. A filter may instead expect {\"one_of\": [...]} (any listed value is right) or {\"excludes\": [...]} (a non-empty list holding none of these values). A part of a multi-part expectation is an answer unless it sets `kind`. Held-out cases are in heldout.json and are scored only at the end.",
+  "version": "2026-10-27.1",
   "cases": [
     {
       "id": "trend-01",
@@ -910,6 +910,318 @@
             }
           }
         ]
+      }
+    },
+    {
+      "id": "adv-typo-01",
+      "family": "adversarial",
+      "appendix": "(misspelled drug: copied as written or corrected, never dropped)",
+      "question": "How many pembrolizumb trials started each year since 2018?",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "start_year",
+        "filters": {
+          "drugs": {
+            "one_of": [
+              [
+                "pembrolizumb"
+              ],
+              [
+                "pembrolizumab"
+              ]
+            ]
+          },
+          "start_year_from": 2018
+        }
+      }
+    },
+    {
+      "id": "adv-typo-02",
+      "family": "adversarial",
+      "appendix": "(misspelled condition)",
+      "question": "phase breakdown of melonoma trials",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "phase",
+        "filters": {
+          "conditions": {
+            "one_of": [
+              [
+                "melonoma"
+              ],
+              [
+                "melanoma"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "adv-brand-01",
+      "family": "adversarial",
+      "appendix": "(brand names on both sides: no clarification, names kept)",
+      "question": "Compare Opdivo and Keytruda trials by phase",
+      "expect": {
+        "kind": "answer",
+        "operation": "compare",
+        "group_by": "phase",
+        "compare_sides": [
+          {
+            "drug": "opdivo"
+          },
+          {
+            "drug": "keytruda"
+          }
+        ]
+      }
+    },
+    {
+      "id": "adv-brand-02",
+      "family": "adversarial",
+      "appendix": "(brand and generic named together: one drug, not two)",
+      "question": "Which countries have the most recruiting Keytruda (pembrolizumab) trials?",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "country",
+        "filters": {
+          "drugs": {
+            "one_of": [
+              [
+                "keytruda"
+              ],
+              [
+                "pembrolizumab"
+              ],
+              [
+                "keytruda",
+                "pembrolizumab"
+              ]
+            ]
+          },
+          "statuses": [
+            "RECRUITING"
+          ]
+        }
+      }
+    },
+    {
+      "id": "adv-neg-01",
+      "family": "adversarial",
+      "appendix": "(negated status: a status filter without RECRUITING, never an empty one)",
+      "question": "How many lung cancer trials are not recruiting?",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": null,
+        "filters": {
+          "conditions": [
+            "lung cancer"
+          ],
+          "statuses": {
+            "excludes": [
+              "RECRUITING"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "adv-neg-02",
+      "family": "adversarial",
+      "appendix": "(negated status, other wording)",
+      "question": "Show the phases of asthma trials that are no longer recruiting",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "phase",
+        "filters": {
+          "conditions": [
+            "asthma"
+          ],
+          "statuses": {
+            "excludes": [
+              "RECRUITING",
+              "NOT_YET_RECRUITING"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "adv-unsup-01",
+      "family": "adversarial",
+      "appendix": "(sounds countable, but survival is an outcome result)",
+      "question": "What is the 5-year overall survival rate in phase 3 pancreatic cancer trials?",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "adv-unsup-02",
+      "family": "adversarial",
+      "appendix": "(sounds countable, but side effects are not counted)",
+      "question": "What are the most common side effects reported in semaglutide trials?",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "adv-unsup-03",
+      "family": "adversarial",
+      "appendix": "(site coordinates on a map: no such chart or data)",
+      "question": "Plot every recruiting ALS trial site on a map by latitude and longitude",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "adv-unsup-04",
+      "family": "adversarial",
+      "appendix": "(efficacy ranking phrased as a chart)",
+      "question": "Rank the melanoma drugs by response rate in a bar chart",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "adv-conflict-01",
+      "family": "adversarial",
+      "appendix": "(structured phase differs: the planner keeps the question's value; code asks)",
+      "question": "Show phase 2 melanoma trials by country",
+      "fields": {
+        "trial_phase": "PHASE3"
+      },
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "country",
+        "filters": {
+          "conditions": [
+            "melanoma"
+          ],
+          "phases": [
+            "PHASE2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "adv-conflict-02",
+      "family": "adversarial",
+      "appendix": "(structured country differs: the planner keeps the question's value; code asks)",
+      "question": "How many recruiting asthma trials are in Canada?",
+      "fields": {
+        "country": "Germany"
+      },
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": null,
+        "filters": {
+          "conditions": [
+            "asthma"
+          ],
+          "statuses": [
+            "RECRUITING"
+          ],
+          "countries": [
+            "canada"
+          ]
+        }
+      }
+    },
+    {
+      "id": "adv-conflict-03",
+      "family": "adversarial",
+      "appendix": "(brand in the question, generic in the field: no clarification from the planner)",
+      "question": "Keytruda trials by phase",
+      "fields": {
+        "drug_name": "pembrolizumab"
+      },
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "phase",
+        "filters": {
+          "drugs": [
+            "keytruda"
+          ]
+        }
+      }
+    },
+    {
+      "id": "adv-multi-01",
+      "family": "adversarial",
+      "appendix": "(two parts, the second unsupported: the first is still answered)",
+      "question": "How many recruiting melanoma trials are there, and which melanoma drug works best?",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": null,
+            "filters": {
+              "conditions": [
+                "melanoma"
+              ],
+              "statuses": [
+                "RECRUITING"
+              ]
+            }
+          },
+          {
+            "kind": "unsupported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "adv-multi-02",
+      "family": "adversarial",
+      "appendix": "(two parts, the second unsupported)",
+      "question": "Show the phases of semaglutide trials and list its most common side effects",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": "phase",
+            "filters": {
+              "drugs": [
+                "semaglutide"
+              ]
+            }
+          },
+          {
+            "kind": "unsupported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "adv-ref-01",
+      "family": "adversarial",
+      "appendix": "(vague drug reference, no structured field)",
+      "question": "List recruiting trials for this drug in Japan",
+      "expect": {
+        "kind": "clarify",
+        "reason": "missing_reference",
+        "field": "drug"
+      }
+    },
+    {
+      "id": "adv-ref-02",
+      "family": "adversarial",
+      "appendix": "(vague condition reference, no structured field)",
+      "question": "How are trials for that condition distributed across phases?",
+      "expect": {
+        "kind": "clarify",
+        "reason": "missing_reference",
+        "field": "condition"
       }
     }
   ]
