@@ -1,17 +1,10 @@
-"""A typed view of one ClinicalTrials.gov study record, and the values each Dimension reads from it."""
+"""A typed view of one ClinicalTrials.gov study record. What each Dimension reads from it is in the catalog."""
 
 import re
 from dataclasses import dataclass
 from typing import Any
 
-from clinical_trials_viz.catalog import (
-    DRUG_INTERVENTION_TYPES,
-    NON_DRUG_TERMS,
-    NOT_REPORTED,
-    PHASE_LABELS,
-    SPONSOR_CLASS_LABELS,
-    Dimension,
-)
+from clinical_trials_viz.catalog import DIMENSIONS, DRUG_INTERVENTION_TYPES, NON_DRUG_TERMS, NOT_REPORTED, Dimension
 
 
 @dataclass(frozen=True)
@@ -51,6 +44,11 @@ class Trial:
     @property
     def start_year(self) -> int | None:
         return int(self.start_date[:4]) if self.start_date else None
+
+    @property
+    def drugs(self) -> tuple[str, ...]:
+        """The Drugs in this trial (see `drug_identities`)."""
+        return drug_identities(self)
 
 
 def _get(obj: Any, *path: str) -> Any:
@@ -188,51 +186,9 @@ def drug_identities(trial: Trial) -> tuple[str, ...]:
 
 def dimension_values(trial: Trial, dimension: Dimension) -> tuple[str, ...]:
     """Bucket labels a trial falls into. Never empty: missing data is its own state."""
-    match dimension:
-        case Dimension.START_YEAR:
-            values: tuple[str, ...] = (str(trial.start_year),) if trial.start_year else ()
-        case Dimension.PHASE:
-            values = tuple(PHASE_LABELS.get(p, p) for p in trial.phases)
-        case Dimension.STATUS:
-            values = (trial.overall_status,) if trial.overall_status else ()
-        case Dimension.COUNTRY:
-            values = trial.countries
-        case Dimension.LEAD_SPONSOR:
-            values = (trial.lead_sponsor,) if trial.lead_sponsor else ()
-        case Dimension.SPONSOR_CLASS:
-            cls = trial.lead_sponsor_class
-            values = (SPONSOR_CLASS_LABELS.get(cls, cls),) if cls else ()
-        case Dimension.INTERVENTION_TYPE:
-            values = _unique([i.type for i in trial.interventions])
-        case Dimension.STUDY_TYPE:
-            values = (trial.study_type,) if trial.study_type else ()
-        case Dimension.CONDITION:
-            values = trial.condition_mesh_terms or trial.conditions
-        case Dimension.DRUG:
-            values = drug_identities(trial)
-    return values or (NOT_REPORTED,)
+    return DIMENSIONS[dimension].values(trial) or (NOT_REPORTED,)
 
 
 def dimension_evidence(trial: Trial, dimension: Dimension) -> Any:
     """The raw source value behind a trial's bucket, for the Citation."""
-    match dimension:
-        case Dimension.START_YEAR:
-            return {"date": trial.start_date, "type": trial.start_date_type}
-        case Dimension.PHASE:
-            return list(trial.phases)
-        case Dimension.STATUS:
-            return trial.overall_status
-        case Dimension.COUNTRY:
-            return list(trial.countries)
-        case Dimension.LEAD_SPONSOR:
-            return trial.lead_sponsor
-        case Dimension.SPONSOR_CLASS:
-            return trial.lead_sponsor_class
-        case Dimension.INTERVENTION_TYPE:
-            return sorted({i.type for i in trial.interventions})
-        case Dimension.STUDY_TYPE:
-            return trial.study_type
-        case Dimension.CONDITION:
-            return list(trial.condition_mesh_terms or trial.conditions)
-        case Dimension.DRUG:
-            return list(trial.intervention_mesh_terms) or [i.name for i in trial.interventions]
+    return DIMENSIONS[dimension].evidence(trial)

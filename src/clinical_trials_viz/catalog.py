@@ -4,12 +4,18 @@ It feeds the planner prompt, the plan validator, the analysis code and the tests
 Rules here are decided in docs/harness-design.md sections 2-3.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from clinical_trials_viz.ctgov.trial import Trial
 
 # Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS);
-# 2026-10-26.1 marked the time axis (DimensionInfo.temporal); 2026-10-26.2 sponsor ambiguity at 5%.
-CATALOG_VERSION = "2026-10-26.2"
+# 2026-10-26.1 marked the time axis (DimensionInfo.temporal); 2026-10-26.2 sponsor ambiguity at 5%;
+# 2026-10-27.1 each Dimension carries its own readers (DimensionInfo.values, .evidence).
+CATALOG_VERSION = "2026-10-27.1"
 
 
 class Phase(StrEnum):
@@ -77,6 +83,8 @@ class DimensionInfo:
     multi_valued: bool  # one Trial can fall into several buckets
     ordered: bool  # buckets have a natural order (years, phases); otherwise sorted by count
     top_n: bool  # long-tailed: keep the top N buckets and fold the rest into "Other"
+    values: "Callable[[Trial], tuple[str, ...]]"  # the bucket labels a Trial falls into (empty when not reported)
+    evidence: "Callable[[Trial], Any]"  # the raw source value cited for those buckets
     temporal: bool = False  # a time axis: years in order, no silent gaps, drawn as a time series
 
 
@@ -88,6 +96,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         False,
         True,
         False,
+        values=lambda t: (str(t.start_year),) if t.start_year else (),
+        evidence=lambda t: {"date": t.start_date, "type": t.start_date_type},
         temporal=True,
     ),
     Dimension.PHASE: DimensionInfo(
@@ -97,6 +107,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         True,
         True,
         False,
+        values=lambda t: tuple(PHASE_LABELS.get(p, p) for p in t.phases),
+        evidence=lambda t: list(t.phases),
     ),
     Dimension.STATUS: DimensionInfo(
         "Overall status",
@@ -105,6 +117,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         False,
         False,
         False,
+        values=lambda t: (t.overall_status,) if t.overall_status else (),
+        evidence=lambda t: t.overall_status,
     ),
     Dimension.COUNTRY: DimensionInfo(
         "Country",
@@ -113,6 +127,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         True,
         False,
         True,
+        values=lambda t: t.countries,
+        evidence=lambda t: list(t.countries),
     ),
     Dimension.LEAD_SPONSOR: DimensionInfo(
         "Lead sponsor",
@@ -121,6 +137,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         False,
         False,
         True,
+        values=lambda t: (t.lead_sponsor,) if t.lead_sponsor else (),
+        evidence=lambda t: t.lead_sponsor,
     ),
     Dimension.SPONSOR_CLASS: DimensionInfo(
         "Sponsor category",
@@ -129,6 +147,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         False,
         False,
         False,
+        values=lambda t: (SPONSOR_CLASS_LABELS.get(c, c),) if (c := t.lead_sponsor_class) else (),
+        evidence=lambda t: t.lead_sponsor_class,
     ),
     Dimension.INTERVENTION_TYPE: DimensionInfo(
         "Intervention type",
@@ -137,6 +157,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         True,
         False,
         False,
+        values=lambda t: tuple(dict.fromkeys(i.type for i in t.interventions if i.type)),
+        evidence=lambda t: sorted({i.type for i in t.interventions}),
     ),
     Dimension.STUDY_TYPE: DimensionInfo(
         "Study type",
@@ -145,6 +167,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         False,
         False,
         False,
+        values=lambda t: (t.study_type,) if t.study_type else (),
+        evidence=lambda t: t.study_type,
     ),
     Dimension.CONDITION: DimensionInfo(
         "Condition",
@@ -153,6 +177,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         True,
         False,
         True,
+        values=lambda t: t.condition_mesh_terms or t.conditions,
+        evidence=lambda t: list(t.condition_mesh_terms or t.conditions),
     ),
     Dimension.DRUG: DimensionInfo(
         "Drug",
@@ -161,6 +187,8 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         True,
         False,
         True,
+        values=lambda t: t.drugs,
+        evidence=lambda t: list(t.intervention_mesh_terms) or [i.name for i in t.interventions],
     ),
 }
 
