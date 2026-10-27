@@ -1,0 +1,207 @@
+{
+  "description": "Held-out planner eval: fresh phrasings of every question family, in the same format as questions.json. Scored only at the end with `uv run python -m evals.run --heldout`, never during prompt or catalog work: a failure here must not inform a prompt change (fix the cause, then write new held-out cases).",
+  "version": "2026-10-27.1",
+  "cases": [
+    {
+      "id": "ho-trend-01",
+      "family": "time_trend",
+      "question": "Year by year, how many new adalimumab studies have kicked off since 2012?",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "start_year",
+        "filters": {
+          "drugs": [
+            "adalimumab"
+          ],
+          "start_year_from": 2012
+        }
+      }
+    },
+    {
+      "id": "ho-dist-01",
+      "family": "distribution",
+      "question": "Break down cystic fibrosis studies by the kind of intervention they test",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "intervention_type",
+        "filters": {
+          "conditions": [
+            "cystic fibrosis"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ho-cmp-01",
+      "family": "comparison",
+      "question": "Side by side, what phases are apixaban and rivaroxaban studies in?",
+      "expect": {
+        "kind": "answer",
+        "operation": "compare",
+        "group_by": "phase",
+        "compare_sides": [
+          {
+            "drug": "apixaban"
+          },
+          {
+            "drug": "rivaroxaban"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ho-geo-01",
+      "family": "geographic",
+      "question": "Where in the world are hepatitis B trials currently enrolling patients? Give me the top 8 countries.",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "country",
+        "top_n": 8,
+        "filters": {
+          "conditions": [
+            "hepatitis b"
+          ],
+          "statuses": [
+            "RECRUITING"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ho-net-01",
+      "family": "network",
+      "question": "Map out which drugs get paired together in ovarian cancer studies",
+      "expect": {
+        "kind": "answer",
+        "operation": "relate",
+        "network": "drug_drug",
+        "filters": {
+          "conditions": [
+            "ovarian cancer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ho-single-01",
+      "family": "single_value",
+      "question": "Count the completed phase 4 atorvastatin studies",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": null,
+        "filters": {
+          "drugs": [
+            "atorvastatin"
+          ],
+          "phases": [
+            "PHASE4"
+          ],
+          "statuses": [
+            "COMPLETED"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ho-list-01",
+      "family": "per_trial",
+      "question": "Give me a Gantt-style view of the dupilumab trials running in France",
+      "expect": {
+        "kind": "answer",
+        "operation": "per_trial",
+        "view": "timeline",
+        "filters": {
+          "drugs": [
+            "dupilumab"
+          ],
+          "countries": [
+            "france"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ho-hist-01",
+      "family": "histogram",
+      "question": "How big are psoriasis trials in terms of participant numbers?",
+      "expect": {
+        "kind": "answer",
+        "operation": "bin",
+        "filters": {
+          "conditions": [
+            "psoriasis"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ho-series-01",
+      "family": "series",
+      "question": "For heart failure trials, show each start year split by sponsor class",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "start_year",
+        "series_by": "sponsor_class",
+        "filters": {
+          "conditions": [
+            "heart failure"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ho-multi-01",
+      "family": "multi_part",
+      "question": "Which sponsors lead the most epilepsy trials? Plus, how many of those epilepsy trials are recruiting right now?",
+      "expect": {
+        "kind": "multi",
+        "parts": [
+          {
+            "operation": "aggregate",
+            "group_by": "lead_sponsor",
+            "filters": {
+              "conditions": [
+                "epilepsy"
+              ]
+            }
+          },
+          {
+            "operation": "aggregate",
+            "group_by": null,
+            "filters": {
+              "conditions": [
+                "epilepsy"
+              ],
+              "statuses": [
+                "RECRUITING"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ho-clarify-01",
+      "family": "clarification",
+      "question": "How many JAK inhibitor trials are recruiting?",
+      "expect": {
+        "kind": "clarify",
+        "reason": "drug_class",
+        "field": "drug"
+      }
+    },
+    {
+      "id": "ho-unsupported-01",
+      "family": "unsupported",
+      "question": "Which statin lowers LDL the most according to completed trials?",
+      "expect": {
+        "kind": "unsupported"
+      }
+    }
+  ]
+}
