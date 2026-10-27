@@ -9,10 +9,16 @@
 # DATABASE_URL,REDIS_URL} in Secrets Manager.
 #
 #   deploy/aws/create-service.sh          # TAG=v1 by default
+#   TRACES=xray deploy/aws/create-service.sh   # also run as the task role and add the trace collector
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 TAG=${TAG:-v1}
 IMAGE="$REGISTRY/$NAME:$TAG"
+TRACE_ARGS=()
+if [ -n "$TRACES" ]; then
+  ensure_trace_role
+  TRACE_ARGS=(--task-role-arn "arn:aws:iam::$ACCOUNT:role/$TASK_ROLE")
+fi
 
 # Express Mode runs in the "default" cluster; create it (free, empty) if this account has none yet.
 if [ "$(aws ecs describe-clusters --clusters default --query 'length(clusters[?status==`ACTIVE`])' --output text)" = 0 ]; then
@@ -28,7 +34,9 @@ aws ecs create-express-gateway-service \
   --cpu 512 --memory 1024 --cpu-architecture ARM64 \
   --health-check-path /health \
   --scaling-target '{"minTaskCount": 1, "maxTaskCount": 2}' \
+  ${TRACE_ARGS[@]+"${TRACE_ARGS[@]}"} \
   --query 'service.status.statusCode' --output text
 
 open_data_firewall
 wait_until_live
+[ -z "$TRACES" ] || "$(dirname "$0")/enable-traces.sh"  # Express Mode has no sidecar option: add it after

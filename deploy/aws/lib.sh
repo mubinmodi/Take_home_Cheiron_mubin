@@ -4,11 +4,27 @@ export AWS_PROFILE=${AWS_PROFILE:-incubator} AWS_REGION=${AWS_REGION:-us-east-2}
 NAME=clinical-trials-viz
 APP_SECRETS="OPENAI_API_KEY ANTHROPIC_API_KEY API_KEYS DATABASE_URL REDIS_URL"  # read by the service's tasks
 ALL_SECRETS="$APP_SECRETS db-password"
+# Opt-in traces (docs/hosted-deployment.md, "Traces in X-Ray"): TRACES=xray adds an ADOT collector next to
+# the app, which sends the app's OpenTelemetry spans to AWS X-Ray. Unset, nothing about traces changes.
+TRACES=${TRACES:-}
+TASK_ROLE="$NAME-task"  # the role the app's tasks run as; only traces need one (X-Ray write access)
+TRACE_ENV="OTEL_EXPORTER=otlp OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318"  # app -> collector, same task
 
 step() { printf '\n==> %s\n' "$*"; }
 ok() { printf '    ok: %s\n' "$*"; }
 fail() { printf '\nStopped: %s\n' "$*" >&2; exit 1; }
 found() { "$@" >/dev/null 2>&1; }  # a read-only check: does this resource exist?
+change() {  # change DESCRIPTION COMMAND...: run a command that changes AWS, or only name it when DRY_RUN is set
+  local what=$1
+  shift
+  if [ -n "${DRY_RUN:-}" ]; then
+    printf '    would: %s\n' "$what"
+  else
+    printf '    doing: %s\n' "$what"
+    "$@" >/dev/null
+  fi
+}
+case $TRACES in "" | xray) ;; *) fail "TRACES=$TRACES is not supported (use TRACES=xray, or leave it unset)" ;; esac
 
 command -v aws >/dev/null || fail "the AWS CLI is not installed"
 ACCOUNT=$(aws sts get-caller-identity --query Account --output text 2>/dev/null) \
@@ -43,7 +59,27 @@ c["image"] = sys.argv[1]
 env = {e["name"]: e["value"] for e in c.get("environment", [])}
 env.update(pair.split("=", 1) for pair in sys.argv[2].split())  # SET_ENV="NAME=value NAME=value"
 c["environment"] = [{"name": k, "value": v} for k, v in env.items()]
-print(json.dumps(c))' "$IMAGE" "${SET_ENV:-}"
+print(json.dumps(c))' "$IMAGE" "${SET_ENV:-}${TRACES:+ $TRACE_ENV}"  # TRACES=xray: the app exports spans
+}
+
+ensure_trace_role() {  # the task role with X-Ray write access (TRACES=xray only); safe to repeat
+  if found aws iam get-role --role-name "$TASK_ROLE"; then
+    ok "task role $TASK_ROLE"
+  else
+    change "create the task role $TASK_ROLE (what the app's tasks run as)" aws iam create-role \
+      --role-name "$TASK_ROLE" --assume-role-policy-document \
+      "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"},\"Action\":\"sts:AssumeRole\",\"Condition\":{\"StringEquals\":{\"aws:SourceAccount\":\"$ACCOUNT\"}}}]}"
+    [ -n "${DRY_RUN:-}" ] || sleep 10  # a new role takes a few seconds before ECS can hand it to a task
+  fi
+  if found aws iam get-role-policy --role-name "$TASK_ROLE" --policy-name "write-$NAME-traces"; then
+    ok "task role $TASK_ROLE can write traces to X-Ray"
+  else
+    # Only the two calls the collector's X-Ray exporter makes; the managed AWSXrayWriteOnlyAccess
+    # would also allow reading sampling rules, which this setup does not use.
+    change "let $TASK_ROLE write traces to X-Ray" aws iam put-role-policy --role-name "$TASK_ROLE" \
+      --policy-name "write-$NAME-traces" --policy-document \
+      '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["xray:PutTraceSegments","xray:PutTelemetryRecords"],"Resource":"*"}]}'
+  fi
 }
 
 container_json() {  # container_json IMAGE: the app container with its settings and secrets

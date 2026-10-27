@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Delete the whole AWS deployment (docs/hosted-deployment.md, "Costs and teardown"): the service and its
 # load balancer, the cache, the database (no final snapshot) and its run history, the images, the secrets,
-# the security group, the task definitions, the log groups, the two roles and the empty "default" ECS
+# the security group, the task definitions, the log groups, its roles and the empty "default" ECS
 # cluster (the account is used only for this project). This cannot be undone; deploy/aws/deploy.sh can
 # set everything up again later, under a new address. Safe to run again: what is already gone is skipped.
 # AWS's service-linked roles are kept: they are shared by the account, free, and AWS manages them.
@@ -150,6 +150,7 @@ delete_role() {  # delete_role NAME: detach its managed policies, drop its inlin
 }
 delete_role ecsTaskExecutionRole
 delete_role ecsInfrastructureRoleForExpressServices
+delete_role "$TASK_ROLE"  # only exists if traces were turned on (TRACES=xray)
 echo "    kept: AWS's service-linked roles for ECS, load balancing and auto scaling (shared, free)"
 
 step "7/7 The empty ECS cluster"

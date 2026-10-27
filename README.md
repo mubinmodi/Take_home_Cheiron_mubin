@@ -256,7 +256,7 @@ If the main model fails, the fallback answers and the response carries a warning
 - Bad data is passed through, not corrected. One melanoma record lists 2,953,748 participants.
 - Run records keep the plan and response only. Full bundles with raw API pages, for exact replay, are designed but not built.
 - The eval has 46 questions. `gpt-5.4-mini` scored 46/46, 45/46, 45/46 and 46/46 over four runs; `claude-haiku-4-5` got 40 of an earlier 42. One comparison question still varies between runs. A larger held-out set would help.
-- Hosted: circuit breakers are per instance, there are no migrations yet (one table), and traces aren't exported anywhere on AWS. The 30 s deadline applies only when hosted.
+- Hosted: circuit breakers are per instance, there are no migrations yet (one table), and traces aren't exported on AWS by default: `TRACES=xray` adds a collector that sends them to X-Ray (built, not yet run; see `docs/hosted-deployment.md`). The 30 s deadline applies only when hosted.
 - Investigator and site networks, maps and efficacy questions are not supported.
 
 ## 9. Testing
