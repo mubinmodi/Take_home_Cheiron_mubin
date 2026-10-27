@@ -1070,3 +1070,37 @@ async def test_a_sponsor_side_of_a_comparison_asks_which_organization(make_clien
         assert any("Pfizer" in s and "Merck" not in s for s in sent[-2:])  # the Pfizer side is not narrowed
         assert any("'Merck' means Merck Sharp & Dohme LLC" in a for a in body["assumptions"])
         assert body["verification"]["passed"]
+
+
+async def test_a_chart_is_drawn_once_and_cached(make_client, monkeypatch):
+    """Ticket 26: a run never changes, so its image is kept and marked immutable."""
+    from clinical_trials_viz import api
+
+    drawn = []
+    real_render = api.render
+
+    def counting_render(spec, fmt):
+        drawn.append(fmt)
+        return real_render(spec, fmt)
+
+    monkeypatch.setattr(api, "render", counting_render)
+    async for client in make_client(ScriptedPlanner(TREND)):
+        body = (await client.post("/v1/query", json={"query": "Keytruda trials per year"})).json()
+        first = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        second = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert first.content == second.content and first.content.startswith(b"\x89PNG")
+        assert drawn == ["png"]
+        assert "immutable" in second.headers["cache-control"]
+        await client.get(f"/v1/runs/{body['run_id']}/chart.svg")
+        assert drawn == ["png", "svg"]  # each format is drawn once
+
+
+def test_image_cache_drops_the_least_recently_used():
+    from clinical_trials_viz.render import ImageCache
+
+    cache = ImageCache(max_bytes=10)
+    cache.put(("a", 0, "png"), b"12345")
+    cache.put(("b", 0, "png"), b"12345")
+    cache.get(("a", 0, "png"))
+    cache.put(("c", 0, "png"), b"12345")
+    assert cache.get(("a", 0, "png")) and cache.get(("c", 0, "png")) and cache.get(("b", 0, "png")) is None

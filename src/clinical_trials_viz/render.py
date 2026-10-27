@@ -6,6 +6,7 @@ timeUnit transforms, because counting (and therefore citation) belongs to our co
 
 import logging
 import math
+from collections import OrderedDict
 from typing import Any, Literal
 
 import vl_convert
@@ -308,3 +309,28 @@ def render(spec: VisualizationSpec, fmt: ImageFormat) -> bytes:
     if fmt == "svg":
         return vl_convert.vegalite_to_svg(vl, vl_version=VEGA_LITE_VERSION, allowed_base_urls=[]).encode()
     return vl_convert.vegalite_to_png(vl, vl_version=VEGA_LITE_VERSION, scale=2, allowed_base_urls=[])
+
+
+class ImageCache:
+    """Drawn chart images, kept in memory per run, part and format. A run never changes, so a cached image
+    is always current; the least recently used images go first once `max_bytes` is reached."""
+
+    def __init__(self, max_bytes: int = 64 * 1024 * 1024):
+        self.max_bytes = max_bytes
+        self._images: OrderedDict[tuple[str, int, str], bytes] = OrderedDict()
+        self._size = 0
+
+    def get(self, key: tuple[str, int, str]) -> bytes | None:
+        image = self._images.get(key)
+        if image is not None:
+            self._images.move_to_end(key)
+        return image
+
+    def put(self, key: tuple[str, int, str], image: bytes) -> None:
+        if key in self._images or len(image) > self.max_bytes:
+            return
+        self._images[key] = image
+        self._size += len(image)
+        while self._size > self.max_bytes:
+            _, dropped = self._images.popitem(last=False)
+            self._size -= len(dropped)

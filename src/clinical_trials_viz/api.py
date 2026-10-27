@@ -23,12 +23,13 @@ from clinical_trials_viz.models.response import QueryResponse
 from clinical_trials_viz.models.spec import VisualizationSpec
 from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
-from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
+from clinical_trials_viz.render import ImageCache, NotRenderable, render, to_vega_lite
 from clinical_trials_viz.runs import RunRecord, StoreUnavailable, run_store
 from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisPageCache, RedisRateLimiter, RedisUserLimiter
 from clinical_trials_viz.telemetry import configure_logging, setup_tracing
 
 WEB_PAGE = Path(__file__).parent / "web" / "index.html"
+CHART_MAX_AGE = 7 * 24 * 3600  # seconds browsers and proxies may keep a chart image (runs never change)
 log = logging.getLogger(__name__)
 
 
@@ -215,8 +216,15 @@ def create_app(
             raise http_error(404, "no_visualization", "no visualization for this run and part")
         return spec
 
+    images = ImageCache()
+
     @app.get("/v1/runs/{run_id}/chart.{fmt}")
     async def get_chart(run_id: str, fmt: Literal["png", "svg"], part: int = 0) -> Response:
+        media_type = "image/png" if fmt == "png" else "image/svg+xml"
+        # A run never changes, so its image can be kept, here and by browsers and proxies.
+        cache_headers = {"Cache-Control": f"public, max-age={CHART_MAX_AGE}, immutable"}
+        if (cached := images.get((run_id, part, fmt))) is not None:
+            return Response(cached, media_type=media_type, headers=cache_headers)
         spec = await visualization(run_id, part)
         limit = settings.render_timeout_seconds
         try:
@@ -235,7 +243,8 @@ def create_app(
                 f"The chart could not be drawn ({type(exc).__name__}); the visualization specification and "
                 "citations in the run are unaffected.",
             ) from exc
-        return Response(image, media_type="image/png" if fmt == "png" else "image/svg+xml")
+        images.put((run_id, part, fmt), image)
+        return Response(image, media_type=media_type, headers=cache_headers)
 
     @app.get("/v1/runs/{run_id}/vega-lite.json")
     async def get_vega_lite(run_id: str, part: int = 0) -> dict[str, Any]:
