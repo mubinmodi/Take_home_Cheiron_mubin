@@ -40,6 +40,7 @@ The web page is at http://127.0.0.1:8000 and the API docs at `/docs`. On the pag
 uv run clinical-trials-viz ask "Which countries have the most recruiting trials for melanoma?"
 uv run clinical-trials-viz ask "How has the number of trials for this drug changed over time?" --fields '{"drug_name": "Pembrolizumab"}'
 uv run clinical-trials-viz ask "..." --json --previous RUN_ID
+uv run clinical-trials-viz replay RUN_ID     # answer a saved run again, offline, from its raw API responses
 ```
 
 Settings are environment variables, all listed in [`.env.example`](.env.example). The planner defaults to `openai:gpt-5.4-mini` with `anthropic:claude-haiku-4-5` as the fallback; either can be changed there.
@@ -92,9 +93,9 @@ step                     done by
 
 The first model call lists the separate questions in a message and rewrites each so it stands alone ("show their phases" becomes "show the phases of recruiting Keytruda trials in Germany"). Up to three parts are answered, each on its own. The second call turns each question into a typed Query Plan: filters, one of five operations (`aggregate`, `compare`, `per_trial`, `bin`, `relate`) and what to group by. The model never sees trial records, and it never produces a number, a trial ID or a citation.
 
-The gate merges in the structured fields, checks the plan against the capability catalog (`catalog.py`) and, if needed, asks the model for one repair. Retrieval then fetches every matching trial from the API. If a question matches more than 20,000 trials the service asks you to narrow it rather than sample. Counting follows written rules: a trial with two phases counts under both, a trial counts once per country, and a drug filter keeps only trials where the drug is an intervention, not just mentioned.
+The gate merges in the structured fields, checks the plan against the capability catalog (`catalog.py`) and, if needed, asks the model for one repair. Retrieval then fetches every matching trial from the API. If a question matches more than 20,000 trials the service asks you to narrow it rather than sample. The exception is a plain total with no grouping, drug or sponsor: there the registry's own count is the answer, and the citation is the API request itself. Counting follows written rules: a trial with two phases counts under both, a trial counts once per country, and a drug filter keeps only trials where the drug is an intervention, not just mentioned.
 
-Code picks the chart from the plan. A question with no grouping gets a `single_value`; counts over start years a `time_series`; other breakdowns a `bar_chart`, or a `grouped_bar_chart` when a second dimension or a comparison crosses them. Enrollment distributions get a `histogram`; per-trial questions a `table`, `timeline` or `scatter_plot`; relationships a `network_graph`.
+Code picks the chart from the plan. A question with no grouping gets a `single_value`; counts over start years a `time_series`; other breakdowns a `bar_chart`, or a `grouped_bar_chart` when a second dimension or a comparison crosses them. Enrollment distributions get a `histogram`; per-trial questions a `table`, `timeline` or `scatter_plot`; relationships a `network_graph` (lead sponsors, investigators or sites linked to drugs, or drugs given together in the same arm).
 
 Before anything is returned, a verifier recounts every datum from its cited trials, re-reads each cited value from the trial record, checks each cited trial meets the filters, and checks the chart matches the plan. If any check fails, the answer is withheld.
 
@@ -121,7 +122,7 @@ A run uses two model calls in the usual case and five at most. Every run ends in
 
 Keywords, study type and "any sponsor" vs "lead sponsor" come only from the question. If a field and the question disagree (the question says phase 3, the field says phase 2), the service asks which you meant instead of picking one.
 
-`POST /v1/query` also takes an optional `Idempotency-Key` header, and in hosted mode an `X-API-Key`; [`docs/reference.md`](docs/reference.md#idempotent-retries-and-api-keys-readme-3) has the rules. Other endpoints: `GET /v1/runs/{id}`, `GET /v1/runs/{id}/chart.png` and `.svg`, `GET /v1/runs/{id}/vega-lite.json`, `GET /v1/schema` (JSON Schemas for the request and response), `GET /health`, and the web page at `GET /`.
+`POST /v1/query` also takes an optional `Idempotency-Key` header, and in hosted mode an `X-API-Key`; [`docs/reference.md`](docs/reference.md#idempotent-retries-and-api-keys-readme-3) has the rules. For a question that may take long, `POST /v1/runs` takes the same body, returns at once with a run ID, and `GET /v1/runs/{id}/status` reports `running`, `failed` or `done` with the response; these runs are not held to the hosted 30 s deadline. Other endpoints: `GET /v1/runs/{id}`, `GET /v1/runs/{id}/chart.png` and `.svg`, `GET /v1/runs/{id}/vega-lite.json`, `GET /v1/schema` (JSON Schemas for the request and response), `GET /health`, and the web page at `GET /`.
 
 ## 4. Response
 
@@ -132,7 +133,7 @@ Every outcome comes back as HTTP 200 with the outcome in the body. HTTP errors a
 | `run_id`, `outcome`, `message` | the result; `message` explains anything other than success |
 | `visualization` | the chart specification (below), on success |
 | `chart_url` | the rendered image (none for tables) |
-| `evidence` | each cited trial once: title, link, and the source field values that placed it |
+| `evidence` | each cited trial once: title, link, the source field values that placed it, and for a keyword filter an excerpt of the text it matched |
 | `assumptions` | defaults applied and data caveats |
 | `applied_filters` | the filters actually used; `from_request` marks the pinned ones |
 | `clarification` | on `clarification_required`: the question and options, each with its trial count |
@@ -163,7 +164,7 @@ Rows arrive in display order and nothing is left for the renderer to aggregate. 
 
 | `type` | One row per |
 |---|---|
-| `single_value` | the count |
+| `single_value` | the count (above 20,000 trials, the registry's count: `metadata.counted_by` is `registry`, the citation is `metadata.source_query`) |
 | `bar_chart` | category (or comparison side) |
 | `grouped_bar_chart` | category and group (`"A only"`, `"B only"`, `"Both"`) or series |
 | `time_series` | start year, with `estimated_count`; no gaps |
@@ -216,6 +217,8 @@ All nine example questions in the assignment's appendix work. The planner eval (
 | Q-08 | sponsor and drug network | `network_graph` | lead sponsor to drug; links need 2+ trials | net-01, -03 |
 | Q-09 | drugs used together | `network_graph` | same arm, not just same trial; "A or B" arms excluded | net-02 |
 
+Beyond the appendix, investigators and sites can be linked to drugs the same way (net-04, net-05), and trials can be counted by age group (age-01).
+
 Following one bar from source to chart, using example 02: the model's plan is "aggregate by country, condition melanoma, status recruiting". Code turns that into one API request (`query.cond=(melanoma)&filter.overallStatus=RECRUITING`), which reports 485 matches, and fetches all 485. Each trial is counted once under every country where it has a current site, which puts 59 under China. That row is `{"country": "China", "trial_count": 59, "trial_ids": ["NCT03340506", ...]}`, and the evidence for NCT03340506 above shows why it's there. All nine verifier checks passed.
 
 ## 6. Design decisions
@@ -238,6 +241,8 @@ Ask only when there is no sensible default. "Year" means start year and "sponsor
 
 Follow-ups through `previous_run_id`. There is no conversation memory on the server. The earlier plan is loaded from the run record, and the client keeps the thread.
 
+Raw responses kept per run. Every ClinicalTrials.gov response a run used is saved with it (`data/bundles`), so `replay` can answer it again offline and show whether anything changed. The bundles cost disk space, so they are off when hosted until object storage exists.
+
 Hosted mode by configuration. One codebase runs with local files by default and with Redis, Postgres and API keys when hosted. Each store has two implementations to keep in step; both are tested.
 
 pydantic-ai's `FallbackModel` with tool-based output. Models change through configuration. OpenAI and Anthropic were run; Gemini is wired in but was never tried. The fallback only covers provider errors, so a weak plan from the primary is repaired, not re-asked elsewhere.
@@ -250,20 +255,20 @@ If the main model fails, the fallback answers and the response carries a warning
 
 ## 8. Limitations and next steps
 
-- Questions matching more than 20,000 trials are refused. A background job, or the API's count endpoint for plain totals, would lift that.
+- Grouped questions, and totals with a drug or sponsor, still stop at 20,000 trials: their counts need every record. A plain total uses the registry's own count instead, and slow questions can run in the background (`POST /v1/runs`).
 - The API rate-limits. The client allows 40 requests a minute, shared through Redis when hosted.
 - Drug classes like "PD-1 inhibitors" become a clarification listing the drugs most often found in matching trials. The registry has no class membership to check against.
-- Bad data is passed through, not corrected. One melanoma record lists 2,953,748 participants.
-- Run records keep the plan and response only. Full bundles with raw API pages, for exact replay, are designed but not built.
-- The eval has 46 questions. `gpt-5.4-mini` scored 46/46, 45/46, 45/46 and 46/46 over four runs; `claude-haiku-4-5` got 40 of an earlier 42. One comparison question still varies between runs. A larger held-out set would help.
-- Hosted: circuit breakers are per instance, there are no migrations yet (one table), and traces aren't exported on AWS by default: `TRACES=xray` adds a collector that sends them to X-Ray (built, not yet run; see `docs/hosted-deployment.md`). The 30 s deadline applies only when hosted.
-- Investigator and site networks, maps and efficacy questions are not supported.
+- Bad data is passed through, not corrected. One melanoma record lists 2,953,748 participants. Investigator and site names are free text: degrees and initials are removed, but one hospital written two ways is still two nodes.
+- Run bundles are kept on local disk only; hosted runs have none until object storage is added.
+- The eval has 66 questions plus 12 held out. `gpt-5.4-mini` scored 65/66 and 64/66 on the working set in two runs and 12/12 on the held-out set (2026-10-27). Both misses were adversarial: a request to plot sites on a map by latitude and longitude was planned instead of refused (both runs), and "no longer recruiting" once kept not-yet-recruiting trials. On the earlier 46 questions it scored 46/46, 45/46, 45/46 and 46/46; `claude-haiku-4-5` got 40 of an earlier 42 and was not rerun. The industry-vs-academic comparison was right in 11 of 12 runs after the gate learned to ask for the sponsor-category split (4 of 5 before).
+- Hosted: circuit breakers and the image cache are per instance, there are no migrations yet (one table), and traces aren't exported on AWS by default: `TRACES=xray` adds a collector that sends them to X-Ray (built, not yet run; see `docs/hosted-deployment.md`). The 30 s deadline applies only to `POST /v1/query` when hosted.
+- Maps and efficacy questions are not supported.
 
 ## 9. Testing
 
 Before designing anything I checked each filter against the live API. Local counts match the API's own totals exactly on the 2,968-trial pembrolizumab search (start year 2020: 263, Phase 3: 367, Germany: 326, recruiting: 712). The findings are in [`docs/research/api-data-guide.md`](docs/research/api-data-guide.md).
 
-There are 262 offline tests, mostly through the HTTP API, with a scripted planner and saved real API records. They cover every chart type, clarifications, follow-ups, every failure point, the hosted mode, and the counting rules, some with property tests. A set of tamper tests changes a count, moves a trial to the wrong bar or alters a citation, and checks that the verifier catches it. Seven more tests run against the live API, and every answer type was run end to end with the real models and the images checked by eye.
+There are 329 offline tests, mostly through the HTTP API, with a scripted planner and saved real API records. They cover every chart type, clarifications, follow-ups, every failure point, the hosted mode, and the counting rules, some with property tests. A set of tamper tests changes a count, moves a trial to the wrong bar or alters a citation, and checks that the verifier catches it. Seven more tests run against the live API, and every answer type was run end to end with the real models and the images checked by eye.
 
 A second model reviewed the code. Ten of its findings were real bugs; each was fixed with a test that failed first. Many other fixes came from running the service on real data: procedures counted as drugs, HTTP 429s, unreadable network images, "A or B" arms read as combinations, and multi-part questions being merged. The full list is in [`docs/reference.md`](docs/reference.md#what-the-tests-cover-readme-9).
 

@@ -20,6 +20,7 @@ copied as written or corrected), or {"excludes": [...]} (a non-empty list holdin
 
 import asyncio
 import json
+import os
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -124,4 +125,5 @@ async def main(args: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")  # pydantic-ai prints a promotional banner otherwise
     sys.exit(asyncio.run(main(sys.argv[1:])))

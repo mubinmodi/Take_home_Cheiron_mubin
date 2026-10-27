@@ -133,6 +133,22 @@ _Avoid_: Response (the whole reply, covering every Part), result
 One end-to-end handling of one Question, ending in exactly one Outcome.
 _Avoid_: Request, job, session
 
+**Background Run**:
+A Run started with `POST /v1/runs`: the request returns at once with the Run's ID, and the client polls its status until the Run is done or failed. It is held to its own, longer deadline.
+_Avoid_: Job (outside the code), task
+
+**Run Bundle**:
+Every raw ClinicalTrials.gov response one Run used, kept with it so the Run can be replayed: answered again offline with its recorded Query Plans, and compared with what it answered at the time.
+_Avoid_: Snapshot, cache
+
+**Registry Total**:
+A plain count above the retrieval cap, taken from ClinicalTrials.gov's own count of the search instead of from fetched trials. It cites the search, not each trial.
+_Avoid_: Estimate, sample
+
+**Excerpt**:
+The exact text of a trial record where a keyword Filter matched, quoted in that trial's Citation.
+_Avoid_: Snippet, highlight
+
 **Ledger**:
 The record of every model call in one Run: each attempt counted once, where it was made, and the caps enforced — one split call (two if the first model fails) and at most three planning calls. A Run that would exceed them stops rather than calling again.
 _Avoid_: Budget, counter, usage

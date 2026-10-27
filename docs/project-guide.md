@@ -76,12 +76,12 @@ All code is in `src/clinical_trials_viz/`. Grouped by job:
 | **Drawing** | `render.py` | The specification translated into Vega-Lite, and drawn as PNG/SVG |
 | **Rules** | `catalog.py` | The versioned Capability Catalog: operations, Dimensions, limits, the fields a request can pin |
 | **Contracts** | `models/request.py`, `models/plan.py`, `models/response.py`, `models/spec.py` | The request, the Query Plan, the response, the Visualization Specification |
-| **Keeping Runs** | `runs.py`, `idempotency.py` | Run Records (files locally, Postgres when hosted); safe retries with an `Idempotency-Key` |
+| **Keeping Runs** | `runs.py`, `idempotency.py`, `replay.py`, `jobs.py` | Run Records (files locally, Postgres when hosted); safe retries with an `Idempotency-Key`; run bundles and offline replay; background runs' state |
 | **Hosted mode** | `access.py`, `shared_state.py`, `breaker.py`, `config.py`, `telemetry.py` | API keys and limits; state shared through Redis; circuit breakers; settings; OpenTelemetry tracing |
 
 Outside the package:
 - `tests/`: the offline tests, which mock the API with saved real records;
-- `evals/`: 46 questions for scoring the planner;
+- `evals/`: 66 questions for scoring the planner, plus 12 held out (`--heldout`);
 - `examples/`: real runs with their full JSON and charts;
 - `deploy/`: the AWS scripts.
 
@@ -117,7 +117,7 @@ The user's choice comes back as a structured field with `previous_run_id`, and t
 
 | To… | Change |
 |---|---|
-| Add a way to group trials (a **Dimension**) | an entry in `catalog.DIMENSIONS`, and the line in `ctgov/trial.py` that reads its value from a record (plus the API field in `catalog.TRIAL_FIELDS`); counting, charts, citations and the verifier follow |
+| Add a way to group trials (a **Dimension**) | one entry in `catalog.DIMENSIONS` (label, description, source field, flags, its value and citation readers, and a display order if ordered), the API field in `catalog.TRIAL_FIELDS`, and the Trial field it reads in `ctgov/trial.py`; counting, charts, citations and the verifier follow. Worked example: the age group, commit [`d151a25`](https://github.com/mubinmodi/Take_home_Cheiron_mubin/commit/d151a25), with its tests in `tests/test_age_group.py` |
 | Add a Filter | its fields on `AppliedFilters` in `filters.py`, an entry in `FILTER_DEFS`, its parameters in `api_params` and its check in `violations`; a structured request field too, if callers should pin it (`models/request.py`, `catalog.PINNED_FIELDS`) |
 | Add a chart type | the builder in `spec_builder.py`, its choice in `spec_builder.chart_type_for` and `answer._build`, its Vega-Lite in `render.py`, its checks in `verify.py` |
 | Change what a clarification offers | `clarify.py` (data-built options) or `conflicts.py` (field conflicts) |

@@ -10,8 +10,8 @@
 | ID | Status | Evidence | Limitation |
 |---|---|---|---|
 | CTX-03 | verified | Runs locally (`uv run clinical-trials-viz serve`) and on AWS; nine real runs in `examples/` | — |
-| FUN-01 | verified | One typed plan per question (`planner.py`); planner eval on 46 questions: gpt-5.4-mini 46/46 (`evals/results/`); claude-haiku-4-5 40/42 on the earlier 42-question set | Residual planner variance on one comparison (README §8) |
-| FUN-02 | verified | Filters compiled to API parameters (`cohort.py`), every page fetched (`ctgov/client.py`); each response's `source` records API version, data timestamp, matches, cohort size and requests | Raw API pages are not stored (run bundles deferred) |
+| FUN-01 | verified | One typed plan per question (`planner.py`); planner eval on 46 questions: gpt-5.4-mini 46/46 (`evals/results/`); claude-haiku-4-5 40/42 on the earlier 42-question set; 2026-10-27: gpt-5.4-mini 65/66 and 64/66 on 66 cases (17 adversarial) and 12/12 held out | Residual planner variance on one comparison (README §8) |
+| FUN-02 | verified | Filters compiled to API parameters (`cohort.py`), every page fetched (`ctgov/client.py`); each response's `source` records API version, data timestamp, matches, cohort size and requests | Updated 2026-10-27: raw API pages are kept as run bundles locally and `clinical-trials-viz replay RUN_ID` re-answers a run offline (not when hosted) |
 | FUN-03 | verified | README §2 (how code picks the chart); the chart type is chosen by code (`spec_builder.py`) | — |
 | FUN-04 | verified | The verifier checks the chart answers the plan (type and grouping), recounts every datum and re-derives every citation value (`verify.py`); `examples/` | — |
 | FUN-05 | verified | Per-type contract in README §4; `GET /v1/runs/{id}/vega-lite.json`; the web page renders every type from the response | — |
@@ -46,16 +46,16 @@
 | ID | Evidence | Main remaining gap |
 |---|---|---|
 | SD-01 | API spike before design (`docs/research/api-data-guide.md`); decisions with reasons (`docs/harness-design.md`, README §6) | — |
-| SD-02 | Clear module contracts (module map in `docs/project-guide.md` §4); extension walkthrough (`docs/project-guide.md` §6) | The extension is described, not shown as a worked change |
-| SD-03 | Complete paging or `scope_required`, never sampling; retries honouring `Retry-After`; missing values as "Not reported"; multi-valued fields counted once per trial per bucket; tests for each | No stored raw pages for exact replay |
-| AI-01 | The model never outputs numbers, IDs or citations; every answer is verified; eval questions are not in the prompt | Few adversarial phrasings in the eval |
+| SD-02 | Clear module contracts (module map in `docs/project-guide.md` §4); extension walkthrough (`docs/project-guide.md` §6) | Updated 2026-10-27: shown as a worked change, the age group (commit d151a25, `tests/test_age_group.py`) |
+| SD-03 | Complete paging or `scope_required`, never sampling; retries honouring `Retry-After`; missing values as "Not reported"; multi-valued fields counted once per trial per bucket; tests for each | Updated 2026-10-27: run bundles and `replay` give exact offline replay (local only) |
+| AI-01 | The model never outputs numbers, IDs or citations; every answer is verified; eval questions are not in the prompt | Updated 2026-10-27: 17 adversarial cases and a 12-case held-out set; one adversarial miss (a map by latitude and longitude was planned instead of refused) |
 | AI-02 | Semantic gate (`validate.py`) with one repair (`planning.py`); tamper tests prove the verifier rejects wrong counts, wrong grouping and altered citations | — |
 | AI-03 | One typed plan; clarifications built from data; bounded outcomes; `model_calls` and `timings_ms` on every response | The plan is the only planning trace |
 | CODE-01 | Focused modules, module map in `docs/project-guide.md`, ruff and pyright clean | — |
 | CODE-02 | 261 offline tests, including tamper tests and failure injection; regression tests confirmed to fail on the old code; live tests; archive smoke test | — |
 | COV-01 | README §5 table: all nine appendix questions with their eval cases, plus supported and unsupported boundaries | — |
 | COV-02 | Five composable operations × dimensions × filters, multi-part questions and crossed charts, held out from the prompt | — |
-| COV-03 | Nine chart types, including two network kinds with documented weights and size limits | No investigator or site networks |
+| COV-03 | Nine chart types, including four network kinds (sponsor, investigator or site ↔ drug; drug ↔ drug) with documented weights and size limits | Investigator and site names are free text, cleaned but not fully merged |
 | IO-01 | Typed request and response, one error shape, conflict handling, count units (`units: trials`), date meaning (start year), all tested | — |
 | IO-02 | Every type documented and renderable from the response alone; the web page renders all of them, in light and dark themes | — |
 

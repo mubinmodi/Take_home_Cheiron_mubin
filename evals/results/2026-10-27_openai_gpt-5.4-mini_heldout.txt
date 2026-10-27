@@ -1,0 +1,26 @@
+PASS  ho-dist-01       Break down cystic fibrosis studies by the kind of intervention they test
+PASS  ho-cmp-01        Side by side, what phases are apixaban and rivaroxaban studies in?
+PASS  ho-geo-01        Where in the world are hepatitis B trials currently enrolling patients? Give me the top 8 countries.
+PASS  ho-net-01        Map out which drugs get paired together in ovarian cancer studies
+PASS  ho-single-01     Count the completed phase 4 atorvastatin studies
+PASS  ho-list-01       Give me a Gantt-style view of the dupilumab trials running in France
+PASS  ho-hist-01       How big are psoriasis trials in terms of participant numbers?
+PASS  ho-series-01     For heart failure trials, show each start year split by sponsor class
+PASS  ho-multi-01      Which sponsors lead the most epilepsy trials? Plus, how many of those epilepsy trials are recruiting right now?
+PASS  ho-clarify-01    How many JAK inhibitor trials are recruiting?
+PASS  ho-unsupported-01 Which statin lowers LDL the most according to completed trials?
+
+12/12 held-out plans correct (100%) using openai:gpt-5.4-mini
+  clarification   1/1
+  comparison      1/1
+  distribution    1/1
+  geographic      1/1
+  histogram       1/1
+  multi_part      1/1
+  network         1/1
+  per_trial       1/1
+  series          1/1
+  single_value    1/1
+  time_trend      1/1
+  unsupported     1/1
+
