@@ -111,6 +111,35 @@ async def test_invalid_plan_is_repaired_once(make_client):
     assert "compare needs 2 to 5" in planner.calls[1]["repair"][1][0]
 
 
+async def test_sponsor_categories_in_the_question_ask_for_the_sponsor_class_split(make_client):
+    """Ticket 11: "industry vs academic" without a sponsor_class breakdown gets the one repair."""
+    sides = [ComparisonSide(condition="parkinson's disease"), ComparisonSide(condition="ALS")]
+    without = AnswerPlan(operation=Operation.COMPARE, compare_sides=sides)
+    split = AnswerPlan(operation=Operation.COMPARE, compare_sides=sides, group_by=Dimension.SPONSOR_CLASS)
+    query = "Industry vs academic sponsorship: compare Parkinson's disease and ALS trials"
+    planner = ScriptedPlanner(without, split)
+    body = await ask(make_client, planner, query=query)
+    assert body["outcome"] == "success"
+    assert body["plan"]["group_by"] == "sponsor_class"
+    assert "sponsor_class" in planner.calls[1]["repair"][1][0]
+
+
+async def test_a_missing_sponsor_class_split_after_repair_keeps_the_answer(make_client):
+    sides = [ComparisonSide(condition="parkinson's disease"), ComparisonSide(condition="ALS")]
+    without = AnswerPlan(operation=Operation.COMPARE, compare_sides=sides)
+    planner = ScriptedPlanner(without, without)
+    body = await ask(make_client, planner, query="Industry vs academic: compare Parkinson's and ALS trials")
+    assert body["outcome"] == "success"
+    assert any("not broken down by them" in a for a in body["assumptions"])
+
+
+async def test_no_sponsor_class_hint_without_category_words(make_client):
+    planner = ScriptedPlanner(TREND)
+    body = await ask(make_client, planner, query="Keytruda trials per year")
+    assert body["model_calls"] == 1
+    assert not any("sponsor categories" in a for a in body["assumptions"])
+
+
 async def test_follow_up_receives_previous_plan(make_client):
     async for client in make_client(ScriptedPlanner(TREND, TREND)):
         first = (await client.post("/v1/query", json={"query": "Keytruda trials per year"})).json()

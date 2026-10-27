@@ -14,6 +14,7 @@ from clinical_trials_viz.models.request import NCT_ID_PATTERN, QueryRequest
 class GateResult:
     filters: AppliedFilters
     errors: list[str] = field(default_factory=list)  # fixable by the model (repair once)
+    hints: list[tuple[str, str]] = field(default_factory=list)  # (for the repair, for the user): the plan stands
     unsupported: str | None = None  # valid plan the service cannot run yet
     assumptions: list[str] = field(default_factory=list)
     conflicts: list[Conflict] = field(default_factory=list)  # the structured field is applied until answered
@@ -28,6 +29,13 @@ _SPONSOR_CATEGORIES = frozenset({
 _CATEGORY_HINT = (
     "sponsor category, not a sponsor name: use group_by (or compare by) 'sponsor_class' instead, "
     "with the conditions or drugs as the compared sides"
+)
+
+
+# Words that name sponsor categories in a question ("industry vs academic sponsorship").
+_CATEGORY_WORDS = re.compile(
+    r"\b(industry|industrial|academic|academia|nih|government|federal|pharma|pharmaceutical compan(y|ies))\b",
+    re.IGNORECASE,
 )
 
 
@@ -84,6 +92,18 @@ def check_plan(plan: AnswerPlan, request: QueryRequest, known_countries: set[str
         errors.append(f"sponsor '{plan.filters.sponsor}' is a {_CATEGORY_HINT}")
     if plan.operation is Operation.PER_TRIAL and plan.group_by is not None:
         errors.append("per_trial lists trials; set group_by to null")
+    if (
+        plan.operation in (Operation.AGGREGATE, Operation.COMPARE)
+        and Dimension.SPONSOR_CLASS not in (plan.group_by, plan.series_by)
+        and _CATEGORY_WORDS.search(request.query)
+    ):
+        result.hints.append(
+            (
+                "the question names sponsor categories (industry, academic, NIH, government…): "
+                "count by them with group_by (or series_by) 'sponsor_class'",
+                "The question mentions sponsor categories, but this answer is not broken down by them.",
+            )
+        )
     if plan.group_by is not None and plan.group_by not in DIMENSIONS:
         errors.append(f"unknown group_by {plan.group_by}")
 

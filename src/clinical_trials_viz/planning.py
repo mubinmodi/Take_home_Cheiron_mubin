@@ -191,9 +191,12 @@ async def _gate_and_repair(
     request = planning.request
     gate = check_plan(plan, request, countries)
     ledger = current_ledger()
-    if gate.errors and ledger is not None and ledger.remaining(Step.PLANNING):
+    if (gate.errors or gate.hints) and ledger is not None and ledger.remaining(Step.PLANNING):
         result = await planner.plan(
-            request.query, request.structured_fields(), None, repair=(result.messages, gate.errors)
+            request.query,
+            request.structured_fields(),
+            None,
+            repair=(result.messages, gate.errors + [hint for hint, _ in gate.hints]),
         )
         planning.record(result)
         plan = result.plan
@@ -203,6 +206,7 @@ async def _gate_and_repair(
     if gate.errors:
         reason = "The question could not be turned into a valid plan: " + "; ".join(gate.errors)
         return UnsupportedPlan(reason=reason), None
+    gate.assumptions += [note for _, note in gate.hints]
     return plan, gate
 
 
