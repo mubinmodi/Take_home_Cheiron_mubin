@@ -321,6 +321,13 @@ class Pipeline:
                 label = side.drug or side.condition or side.sponsor
                 f = base.for_side(drug=side.drug, condition=side.condition, sponsor=side.sponsor)
                 cohort = await fetch_cohort(self.client, f)
+                ambiguous = side.sponsor and f.sponsor_is_ambiguous_term()
+                if ambiguous and (question := clarify.sponsor_ambiguity(cohort.trials, side.sponsor or "")):
+                    target.clarification = question
+                    _finish(target, Outcome.CLARIFICATION_REQUIRED, question.question)
+                    return
+                if names := base.side_sponsors.get(side.sponsor or ""):
+                    target.assumptions.append(f"'{side.sponsor}' means {', '.join(names)} (your choice).")
                 sides[label or "?"] = cohort.trials
                 target.assumptions.extend(cohort.assumptions)
                 target.source.search_matches += cohort.search_matches

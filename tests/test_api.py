@@ -1021,3 +1021,52 @@ async def test_a_split_call_that_times_out_falls_back_to_the_code_splitter(make_
     body = await ask(make_client, planner, query="Keytruda trials per year")
     assert body["outcome"] == "success"
     assert any("could not be split by the model" in w for w in body["warnings"])
+
+
+async def test_a_sponsor_side_of_a_comparison_asks_which_organization(make_client, ctgov, page):
+    """Ticket 22: "Merck vs Pfizer" asks which Merck, and the answer narrows that side only."""
+    import copy
+
+    studies = copy.deepcopy(page["studies"])
+    names = ["Merck Sharp & Dohme LLC", "Merck KGaA, Darmstadt, Germany", "Pfizer"]
+    for i, study in enumerate(studies):
+        study["protocolSection"].setdefault("sponsorCollaboratorsModule", {})["leadSponsor"] = {
+            "name": names[i % 3],
+            "class": "INDUSTRY",
+        }
+
+    def by_sponsor(request: httpx.Request) -> httpx.Response:
+        advanced = request.url.params.get("filter.advanced", "")
+        keep = [n for n in names if n.split()[0] in advanced and (n in advanced or '"' not in advanced)]
+        chosen = [
+            s for s in studies if s["protocolSection"]["sponsorCollaboratorsModule"]["leadSponsor"]["name"] in keep
+        ]
+        return httpx.Response(200, json={"studies": chosen, "totalCount": len(chosen)})
+
+    ctgov.get("/studies").mock(side_effect=by_sponsor)
+    plan = AnswerPlan(
+        operation=Operation.COMPARE,
+        group_by=Dimension.PHASE,
+        compare_sides=[ComparisonSide(sponsor="Merck"), ComparisonSide(sponsor="Pfizer")],
+    )
+    async for client in make_client(ScriptedPlanner(plan, plan)):
+        first = (await client.post("/v1/query", json={"query": "Phases of Merck vs Pfizer trials"})).json()
+        assert first["outcome"] == "clarification_required"
+        assert first["clarification"]["field"] == "sponsor"
+        assert {o["value"] for o in first["clarification"]["options"][:2]} == set(names[:2])
+
+        second = await client.post(
+            "/v1/query",
+            json={"query": "Merck Sharp & Dohme", "previous_run_id": first["run_id"], "sponsor": [names[0]]},
+        )
+        body = second.json()
+        assert body["outcome"] == "success", body.get("message")
+        sent = [
+            c.request.url.params.get("filter.advanced", "")
+            for c in ctgov.calls
+            if c.request.url.path.endswith("/studies")
+        ]
+        assert any('"Merck Sharp & Dohme LLC"' in s for s in sent)
+        assert any("Pfizer" in s and "Merck" not in s for s in sent[-2:])  # the Pfizer side is not narrowed
+        assert any("'Merck' means Merck Sharp & Dohme LLC" in a for a in body["assumptions"])
+        assert body["verification"]["passed"]

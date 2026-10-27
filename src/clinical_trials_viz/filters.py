@@ -56,6 +56,15 @@ def _quote(value: str) -> str:
     return '"' + value.replace('"', "") + '"'
 
 
+def _side_named_by(plan: AnswerPlan, names: list[str]) -> str | None:
+    """The comparison side whose sponsor term every one of these exact names contains ("Merck" for
+    "Merck Sharp & Dohme LLC"), if any."""
+    for side in plan.compare_sides:
+        if side.sponsor and all(side.sponsor.strip().lower() in n.lower() for n in names):
+            return side.sponsor
+    return None
+
+
 class AppliedFilters(BaseModel):
     """The Filters actually applied, after merging the plan with structured request fields."""
 
@@ -72,6 +81,11 @@ class AppliedFilters(BaseModel):
     )
     sponsor_exact: bool = Field(
         default=False, description="Sponsor came from a structured field and is matched exactly."
+    )
+    side_sponsors: dict[str, list[str]] = Field(
+        default_factory=dict,
+        exclude=True,  # reported as an Assumption when applied
+        description="Exact lead sponsor names chosen for a comparison side's sponsor term (a Clarification answer).",
     )
     countries: list[str] = Field(default_factory=list)
     start_year_from: int | None = None
@@ -92,7 +106,12 @@ class AppliedFilters(BaseModel):
                 applied.from_request.append(filter_field)
         if request.sponsor:
             asked = (plan.filters.sponsor or "").strip().lower()
-            if asked and [s.strip().lower() for s in request.sponsor] == [asked]:
+            side = _side_named_by(plan, request.sponsor)
+            if side and not asked:
+                # The answer to "which Merck?" for one side of a comparison: it applies to that side only.
+                applied.side_sponsors[side] = list(request.sponsor)
+                applied.from_request.append("sponsor")
+            elif asked and [s.strip().lower() for s in request.sponsor] == [asked]:
                 # The field repeats the question's own sponsor term (e.g. the "your question" answer to a
                 # Conflict): search it as a lead sponsor name, so an ambiguous name is still asked about.
                 applied.from_request.append("sponsor")
@@ -113,6 +132,9 @@ class AppliedFilters(BaseModel):
             side.drugs = [drug]
         elif condition:
             side.conditions = [condition]
+        elif names := self.side_sponsors.get(sponsor or ""):
+            side.sponsor, side.sponsor_role, side.sponsor_exact = " or ".join(names), "lead", True
+            side.exact_sponsors = list(names)
         else:
             side.sponsor, side.sponsor_role, side.sponsor_exact = sponsor, "lead", False
         return side
