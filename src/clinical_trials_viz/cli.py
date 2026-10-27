@@ -1,4 +1,5 @@
-"""Command line: `serve` runs the API; `ask` answers one question in-process."""
+"""Command line: `serve` runs the API; `ask` answers one question in-process; `replay` answers a saved Run
+again from its run bundle, offline, and checks the answer is the same."""
 
 import argparse
 import asyncio
@@ -24,6 +25,8 @@ def main() -> None:
     ask.add_argument("--previous", metavar="RUN_ID", help="follow up on (or answer a clarification for) a run")
     ask.add_argument("--json", action="store_true", help="print the full JSON response")
     ask.add_argument("--no-chart", action="store_true", help="do not save the chart image")
+    replay = sub.add_parser("replay", help="answer a saved run again from its bundle (offline, no model call)")
+    replay.add_argument("run_id")
     args = parser.parse_args()
 
     if args.command == "serve":
@@ -33,6 +36,8 @@ def main() -> None:
             "clinical_trials_viz.api:create_app", factory=True, host=args.host, port=args.port, reload=args.reload
         )
         return
+    if args.command == "replay":
+        raise SystemExit(asyncio.run(_replay(args.run_id)))
     body = {"query": args.query, **json.loads(args.fields)}
     if args.previous:
         body["previous_run_id"] = args.previous
@@ -70,6 +75,33 @@ async def _ask(body: dict[str, Any], *, full_json: bool, save_chart: bool) -> No
             path.write_bytes(image.content)
             chart_paths[part] = path
     print(json.dumps(result, indent=2) if full_json else summarize(result, chart_paths))
+
+
+async def _replay(run_id: str) -> int:
+    from clinical_trials_viz.config import get_settings
+    from clinical_trials_viz.replay import BundleStore, replay
+    from clinical_trials_viz.runs import run_store
+
+    settings = get_settings()
+    database_url = settings.database_url.get_secret_value() if settings.database_url else None
+    runs = run_store(database_url, settings.runs_dir)
+    await runs.open()
+    try:
+        record = await runs.load(run_id)
+        bundle = BundleStore(settings.bundles_dir).load(run_id) if settings.bundles_dir else None
+        if record is None or bundle is None:
+            print(f"{run_id}: no {'run record' if record is None else 'run bundle'} found")
+            return 2
+        result = await replay(record, bundle, runs, settings.max_pages)
+    finally:
+        await runs.close()
+    if result.differences:
+        print(f"{run_id}: the replayed answer differs from the recorded one:")
+        print("\n".join(f"  - {d}" for d in result.differences))
+        return 1
+    timestamp = result.original.source.data_timestamp if result.original.source else "unknown"
+    print(f"{run_id}: replayed offline from its bundle (registry data of {timestamp}); same answer.")
+    return 0
 
 
 def summarize(r: dict[str, Any], chart_paths: dict[int, Path] | None = None) -> str:

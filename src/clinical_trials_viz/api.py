@@ -24,6 +24,7 @@ from clinical_trials_viz.models.spec import VisualizationSpec
 from clinical_trials_viz.pipeline import Pipeline, RunNotFound
 from clinical_trials_viz.planner import Planner, build_planner
 from clinical_trials_viz.render import ImageCache, NotRenderable, render, to_vega_lite
+from clinical_trials_viz.replay import BundleStore
 from clinical_trials_viz.runs import RunRecord, StoreUnavailable, run_store
 from clinical_trials_viz.shared_state import RedisIdempotencyStore, RedisPageCache, RedisRateLimiter, RedisUserLimiter
 from clinical_trials_viz.telemetry import configure_logging, setup_tracing
@@ -88,6 +89,7 @@ def create_app(
             runs,
             settings.public_base_url,
             settings.run_deadline_seconds,
+            BundleStore(settings.bundles_dir) if settings.bundles_dir else None,
         )
         app.state.idempotency = (
             RedisIdempotencyStore(shared) if shared else FileIdempotencyStore(settings.runs_dir / "idempotency")

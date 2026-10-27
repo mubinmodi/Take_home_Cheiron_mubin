@@ -80,7 +80,11 @@ def http() -> httpx.AsyncClient:
 def settings(tmp_path) -> Settings:
     # Not the developer's .env: tests must not depend on local settings.
     return Settings(  # type: ignore[call-arg]
-        _env_file=None, runs_dir=tmp_path / "runs", otel_exporter="none", ctgov_requests_per_minute=1000
+        _env_file=None,
+        runs_dir=tmp_path / "runs",
+        bundles_dir=tmp_path / "bundles",
+        otel_exporter="none",
+        ctgov_requests_per_minute=1000,
     )
 
 

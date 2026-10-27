@@ -125,6 +125,26 @@ def count_requests() -> Iterator[list[int]]:
         _requests_in_run.reset(token)
 
 
+_responses_in_run: ContextVar[list[dict[str, Any]] | None] = ContextVar("ctgov_responses_in_run", default=None)
+
+
+@contextmanager
+def record_responses() -> Iterator[list[dict[str, Any]]]:
+    """Keep every API response used inside this block (one Run), cached or fetched, for its run bundle:
+    `{"path", "params", "body"}` each, enough to answer the Run again offline (see replay.py)."""
+    responses: list[dict[str, Any]] = []
+    token = _responses_in_run.set(responses)
+    try:
+        yield responses
+    finally:
+        _responses_in_run.reset(token)
+
+
+def _record(path: str, params: dict[str, str] | None, body: Any) -> None:
+    if (responses := _responses_in_run.get()) is not None:
+        responses.append({"path": path, "params": dict(params or {}), "body": body})
+
+
 class RateLimiter:
     """Token bucket shared by all requests from this process."""
 
@@ -221,19 +241,19 @@ class CtGovClient:
 
     async def version(self) -> SourceVersion:
         """API version and data timestamp; re-checked every 10 minutes (data refreshes daily)."""
-        if self._version and time.monotonic() - self._version[0] < 600:
-            return self._version[1]
-        body = await self._get("/version")
-        version = SourceVersion(body["apiVersion"], body["dataTimestamp"])
-        self._version = (time.monotonic(), version)
+        if not (self._version and time.monotonic() - self._version[0] < 600):
+            body = await self._get("/version")
+            self._version = (time.monotonic(), SourceVersion(body["apiVersion"], body["dataTimestamp"]))
+        version = self._version[1]
+        _record("/version", None, {"apiVersion": version.api_version, "dataTimestamp": version.data_timestamp})
         return version
 
     async def _page(self, params: dict[str, str], data_timestamp: str) -> dict[str, Any]:
         key = page_key(params, data_timestamp)
-        if (page := await self._cache.get(key)) is not None:
-            return page
-        page = await self._get("/studies", params)
-        await self._cache.put(key, page)
+        if (page := await self._cache.get(key)) is None:
+            page = await self._get("/studies", params)
+            await self._cache.put(key, page)
+        _record("/studies", params, page)
         return page
 
     async def search(

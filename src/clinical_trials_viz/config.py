@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     max_pages: int = 20  # 20 pages x 1,000 trials; larger cohorts return scope_required
 
     runs_dir: Path = Path("data/runs")
+    # Raw API responses per Run, for exact replay (`clinical-trials-viz replay RUN_ID`). Off when hosted
+    # unless set: a container's disk is not kept, and object storage is not built.
+    bundles_dir: Path | None = Path("data/bundles")
     # Base of chart_url links. Unset, it is the address each request arrived on (behind a proxy, from
     # its X-Forwarded headers); set it when clients reach the service by another address.
     public_base_url: str | None = None
@@ -96,6 +99,8 @@ class Settings(BaseSettings):
             if missing:
                 raise ValueError(f"DEPLOYMENT=hosted needs {', '.join(missing)} (see docs/hosted-deployment.md)")
             self.user_queries_per_hour = self.user_queries_per_hour or HOSTED_QUERIES_PER_HOUR
+            if "bundles_dir" not in self.model_fields_set:
+                self.bundles_dir = None
             self.run_deadline_seconds = self.run_deadline_seconds or HOSTED_RUN_DEADLINE_SECONDS
         if self.open_access:  # no hourly limit, even when USER_QUERIES_PER_HOUR is set
             self.user_queries_per_hour = None

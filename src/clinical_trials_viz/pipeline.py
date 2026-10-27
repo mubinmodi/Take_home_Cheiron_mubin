@@ -18,7 +18,7 @@ from clinical_trials_viz import clarify, conflicts, suggest
 from clinical_trials_viz.catalog import NETWORK_FIELDS
 from clinical_trials_viz.cohort import fetch_cohort
 from clinical_trials_viz.conflicts import PreviousRun
-from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError, count_requests
+from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError, count_requests, record_responses
 from clinical_trials_viz.ctgov.trial import Trial
 from clinical_trials_viz.failures import Failure, classify
 from clinical_trials_viz.ledger import run_ledger
@@ -45,6 +45,7 @@ from clinical_trials_viz.models.spec import VisualizationType
 from clinical_trials_viz.planner import Planner
 from clinical_trials_viz.planning import plan_question
 from clinical_trials_viz.render import chart_problem
+from clinical_trials_viz.replay import BundleStore
 from clinical_trials_viz.runs import RunStore, StoreUnavailable, new_run_id
 from clinical_trials_viz.validate import GateResult
 
@@ -113,10 +114,12 @@ class Pipeline:
         runs: RunStore,
         public_base_url: str | None = None,
         run_deadline: float | None = None,
+        bundles: BundleStore | None = None,
     ):
         self.client = client
         self.planner = planner
         self.runs = runs
+        self.bundles = bundles  # raw API responses per Run, for exact replay; None: not kept
         self.public_base_url = public_base_url
         self.run_deadline = run_deadline  # seconds for a whole Run; None: no limit
         self._countries: set[str] | None = None
@@ -136,7 +139,11 @@ class Pipeline:
         settings give no public address; `user` is recorded in the run history."""
         links = (self.public_base_url or base_url or DEFAULT_BASE_URL).rstrip("/")
         run = _Run(request, None, links)
-        with tracer.start_as_current_span("run") as span, count_requests() as requests:
+        with (
+            tracer.start_as_current_span("run") as span,
+            count_requests() as requests,
+            record_responses() as responses,
+        ):
             span.set_attribute("run.id", run.response.run_id)
             deadline = asyncio.timeout(self.run_deadline)
             with run_ledger() as ledger:  # every model call of the Run, kept even when planning fails
@@ -173,6 +180,11 @@ class Pipeline:
             )
             for answer in (response, *response.additional_answers):
                 answer.chart_url = None
+        if self.bundles is not None:
+            try:
+                await self.bundles.save(response.run_id, responses, sorted(self._countries or ()))
+            except OSError as exc:  # the answer stands; only exact replay of this Run is lost
+                log.error("run %s: its bundle could not be saved: %s", response.run_id, exc)
         return response
 
     async def _load_previous(self, run: _Run) -> QueryPlan | None:
