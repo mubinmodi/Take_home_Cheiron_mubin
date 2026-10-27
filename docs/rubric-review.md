@@ -12,7 +12,7 @@
 | CTX-03 | verified | Runs locally (`uv run clinical-trials-viz serve`) and on AWS; nine real runs in `examples/` | — |
 | FUN-01 | verified | One typed plan per question (`planner.py`); planner eval on 46 questions: gpt-5.4-mini 46/46 (`evals/results/`); claude-haiku-4-5 40/42 on the earlier 42-question set | Residual planner variance on one comparison (README §8) |
 | FUN-02 | verified | Filters compiled to API parameters (`cohort.py`), every page fetched (`ctgov/client.py`); each response's `source` records API version, data timestamp, matches, cohort size and requests | Raw API pages are not stored (run bundles deferred) |
-| FUN-03 | verified | README §2, "When the answer is a chart"; the chart type is chosen by code (`spec_builder.py`) | — |
+| FUN-03 | verified | README §2 (how code picks the chart); the chart type is chosen by code (`spec_builder.py`) | — |
 | FUN-04 | verified | The verifier checks the chart answers the plan (type and grouping), recounts every datum and re-derives every citation value (`verify.py`); `examples/` | — |
 | FUN-05 | verified | Per-type contract in README §4; `GET /v1/runs/{id}/vega-lite.json`; the web page renders every type from the response | — |
 | SRC-01 | verified | Live API at request time; examples carry data timestamp 2026-10-02T09:00:04; test fixtures are saved real records (`tests/fixtures/`) | — |
@@ -20,7 +20,7 @@
 | IN-03 | verified | README §3 field table; `GET /v1/schema` | — |
 | IN-04 | verified | Example 01 (`drug_name: Pembrolizumab` resolves "this drug"); `tests/test_api.py`; conflicts: code compares the question with the fields and asks (`tests/test_api.py`, checked live 2026-10-04) | — |
 | OUT-01 – OUT-06 | verified | `models/spec.py`; README §4; the verifier's `encoded_fields_exist` check | — |
-| OUT-08 | verified | README §4, "Visualization Specification" (our own spec; Vega-Lite only renders it) | — |
+| OUT-08 | verified | README §4 (the chart specification) (our own spec; Vega-Lite only renders it) | — |
 | VIS-01 | verified | Every successful answer carries a visualization (single numbers as `single_value`, lists as `table`) | — |
 | SUB-01 | verified on 2026-10-04 | Zip built with `git archive`, unpacked into an empty folder, installed, tested, and a live question answered (see the checklist below) | **The built zip is stale:** `dist/` holds the 2026-10-04 build, and the tree has moved on. Rebuild and re-check before submitting |
 | SUB-02 | verified | `pyproject.toml` + `uv.lock`; clean `uv sync` from the zip | — |
@@ -46,12 +46,12 @@
 | ID | Evidence | Main remaining gap |
 |---|---|---|
 | SD-01 | API spike before design (`docs/research/api-data-guide.md`); decisions with reasons (`docs/harness-design.md`, README §6) | — |
-| SD-02 | Clear module contracts (README code map); extension walkthrough (README §2, "Extending") | The extension is described, not shown as a worked change |
+| SD-02 | Clear module contracts (module map in `docs/project-guide.md` §4); extension walkthrough (`docs/project-guide.md` §6) | The extension is described, not shown as a worked change |
 | SD-03 | Complete paging or `scope_required`, never sampling; retries honouring `Retry-After`; missing values as "Not reported"; multi-valued fields counted once per trial per bucket; tests for each | No stored raw pages for exact replay |
 | AI-01 | The model never outputs numbers, IDs or citations; every answer is verified; eval questions are not in the prompt | Few adversarial phrasings in the eval |
 | AI-02 | Semantic gate (`validate.py`) with one repair (`planning.py`); tamper tests prove the verifier rejects wrong counts, wrong grouping and altered citations | — |
 | AI-03 | One typed plan; clarifications built from data; bounded outcomes; `model_calls` and `timings_ms` on every response | The plan is the only planning trace |
-| CODE-01 | Focused modules, README code map, ruff and pyright clean | — |
+| CODE-01 | Focused modules, module map in `docs/project-guide.md`, ruff and pyright clean | — |
 | CODE-02 | 261 offline tests, including tamper tests and failure injection; regression tests confirmed to fail on the old code; live tests; archive smoke test | — |
 | COV-01 | README §5 table: all nine appendix questions with their eval cases, plus supported and unsupported boundaries | — |
 | COV-02 | Five composable operations × dimensions × filters, multi-part questions and crossed charts, held out from the prompt | — |

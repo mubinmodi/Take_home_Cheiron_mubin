@@ -144,6 +144,7 @@ uv run clinical-trials-viz ask "How many recruiting Keytruda trials are there?"
 ## 8. Where to read more
 
 - [README](../README.md): request and response schemas, design decisions and tradeoffs, failure handling, limitations, how correctness was checked.
+- [`docs/reference.md`](reference.md): the web page, the hosted mode, one real Datum of each chart type, every failure point, the full list of what the tests cover.
 - [`docs/harness-design.md`](harness-design.md): the agreed design rules (counting rules, the workflow, the verifier) and why.
 - [`docs/hosted-deployment.md`](hosted-deployment.md): the AWS version, its costs and its teardown.
 - [`docs/research/api-data-guide.md`](research/api-data-guide.md): what the ClinicalTrials.gov data looks like, measured.
