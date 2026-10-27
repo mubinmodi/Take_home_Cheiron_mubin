@@ -741,6 +741,9 @@ async def test_keywords_are_free_text_and_reported(make_client, ctgov):
     assert sent["query.cond"] == "(COVID-19)" and sent["query.term"] == "(vaccine)"
     assert any("free text" in a and "'vaccine'" in a for a in body["assumptions"])
     assert "'vaccine'" in body["visualization"]["title"]
+    assert "BriefSummary" in sent["fields"]  # fetched so the citation can quote where 'vaccine' matched
+    entry = next(iter(body["evidence"].values()))
+    assert entry["excerpts"][0]["keyword"] == "vaccine"
 
 
 async def test_sponsor_categories_are_not_sponsor_names(make_client):

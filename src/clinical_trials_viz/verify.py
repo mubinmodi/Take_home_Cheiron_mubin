@@ -6,7 +6,7 @@ from clinical_trials_viz.ctgov.trial import Trial, dimension_values
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import same_arm_pairs, trial_drugs
-from clinical_trials_viz.spec_builder import cited_value, duration_months, iso_date, trial_end
+from clinical_trials_viz.spec_builder import cited_value, duration_months, iso_date, keyword_excerpts, trial_end
 
 _WHOLE_COHORT = frozenset({
     VisualizationType.SINGLE_VALUE, VisualizationType.BAR_CHART, VisualizationType.TIME_SERIES,
@@ -179,6 +179,8 @@ def verify(
                 continue
             if value != expected:
                 altered.append(f"{nct_id}: '{name}' differs from the record")
+        if (entry.excerpts or []) != keyword_excerpts(trial, filters.keywords):
+            altered.append(f"{nct_id}: a keyword excerpt differs from the record")
     check("evidence_matches_source", altered)
 
     # Every cited trial meets the filters, checked against its own source values (not the API's word).

@@ -79,6 +79,14 @@ class Clarification(BaseModel):
     allow_free_text: bool = False
 
 
+class Excerpt(BaseModel):
+    """The text in a trial record that a keyword filter matched."""
+
+    keyword: str
+    field: str | None = Field(description="API field path quoted, or null when the match is in a field not fetched.")
+    text: str = Field(description="An exact excerpt of that field around the keyword ('…' marks a cut).")
+
+
 class EvidenceEntry(BaseModel):
     """One cited Trial, with the source field values that placed it in its data."""
 
@@ -86,6 +94,7 @@ class EvidenceEntry(BaseModel):
     title: str
     url: str
     fields: dict[str, Any] = Field(description="API field path -> value as captured from ClinicalTrials.gov.")
+    excerpts: list[Excerpt] | None = Field(default=None, description="Where each keyword filter matched.")
 
 
 class SourceInfo(BaseModel):

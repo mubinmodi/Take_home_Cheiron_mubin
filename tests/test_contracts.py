@@ -6,12 +6,20 @@ from pydantic import ValidationError
 from clinical_trials_viz import conflicts
 from clinical_trials_viz.analyze import breakdown
 from clinical_trials_viz.catalog import Dimension, OverallStatus, Phase
+from clinical_trials_viz.ctgov.trial import parse_trial
 from clinical_trials_viz.models.plan import AnswerPlan, Filters, Operation
 from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import AppliedFilters
 from clinical_trials_viz.models.spec import VisualizationType
 from clinical_trials_viz.render import NotRenderable, render, to_vega_lite
-from clinical_trials_viz.spec_builder import breakdown_spec, build_evidence, single_value_spec, table_spec
+from clinical_trials_viz.spec_builder import (
+    NOT_FETCHED,
+    breakdown_spec,
+    build_evidence,
+    keyword_excerpts,
+    single_value_spec,
+    table_spec,
+)
 from clinical_trials_viz.validate import check_plan
 from clinical_trials_viz.verify import verify
 
@@ -310,3 +318,41 @@ def test_recruiting_by_country_says_which_status_is_meant():
     )
     result = check_plan(plan, QueryRequest(query="Which countries have the most recruiting melanoma trials?"), set())
     assert any("overall status" in a and "whatever their own status" in a for a in result.assumptions)
+
+
+TRIAL_WITH_SUMMARY = parse_trial(
+    {"protocolSection": {"identificationModule": {"nctId": "NCT00000002", "briefTitle": "A study"}}}
+)
+
+
+def test_keyword_citations_quote_the_text_that_matched(trials):
+    """Ticket 27: a keyword filter has no field of its own, so its citation is an excerpt."""
+    trial = next(t for t in trials if "pembrolizumab" in t.title.lower())
+    excerpt = keyword_excerpts(trial, ["Pembrolizumab"])[0]
+    assert excerpt.field == "protocolSection.identificationModule.briefTitle"
+    assert excerpt.text.strip("…").lower() in trial.title.lower()
+    assert "pembrolizumab" in excerpt.text.lower()
+    missing = keyword_excerpts(trial, ["zzz-not-there"])[0]
+    assert missing.field is None and missing.text == NOT_FETCHED
+
+
+def test_long_fields_are_cut_around_the_keyword():
+    from dataclasses import replace
+
+    trial = replace(TRIAL_WITH_SUMMARY, brief_summary="x" * 200 + " a CAR-T product " + "y" * 200)
+    excerpt = keyword_excerpts(trial, ["car-t"])[0]
+    assert excerpt.field == "protocolSection.descriptionModule.briefSummary"
+    assert excerpt.text.startswith("…") and excerpt.text.endswith("…")
+    assert excerpt.text.strip("…") in trial.brief_summary
+
+
+def test_verifier_catches_an_altered_keyword_excerpt(trials):
+    filters = AppliedFilters(keywords=["pembrolizumab"])
+    by_id = {t.nct_id: t for t in trials}
+    spec = breakdown_spec(breakdown(trials, Dimension.STATUS, None), filters, len(trials))
+    evidence = build_evidence(spec, by_id, Dimension.STATUS, filters)
+    entry = next(e for e in evidence.values() if e.excerpts and e.excerpts[0].field)
+    assert verify(spec, evidence, by_id, Dimension.STATUS, VisualizationType.BAR_CHART, filters).checks
+    entry.excerpts[0].text = "a sentence the record never says"
+    result = verify(spec, evidence, by_id, Dimension.STATUS, VisualizationType.BAR_CHART, filters)
+    assert not next(c for c in result.checks if c.name == "evidence_matches_source").passed

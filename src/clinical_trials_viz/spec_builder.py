@@ -23,7 +23,7 @@ from clinical_trials_viz.catalog import (
 )
 from clinical_trials_viz.ctgov.trial import Trial, dimension_evidence
 from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation, PerTrialView
-from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry
+from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Excerpt
 from clinical_trials_viz.models.spec import (
     Channel,
     Encoding,
@@ -333,6 +333,40 @@ _CITED_FIELDS: dict[str, Callable[[Trial], Any]] = {
 }
 
 
+# Where a keyword is looked for, in this order: the fields a reader checks first.
+_KEYWORD_TEXTS: dict[str, Callable[[Trial], tuple[str, ...]]] = {
+    "protocolSection.identificationModule.briefTitle": lambda t: (t.title,),
+    "protocolSection.conditionsModule.keywords": lambda t: t.keywords,
+    "protocolSection.conditionsModule.conditions": lambda t: t.conditions,
+    "protocolSection.armsInterventionsModule.interventions.name": lambda t: tuple(i.name for i in t.interventions),
+    "protocolSection.descriptionModule.briefSummary": lambda t: (t.brief_summary,) if t.brief_summary else (),
+}
+_EXCERPT_CONTEXT = 60  # characters kept on each side of the match
+NOT_FETCHED = (
+    "Not in the fields this service reads; ClinicalTrials.gov's full-text search matched it elsewhere "
+    "in the record (it also matches related word forms)."
+)
+
+
+def keyword_excerpts(trial: Trial, keywords: list[str]) -> list[Excerpt]:
+    """For each keyword, the first fetched field that contains it, with an exact excerpt around the match."""
+    excerpts = []
+    for keyword in keywords:
+        found = None
+        for field_path, read in _KEYWORD_TEXTS.items():
+            for text in read(trial):
+                at = text.lower().find(keyword.lower())
+                if at >= 0:
+                    start, end = max(0, at - _EXCERPT_CONTEXT), min(len(text), at + len(keyword) + _EXCERPT_CONTEXT)
+                    quote = ("…" if start else "") + text[start:end] + ("…" if end < len(text) else "")
+                    found = Excerpt(keyword=keyword, field=field_path, text=quote)
+                    break
+            if found:
+                break
+        excerpts.append(found or Excerpt(keyword=keyword, field=None, text=NOT_FETCHED))
+    return excerpts
+
+
 def cited_value(trial: Trial, field: str) -> Any:
     """The value a Citation quotes for `field`, read from the trial record. KeyError: never cited."""
     return _CITED_FIELDS[field](trial)
@@ -460,7 +494,8 @@ def build_evidence(
 ) -> dict[str, EvidenceEntry]:
     """One entry per cited trial, with the source values that placed it in the data: the field it
     is grouped by, every field an applied filter (or comparison side, via `extra`) relies on, and
-    the record fields a per-trial chart plots (`record_fields`)."""
+    the record fields a per-trial chart plots (`record_fields`). A keyword filter, which has no field of
+    its own, is cited by an excerpt of the text it matched."""
     wanted: list[Dimension] = [*filters.cited_dimensions(), *extra, *([dimension] if dimension else [])]
     fields = [NCT_ID_FIELD, *(DIMENSIONS[d].source_field for d in wanted)]
     if filters.cites_collaborators():
@@ -476,5 +511,6 @@ def build_evidence(
                     title=trial.title,
                     url=study_url(nct_id),
                     fields={f: cited_value(trial, f) for f in fields},
+                    excerpts=keyword_excerpts(trial, filters.keywords) or None,
                 )
     return evidence

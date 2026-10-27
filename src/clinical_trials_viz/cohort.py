@@ -4,7 +4,12 @@ the drug match check."""
 from collections import Counter
 from dataclasses import dataclass, field
 
-from clinical_trials_viz.catalog import DRUG_IDENTITY_MIN_SHARE, DRUG_INTERVENTION_TYPES, TRIAL_FIELDS
+from clinical_trials_viz.catalog import (
+    DRUG_IDENTITY_MIN_SHARE,
+    DRUG_INTERVENTION_TYPES,
+    KEYWORD_TEXT_FIELDS,
+    TRIAL_FIELDS,
+)
 from clinical_trials_viz.ctgov.client import CtGovClient
 from clinical_trials_viz.ctgov.trial import Intervention, Trial, clean_drug_name, parse_trial
 from clinical_trials_viz.models.response import AppliedFilters
@@ -52,7 +57,7 @@ def lists_drug(trial: Trial, name: str, identity: str | None) -> bool:
 
 async def fetch_cohort(client: CtGovClient, filters: AppliedFilters, extra_fields: list[str] | None = None) -> Cohort:
     """Retrieve every matching trial; raises ScopeTooLarge instead of sampling."""
-    fields = [*TRIAL_FIELDS, *(extra_fields or [])]
+    fields = [*TRIAL_FIELDS, *(extra_fields or []), *(KEYWORD_TEXT_FIELDS if filters.keywords else [])]
     if not filters.drugs:
         result = await client.search(filters.api_params(), fields=fields)
         trials = [parse_trial(s) for s in result.studies]

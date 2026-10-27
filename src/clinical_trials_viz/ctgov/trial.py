@@ -41,6 +41,8 @@ class Trial:
     enrollment: int | None
     enrollment_type: str | None
     std_ages: tuple[str, ...] = ()  # CHILD, ADULT, OLDER_ADULT
+    brief_summary: str | None = None  # fetched only when a keyword filter applies
+    keywords: tuple[str, ...] = ()  # the record's own keywords; fetched only when a keyword filter applies
 
     @property
     def start_year(self) -> int | None:
@@ -117,6 +119,8 @@ def parse_trial(study: dict[str, Any]) -> Trial:
         enrollment=_get(design, "enrollmentInfo", "count"),
         enrollment_type=_get(design, "enrollmentInfo", "type"),
         std_ages=tuple(_get(p, "eligibilityModule", "stdAges") or ()),
+        brief_summary=_get(p, "descriptionModule", "briefSummary"),
+        keywords=tuple(_get(p, "conditionsModule", "keywords") or ()),
     )
 
 
