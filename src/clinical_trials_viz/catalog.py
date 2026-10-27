@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 # Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS);
 # 2026-10-26.1 marked the time axis (DimensionInfo.temporal); 2026-10-26.2 sponsor ambiguity at 5%;
-# 2026-10-27.1 each Dimension carries its own readers (DimensionInfo.values, .evidence).
-CATALOG_VERSION = "2026-10-27.1"
+# 2026-10-27.1 each Dimension carries its own readers (DimensionInfo.values, .evidence); 2026-10-27.2 age group.
+CATALOG_VERSION = "2026-10-27.2"
 
 
 class Phase(StrEnum):
@@ -73,6 +73,7 @@ class Dimension(StrEnum):
     STUDY_TYPE = "study_type"
     CONDITION = "condition"
     DRUG = "drug"
+    AGE_GROUP = "age_group"
 
 
 @dataclass(frozen=True)
@@ -192,6 +193,17 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         values=lambda t: t.drugs,
         evidence=lambda t: list(t.intervention_mesh_terms) or [i.name for i in t.interventions],
     ),
+    Dimension.AGE_GROUP: DimensionInfo(
+        "Age group",
+        "Age groups the trial enrolls (child, adult, older adult); a trial counts under each",
+        "protocolSection.eligibilityModule.stdAges",
+        True,
+        True,
+        False,
+        values=lambda t: tuple(AGE_GROUP_LABELS.get(a, a) for a in t.std_ages),
+        evidence=lambda t: list(t.std_ages),
+        order=("Child (under 18)", "Adult (18–64)", "Older adult (65+)"),
+    ),
 }
 
 # Labels for states that are not values, kept separate on purpose.
@@ -215,6 +227,12 @@ NON_DRUG_TERMS = frozenset(
         "standard of care",
     }
 )
+
+AGE_GROUP_LABELS: dict[str, str] = {
+    "CHILD": "Child (under 18)",
+    "ADULT": "Adult (18–64)",
+    "OLDER_ADULT": "Older adult (65+)",
+}
 
 SPONSOR_CLASS_LABELS: dict[str, str] = {
     "INDUSTRY": "Industry",
@@ -339,6 +357,7 @@ TRIAL_FIELDS = [
     "RemovedCountry",
     "EnrollmentCount",
     "EnrollmentType",
+    "StdAge",
 ]
 
 

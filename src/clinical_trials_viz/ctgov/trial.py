@@ -40,6 +40,7 @@ class Trial:
     arm_descriptions: tuple[tuple[str, str], ...]  # (arm label, description); fetched only when needed
     enrollment: int | None
     enrollment_type: str | None
+    std_ages: tuple[str, ...] = ()  # CHILD, ADULT, OLDER_ADULT
 
     @property
     def start_year(self) -> int | None:
@@ -115,6 +116,7 @@ def parse_trial(study: dict[str, Any]) -> Trial:
         ),
         enrollment=_get(design, "enrollmentInfo", "count"),
         enrollment_type=_get(design, "enrollmentInfo", "type"),
+        std_ages=tuple(_get(p, "eligibilityModule", "stdAges") or ()),
     )
 
 
