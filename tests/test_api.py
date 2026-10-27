@@ -7,7 +7,7 @@ import httpx
 from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCallPart
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 
-from clinical_trials_viz.catalog import Dimension, Phase
+from clinical_trials_viz.catalog import Dimension, OverallStatus, Phase
 from clinical_trials_viz.config import Settings
 from clinical_trials_viz.models.plan import (
     AnswerPlan,
@@ -652,7 +652,10 @@ async def test_a_failed_split_call_falls_back_to_the_code_splitter(make_client):
 
 
 async def test_parts_fail_independently(make_client, ctgov, page):
-    parts = [TREND, AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(conditions=["cancer"]))]
+    parts = [
+        TREND,
+        AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(conditions=["cancer"]), group_by=Dimension.PHASE),
+    ]
 
     def studies(request):
         if "query.cond" in request.url.params:  # the second part matches too many trials
@@ -1104,3 +1107,29 @@ def test_image_cache_drops_the_least_recently_used():
     cache.get(("a", 0, "png"))
     cache.put(("c", 0, "png"), b"12345")
     assert cache.get(("a", 0, "png")) and cache.get(("c", 0, "png")) and cache.get(("b", 0, "png")) is None
+
+
+async def test_a_plain_total_above_the_cap_is_the_registrys_own_count(make_client, ctgov):
+    """Ticket 13: "how many recruiting trials?" no longer stops at scope_required."""
+    ctgov.get("/studies").respond(json={"totalCount": 99_000, "studies": [], "nextPageToken": "t"})
+    plan = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(statuses=[OverallStatus.RECRUITING]))
+    async for client in make_client(ScriptedPlanner(plan)):
+        body = (await client.post("/v1/query", json={"query": "How many trials are recruiting?"})).json()
+        assert body["outcome"] == "success", body.get("message")
+        spec = body["visualization"]
+        assert spec["type"] == "single_value"
+        assert spec["data"][0]["trial_count"] == 99_000 and spec["data"][0]["trial_ids"] == []
+        assert spec["metadata"]["counted_by"] == "registry"
+        assert "filter.overallStatus=RECRUITING" in spec["metadata"]["source_query"]
+        assert any("own count" in a for a in body["assumptions"])
+        pages = [c for c in ctgov.calls if c.request.url.path.endswith("/studies")]
+        assert len(pages) == 1  # one page reports the total; nothing is paged
+        chart = await client.get(f"/v1/runs/{body['run_id']}/chart.png")
+        assert chart.status_code == 200
+
+
+async def test_a_grouped_or_drug_total_above_the_cap_still_needs_narrowing(make_client, ctgov):
+    ctgov.get("/studies").respond(json={"totalCount": 99_000, "studies": [], "nextPageToken": "t"})
+    drug_total = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["aspirin"]))
+    body = await ask(make_client, ScriptedPlanner(drug_total), query="How many aspirin trials?")
+    assert body["outcome"] == "scope_required"  # the drug match check needs every record

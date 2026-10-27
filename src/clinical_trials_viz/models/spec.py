@@ -76,6 +76,12 @@ class RenderMetadata(BaseModel):
     y_scale: Literal["linear", "symlog"] = Field(
         default="linear", description="symlog: symmetric log scale for skewed values that include 0."
     )
+    counted_by: Literal["trials", "registry"] = Field(
+        default="trials",
+        description="registry: a single_value above the retrieval cap, ClinicalTrials.gov's own count of "
+        "`source_query`; it cites the query, not each trial, so its trial_ids are empty.",
+    )
+    source_query: str | None = Field(default=None, description="registry: the API request whose total is shown.")
     bins: list[dict[str, Any]] | None = Field(
         default=None, description="histogram: bins in order, each {label, min, max}; max null = no upper limit."
     )

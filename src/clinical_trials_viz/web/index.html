@@ -506,10 +506,21 @@ function showCitation(v, index) {
   const d = datums(spec)[index];
   if (!d) return;
   const ids = d.trial_ids || [];
+  if (spec.metadata && spec.metadata.counted_by === "registry") {  // a total above the retrieval cap
+    v.citeEl.replaceChildren(
+      el("p", {}, el("strong", {}, describe(spec, d))),
+      el("p", { class: "muted" }, "ClinicalTrials.gov's own count for this search, which is the citation: ",
+         el("a", { href: spec.metadata.source_query, target: "_blank", rel: "noopener" }, "the API request")),
+    );
+    return;
+  }
   const shown = ids.slice(0, MAX_TRIALS_SHOWN).map((id) => {
     const e = v.answer.evidence[id] || { title: "", url: `https://clinicaltrials.gov/study/${id}`, fields: {} };
     const fields = Object.entries(e.fields).filter(([k]) => !k.endsWith("nctId")).map(([k, val]) =>
       el("li", { title: k }, `${fieldName(k)}: ${typeof val === "string" ? val : JSON.stringify(val)}`));
+    for (const x of e.excerpts || []) {  // where a keyword filter matched
+      fields.push(el("li", { title: x.field || "" }, `'${x.keyword}' in ${x.field ? fieldName(x.field) : "the record"}: ${x.text}`));
+    }
     return el("div", { class: "trial" },
       el("a", { href: e.url, target: "_blank", rel: "noopener" }, id), " ", e.title,
       fields.length ? el("ul", { class: "fields" }, fields) : null);

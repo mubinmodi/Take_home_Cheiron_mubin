@@ -14,12 +14,13 @@ from clinical_trials_viz.analyze import breakdown, comparison_groups, cross_brea
 from clinical_trials_viz.catalog import DEFAULT_TOP_N, ENROLLMENT_FIELD, NOT_REPORTED, Dimension
 from clinical_trials_viz.ctgov.trial import Trial
 from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation, PerTrialView
-from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification
-from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
+from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
+from clinical_trials_viz.models.spec import Encoding, NetworkData, RenderMetadata, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import drug_drug_network, sponsor_drug_network
 from clinical_trials_viz.spec_builder import (
     ARM_FIELD,
     COMPLETION_FIELD,
+    COUNT,
     PRIMARY_COMPLETION_FIELD,
     START_FIELD,
     breakdown_spec,
@@ -58,6 +59,36 @@ class Unverified:
 
 
 AnswerResult = Answered | NothingToDraw | Unverified
+
+
+def counts_without_records(plan: AnswerPlan, filters: AppliedFilters) -> bool:
+    """A plain total whose filters ClinicalTrials.gov applies exactly as we would, so its own count is the
+    answer: no grouping, no drug (the drug match check reads each record) and no sponsor (an ambiguous
+    sponsor is asked about from the records)."""
+    plain = plan.operation is Operation.AGGREGATE and plan.group_by is None and plan.series_by is None
+    return plain and not filters.drugs and not filters.sponsor
+
+
+def registry_total(filters: AppliedFilters, total: int, query: str) -> Answered:
+    """A plain total above the retrieval cap: the registry's own count of `query`, which it cites instead
+    of each trial (`counts_without_records` says when this is allowed)."""
+    spec = VisualizationSpec(
+        type=VisualizationType.SINGLE_VALUE,
+        title=f"Number of trials: {filters.describe()}",
+        encoding=Encoding(value=COUNT),
+        data=[{"label": "Trials", "trial_count": total, "trial_ids": []}],
+        metadata=RenderMetadata(cohort_size=total, counted_by="registry", source_query=query),
+    )
+    checks = [
+        VerificationCheck(name="answers_plan", passed=True),
+        VerificationCheck(name="count_is_registry_total", passed=True, detail=f"totalCount of {query}"),
+    ]
+    note = (
+        f"{total:,} trials is ClinicalTrials.gov's own count for this search (the request is in "
+        "metadata.source_query). Above the retrieval cap the trials are not fetched one by one, so this total "
+        "cites the search rather than each trial."
+    )
+    return Answered(spec, {}, Verification(passed=True, checks=checks), [note])
 
 
 def answer(plan: AnswerPlan, filters: AppliedFilters, cohort: list[Trial] | dict[str, list[Trial]]) -> AnswerResult:

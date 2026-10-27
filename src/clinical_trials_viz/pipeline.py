@@ -9,6 +9,7 @@ import time
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from datetime import UTC, datetime
+from urllib.parse import urlencode
 
 from opentelemetry import trace
 
@@ -17,7 +18,7 @@ from clinical_trials_viz import clarify, conflicts, suggest
 from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS
 from clinical_trials_viz.cohort import fetch_cohort
 from clinical_trials_viz.conflicts import PreviousRun
-from clinical_trials_viz.ctgov.client import CtGovClient, UpstreamError, count_requests
+from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError, count_requests
 from clinical_trials_viz.ctgov.trial import Trial
 from clinical_trials_viz.failures import Failure, classify
 from clinical_trials_viz.ledger import run_ledger
@@ -277,7 +278,15 @@ class Pipeline:
 
         with run.stage("retrieve"):
             extra = ARM_DESCRIPTION_FIELDS if plan.network is NetworkKind.DRUG_DRUG else None
-            cohort = await fetch_cohort(self.client, filters, extra)
+            try:
+                cohort = await fetch_cohort(self.client, filters, extra)
+            except ScopeTooLarge as exc:
+                if not answering.counts_without_records(plan, filters):
+                    raise
+                target.source.search_matches = target.source.cohort_size = exc.total
+                query = f"{self.client.studies_url}?{urlencode(filters.api_params())}"
+                self._finish_answer(run, target, answering.registry_total(filters, exc.total, query), index)
+                return
         target.source.search_matches = cohort.search_matches
         target.source.cohort_size = len(cohort.trials)
         target.assumptions.extend(cohort.assumptions)

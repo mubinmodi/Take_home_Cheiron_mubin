@@ -159,6 +159,7 @@ class CtGovClient:
     ):
         self._http = http
         self._base = base_url.rstrip("/")
+        self.studies_url = f"{self._base}/studies"
         self._limiter = limiter
         self.max_pages = max_pages
         self._cache = cache or MemoryPageCache()
