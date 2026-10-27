@@ -21,7 +21,7 @@ from clinical_trials_viz.catalog import (
     Dimension,
     study_url,
 )
-from clinical_trials_viz.ctgov.trial import Trial, dimension_evidence
+from clinical_trials_viz.ctgov.trial import Trial, dimension_evidence, investigators, sites
 from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation, PerTrialView
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Excerpt
 from clinical_trials_viz.models.spec import (
@@ -210,6 +210,19 @@ def comparison_spec(
 NODE_KIND = Channel(field="kind", type=FieldType.NOMINAL, title="Entity")
 
 
+# Each network kind's title, what its subtitle counts, and the node kind drawn left of the drugs (if any).
+_NETWORK_TEXT: dict[NetworkKind, tuple[str, str, str | None]] = {
+    NetworkKind.SPONSOR_DRUG: ("Lead sponsors and drugs", "trials with a drug and a lead sponsor", "sponsor"),
+    NetworkKind.DRUG_DRUG: ("Drugs given together in the same arm", "trials with a same-arm drug combination", None),
+    NetworkKind.INVESTIGATOR_DRUG: (
+        "Investigators and drugs",
+        "trials with a drug and a named investigator",
+        "investigator",
+    ),
+    NetworkKind.SITE_DRUG: ("Sites and drugs", "trials with a drug and a listed site", "site"),
+}
+
+
 def network_spec(
     network: Network, filters: AppliedFilters, cohort_size: int, kind: NetworkKind = NetworkKind.SPONSOR_DRUG
 ) -> VisualizationSpec:
@@ -222,12 +235,8 @@ def network_spec(
          "trial_ids": e.trial_ids}
         for e in network.edges
     ]  # fmt: skip
-    sponsor_drug = kind is NetworkKind.SPONSOR_DRUG
-    kinds = ["sponsor", "drug"] if sponsor_drug else ["drug"]
-    if sponsor_drug:
-        title, counted = "Lead sponsors and drugs", "trials with a drug and a lead sponsor"
-    else:
-        title, counted = "Drugs given together in the same arm", "trials with a same-arm drug combination"
+    title, counted, entity = _NETWORK_TEXT[kind]
+    kinds = [entity, "drug"] if entity else ["drug"]
     return VisualizationSpec(
         type=VisualizationType.NETWORK_GRAPH,
         title=f"{title}: {filters.describe()}",
@@ -243,7 +252,7 @@ def network_spec(
         ),
         data=NetworkData(nodes=nodes, edges=edges),
         metadata=RenderMetadata(
-            units="trials", node_kinds=kinds, bipartite=sponsor_drug, min_edge_trials=NETWORK_MIN_EDGE_TRIALS,
+            units="trials", node_kinds=kinds, bipartite=bool(entity), min_edge_trials=NETWORK_MIN_EDGE_TRIALS,
             cohort_size=cohort_size,
         ),
     )  # fmt: skip
@@ -319,6 +328,8 @@ START_FIELD = DIMENSIONS[Dimension.START_YEAR].source_field
 PRIMARY_COMPLETION_FIELD = "protocolSection.statusModule.primaryCompletionDateStruct"
 COMPLETION_FIELD = "protocolSection.statusModule.completionDateStruct"
 ARM_FIELD = "protocolSection.armsInterventionsModule.armGroups (drug pairs given in the same arm)"
+INVESTIGATOR_FIELD = "protocolSection.contactsLocationsModule.overallOfficials.name (people, names cleaned)"
+SITE_FIELD = "protocolSection.contactsLocationsModule.locations.facility"
 
 # How each cited field is read from a trial record. The evidence builder and the verifier both use
 # this table, so a Citation can be re-derived from the record it names.
@@ -329,6 +340,8 @@ _CITED_FIELDS: dict[str, Callable[[Trial], Any]] = {
     COMPLETION_FIELD: lambda t: {"date": t.completion_date, "type": t.completion_date_type},
     ENROLLMENT_FIELD: lambda t: {"count": t.enrollment, "type": t.enrollment_type},
     ARM_FIELD: lambda t: {f"{a} + {b}": arms for (a, b), arms in same_arm_pairs(t).items()},
+    INVESTIGATOR_FIELD: lambda t: list(investigators(t)),
+    SITE_FIELD: lambda t: list(sites(t)),
     **{info.source_field: partial(dimension_evidence, dimension=d) for d, info in DIMENSIONS.items()},
 }
 

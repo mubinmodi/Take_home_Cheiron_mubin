@@ -43,6 +43,8 @@ class Trial:
     std_ages: tuple[str, ...] = ()  # CHILD, ADULT, OLDER_ADULT
     brief_summary: str | None = None  # fetched only when a keyword filter applies
     keywords: tuple[str, ...] = ()  # the record's own keywords; fetched only when a keyword filter applies
+    officials: tuple[str, ...] = ()  # overall officials as written; fetched only for an investigator network
+    facilities: tuple[str, ...] = ()  # site facility names as written; fetched only for a site network
 
     @property
     def start_year(self) -> int | None:
@@ -121,6 +123,8 @@ def parse_trial(study: dict[str, Any]) -> Trial:
         std_ages=tuple(_get(p, "eligibilityModule", "stdAges") or ()),
         brief_summary=_get(p, "descriptionModule", "briefSummary"),
         keywords=tuple(_get(p, "conditionsModule", "keywords") or ()),
+        officials=_unique([o.get("name") for o in _get(p, "contactsLocationsModule", "overallOfficials") or []]),
+        facilities=_unique([loc.get("facility") for loc in _get(p, "contactsLocationsModule", "locations") or []]),
     )
 
 
@@ -198,3 +202,32 @@ def dimension_values(trial: Trial, dimension: Dimension) -> tuple[str, ...]:
 def dimension_evidence(trial: Trial, dimension: Dimension) -> Any:
     """The raw source value behind a trial's bucket, for the Citation."""
     return DIMENSIONS[dimension].evidence(trial)
+
+
+# Overall officials are free text: "David A. Reardon, MD", "Clinical Trials", "Call 1-877-CTLILLY …".
+_NOT_A_PERSON = re.compile(
+    r"\d|pharma|clinical|trial|study|studies|medical|director|monitor|sponsor|squibb|\binc\b|\bllc\b|\bltd\b|"
+    r"gmbh|\bcorp|company|group|team|cent(er|re)|hospital|universit|institut|information|contact|\bcall\b",
+    re.IGNORECASE,
+)
+_HONORIFIC = re.compile(r"^(dr|prof|professor)\.?\s+", re.IGNORECASE)
+
+
+def clean_person_name(name: str) -> str | None:
+    """A person's name without degrees, honorifics or initials ("David A. Reardon, MD" -> "David Reardon");
+    None for an organization or placeholder listed as an official."""
+    if _NOT_A_PERSON.search(name):
+        return None
+    base = _HONORIFIC.sub("", name.split(",")[0]).strip()
+    words = [w for w in base.split() if len(w.strip(".")) > 1]
+    return " ".join(words) if len(words) >= 2 else None
+
+
+def investigators(trial: Trial) -> tuple[str, ...]:
+    """The people listed as overall officials, names cleaned (see `clean_person_name`)."""
+    return _unique([n for n in (clean_person_name(o) for o in trial.officials) if n])
+
+
+def sites(trial: Trial) -> tuple[str, ...]:
+    """The trial's site facilities, with spacing normalized."""
+    return _unique([" ".join(f.split()) for f in trial.facilities])

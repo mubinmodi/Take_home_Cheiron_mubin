@@ -15,7 +15,7 @@ from opentelemetry import trace
 
 from clinical_trials_viz import answer as answering
 from clinical_trials_viz import clarify, conflicts, suggest
-from clinical_trials_viz.catalog import ARM_DESCRIPTION_FIELDS
+from clinical_trials_viz.catalog import NETWORK_FIELDS
 from clinical_trials_viz.cohort import fetch_cohort
 from clinical_trials_viz.conflicts import PreviousRun
 from clinical_trials_viz.ctgov.client import CtGovClient, ScopeTooLarge, UpstreamError, count_requests
@@ -26,7 +26,6 @@ from clinical_trials_viz.models.plan import (
     AnswerPlan,
     ClarifyPlan,
     MultiAnswerPlan,
-    NetworkKind,
     Operation,
     QueryPlan,
     UnsupportedPlan,
@@ -277,7 +276,7 @@ class Pipeline:
             return
 
         with run.stage("retrieve"):
-            extra = ARM_DESCRIPTION_FIELDS if plan.network is NetworkKind.DRUG_DRUG else None
+            extra = NETWORK_FIELDS.get(plan.network) if plan.network else None
             try:
                 cohort = await fetch_cohort(self.client, filters, extra)
             except ScopeTooLarge as exc:

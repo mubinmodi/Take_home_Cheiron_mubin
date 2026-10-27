@@ -15,8 +15,9 @@ if TYPE_CHECKING:
 # Bumped when the catalog changes: 2026-10-04.1 added the conflict policy (PINNED_FIELDS);
 # 2026-10-26.1 marked the time axis (DimensionInfo.temporal); 2026-10-26.2 sponsor ambiguity at 5%;
 # 2026-10-27.1 each Dimension carries its own readers (DimensionInfo.values, .evidence); 2026-10-27.2 age group;
-# 2026-10-27.3 operations, views, networks and clarification reasons, with the prompt's guidance for each.
-CATALOG_VERSION = "2026-10-27.3"
+# 2026-10-27.3 operations, views, networks and clarification reasons, with the prompt's guidance for each;
+# 2026-10-27.4 investigator and site networks.
+CATALOG_VERSION = "2026-10-27.4"
 
 
 class Phase(StrEnum):
@@ -78,6 +79,8 @@ class PerTrialView(StrEnum):
 class NetworkKind(StrEnum):
     SPONSOR_DRUG = "sponsor_drug"  # lead sponsors linked to the drugs their trials give
     DRUG_DRUG = "drug_drug"  # drugs given together in the same trial arm
+    INVESTIGATOR_DRUG = "investigator_drug"  # overall officials (principal investigators) linked to the drugs
+    SITE_DRUG = "site_drug"  # trial sites (facilities) linked to the drugs given there
 
 
 class ClarificationReason(StrEnum):
@@ -99,6 +102,8 @@ VIEW_GUIDE: dict[PerTrialView, str] = {
 NETWORK_GUIDE: dict[NetworkKind, str] = {
     NetworkKind.SPONSOR_DRUG: '"network of sponsors and drugs", "which companies develop which drugs"',
     NetworkKind.DRUG_DRUG: '"which drugs are combined / co-occur / given together"',
+    NetworkKind.INVESTIGATOR_DRUG: '"network of investigators and drugs", "which principal investigators run which drugs"',
+    NetworkKind.SITE_DRUG: '"network of sites and drugs", "which hospitals / centers run trials of which drugs"',
 }
 
 OPERATION_GUIDE: dict[Operation, str] = {
@@ -335,6 +340,8 @@ DEFAULT_TOP_N = 10
 
 # Networks: keep the busiest nodes and only edges backed by several trials, so the graph stays readable.
 NETWORK_TOP_SPONSORS = 15
+NETWORK_TOP_INVESTIGATORS = 15
+NETWORK_TOP_SITES = 15
 NETWORK_TOP_DRUGS = 25
 NETWORK_MIN_EDGE_TRIALS = 2
 NETWORK_MAX_EDGES = 60
@@ -357,6 +364,12 @@ ENROLLMENT_FIELD = "protocolSection.designModule.enrollmentInfo"
 # Arm descriptions are long text, fetched only for drug-drug networks to tell alternatives
 # ("cisplatin OR carboplatin") from combinations ("pembrolizumab PLUS pemetrexed").
 ARM_DESCRIPTION_FIELDS = ["ArmGroupDescription"]
+# API fields fetched only for the networks that need them.
+NETWORK_FIELDS: dict[NetworkKind, list[str]] = {
+    NetworkKind.DRUG_DRUG: ARM_DESCRIPTION_FIELDS,
+    NetworkKind.INVESTIGATOR_DRUG: ["OverallOfficialName"],
+    NetworkKind.SITE_DRUG: ["LocationFacility"],
+}
 # Fetched only when a keyword filter applies, so its citations can quote the text that matched.
 KEYWORD_TEXT_FIELDS = ["BriefSummary", "Keyword"]
 MAX_TOP_N = 50

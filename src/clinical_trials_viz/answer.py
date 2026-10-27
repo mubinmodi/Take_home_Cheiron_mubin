@@ -16,12 +16,20 @@ from clinical_trials_viz.ctgov.trial import Trial
 from clinical_trials_viz.models.plan import AnswerPlan, NetworkKind, Operation, PerTrialView
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import Encoding, NetworkData, RenderMetadata, VisualizationSpec, VisualizationType
-from clinical_trials_viz.network import drug_drug_network, sponsor_drug_network
+from clinical_trials_viz.network import (
+    INVESTIGATORS,
+    SITES,
+    drug_drug_network,
+    entity_drug_network,
+    sponsor_drug_network,
+)
 from clinical_trials_viz.spec_builder import (
     ARM_FIELD,
     COMPLETION_FIELD,
     COUNT,
+    INVESTIGATOR_FIELD,
     PRIMARY_COMPLETION_FIELD,
+    SITE_FIELD,
     START_FIELD,
     breakdown_spec,
     build_evidence,
@@ -131,7 +139,12 @@ def _build(
         return histogram_spec(histogram, filters, len(trials)), None
     if plan.operation is Operation.RELATE:
         kind = plan.network or NetworkKind.SPONSOR_DRUG
-        network = (sponsor_drug_network if kind is NetworkKind.SPONSOR_DRUG else drug_drug_network)(trials)
+        network = {
+            NetworkKind.SPONSOR_DRUG: sponsor_drug_network,
+            NetworkKind.DRUG_DRUG: drug_drug_network,
+            NetworkKind.INVESTIGATOR_DRUG: lambda ts: entity_drug_network(ts, INVESTIGATORS),
+            NetworkKind.SITE_DRUG: lambda ts: entity_drug_network(ts, SITES),
+        }[kind](trials)
         notes += network.assumptions
         return network_spec(network, filters, network.contributing_trials, kind), None
     if plan.group_by is None:
@@ -179,9 +192,9 @@ def _cited_dimensions(plan: AnswerPlan) -> list[Dimension]:
     if plan.series_by is not None:
         return [plan.series_by]
     if plan.operation is Operation.RELATE:
-        if plan.network is NetworkKind.DRUG_DRUG:
-            return [Dimension.DRUG]
-        return [Dimension.LEAD_SPONSOR, Dimension.DRUG]
+        if plan.network in (NetworkKind.SPONSOR_DRUG, None):
+            return [Dimension.LEAD_SPONSOR, Dimension.DRUG]
+        return [Dimension.DRUG]  # investigators, sites and same-arm pairs are cited as record fields
     found = []
     for side in plan.compare_sides:
         if side.drug:
@@ -202,4 +215,8 @@ def _record_fields(plan: AnswerPlan, spec: VisualizationSpec) -> tuple[str, ...]
         fields.append(ENROLLMENT_FIELD)
     if plan.network is NetworkKind.DRUG_DRUG:
         fields.append(ARM_FIELD)  # the arms that make each link a combination
+    elif plan.network is NetworkKind.INVESTIGATOR_DRUG:
+        fields.append(INVESTIGATOR_FIELD)
+    elif plan.network is NetworkKind.SITE_DRUG:
+        fields.append(SITE_FIELD)
     return tuple(fields)

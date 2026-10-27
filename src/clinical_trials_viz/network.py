@@ -2,6 +2,7 @@
 
 import re
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from itertools import combinations
 
@@ -10,14 +11,23 @@ from clinical_trials_viz.catalog import (
     NETWORK_MAX_EDGES,
     NETWORK_MIN_EDGE_TRIALS,
     NETWORK_TOP_DRUGS,
+    NETWORK_TOP_INVESTIGATORS,
+    NETWORK_TOP_SITES,
     NETWORK_TOP_SPONSORS,
 )
-from clinical_trials_viz.ctgov.trial import Trial, arm_drugs, drug_identities, drug_name_variants
+from clinical_trials_viz.ctgov.trial import (
+    Trial,
+    arm_drugs,
+    drug_identities,
+    drug_name_variants,
+    investigators,
+    sites,
+)
 
 
 @dataclass
 class Node:
-    kind: str  # "sponsor" or "drug"
+    kind: str  # "sponsor", "investigator", "site" or "drug"
     label: str
     trial_ids: list[str]
 
@@ -62,58 +72,103 @@ def _top(ids: dict[str, set[str]], n: int) -> list[str]:
     return [label for label, _ in sorted(ids.items(), key=lambda kv: (-len(kv[1]), kv[0]))[:n]]
 
 
-def sponsor_drug_network(trials: list[Trial]) -> Network:
-    """Lead sponsors linked to the drugs their trials give; edge weight = trials with both."""
-    sponsor_ids: dict[str, set[str]] = defaultdict(set)
+@dataclass(frozen=True)
+class _EntityKind:
+    """The non-drug side of a two-column network, and how its answer describes it."""
+
+    kind: str  # node kind, e.g. "sponsor"
+    read: Callable[[Trial], tuple[str, ...]]  # its entities in one trial
+    top: int  # entities kept
+    edge_kind: str
+    plural: str  # "lead sponsors"
+    short: str  # "sponsors"
+    link: str  # what one link means
+    missing: str  # what a trial left out lacks
+
+
+SPONSORS = _EntityKind(
+    "sponsor", lambda t: (t.lead_sponsor,) if t.lead_sponsor else (), NETWORK_TOP_SPONSORS, "sponsors_trials_of",
+    "lead sponsors", "sponsors",
+    "A link means the sponsor leads trials that give the drug (lead sponsors only; collaborators not included).",
+    "no lead sponsor",
+)  # fmt: skip
+INVESTIGATORS = _EntityKind(
+    "investigator", investigators, NETWORK_TOP_INVESTIGATORS, "investigates", "investigators", "investigators",
+    "A link means the person is an overall official (principal investigator or study chair) of trials that give "
+    "the drug. Names are cleaned of degrees and initials, and organizations listed as officials are left out; "
+    "the same person written two ways may still appear twice.",
+    "no named investigator",
+)  # fmt: skip
+SITES = _EntityKind(
+    "site", sites, NETWORK_TOP_SITES, "runs_trials_of", "sites", "sites",
+    "A link means the site (a facility listed among the trial's locations) takes part in trials that give the "
+    "drug. Facility names are free text, so one hospital written two ways appears twice.",
+    "no listed site",
+)  # fmt: skip
+
+
+def entity_drug_network(trials: list[Trial], entity: _EntityKind) -> Network:
+    """An entity (lead sponsor, investigator or site) linked to the drugs its trials give; edge weight =
+    trials with both."""
+    entity_ids: dict[str, set[str]] = defaultdict(set)
     drug_ids: dict[str, set[str]] = defaultdict(set)
     pair_ids: dict[tuple[str, str], set[str]] = defaultdict(set)
     contributing = 0
     for trial in trials:
         drugs = trial_drugs(trial)
-        if not trial.lead_sponsor or not drugs:
+        names = entity.read(trial)
+        if not names or not drugs:
             continue
         contributing += 1
-        sponsor_ids[trial.lead_sponsor].add(trial.nct_id)
+        for name in names:
+            entity_ids[name].add(trial.nct_id)
         for drug in drugs:
             drug_ids[drug].add(trial.nct_id)
-            pair_ids[(trial.lead_sponsor, drug)].add(trial.nct_id)
+            for name in names:
+                pair_ids[(name, drug)].add(trial.nct_id)
 
-    sponsors = set(_top(sponsor_ids, NETWORK_TOP_SPONSORS))
+    kept = set(_top(entity_ids, entity.top))
     drugs = set(_top(drug_ids, NETWORK_TOP_DRUGS))
     kept_pairs = {
         pair: ids
         for pair, ids in pair_ids.items()
-        if pair[0] in sponsors and pair[1] in drugs and len(ids) >= NETWORK_MIN_EDGE_TRIALS
+        if pair[0] in kept and pair[1] in drugs and len(ids) >= NETWORK_MIN_EDGE_TRIALS
     }
     capped: list[str] = []
     kept_pairs = _cap_edges(kept_pairs, capped)
-    linked_sponsors = {s for s, _ in kept_pairs}
+    linked_entities = {e for e, _ in kept_pairs}
     linked_drugs = {d for _, d in kept_pairs}
+    kind = entity.kind
     nodes = {
-        ("sponsor", s): Node("sponsor", s, sorted(sponsor_ids[s])) for s in _top(sponsor_ids, len(sponsor_ids))
-        if s in linked_sponsors
+        (kind, e): Node(kind, e, sorted(entity_ids[e])) for e in _top(entity_ids, len(entity_ids))
+        if e in linked_entities
     } | {("drug", d): Node("drug", d, sorted(drug_ids[d])) for d in _top(drug_ids, len(drug_ids)) if d in linked_drugs}  # fmt: skip
     edges = [
-        Edge(nodes[("sponsor", s)], nodes[("drug", d)], "sponsors_trials_of", sorted(ids))
-        for (s, d), ids in sorted(kept_pairs.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+        Edge(nodes[(kind, e)], nodes[("drug", d)], entity.edge_kind, sorted(ids))
+        for (e, d), ids in sorted(kept_pairs.items(), key=lambda kv: (-len(kv[1]), kv[0]))
     ]
 
-    unlinked = (len(sponsors) - len(linked_sponsors)) + (len(drugs) - len(linked_drugs))
+    unlinked = (len(kept) - len(linked_entities)) + (len(drugs) - len(linked_drugs))
     assumptions = [
-        f"Network shows the top {NETWORK_TOP_SPONSORS} lead sponsors and top {NETWORK_TOP_DRUGS} drugs by trial "
+        f"Network shows the top {entity.top} {entity.plural} and top {NETWORK_TOP_DRUGS} drugs by trial "
         f"count, linked when at least {NETWORK_MIN_EDGE_TRIALS} trials share them; "
-        f"{len(sponsor_ids)} sponsors and {len(drug_ids)} drugs were found in total.",
-        "A link means the sponsor leads trials that give the drug (lead sponsors only; collaborators not included).",
+        f"{len(entity_ids)} {entity.short} and {len(drug_ids)} drugs were found in total.",
+        entity.link,
         "Supplements, placebo, saline and 'standard of care' are not counted as drugs.",
     ]
     assumptions.extend(capped)
     if unlinked:
-        assumptions.append(f"{unlinked} top sponsors or drugs had no link above the threshold and are not shown.")
+        assumptions.append(f"{unlinked} top {entity.short} or drugs had no link above the threshold and are not shown.")
     if skipped := len(trials) - contributing:
         assumptions.append(
-            f"{skipped} trials have no drug intervention (or no lead sponsor) and are not in the network."
+            f"{skipped} trials have no drug intervention (or {entity.missing}) and are not in the network."
         )
     return Network(list(nodes.values()), edges, contributing, assumptions)
+
+
+def sponsor_drug_network(trials: list[Trial]) -> Network:
+    """Lead sponsors linked to the drugs their trials give; edge weight = trials with both."""
+    return entity_drug_network(trials, SPONSORS)
 
 
 _ALTERNATIVE_WINDOW = 150  # characters between the two drug names

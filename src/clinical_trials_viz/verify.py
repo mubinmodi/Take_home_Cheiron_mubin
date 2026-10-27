@@ -2,7 +2,7 @@
 
 from clinical_trials_viz.analyze import enrollment_bin, enrollment_type
 from clinical_trials_viz.catalog import DIMENSIONS, NOT_REPORTED, OTHER_BUCKET, Dimension, study_url
-from clinical_trials_viz.ctgov.trial import Trial, dimension_values
+from clinical_trials_viz.ctgov.trial import Trial, dimension_values, investigators, sites
 from clinical_trials_viz.models.response import AppliedFilters, EvidenceEntry, Verification, VerificationCheck
 from clinical_trials_viz.models.spec import NetworkData, VisualizationSpec, VisualizationType
 from clinical_trials_viz.network import same_arm_pairs, trial_drugs
@@ -202,6 +202,10 @@ def _node_values(trial: Trial, kind: str) -> tuple[str, ...]:
         return (trial.lead_sponsor,) if trial.lead_sponsor else ()
     if kind == "drug":
         return trial_drugs(trial)
+    if kind == "investigator":
+        return investigators(trial)
+    if kind == "site":
+        return sites(trial)
     return ()
 
 

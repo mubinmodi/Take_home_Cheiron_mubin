@@ -160,6 +160,9 @@ const FIELD_NAMES = [
   ["startDateStruct", "start date"], ["primaryCompletionDateStruct", "primary completion"],
   ["completionDateStruct", "completion"], ["enrollmentInfo", "enrollment"],
   ["interventions.type", "intervention types"], ["armGroups", "arms giving each drug pair"],
+  ["overallOfficials.name", "investigators"], ["locations.facility", "sites"], ["eligibilityModule.stdAges", "age groups"],
+  ["briefTitle", "title"], ["conditionsModule.keywords", "keywords"], ["conditionsModule.conditions", "conditions"],
+  ["interventions.name", "interventions"], ["briefSummary", "summary"],
 ];
 function fieldName(path) {
   const hit = FIELD_NAMES.find(([suffix]) => path.includes(suffix));
