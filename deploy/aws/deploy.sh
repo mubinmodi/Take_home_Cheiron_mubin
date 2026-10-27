@@ -9,6 +9,7 @@
 #   TAG=v7 deploy/aws/deploy.sh                        # image tag (default: the current git commit)
 #   SET_ENV="OPEN_ACCESS=true" deploy/aws/deploy.sh    # also add or change settings on the service
 #   UPDATE_MODEL_KEYS=1 deploy/aws/deploy.sh           # replace the stored model keys with those in .env
+#   TRACES=xray deploy/aws/deploy.sh                   # also send traces to AWS X-Ray (deploy/aws/enable-traces.sh)
 #
 # Needs: the AWS CLI signed in (aws login --profile incubator), Docker running, and OPENAI_API_KEY and
 # ANTHROPIC_API_KEY in .env. A first deployment takes about 15 minutes, mostly waiting for the database.
@@ -17,17 +18,7 @@ cd "$(dirname "$0")/../.."
 export AWS_PROFILE=${AWS_PROFILE:-incubator} AWS_REGION=${AWS_REGION:-us-east-2}
 DRY_RUN=${DRY_RUN:-}
 
-source deploy/aws/lib.sh  # step, ok, fail, found; checks the AWS sign-in; NAME, ACCOUNT, REGISTRY, ...
-change() {  # change DESCRIPTION COMMAND...: run a command that changes AWS, or only name it in a dry run
-  local what=$1
-  shift
-  if [ -n "$DRY_RUN" ]; then
-    printf '    would: %s\n' "$what"
-  else
-    printf '    doing: %s\n' "$what"
-    "$@" >/dev/null
-  fi
-}
+source deploy/aws/lib.sh  # step, ok, fail, found, change; checks the AWS sign-in; NAME, ACCOUNT, ...
 env_value() { grep -E "^$1=" .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"'"'"; }
 
 # --- 0. Before changing anything ----------------------------------------------------------------------
@@ -93,6 +84,7 @@ else
     --role-name ecsInfrastructureRoleForExpressServices \
     --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSInfrastructureRoleforExpressGatewayServices
 fi
+[ -z "$TRACES" ] || ensure_trace_role  # TRACES=xray: the task role that may write to X-Ray
 # Created before the first service: the first deployment failed when they were made in the same second.
 for pair in AWSServiceRoleForECS:ecs.amazonaws.com \
   AWSServiceRoleForElasticLoadBalancing:elasticloadbalancing.amazonaws.com \
@@ -235,6 +227,8 @@ if [ -n "$DRY_RUN" ]; then
   else
     printf '    would: create the service %s (status now: %s)\n' "$NAME" "$STATUS"
   fi
+  [ -z "$TRACES" ] || printf '    would: run as %s, add the trace collector next to the app (deploy/aws/enable-traces.sh)\n' \
+    "$TASK_ROLE"
   step "Dry run finished: nothing was changed. Run without DRY_RUN=1 to do the steps marked 'would'."
   exit 0
 fi

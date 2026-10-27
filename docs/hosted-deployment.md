@@ -58,7 +58,7 @@ One codebase; `DEPLOYMENT=hosted` switches on the hosted dependencies and refuse
 | Postgres: run history | RDS for PostgreSQL (db.t4g.micro, not public; deployed on 18, though the create call pins no version). `runs` table (run ID, time, user, outcome, model calls, planner model, latency, question, full record as JSONB) via SQLAlchemy async + asyncpg; created on startup | `runs.py` |
 | Run bundles / R2 | Still deferred | — |
 | Secrets | Secrets Manager; ECS reads them into environment variables when a task starts (the task execution role may read only `clinical-trials-viz/*`) | `deploy/aws/lib.sh` |
-| Tracing | OpenTelemetry spans, exported when `OTEL_EXPORTER` is `otlp` (endpoint from the standard `OTEL_EXPORTER_OTLP_ENDPOINT`) or `console`. It defaults to `none`, and the AWS task does not set it, so **the deployed service emits no spans**: setting the endpoint alone changes nothing. Connecting X-Ray needs a collector next to the app, because its OTLP endpoint wants SigV4 signing | `telemetry.py` |
+| Tracing | OpenTelemetry spans, exported when `OTEL_EXPORTER` is `otlp` (endpoint from the standard `OTEL_EXPORTER_OTLP_ENDPOINT`) or `console`. It defaults to `none`, and the AWS task does not set it, so **the deployed service emits no spans**: setting the endpoint alone changes nothing. Connecting X-Ray needs a collector next to the app, because its OTLP endpoint wants SigV4 signing. *Added 2026-10-27:* `TRACES=xray` adds that collector and sets both settings (see "Traces in X-Ray"); built, not yet run on AWS | `telemetry.py`, `deploy/aws/enable-traces.sh` |
 | 1. Cache key with data timestamp | Kept (`page_key`) | `ctgov/client.py` |
 | 2. Per-run page cap | Kept (`MAX_PAGES=20`) | `config.py` |
 | 3. Circuit breakers | One for ClinicalTrials.gov, one per planner model; an open model is skipped so the fallback answers at once | `breaker.py` |
@@ -102,6 +102,30 @@ It needs the AWS CLI signed in (`aws login --profile incubator`), Docker running
 
 For an image-only rollout, `TAG=vN deploy/aws/update-service.sh` still works: build, push, and a rolling update that changes nothing but the image, rolled back automatically if the new tasks fail their health checks. The `v1`–`v6` series came from those manual rollouts (v2 startup fix, v3 threaded web page, v4 tolerant key check, v5 light and dark themes, v6 the first review's fixes and open access); `deploy.sh` now tags with the current git commit instead, so the running tag is a commit SHA.
 
+### Traces in X-Ray (opt-in; built 2026-10-27, not yet run on AWS)
+
+Off by default: a deploy without `TRACES` changes nothing. With `TRACES=xray`, the app sends its OpenTelemetry spans (one trace per run: stages, ClinicalTrials.gov requests, model calls) over OTLP to an **ADOT collector in the same task** (`public.ecr.aws/aws-observability/aws-otel-collector:v0.50.0`, config in `deploy/aws/otel-collector.yaml`), which batches them and sends them to **AWS X-Ray** with the `awsxray` exporter, signed with the task role's credentials. No app code changed: the app already exports OTLP when `OTEL_EXPORTER=otlp` and `OTEL_EXPORTER_OTLP_ENDPOINT` are set, and still has no vendor SDK.
+
+**Why a sidecar works on Express Mode.** Express Mode has no sidecar setting, but AWS documents adding one: either create the service from your own task definition (`taskDefinitionArn`, which cannot be combined with `primaryContainer`, so it would replace how `create-service.sh` works), or edit the task definition Express Mode manages, which it then keeps ("Express Mode will not overwrite changes unless requested as part of an Express Mode update"; [Updating Resources Outside of Express Mode](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-service-advanced-customization.html)). The scripts take the second path, so the default deploy stays exactly as it is.
+
+```bash
+DRY_RUN=1 deploy/aws/enable-traces.sh      # read-only: say what would change on the running service
+deploy/aws/enable-traces.sh                # turn traces on for the running service (one rolling update)
+TRACES=xray deploy/aws/deploy.sh           # or: ship the current code with traces on
+```
+
+What `TRACES=xray` does (`deploy/aws/lib.sh`, `enable-traces.sh`):
+
+1. Creates the task role `clinical-trials-viz-task` (the app had none) with one inline policy allowing only `xray:PutTraceSegments` and `xray:PutTelemetryRecords` — the calls the exporter makes; narrower than the managed `AWSXrayWriteOnlyAccess`.
+2. Passes that role and `OTEL_EXPORTER=otlp`, `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318` through Express Mode itself (`--task-role-arn`, the container settings), so later Express Mode updates keep them.
+3. Copies the running task definition, adds the collector container (not essential: if it stops, the app keeps serving; 64 MiB reserved inside the existing 1 GB; logs in the app's log group under the `otel-collector` prefix), registers the new revision and rolls it out with `aws ecs update-service`, then waits for the health checks. When the running revision already has all of this, it changes nothing.
+
+`update-service.sh` and `deploy.sh` run step 3 again after each rollout when `TRACES=xray` is set; it is a no-op while Express Mode keeps the collector, and re-adds it (one more rolling update) if a rollout dropped it. Ship later code with `TRACES=xray` too. To stop sending spans without removing anything, deploy with `SET_ENV="OTEL_EXPORTER=none"`; `teardown.sh` deletes the task role along with the rest.
+
+**Cost.** The collector runs inside the existing task, so Fargate costs nothing more. X-Ray charges per trace recorded and per trace retrieved or scanned, after a monthly free tier (long-standing figures: the first 100,000 traces recorded free, then about $5 per million). AWS has been folding tracing into CloudWatch pricing, so check [the pricing page](https://aws.amazon.com/xray/pricing/) before turning it on; these numbers were not re-checked for this account. One question is one trace, so the review demo's volume is tiny either way. Spans include the question text and the model's replies (pydantic-ai records them); nothing secret is in them.
+
+**Checking it.** After a question or two, open the CloudWatch console in **us-east-2** → *X-Ray traces* → *Traces* (or *Trace Map*), and look for the service `clinical-trials-viz`; each trace is one `POST /v1/query` with the stages, ClinicalTrials.gov requests and model calls underneath. If nothing arrives, the collector's own log is in the service's log group under the `otel-collector/` stream prefix (an `AccessDenied` there means the task role is missing its policy).
+
 ### First deployment: what went wrong and the fixes
 
 1. **Express Mode's first attempt was rolled back** ("the infrastructure role doesn't have enough permission"). CloudTrail showed `CreateLoadBalancer` refused in the same second the load-balancing service-linked role was created. Auto scaling failed the same way. The account had never used either service. A retry succeeded once the roles existed; setup step 2 now creates them first.
@@ -126,7 +150,7 @@ deploy/aws/teardown.sh               # asks you to type the service name, then d
 3. The database, with no final snapshot and without keeping its automated backups. **The run history goes with it.**
 4. The security group, now that nothing uses it.
 5. The ECR repository and its images, the six secrets, the log groups, and every task definition Express Mode registered (one revision per rollout).
-6. The two IAM roles.
+6. The two IAM roles, and the task role if traces were turned on.
 7. The empty `default` ECS cluster.
 
 Service-linked roles are kept: the account shares them, they cost nothing, and AWS manages them. Nothing here can be undone — `deploy/aws/deploy.sh` can build it all again, but under a new address.
