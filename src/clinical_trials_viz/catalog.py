@@ -86,6 +86,7 @@ class DimensionInfo:
     values: "Callable[[Trial], tuple[str, ...]]"  # the bucket labels a Trial falls into (empty when not reported)
     evidence: "Callable[[Trial], Any]"  # the raw source value cited for those buckets
     temporal: bool = False  # a time axis: years in order, no silent gaps, drawn as a time series
+    order: tuple[str, ...] = ()  # display order of the bucket labels when `ordered` and not temporal
 
 
 DIMENSIONS: dict[Dimension, DimensionInfo] = {
@@ -107,6 +108,7 @@ DIMENSIONS: dict[Dimension, DimensionInfo] = {
         True,
         True,
         False,
+        order=tuple(PHASE_LABELS.values()),
         values=lambda t: tuple(PHASE_LABELS.get(p, p) for p in t.phases),
         evidence=lambda t: list(t.phases),
     ),

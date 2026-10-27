@@ -9,12 +9,9 @@ from clinical_trials_viz.catalog import (
     ENROLLMENT_BINS,
     NOT_REPORTED,
     OTHER_BUCKET,
-    PHASE_LABELS,
     Dimension,
 )
 from clinical_trials_viz.ctgov.trial import Trial, dimension_values
-
-_PHASE_ORDER = list(PHASE_LABELS.values())
 
 
 @dataclass
@@ -43,9 +40,8 @@ def _sort_key(dimension: Dimension, bucket: Bucket) -> tuple:
     not_reported = bucket.label in (NOT_REPORTED, OTHER_BUCKET)
     if DIMENSIONS[dimension].temporal:
         return (not_reported, int(bucket.label) if not not_reported else 0)
-    if dimension is Dimension.PHASE:
-        order = _PHASE_ORDER.index(bucket.label) if bucket.label in _PHASE_ORDER else len(_PHASE_ORDER)
-        return (not_reported, order)
+    if order := DIMENSIONS[dimension].order:
+        return (not_reported, order.index(bucket.label) if bucket.label in order else len(order))
     return (not_reported, -bucket.count, bucket.label)
 
 
