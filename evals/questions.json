@@ -1,6 +1,6 @@
 {
   "description": "Planner eval set modelled on the assignment's appendix of example questions, plus adversarial cases (family 'adversarial': misspellings, brand vs generic names, negations, unsupported questions that sound supported, conflicting structured fields, multi-part questions with an unsupported part, vague references). Each case lists the question, optional structured fields, and the expected plan. Only the keys listed under `expect` are checked; drug, condition, sponsor and country names compare case-insensitively. A filter may instead expect {\"one_of\": [...]} (any listed value is right) or {\"excludes\": [...]} (a non-empty list holding none of these values). A part of a multi-part expectation is an answer unless it sets `kind`. Held-out cases are in heldout.json and are scored only at the end.",
-  "version": "2026-10-27.1",
+  "version": "2026-10-27.2",
   "cases": [
     {
       "id": "trend-01",
@@ -1222,6 +1222,54 @@
         "kind": "clarify",
         "reason": "missing_reference",
         "field": "condition"
+      }
+    },
+    {
+      "id": "net-04",
+      "family": "network",
+      "appendix": "Beyond the appendix: investigator networks (ticket 15).",
+      "question": "Which principal investigators run trials of which drugs in multiple myeloma?",
+      "expect": {
+        "kind": "answer",
+        "operation": "relate",
+        "filters": {
+          "conditions": [
+            "multiple myeloma"
+          ]
+        },
+        "network": "investigator_drug"
+      }
+    },
+    {
+      "id": "net-05",
+      "family": "network",
+      "appendix": "Beyond the appendix: site networks (ticket 15).",
+      "question": "Show a network of hospitals and the drugs they test in pancreatic cancer trials",
+      "expect": {
+        "kind": "answer",
+        "operation": "relate",
+        "filters": {
+          "conditions": [
+            "pancreatic cancer"
+          ]
+        },
+        "network": "site_drug"
+      }
+    },
+    {
+      "id": "age-01",
+      "family": "distribution",
+      "appendix": "Beyond the appendix: the age-group dimension (ticket 16).",
+      "question": "How are asthma trials split by age group?",
+      "expect": {
+        "kind": "answer",
+        "operation": "aggregate",
+        "group_by": "age_group",
+        "filters": {
+          "conditions": [
+            "asthma"
+          ]
+        }
       }
     }
   ]

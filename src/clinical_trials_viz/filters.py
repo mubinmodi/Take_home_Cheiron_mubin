@@ -56,13 +56,17 @@ def _quote(value: str) -> str:
     return '"' + value.replace('"', "") + '"'
 
 
-def _side_named_by(plan: AnswerPlan, names: list[str]) -> str | None:
-    """The comparison side whose sponsor term every one of these exact names contains ("Merck" for
-    "Merck Sharp & Dohme LLC"), if any."""
-    for side in plan.compare_sides:
-        if side.sponsor and all(side.sponsor.strip().lower() in n.lower() for n in names):
-            return side.sponsor
-    return None
+def _names_by_side(plan: AnswerPlan, names: list[str]) -> dict[str, list[str]]:
+    """Exact lead sponsor names grouped under the comparison side whose sponsor term each contains
+    ("Merck" for "Merck Sharp & Dohme LLC"). Empty unless every name belongs to a side."""
+    terms = [side.sponsor for side in plan.compare_sides if side.sponsor]
+    by_side: dict[str, list[str]] = {}
+    for name in names:
+        term = next((t for t in terms if t.strip().lower() in name.lower()), None)
+        if term is None:
+            return {}
+        by_side.setdefault(term, []).append(name)
+    return by_side
 
 
 class AppliedFilters(BaseModel):
@@ -106,10 +110,10 @@ class AppliedFilters(BaseModel):
                 applied.from_request.append(filter_field)
         if request.sponsor:
             asked = (plan.filters.sponsor or "").strip().lower()
-            side = _side_named_by(plan, request.sponsor)
-            if side and not asked:
-                # The answer to "which Merck?" for one side of a comparison: it applies to that side only.
-                applied.side_sponsors[side] = list(request.sponsor)
+            by_side = _names_by_side(plan, request.sponsor)
+            if by_side and not asked:
+                # The answer to "which Merck?" for sides of a comparison: each name narrows its own side only.
+                applied.side_sponsors = by_side
                 applied.from_request.append("sponsor")
             elif asked and [s.strip().lower() for s in request.sponsor] == [asked]:
                 # The field repeats the question's own sponsor term (e.g. the "your question" answer to a

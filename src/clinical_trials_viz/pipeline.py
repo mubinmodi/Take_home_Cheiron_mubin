@@ -34,6 +34,7 @@ from clinical_trials_viz.models.request import QueryRequest
 from clinical_trials_viz.models.response import (
     Answer,
     AppliedFilters,
+    Clarification,
     ErrorCode,
     ErrorInfo,
     Outcome,
@@ -346,22 +347,26 @@ class Pipeline:
 
     async def _compare(self, run: _Run, target: Answer, plan: AnswerPlan, base: AppliedFilters, index: int) -> None:
         sides: dict[str, list[Trial]] = {}
+        ambiguous: list[tuple[str, Clarification]] = []
         assert target.source
         with run.stage("retrieve"):
             for side in plan.compare_sides:
                 label = side.drug or side.condition or side.sponsor
                 f = base.for_side(drug=side.drug, condition=side.condition, sponsor=side.sponsor)
                 cohort = await fetch_cohort(self.client, f)
-                ambiguous = side.sponsor and f.sponsor_is_ambiguous_term()
-                if ambiguous and (question := clarify.sponsor_ambiguity(cohort.trials, side.sponsor or "")):
-                    target.clarification = question
-                    _finish(target, Outcome.CLARIFICATION_REQUIRED, question.question)
-                    return
+                unclear = side.sponsor and f.sponsor_is_ambiguous_term()
+                if unclear and (question := clarify.sponsor_ambiguity(cohort.trials, side.sponsor or "")):
+                    ambiguous.append((side.sponsor or "", question))
                 if names := base.side_sponsors.get(side.sponsor or ""):
                     target.assumptions.append(f"'{side.sponsor}' means {', '.join(names)} (your choice).")
                 sides[label or "?"] = cohort.trials
                 target.assumptions.extend(cohort.assumptions)
                 target.source.search_matches += cohort.search_matches
+        if ambiguous:  # every unclear side is asked about at once, so one answer settles them all
+            question = clarify.sponsor_sides_ambiguity(ambiguous)
+            target.clarification = question
+            _finish(target, Outcome.CLARIFICATION_REQUIRED, question.question)
+            return
         trials = {t.nct_id: t for ts in sides.values() for t in ts}
         target.source.cohort_size = len(trials)
         if not trials:

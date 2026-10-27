@@ -83,3 +83,18 @@ def sponsor_ambiguity(trials: list[Trial], term: str) -> Clarification | None:
         options=options,
         multi_select=False,
     )
+
+
+def sponsor_sides_ambiguity(questions: list[tuple[str, Clarification]]) -> Clarification:
+    """One question for every comparison side whose sponsor term matches several lead sponsors ("Merck
+    vs Pfizer"), so all the answers arrive together: each chosen name narrows the side it belongs to."""
+    if len(questions) == 1:
+        return questions[0][1]
+    options = [o for _, q in questions for o in q.options if not isinstance(o.value, list)]  # no "All of these"
+    terms = " and ".join(f"'{term}'" for term, _ in questions)
+    return Clarification(
+        field="sponsor",
+        question=f"{terms} each match more than one lead sponsor. Choose the ones you mean (at least one for each).",
+        options=options,
+        multi_select=True,
+    )

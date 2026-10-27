@@ -1133,3 +1133,49 @@ async def test_a_grouped_or_drug_total_above_the_cap_still_needs_narrowing(make_
     drug_total = AnswerPlan(operation=Operation.AGGREGATE, filters=Filters(drugs=["aspirin"]))
     body = await ask(make_client, ScriptedPlanner(drug_total), query="How many aspirin trials?")
     assert body["outcome"] == "scope_required"  # the drug match check needs every record
+
+
+async def test_two_unclear_sponsor_sides_are_asked_about_together(make_client, ctgov, page):
+    """Ticket 22, found on live data: "Merck vs Pfizer" when both names match several lead sponsors. One
+    question covers both, so answering one side never undoes the other."""
+    import copy
+
+    studies = copy.deepcopy(page["studies"])
+    names = ["Merck Sharp & Dohme LLC", "Merck KGaA, Darmstadt, Germany", "Pfizer", "Pfizer's Upjohn"]
+    for i, study in enumerate(studies):
+        study["protocolSection"].setdefault("sponsorCollaboratorsModule", {})["leadSponsor"] = {
+            "name": names[i % 4],
+            "class": "INDUSTRY",
+        }
+
+    def by_sponsor(request: httpx.Request) -> httpx.Response:
+        advanced = request.url.params.get("filter.advanced", "")
+        if '"' in advanced:  # exact names
+            keep = [n for n in names if f'"{n}"' in advanced]
+        else:
+            keep = [n for n in names if n.split()[0].rstrip("'s") in advanced]
+        chosen = [
+            s for s in studies if s["protocolSection"]["sponsorCollaboratorsModule"]["leadSponsor"]["name"] in keep
+        ]
+        return httpx.Response(200, json={"studies": chosen, "totalCount": len(chosen)})
+
+    ctgov.get("/studies").mock(side_effect=by_sponsor)
+    plan = AnswerPlan(
+        operation=Operation.COMPARE,
+        group_by=Dimension.PHASE,
+        compare_sides=[ComparisonSide(sponsor="Merck"), ComparisonSide(sponsor="Pfizer")],
+    )
+    async for client in make_client(ScriptedPlanner(plan, plan)):
+        first = (await client.post("/v1/query", json={"query": "Phases of Merck vs Pfizer trials"})).json()
+        assert first["outcome"] == "clarification_required"
+        question = first["clarification"]
+        assert question["multi_select"] and {o["value"] for o in question["options"]} == set(names)
+        chosen = [names[0], names[2]]
+        body = (
+            await client.post(
+                "/v1/query", json={"query": "these", "previous_run_id": first["run_id"], "sponsor": chosen}
+            )
+        ).json()
+        assert body["outcome"] == "success", body.get("message")
+        assert any("'Merck' means Merck Sharp & Dohme LLC" in a for a in body["assumptions"])
+        assert any("'Pfizer' means Pfizer" in a for a in body["assumptions"])
