@@ -101,6 +101,50 @@ Before anything is returned, a verifier recounts every datum from its cited tria
 
 A run uses two model calls in the usual case and five at most. Every run ends in one outcome: `success`, `no_data`, `clarification_required`, `unsupported_query`, `scope_required`, `upstream_error` or `internal_error`.
 
+### System design
+
+The service is one Python process (FastAPI) with three outside dependencies: the model providers, ClinicalTrials.gov, and in hosted mode Redis and Postgres. Everything that decides a number sits inside the process, in code that can be tested offline.
+
+```mermaid
+flowchart LR
+    U["Web page / API client"] -->|POST /v1/query<br/>POST /v1/runs| API["FastAPI app<br/>auth, hourly limit,<br/>Idempotency-Key"]
+    API --> P["Pipeline<br/>one Outcome per run"]
+    P --> PL["Planning<br/>split + plan, gate, one repair"]
+    PL -->|"≤ 5 calls per run"| LLM["OpenAI (primary)<br/>Anthropic (fallback)"]
+    P --> CO["Cohort<br/>every page, drug match check"]
+    CO --> CT["ClinicalTrials.gov client<br/>rate limit, page cache,<br/>retries, circuit breaker"]
+    CT --> REG[("ClinicalTrials.gov<br/>API v2")]
+    P --> AN["Answer<br/>count, spec, evidence, verify"]
+    AN --> CAT["Capability catalog<br/>dimensions, operations, rules"]
+    PL --> CAT
+    P --> RS[("Run records<br/>files / Postgres")]
+    P --> BU[("Run bundles<br/>raw responses")]
+    API --> R["Renderer<br/>spec → Vega-Lite → PNG/SVG"]
+```
+
+What the design is built to guarantee, and where:
+
+- **Numbers come only from the registry.** The model sees the question, never trial records, and its output is a typed plan that code checks against the catalog. Counting, chart choice and citations are plain code (`answer.py`, `analyze.py`, `spec_builder.py`).
+- **Every answer is checked before it leaves.** The verifier re-derives each count and cited value from the trial records; a failed check withholds the answer (`verify.py`).
+- **Cost and time are bounded.** At most five model calls per run, counted in one ledger (`ledger.py`); 20 s per model attempt and 60 s for planning; a 30 s request deadline when hosted, with `POST /v1/runs` for questions that need longer.
+- **Failures are contained.** Every exception becomes one outcome with a structured error (`failures.py`); the fallback model covers a provider outage; circuit breakers stop calling a dependency that keeps failing; one part of a multi-part question failing leaves the others answered.
+- **One source of rules.** The capability catalog (`catalog.py`) feeds the planner prompt, the plan gate, counting, the verifier and the tests, so adding a dimension is one entry ([worked example](docs/project-guide.md#6-where-to-make-common-changes)).
+- **Runs can be checked later.** Each run keeps its plan and response, and locally its raw API responses, so `replay` can answer it again offline.
+
+Hosted, the same container runs on AWS in us-east-2:
+
+```mermaid
+flowchart LR
+    C["Browser / client"] -->|HTTPS| LB["Load balancer<br/>(ECS Express Mode)"]
+    LB --> T["Fargate tasks, 1–2<br/>the same container"]
+    T --> V[("ElastiCache Serverless (Valkey)<br/>shared rate budget, page cache,<br/>Idempotency-Keys, user counts, job states")]
+    T --> DB[("RDS PostgreSQL<br/>run history")]
+    SM["Secrets Manager<br/>model keys, API keys,<br/>connection strings"] -.->|at task start| T
+    T --> EXT["ClinicalTrials.gov,<br/>OpenAI, Anthropic"]
+```
+
+Redis is shared so that every instance stays inside ClinicalTrials.gov's per-IP request limit together, and any instance can replay an Idempotency-Key or report a background run. If Redis fails, each instance falls back to its own counts and the service keeps answering.
+
 [`docs/project-guide.md`](docs/project-guide.md) follows one question through the modules and says where to make common changes. The design rules and the reasons for them are in [`docs/harness-design.md`](docs/harness-design.md).
 
 ## 3. Request
